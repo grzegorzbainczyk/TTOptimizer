@@ -3,7 +3,6 @@
 #include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 
 using TeacherId = int;
 using ClassGroupId = int;
@@ -11,6 +10,7 @@ using SubjectId = int;
 using RoomId = int;
 using LessonRequirementId = int;
 
+// Strongly typed representation of a weekday used in the timetable.
 // We use enum class instead of a plain enum to avoid accidental conversion to int.
 enum class DayOfWeek
 {
@@ -21,6 +21,8 @@ enum class DayOfWeek
     Friday = 4
 };
 
+// Represents a single time position in the school week.
+// Example: Monday, slot 1 means the first lesson on Monday.
 struct TimeSlot
 {
     DayOfWeek day{};
@@ -32,12 +34,16 @@ struct TimeSlot
     }
 };
 
+// Represents a school subject, for example Math, English, Physics, or PE.
+// Subjects are referenced by teachers, rooms, and lesson requirements.
 struct Subject
 {
     SubjectId id{};
     std::string name;
 };
 
+// Represents a teacher who can teach selected subjects and may be unavailable
+// during specific time slots.
 struct Teacher
 {
     TeacherId id{};
@@ -47,6 +53,8 @@ struct Teacher
     std::vector<TimeSlot> unavailableSlots;
 };
 
+// Represents a class group, for example 1A, 2B, or 8C.
+// A class group has its own lesson limits and receives scheduled lessons.
 struct ClassGroup
 {
     ClassGroupId id{};
@@ -55,6 +63,8 @@ struct ClassGroup
     int maxLessonsPerDay{};
 };
 
+// Represents a physical room where lessons can take place.
+// A room may have capacity limits and may allow only selected subjects.
 struct Room
 {
     RoomId id{};
@@ -64,7 +74,11 @@ struct Room
     std::vector<SubjectId> allowedSubjects;
 };
 
+// Represents a weekly teaching requirement.
 // This says WHAT must be planned, but not yet WHEN.
+//
+// Example:
+// Class 1A must have Math with teacher Jan Kowalski 5 times per week.
 struct LessonRequirement
 {
     LessonRequirementId id{};
@@ -76,7 +90,11 @@ struct LessonRequirement
     int weeklyCount{};
 };
 
-// This is one concrete planned lesson in the chromosome.
+// Represents one concrete scheduled lesson inside a chromosome.
+// It assigns one lesson requirement to a specific time slot and optionally to a room.
+//
+// Example:
+// Math for class 1A is scheduled on Monday, slot 2, in room 101.
 struct ScheduledLesson
 {
     LessonRequirementId requirementId{};
@@ -84,12 +102,19 @@ struct ScheduledLesson
     std::optional<RoomId> roomId;
 };
 
+// Represents one complete candidate timetable solution.
+// In the genetic algorithm, this is one individual/chromosome in the population.
+//
+// The lessons vector contains all scheduled lessons.
+// The fitness value describes how good this timetable is.
 struct Chromosome
 {
     std::vector<ScheduledLesson> lessons;
     double fitness = 0.0;
 };
 
+// Represents the full input problem definition for the timetable optimizer.
+// It contains all entities and configuration needed to generate and evaluate schedules.
 struct TimetableProblem
 {
     std::vector<Teacher> teachers;
