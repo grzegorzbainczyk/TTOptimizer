@@ -13,10 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{242adbf3-bb05-4286-95c4-f40a6b0c92de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\nlohmann">
+      <UniqueIdentifier>{91ac2eee-d615-4ec2-9bc7-512fdf7b6fd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TTOptimizer.Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="External\nlohmann\json.hpp">
+      <Filter>External\nlohmann</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

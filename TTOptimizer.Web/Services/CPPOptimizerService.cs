@@ -1,41 +1,77 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
 using TTOptimizer.Web.Models;
 
 namespace TTOptimizer.Web.Services;
 
 public class CppOptimizerService
 {
-    public async Task<OptimizationResponse> RunOptimizerAsync(string input)
+    public async Task<OptimizationResponse> RunOptimizerAsync(OptimizationRequest request)
     {
         var exePath = @"C:\TTOptimizer\x64\Debug\TTOptimizer.Engine.exe";
 
-        var startInfo = new ProcessStartInfo
+        if (!File.Exists(exePath))
         {
-            FileName = exePath,
-            Arguments = $"\"{input}\"",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
+            return new OptimizationResponse
+            {
+                Success = false,
+                ErrorJson = $"C++ executable not found: {exePath}"
+            };
+        }
 
-        using var process = new Process
+        var inputFilePath = Path.Combine(
+            Path.GetTempPath(),
+            $"ttoptimizer-input-{Guid.NewGuid():N}.json"
+        );
+
+        try
         {
-            StartInfo = startInfo
-        };
+            var jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
 
-        process.Start();
+            var inputJson = JsonSerializer.Serialize(request, jsonOptions);
 
-        string output = await process.StandardOutput.ReadToEndAsync();
-        string error = await process.StandardError.ReadToEndAsync();
+            await File.WriteAllTextAsync(inputFilePath, inputJson);
 
-        await process.WaitForExitAsync();
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = exePath,
+                Arguments = $"\"{inputFilePath}\"",
+                WorkingDirectory = Path.GetDirectoryName(exePath)!,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
-        return new OptimizationResponse
+            using var process = new Process
+            {
+                StartInfo = startInfo
+            };
+
+            process.Start();
+
+            string outputJson = await process.StandardOutput.ReadToEndAsync();
+            string errorJson = await process.StandardError.ReadToEndAsync();
+
+            await process.WaitForExitAsync();
+
+            return new OptimizationResponse
+            {
+                Success = process.ExitCode == 0,
+                OutputJson = outputJson,
+                ErrorJson = errorJson
+            };
+        }
+        finally
         {
-            Success = process.ExitCode == 0,
-            Output = output,
-            Error = error
-        };
+            if (File.Exists(inputFilePath))
+            {
+                File.Delete(inputFilePath);
+            }
+        }
     }
 }

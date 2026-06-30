@@ -125,6 +125,9 @@
   <ItemGroup>
     <ClCompile Include="TTOptimizer.Engine.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="External\nlohmann\json.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

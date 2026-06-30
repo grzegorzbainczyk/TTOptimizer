@@ -2,5 +2,6 @@
 
 public class OptimizationRequest
 {
-    public string Input { get; set; } = string.Empty;
+    public List<OptimizationTask> Tasks { get; set; } = new();
+    public int Resources { get; set; }
 }

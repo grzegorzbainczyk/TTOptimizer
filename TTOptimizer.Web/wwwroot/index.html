@@ -3,21 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <title>TT Optimizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main class="container">
-        <h1>TT Optimizer</h1>
+    <div class="app-shell">
+        <header class="app-header">
+            <div>
+                <h1>TT Optimizer</h1>
+                <p>ASP.NET Core → C++ Engine → JSON result</p>
+            </div>
 
-        <p>Simple ASP.NET → C++ integration test</p>
+            <div id="statusBadge" class="status-badge idle">
+                Ready
+            </div>
+        </header>
 
-        <textarea id="inputText" placeholder="Enter input for C++ optimizer..."></textarea>
+        <main class="workspace">
+            <section class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Input JSON</h2>
+                        <p>Data sent from the web page to ASP.NET and then to C++.</p>
+                    </div>
+                </div>
 
-        <button id="runButton">Run Optimizer</button>
+                <textarea id="inputJson" spellcheck="false"></textarea>
 
-        <h2>Result</h2>
-        <pre id="resultBox"></pre>
-    </main>
+                <div class="button-row">
+                    <button id="runButton" class="primary-button">Run Optimizer</button>
+                    <button id="sampleButton" class="secondary-button">Load Sample</button>
+                    <button id="clearButton" class="secondary-button">Clear Result</button>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Result</h2>
+                        <p>JSON returned by the C++ optimization engine.</p>
+                    </div>
+                </div>
+
+                <pre id="resultBox" class="result-box">No result yet.</pre>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <span>TT Optimizer</span>
+            <span>created by Grzegorz Bainczyk</span>
+        </footer>
+    </div>
 
     <script src="app.js"></script>
 </body>

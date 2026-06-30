@@ -18,18 +18,23 @@ public class OptimizerController : ControllerBase
     [HttpPost("run")]
     public async Task<IActionResult> Run([FromBody] OptimizationRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Input))
+        if (request.Resources <= 0)
         {
-            return BadRequest("Input cannot be empty.");
+            return BadRequest("Resources must be greater than zero.");
         }
 
-        var result = await _cppOptimizerService.RunOptimizerAsync(request.Input);
+        if (request.Tasks.Count == 0)
+        {
+            return BadRequest("At least one task is required.");
+        }
+
+        var result = await _cppOptimizerService.RunOptimizerAsync(request);
 
         if (!result.Success)
         {
             return StatusCode(500, result);
         }
 
-        return Ok(result);
+        return Content(result.OutputJson, "application/json");
     }
 }
