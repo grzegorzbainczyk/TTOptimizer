@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{d6252f07-6611-4be7-b841-a58959455315}</ProjectGuid>
-    <RootNamespace>TTOptimizerEngine</RootNamespace>
+    <ProjectGuid>{d0bdf2d9-56dc-4cc3-a3fe-48ee171297ae}</ProjectGuid>
+    <RootNamespace>TTOptimizerConsole</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TTOptimizer.Engine\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -92,7 +92,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TTOptimizer.Engine\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -106,7 +106,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TTOptimizer.Engine\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TTOptimizer.Engine\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -131,16 +131,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\ChromosomeFactory.cpp" />
-    <ClCompile Include="src\FitnessEvaluator.cpp" />
-    <ClCompile Include="TTOptimizer.Engine.cpp" />
+    <ClCompile Include="..\TTOptimizer.Engine\src\ChromosomeFactory.cpp" />
+    <ClCompile Include="..\TTOptimizer.Engine\src\FitnessEvaluator.cpp" />
+    <ClCompile Include="TTOptimizer.Console.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="External\nlohmann\json.hpp" />
-    <ClInclude Include="include\ChromosomeFactory.h" />
-    <ClInclude Include="include\Domain.h" />
-    <ClInclude Include="include\FitnessEvaluator.h" />
-    <ClInclude Include="include\Utils.h" />
+    <ProjectReference Include="..\TTOptimizer.Engine\TTOptimizer.Engine.vcxproj">
+      <Project>{d6252f07-6611-4be7-b841-a58959455315}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -19,15 +19,51 @@
     <Filter Include="External\nlohmann">
       <UniqueIdentifier>{91ac2eee-d615-4ec2-9bc7-512fdf7b6fd3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Domain">
+      <UniqueIdentifier>{1602095d-2cca-4b51-9707-aea60243df9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Genetic">
+      <UniqueIdentifier>{c0f43c95-77a1-404d-8c74-a118826f943e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Evaluation">
+      <UniqueIdentifier>{be8bc995-caeb-4c2b-a92b-e01fd8aa4284}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{87e07b22-374c-42c5-a5a8-5bbb39c3ac60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Genetic">
+      <UniqueIdentifier>{61a7b125-798d-42ed-b8ea-73a4c3b335a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Evaluation">
+      <UniqueIdentifier>{708d1d8f-5370-4d44-ac1d-c9b24aff59bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TTOptimizer.Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChromosomeFactory.cpp">
+      <Filter>Source Files\Genetic</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FitnessEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\nlohmann\json.hpp">
       <Filter>External\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Domain.h">
+      <Filter>Header Files\Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ChromosomeFactory.h">
+      <Filter>Header Files\Genetic</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FitnessEvaluator.h">
+      <Filter>Header Files\Evaluation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

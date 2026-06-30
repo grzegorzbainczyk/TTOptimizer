@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTOptimizer.Web", "TTOptimi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTOptimizer.Engine", "TTOptimizer.Engine\TTOptimizer.Engine.vcxproj", "{D6252F07-6611-4BE7-B841-A58959455315}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTOptimizer.Console", "TTOptimizer.Console\TTOptimizer.Console.vcxproj", "{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,18 @@ Global
 		{D6252F07-6611-4BE7-B841-A58959455315}.Release|x64.Build.0 = Release|x64
 		{D6252F07-6611-4BE7-B841-A58959455315}.Release|x86.ActiveCfg = Release|Win32
 		{D6252F07-6611-4BE7-B841-A58959455315}.Release|x86.Build.0 = Release|Win32
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Debug|Any CPU.Build.0 = Debug|x64
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Debug|x64.ActiveCfg = Debug|x64
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Debug|x64.Build.0 = Debug|x64
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Debug|x86.ActiveCfg = Debug|Win32
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Debug|x86.Build.0 = Debug|Win32
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Release|Any CPU.ActiveCfg = Release|x64
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Release|Any CPU.Build.0 = Release|x64
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Release|x64.ActiveCfg = Release|x64
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Release|x64.Build.0 = Release|x64
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Release|x86.ActiveCfg = Release|Win32
+		{D0BDF2D9-56DC-4CC3-A3FE-48EE171297AE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
