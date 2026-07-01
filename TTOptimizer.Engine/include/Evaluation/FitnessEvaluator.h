@@ -1,16 +1,14 @@
 #pragma once
 
 #include <vector>
+#include "Domain/TimetableModels.h"
 
-#include "TimetableModels.h"
-
-class TimetableDecoder
+class FitnessEvaluator
 {
 public:
-    std::vector<ScheduledLesson> decode(
+    double evaluate(
         const Chromosome& chromosome,
         const TimetableProblem& problem,
         const std::vector<LessonInstance>& lessonInstances,
         const std::vector<ScheduleSlot>& scheduleSlots) const;
 };
-

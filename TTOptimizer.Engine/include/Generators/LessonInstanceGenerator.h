@@ -1,5 +1,5 @@
 #include <vector>
-#include "TimeTableModels.h"
+#include "Domain/TimetableModels.h"
 
 
 class LessonInstanceGenerator

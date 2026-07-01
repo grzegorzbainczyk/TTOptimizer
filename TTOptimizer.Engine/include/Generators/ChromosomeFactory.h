@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <random>
 #include <vector>
-#include "TimeTableModels.h"
+#include "Domain/TimetableModels.h"
 
 using LessonInstanceIndex = std::size_t;
 using ScheduleSlotIndex = std::size_t;

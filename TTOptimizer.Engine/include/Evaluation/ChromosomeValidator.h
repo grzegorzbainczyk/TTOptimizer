@@ -1,14 +1,14 @@
 #pragma once
 
 #include <vector>
-#include "TimetableModels.h"
 
-class FitnessEvaluator
+#include "Domain/TimetableModels.h"
+
+class ChromosomeValidator
 {
 public:
-    double evaluate(
+    void validate(
         const Chromosome& chromosome,
-        const TimetableProblem& problem,
         const std::vector<LessonInstance>& lessonInstances,
         const std::vector<ScheduleSlot>& scheduleSlots) const;
 };

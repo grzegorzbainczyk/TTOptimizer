@@ -2,13 +2,15 @@
 
 #include <vector>
 
-#include "TimetableModels.h"
+#include "Domain/TimetableModels.h"
 
-class ChromosomeValidator
+class TimetableDecoder
 {
 public:
-    void validate(
+    std::vector<ScheduledLesson> decode(
         const Chromosome& chromosome,
+        const TimetableProblem& problem,
         const std::vector<LessonInstance>& lessonInstances,
         const std::vector<ScheduleSlot>& scheduleSlots) const;
 };
+

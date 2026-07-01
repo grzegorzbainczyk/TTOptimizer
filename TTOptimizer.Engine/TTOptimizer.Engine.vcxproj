@@ -131,30 +131,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ChromosomeMutator.cpp" />
-    <ClCompile Include="ChromosomeValidator.cpp" />
-    <ClCompile Include="FitnessEvaluator.cpp" />
-    <ClCompile Include="SimpleOptimizer.cpp" />
-    <ClCompile Include="TimeTableDecoder.cpp" />
-    <ClCompile Include="TimeTableViewBuilder.cpp" />
-    <ClCompile Include="TTOptimizer.Engine.cpp" />
-    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="src\Evaluation\ChromosomeValidator.cpp" />
+    <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp" />
+    <ClCompile Include="src\Optimization\ChromosomeMutator.cpp" />
+    <ClCompile Include="src\Optimization\SimpleOptimizer.cpp" />
+    <ClCompile Include="src\Output\TimeTableDecoder.cpp" />
+    <ClCompile Include="src\Output\TimeTableViewBuilder.cpp" />
+    <ClCompile Include="src\TTOptimizer.Engine.cpp" />
+    <ClCompile Include="src\Utils\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChromosomeFactory.h" />
-    <ClInclude Include="ChromosomeMutator.h" />
-    <ClInclude Include="ChromosomeValidator.h" />
     <ClInclude Include="External\nlohmann\json.hpp" />
-    <ClInclude Include="FitnessEvaluator.h" />
-    <ClInclude Include="LessonInstanceGenerator.h" />
-    <ClInclude Include="ScheduleSlotGenerator.h" />
-    <ClInclude Include="SimpleOptimizer.h" />
-    <ClInclude Include="Test.h" />
-    <ClInclude Include="Test1.h" />
-    <ClInclude Include="TimeTableDecoder.h" />
+    <ClInclude Include="include\Evaluation\ChromosomeValidator.h" />
+    <ClInclude Include="include\Evaluation\FitnessEvaluator.h" />
+    <ClInclude Include="include\Generators\ChromosomeFactory.h" />
+    <ClInclude Include="include\Generators\LessonInstanceGenerator.h" />
+    <ClInclude Include="include\Generators\ScheduleSlotGenerator.h" />
+    <ClInclude Include="include\Optimization\ChromosomeMutator.h" />
+    <ClInclude Include="include\Optimization\SimpleOptimizer.h" />
+    <ClInclude Include="include\Output\TimeTableDecoder.h" />
+    <ClInclude Include="include\Output\TimeTableViewBuilder.h" />
+    <ClInclude Include="include\TestData\Test1.h" />
+    <ClInclude Include="include\Utils\Utils.h" />
     <ClInclude Include="TimeTableModels.h" />
-    <ClInclude Include="TimeTableViewBuilder.h" />
-    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TimetableModels.h"
+#include "Domain/TimetableModels.h"
 
 // Small deterministic test data set for early development.
 //

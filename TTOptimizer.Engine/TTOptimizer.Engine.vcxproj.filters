@@ -22,45 +22,69 @@
     <Filter Include="Header Files\Domain">
       <UniqueIdentifier>{1602095d-2cca-4b51-9707-aea60243df9f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Genetic">
-      <UniqueIdentifier>{c0f43c95-77a1-404d-8c74-a118826f943e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Evaluation">
       <UniqueIdentifier>{be8bc995-caeb-4c2b-a92b-e01fd8aa4284}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Genetic">
-      <UniqueIdentifier>{61a7b125-798d-42ed-b8ea-73a4c3b335a8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Evaluation">
       <UniqueIdentifier>{708d1d8f-5370-4d44-ac1d-c9b24aff59bf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Demo">
-      <UniqueIdentifier>{4d331b98-4ae7-42fa-8666-027baef58645}</UniqueIdentifier>
+    <Filter Include="Header Files\Generators">
+      <UniqueIdentifier>{18aa054a-100f-46f4-9116-bcd5b150495f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Optimization">
+      <UniqueIdentifier>{a805843a-ca2a-4158-9c39-a0dfc0d3eb91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Output">
+      <UniqueIdentifier>{23cdf03e-014c-471f-91f1-dd053c225c2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{0a53a66d-ba0e-4b51-9a45-4122d52bf0cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TestData">
+      <UniqueIdentifier>{1676306c-8bc3-4a8d-aa42-851ccfa025cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Domain">
+      <UniqueIdentifier>{61a7b125-798d-42ed-b8ea-73a4c3b335a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Generators">
+      <UniqueIdentifier>{567ed871-6008-4dea-9c15-e7c84f9a3e3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TestData">
+      <UniqueIdentifier>{5c687ba2-a8e2-4f66-a632-783c8c1a4bfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{56f0cf9e-8c56-4bcc-8b21-60d4d4adca3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Output">
+      <UniqueIdentifier>{8b3ea026-4b76-4859-aacb-39bce3301f50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Optimization">
+      <UniqueIdentifier>{15ff33ac-142b-44c7-9f24-dd72d9707674}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TTOptimizer.Engine.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Utils\Utils.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="FitnessEvaluator.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Evaluation\ChromosomeValidator.cpp">
+      <Filter>Source Files\Evaluation</Filter>
     </ClCompile>
-    <ClCompile Include="ChromosomeValidator.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp">
+      <Filter>Source Files\Evaluation</Filter>
     </ClCompile>
-    <ClCompile Include="ChromosomeMutator.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Optimization\ChromosomeMutator.cpp">
+      <Filter>Source Files\Optimization</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleOptimizer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Optimization\SimpleOptimizer.cpp">
+      <Filter>Source Files\Optimization</Filter>
     </ClCompile>
-    <ClCompile Include="TimeTableDecoder.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Output\TimeTableDecoder.cpp">
+      <Filter>Source Files\Output</Filter>
     </ClCompile>
-    <ClCompile Include="TimeTableViewBuilder.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Output\TimeTableViewBuilder.cpp">
+      <Filter>Source Files\Output</Filter>
     </ClCompile>
-    <ClCompile Include="Utils.cpp">
+    <ClCompile Include="src\TTOptimizer.Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,44 +92,44 @@
     <ClInclude Include="External\nlohmann\json.hpp">
       <Filter>External\nlohmann</Filter>
     </ClInclude>
-    <ClInclude Include="Test1.h">
-      <Filter>Header Files\Demo</Filter>
-    </ClInclude>
-    <ClInclude Include="Test.h">
-      <Filter>Header Files\Demo</Filter>
-    </ClInclude>
     <ClInclude Include="TimeTableModels.h">
       <Filter>Header Files\Domain</Filter>
     </ClInclude>
-    <ClInclude Include="ScheduleSlotGenerator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Evaluation\ChromosomeValidator.h">
+      <Filter>Header Files\Evaluation</Filter>
     </ClInclude>
-    <ClInclude Include="LessonInstanceGenerator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Evaluation\FitnessEvaluator.h">
+      <Filter>Header Files\Evaluation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Generators\ChromosomeFactory.h">
+      <Filter>Header Files\Generators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Generators\LessonInstanceGenerator.h">
+      <Filter>Header Files\Generators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Generators\ScheduleSlotGenerator.h">
+      <Filter>Header Files\Generators</Filter>
     </ClInclude>
     <ClInclude Include="ChromosomeFactory.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Generators</Filter>
     </ClInclude>
-    <ClInclude Include="FitnessEvaluator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Utils\Utils.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="ChromosomeValidator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\TestData\Test1.h">
+      <Filter>Header Files\TestData</Filter>
     </ClInclude>
-    <ClInclude Include="ChromosomeMutator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Output\TimeTableDecoder.h">
+      <Filter>Header Files\Output</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleOptimizer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Output\TimeTableViewBuilder.h">
+      <Filter>Header Files\Output</Filter>
     </ClInclude>
-    <ClInclude Include="TimeTableDecoder.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Optimization\ChromosomeMutator.h">
+      <Filter>Header Files\Optimization</Filter>
     </ClInclude>
-    <ClInclude Include="TimeTableViewBuilder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Optimization\SimpleOptimizer.h">
+      <Filter>Header Files\Optimization</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

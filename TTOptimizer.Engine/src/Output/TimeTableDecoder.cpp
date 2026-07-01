@@ -1,4 +1,4 @@
-#include "TimetableDecoder.h"
+#include "Output/TimetableDecoder.h"
 
 #include <algorithm>
 #include <stdexcept>

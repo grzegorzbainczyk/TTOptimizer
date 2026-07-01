@@ -1,18 +1,22 @@
 #include <iostream>
 #include <vector>
+#include "Domain/TimetableModels.h"
+#include "TestData/test1.h"
 
-#include "TimetableModels.h"
-#include "test1.h"
+#include "Generators/ScheduleSlotGenerator.h"
+#include "Generators/LessonInstanceGenerator.h"
+#include "Generators/ChromosomeFactory.h"
 
-#include "ScheduleSlotGenerator.h"
-#include "LessonInstanceGenerator.h"
-#include "ChromosomeFactory.h"
-#include "FitnessEvaluator.h"
-#include "SimpleOptimizer.h"
-#include "TimeTableDecoder.h"
-#include "Utils.h"
-#include "TimeTableViewBuilder.h"
+#include "Evaluation/FitnessEvaluator.h"
+#include "Evaluation/ChromosomeValidator.h"
 
+#include "Optimization/ChromosomeMutator.h"
+#include "Optimization/SimpleOptimizer.h"
+
+#include "Output/TimetableDecoder.h"
+#include "Output/TimetableViewBuilder.h"
+
+#include "Utils/Utils.h"
 int main()
 {
     TimetableProblem problem = CreateTestProblem1();

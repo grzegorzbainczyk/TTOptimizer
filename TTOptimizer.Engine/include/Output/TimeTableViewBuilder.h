@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "TimetableModels.h"
+#include "Domain/TimetableModels.h"
 
 class TimetableViewBuilder
 {

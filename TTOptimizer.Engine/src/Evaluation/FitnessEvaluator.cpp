@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include "FitnessEvaluator.h"
+#include "Evaluation/FitnessEvaluator.h"
 
 
 namespace

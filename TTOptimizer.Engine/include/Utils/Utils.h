@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "TimeTableModels.h"
+#include "Domain/TimetableModels.h"
 
 
 class Utils

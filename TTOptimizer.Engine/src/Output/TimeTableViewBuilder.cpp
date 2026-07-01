@@ -1,4 +1,4 @@
-#include "TimetableViewBuilder.h"
+#include "Output/TimetableViewBuilder.h"
 
 #include <algorithm>
 #include <stdexcept>

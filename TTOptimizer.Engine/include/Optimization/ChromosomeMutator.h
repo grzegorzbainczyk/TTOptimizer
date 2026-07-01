@@ -2,7 +2,7 @@
 
 #include <random>
 
-#include "TimetableModels.h"
+#include "Domain/TimetableModels.h"
 
 class ChromosomeMutator
 {

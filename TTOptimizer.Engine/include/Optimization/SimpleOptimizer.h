@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "TimetableModels.h"
-#include "FitnessEvaluator.h"
+#include "Domain/TimetableModels.h"
+#include "Evaluation/FitnessEvaluator.h"
 #include "ChromosomeMutator.h"
 
 class SimpleOptimizer
