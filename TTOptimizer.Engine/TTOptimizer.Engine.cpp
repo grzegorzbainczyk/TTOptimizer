@@ -9,6 +9,8 @@
 #include "ScheduleSlotGenerator.h"
 #include "LessonInstanceGenerator.h"
 #include "ChromosomeFactory.h"
+#include "FitnessEvaluator.h"
+#include "ChromosomeValidator.h"
 
     int main(int argc, char* argv[])
     {
@@ -30,10 +32,39 @@
 
 
         ChromosomeFactory chromosome_factory(123); // Seed for reproducibility
-		Chromosome first_chromosome = chromosome_factory.createRandom(scheduleSlots, lessonInstances);
+		Chromosome chromosome = chromosome_factory.createRandom(scheduleSlots, lessonInstances);
 
+        ChromosomeValidator validator;
+        validator.validate(chromosome, lessonInstances, scheduleSlots);
 
+        FitnessEvaluator fitnessEvaluator;
+        chromosome.penalty = fitnessEvaluator.evaluate(
+            chromosome,
+            problem,
+            lessonInstances,
+            scheduleSlots);
 
+        int occupiedGenes = 0;
+        int emptyGenes = 0;
+
+        for (const auto& gene : chromosome.genes)
+        {
+            if (gene.has_value())
+            {
+                ++occupiedGenes;
+            }
+            else
+            {
+                ++emptyGenes;
+            }
+        }
+
+        std::cout << "Schedule slots: " << scheduleSlots.size() << '\n';
+        std::cout << "Lesson instances: " << lessonInstances.size() << '\n';
+        std::cout << "Chromosome genes: " << chromosome.genes.size() << '\n';
+        std::cout << "Occupied genes: " << occupiedGenes << '\n';
+        std::cout << "Empty genes: " << emptyGenes << '\n';
+        std::cout << "Penalty: " << chromosome.penalty << '\n';
 
         return 0;
     }

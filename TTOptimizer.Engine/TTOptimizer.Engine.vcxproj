@@ -131,12 +131,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChromosomeValidator.cpp" />
+    <ClCompile Include="FitnessEvaluator.cpp" />
     <ClCompile Include="TTOptimizer.Engine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChromosomeFactory.h" />
+    <ClInclude Include="ChromosomeValidator.h" />
     <ClInclude Include="External\nlohmann\json.hpp" />
-    <ClInclude Include="include\Utils.h" />
+    <ClInclude Include="FitnessEvaluator.h" />
     <ClInclude Include="LessonInstanceGenerator.h" />
     <ClInclude Include="ScheduleSlotGenerator.h" />
     <ClInclude Include="Test.h" />

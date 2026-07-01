@@ -28,9 +28,6 @@
     <Filter Include="Header Files\Evaluation">
       <UniqueIdentifier>{be8bc995-caeb-4c2b-a92b-e01fd8aa4284}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Utils">
-      <UniqueIdentifier>{87e07b22-374c-42c5-a5a8-5bbb39c3ac60}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Genetic">
       <UniqueIdentifier>{61a7b125-798d-42ed-b8ea-73a4c3b335a8}</UniqueIdentifier>
     </Filter>
@@ -45,13 +42,16 @@
     <ClCompile Include="TTOptimizer.Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FitnessEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChromosomeValidator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\nlohmann\json.hpp">
       <Filter>External\nlohmann</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Utils.h">
-      <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Test1.h">
       <Filter>Header Files\Demo</Filter>
@@ -69,6 +69,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ChromosomeFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FitnessEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChromosomeValidator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
