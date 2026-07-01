@@ -153,6 +153,7 @@
     <ClInclude Include="include\Output\TimeTableDecoder.h" />
     <ClInclude Include="include\Output\TimeTableViewBuilder.h" />
     <ClInclude Include="include\TestData\Test1.h" />
+    <ClInclude Include="include\TestData\test2.h" />
     <ClInclude Include="include\Utils\Utils.h" />
     <ClInclude Include="TimeTableModels.h" />
   </ItemGroup>

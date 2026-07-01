@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "Domain/TimetableModels.h"
-#include "TestData/test1.h"
+#include "TestData/test2.h"
 
 #include "Generators/ScheduleSlotGenerator.h"
 #include "Generators/LessonInstanceGenerator.h"
@@ -19,7 +19,7 @@
 #include "Utils/Utils.h"
 int main()
 {
-    TimetableProblem problem = CreateTestProblem1();
+    TimetableProblem problem = CreateTestProblem2();
 
     ScheduleSlotGenerator scheduleSlotGenerator;
     std::vector<ScheduleSlot> scheduleSlots =

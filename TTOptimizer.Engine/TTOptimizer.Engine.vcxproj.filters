@@ -131,5 +131,8 @@
     <ClInclude Include="include\Optimization\SimpleOptimizer.h">
       <Filter>Header Files\Optimization</Filter>
     </ClInclude>
+    <ClInclude Include="include\TestData\test2.h">
+      <Filter>Header Files\TestData</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
