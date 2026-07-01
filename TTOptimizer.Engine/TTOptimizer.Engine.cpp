@@ -4,114 +4,36 @@
 #include <vector>
 #include <cmath>
 #include "external/nlohmann/json.hpp"
-#include "TTOptimizer.Engine.h"
-#include "Test.h"
+#include "TimetableModels.h"
+#include "test1.h"
+#include "ScheduleSlotGenerator.h"
+#include "LessonInstanceGenerator.h"
+#include "ChromosomeFactory.h"
 
-using json = nlohmann::json;
-
-struct Task
-{
-    int id{};
-    std::string name;
-    int duration{};
-};
-
-
-int main(int argc, char* argv[])
-{
-
-    if (argc >= 2)
+    int main(int argc, char* argv[])
     {
-        return runJsonMode(argv[1]);   // tryb dla ASP.NET
-    }
+        TimetableProblem problem = CreateTestProblem1();
 
-    Test test;
-    return test.runDemoMode();              // tryb konsolowy/testowy
-}
+        ScheduleSlotGenerator scheduleSlotGenerator;
+        std::vector<ScheduleSlot> scheduleSlots = scheduleSlotGenerator.generate(problem);
+
+        LessonInstanceGenerator lessonInstanceGenerator;
+        std::vector<LessonInstance> lessonInstances = lessonInstanceGenerator.generate(problem);
+
+        std::cout << "Teachers: " << problem.teachers.size() << '\n';
+        std::cout << "Classes: " << problem.classGroups.size() << '\n';
+        std::cout << "Subjects: " << problem.subjects.size() << '\n';
+        std::cout << "Rooms: " << problem.rooms.size() << '\n';
+        std::cout << "Lesson requirements: " << problem.lessonRequirements.size() << '\n';
+        std::cout << "Schedule slots: " << scheduleSlots.size() << '\n';
+        std::cout << "Lesson instances: " << lessonInstances.size() << '\n';
 
 
-int CalculateEstimatedScheduleLength(const std::vector<Task>& tasks, int resources)
-{
-    int totalDuration = 0;
+        ChromosomeFactory chromosome_factory(123); // Seed for reproducibility
+		Chromosome first_chromosome = chromosome_factory.createRandom(scheduleSlots, lessonInstances);
 
-    for (const auto& task : tasks)
-    {
-        totalDuration += task.duration;
-    }
 
-    if (resources <= 0)
-    {
-        throw std::runtime_error("Resources must be greater than zero.");
-    }
 
-    return static_cast<int>(std::ceil(static_cast<double>(totalDuration) / resources));
-}
-
-int runJsonMode(const std::string& inputFilePath)
-{
-    try
-    {
-      
-        //std::string inputFilePath = argv[1];
-
-        std::ifstream inputFile(inputFilePath);
-
-        if (!inputFile.is_open())
-        {
-            json errorResponse =
-            {
-                { "success", false },
-                { "message", "Cannot open input JSON file." },
-                { "path", inputFilePath }
-            };
-
-            std::cerr << errorResponse.dump(4) << std::endl;
-            return 2;
-        }
-
-        json inputJson;
-        inputFile >> inputJson;
-
-        int resources = inputJson.value("resources", 0);
-
-        std::vector<Task> tasks;
-
-        for (const auto& taskJson : inputJson["tasks"])
-        {
-            Task task;
-            task.id = taskJson.value("id", 0);
-            task.name = taskJson.value("name", "");
-            task.duration = taskJson.value("duration", 0);
-
-            tasks.push_back(task);
-        }
-
-        int estimatedScheduleLength = CalculateEstimatedScheduleLength(tasks, resources);
-
-        json result =
-        {
-            { "success", true },
-            { "taskCount", tasks.size() },
-            { "resources", resources },
-            { "estimatedScheduleLength", estimatedScheduleLength },
-            { "message", "Optimization completed" }
-        };
-
-        std::cout << result.dump(4) << std::endl;
 
         return 0;
     }
-    catch (const std::exception& ex)
-    {
-        json errorResponse =
-        {
-            { "success", false },
-            { "message", ex.what() }
-        };
-
-        std::cerr << errorResponse.dump(4) << std::endl;
-        return 10;
-    }
-
-
-}

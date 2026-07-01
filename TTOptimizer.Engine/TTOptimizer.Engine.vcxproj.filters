@@ -45,27 +45,30 @@
     <ClCompile Include="TTOptimizer.Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\Domain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\nlohmann\json.hpp">
       <Filter>External\nlohmann</Filter>
     </ClInclude>
-    <ClInclude Include="include\Domain.h">
-      <Filter>Header Files\Domain</Filter>
-    </ClInclude>
     <ClInclude Include="include\Utils.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="TTOptimizer.Engine.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Test1.h">
+      <Filter>Header Files\Demo</Filter>
     </ClInclude>
     <ClInclude Include="Test.h">
+      <Filter>Header Files\Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeTableModels.h">
+      <Filter>Header Files\Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="ScheduleSlotGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RoomTimeSlotGenerator.h">
+    <ClInclude Include="LessonInstanceGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChromosomeFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

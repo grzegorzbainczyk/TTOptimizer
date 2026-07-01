@@ -131,16 +131,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\Domain.cpp" />
     <ClCompile Include="TTOptimizer.Engine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChromosomeFactory.h" />
     <ClInclude Include="External\nlohmann\json.hpp" />
-    <ClInclude Include="include\Domain.h" />
     <ClInclude Include="include\Utils.h" />
-    <ClInclude Include="RoomTimeSlotGenerator.h" />
+    <ClInclude Include="LessonInstanceGenerator.h" />
+    <ClInclude Include="ScheduleSlotGenerator.h" />
     <ClInclude Include="Test.h" />
-    <ClInclude Include="TTOptimizer.Engine.h" />
+    <ClInclude Include="Test1.h" />
+    <ClInclude Include="TimeTableModels.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
