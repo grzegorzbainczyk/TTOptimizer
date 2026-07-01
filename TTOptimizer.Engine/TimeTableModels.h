@@ -103,3 +103,16 @@ struct TimetableProblem
     int daysPerWeek = 5;
     int slotsPerDay = 8;
 };
+
+struct ScheduledLesson
+{
+    LessonInstanceId lessonInstanceId{};
+    LessonRequirementId requirementId{};
+
+    ClassGroupId classGroupId{};
+    SubjectId subjectId{};
+    TeacherId teacherId{};
+    RoomId roomId{};
+
+    TimeSlot timeSlot{};
+};

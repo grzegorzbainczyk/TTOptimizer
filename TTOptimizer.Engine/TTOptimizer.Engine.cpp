@@ -9,6 +9,7 @@
 #include "ChromosomeFactory.h"
 #include "FitnessEvaluator.h"
 #include "SimpleOptimizer.h"
+#include "TimeTableDecoder.h"
 
 int main()
 {
@@ -48,8 +49,29 @@ int main()
         scheduleSlots,
         10000);
 
-    std::cout << "Best penalty after optimizer: "
-        << bestChromosome.penalty << '\n';
+    TimetableDecoder decoder;
+
+    std::vector<ScheduledLesson> scheduledLessons = decoder.decode(
+        bestChromosome,
+        problem,
+        lessonInstances,
+        scheduleSlots);
+
+    std::cout << "Best penalty: " << bestChromosome.penalty << '\n';
+    std::cout << "Scheduled lessons: " << scheduledLessons.size() << '\n';
+
+    for (const ScheduledLesson& lesson : scheduledLessons)
+    {
+        std::cout
+            << "LessonInstanceId: " << lesson.lessonInstanceId
+            << ", classGroupId: " << lesson.classGroupId
+            << ", subjectId: " << lesson.subjectId
+            << ", teacherId: " << lesson.teacherId
+            << ", roomId: " << lesson.roomId
+            << ", day: " << static_cast<int>(lesson.timeSlot.day)
+            << ", lessonNumber: " << lesson.timeSlot.lessonNumber
+            << '\n';
+    }
 
     return 0;
 }
