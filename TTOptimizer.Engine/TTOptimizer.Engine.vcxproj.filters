@@ -45,11 +45,8 @@
     <ClCompile Include="TTOptimizer.Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ChromosomeFactory.cpp">
-      <Filter>Source Files\Genetic</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FitnessEvaluator.cpp">
-      <Filter>Source Files\Evaluation</Filter>
+    <ClCompile Include="include\Domain.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -59,20 +56,17 @@
     <ClInclude Include="include\Domain.h">
       <Filter>Header Files\Domain</Filter>
     </ClInclude>
-    <ClInclude Include="include\ChromosomeFactory.h">
-      <Filter>Header Files\Genetic</Filter>
-    </ClInclude>
-    <ClInclude Include="include\FitnessEvaluator.h">
-      <Filter>Header Files\Evaluation</Filter>
-    </ClInclude>
     <ClInclude Include="include\Utils.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="TTOptimizer.Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\SampleTimetableData.h">
-      <Filter>Header Files\Demo</Filter>
+    <ClInclude Include="Test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RoomTimeSlotGenerator.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

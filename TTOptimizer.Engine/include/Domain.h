@@ -3,12 +3,17 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <cstddef>
 
 using TeacherId = int;
 using ClassGroupId = int;
 using SubjectId = int;
 using RoomId = int;
 using LessonRequirementId = int;
+using LessonInstanceId = int;
+
+using LessonInstanceIndex = std::size_t;
+using RoomTimeSlotIndex = std::size_t;
 
 // Strongly typed representation of a weekday used in the timetable.
 // We use enum class instead of a plain enum to avoid accidental conversion to int.
@@ -19,6 +24,12 @@ enum class DayOfWeek
     Wednesday = 2,
     Thursday = 3,
     Friday = 4
+};
+
+struct LessonInstance
+{
+    LessonInstanceId id{};
+    LessonRequirementId requirementId{};
 };
 
 // Represents a single time position in the school week.
@@ -32,6 +43,60 @@ struct TimeSlot
     {
         return day == other.day && slot == other.slot;
     }
+};
+
+struct RoomTimeSlot
+{
+    RoomId roomId{};
+    TimeSlot timeSlot{};
+};
+
+// Represents a weekly teaching requirement.
+// This says WHAT must be planned, but not yet WHEN.
+//
+// Example:
+// Class 1A must have Math with teacher Jan Kowalski 5 times per week.
+struct LessonRequirement
+{
+    LessonRequirementId id{};
+
+    ClassGroupId classGroupId{};
+    SubjectId subjectId{};
+    TeacherId teacherId{};
+
+    int weeklyCount{};
+};
+
+// Represents a class group, for example 1A, 2B, or 8C.
+// A class group has its own lesson limits and receives scheduled lessons.
+struct ClassGroup
+{
+    ClassGroupId id{};
+    std::string name;
+
+    int maxLessonsPerDay{};
+};
+
+// Represents the full input problem definition for the timetable optimizer.
+// It contains all entities and configuration needed to generate and evaluate schedules.
+struct TimetableProblem
+{
+    std::vector<Teacher> teachers;
+    std::vector<ClassGroup> classGroups;
+    std::vector<Subject> subjects;
+    std::vector<Room> rooms;
+    std::vector<LessonRequirement> lessonRequirements;
+
+    int daysPerWeek = 5;
+    int slotsPerDay = 8;
+};
+
+struct TimetableContext
+{
+    TimetableProblem problem;
+
+    std::vector<LessonInstance> lessonInstances;
+    std::vector<RoomTimeSlot> roomTimeSlots;
 };
 
 // Represents a school subject, for example Math, English, Physics, or PE.
@@ -53,16 +118,6 @@ struct Teacher
     std::vector<TimeSlot> unavailableSlots;
 };
 
-// Represents a class group, for example 1A, 2B, or 8C.
-// A class group has its own lesson limits and receives scheduled lessons.
-struct ClassGroup
-{
-    ClassGroupId id{};
-    std::string name;
-
-    int maxLessonsPerDay{};
-};
-
 // Represents a physical room where lessons can take place.
 // A room may have capacity limits and may allow only selected subjects.
 struct Room
@@ -72,22 +127,6 @@ struct Room
 
     int capacity{};
     std::vector<SubjectId> allowedSubjects;
-};
-
-// Represents a weekly teaching requirement.
-// This says WHAT must be planned, but not yet WHEN.
-//
-// Example:
-// Class 1A must have Math with teacher Jan Kowalski 5 times per week.
-struct LessonRequirement
-{
-    LessonRequirementId id{};
-
-    ClassGroupId classGroupId{};
-    SubjectId subjectId{};
-    TeacherId teacherId{};
-
-    int weeklyCount{};
 };
 
 // Represents one concrete scheduled lesson inside a chromosome.
@@ -102,27 +141,23 @@ struct ScheduledLesson
     std::optional<RoomId> roomId;
 };
 
-// Represents one complete candidate timetable solution.
-// In the genetic algorithm, this is one individual/chromosome in the population.
+// A chromosome represents one complete timetable solution.
 //
-// The lessons vector contains all scheduled lessons.
-// The fitness value describes how good this timetable is.
+// The chromosome is encoded as a vector of RoomTimeSlot indices.
+// The size of the vector is equal to the number of lesson instances.
+//
+// genes[i] stores the index of the RoomTimeSlot assigned to lessonInstances[i].
+//
+// lessonInstances[i] defines WHAT is taught:
+// subject, class group, teacher.
+//
+// roomTimeSlots[genes[i]] defines WHEN and WHERE it is taught:
+// day, slot, room.
 struct Chromosome
 {
-    std::vector<ScheduledLesson> lessons;
+    // genes[i] contains the index of RoomTimeSlot assigned to lessonInstances[i].
+    std::vector<RoomTimeSlotIndex> genes;
+
     double fitness = 0.0;
 };
 
-// Represents the full input problem definition for the timetable optimizer.
-// It contains all entities and configuration needed to generate and evaluate schedules.
-struct TimetableProblem
-{
-    std::vector<Teacher> teachers;
-    std::vector<ClassGroup> classGroups;
-    std::vector<Subject> subjects;
-    std::vector<Room> rooms;
-    std::vector<LessonRequirement> lessonRequirements;
-
-    int daysPerWeek = 5;
-    int slotsPerDay = 8;
-};
