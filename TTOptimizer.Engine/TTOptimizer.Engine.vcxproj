@@ -136,7 +136,9 @@
     <ClCompile Include="FitnessEvaluator.cpp" />
     <ClCompile Include="SimpleOptimizer.cpp" />
     <ClCompile Include="TimeTableDecoder.cpp" />
+    <ClCompile Include="TimeTableViewBuilder.cpp" />
     <ClCompile Include="TTOptimizer.Engine.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChromosomeFactory.h" />
@@ -151,6 +153,8 @@
     <ClInclude Include="Test1.h" />
     <ClInclude Include="TimeTableDecoder.h" />
     <ClInclude Include="TimeTableModels.h" />
+    <ClInclude Include="TimeTableViewBuilder.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

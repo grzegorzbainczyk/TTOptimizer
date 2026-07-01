@@ -116,3 +116,18 @@ struct ScheduledLesson
 
     TimeSlot timeSlot{};
 };
+
+struct ScheduledLessonView
+{
+    LessonInstanceId lessonInstanceId{};
+
+    std::string classGroupName;
+    std::string subjectName;
+    std::string teacherName;
+    std::string roomName;
+
+    DayOfWeek day{};
+    int lessonNumber{};
+};
+
+

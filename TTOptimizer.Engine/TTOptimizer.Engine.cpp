@@ -10,6 +10,8 @@
 #include "FitnessEvaluator.h"
 #include "SimpleOptimizer.h"
 #include "TimeTableDecoder.h"
+#include "Utils.h"
+#include "TimeTableViewBuilder.h"
 
 int main()
 {
@@ -60,18 +62,44 @@ int main()
     std::cout << "Best penalty: " << bestChromosome.penalty << '\n';
     std::cout << "Scheduled lessons: " << scheduledLessons.size() << '\n';
 
-    for (const ScheduledLesson& lesson : scheduledLessons)
+    TimetableViewBuilder viewBuilder;
+
+    std::vector<ScheduledLessonView> lessonViews = viewBuilder.build(
+        scheduledLessons,
+        problem);
+
+    std::sort(
+        lessonViews.begin(),
+        lessonViews.end(),
+        [](const ScheduledLessonView& left, const ScheduledLessonView& right)
+        {
+            if (left.day != right.day)
+            {
+                return static_cast<int>(left.day) < static_cast<int>(right.day);
+            }
+
+            if (left.lessonNumber != right.lessonNumber)
+            {
+                return left.lessonNumber < right.lessonNumber;
+            }
+
+            return left.roomName < right.roomName;
+        });
+
+    std::cout << "\nFull timetable:\n";
+
+    for (const ScheduledLessonView& lesson : lessonViews)
     {
         std::cout
-            << "LessonInstanceId: " << lesson.lessonInstanceId
-            << ", classGroupId: " << lesson.classGroupId
-            << ", subjectId: " << lesson.subjectId
-            << ", teacherId: " << lesson.teacherId
-            << ", roomId: " << lesson.roomId
-            << ", day: " << static_cast<int>(lesson.timeSlot.day)
-            << ", lessonNumber: " << lesson.timeSlot.lessonNumber
+            << Utils::ToString(lesson.day)
+            << ", lesson " << lesson.lessonNumber
+            << ", room " << lesson.roomName
+            << " | " << lesson.classGroupName
+            << " | " << lesson.subjectName
+            << " | " << lesson.teacherName
             << '\n';
     }
+
 
     return 0;
 }
