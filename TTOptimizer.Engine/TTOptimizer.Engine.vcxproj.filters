@@ -134,5 +134,14 @@
     <ClInclude Include="include\TestData\test2.h">
       <Filter>Header Files\TestData</Filter>
     </ClInclude>
+    <ClInclude Include="include\Output\TimetableJsonWriter.h">
+      <Filter>Header Files\Output</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TTOptimizer.Engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Output\EngineResultJsonWriter.h">
+      <Filter>Header Files\Output</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

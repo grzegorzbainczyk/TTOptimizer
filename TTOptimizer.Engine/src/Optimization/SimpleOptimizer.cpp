@@ -24,7 +24,7 @@ Chromosome SimpleOptimizer::optimize(
 
     Chromosome currentChromosome = bestChromosome;
 
-    std::cout << "Initial penalty: " << bestChromosome.penalty << '\n';
+    std::cerr << "Initial penalty: " << bestChromosome.penalty << '\n';
 
     for (int iteration = 1; iteration <= iterations; ++iteration)
     {
@@ -54,7 +54,7 @@ Chromosome SimpleOptimizer::optimize(
         }
     }
 
-    std::cout << "Final penalty: " << bestChromosome.penalty << '\n';
+    std::cerr << "Final penalty: " << bestChromosome.penalty << '\n';
 
     return bestChromosome;
 }

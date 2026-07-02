@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "Domain/TimetableModels.h"
+#include "TestData/test1.h"
 #include "TestData/test2.h"
 
 #include "Generators/ScheduleSlotGenerator.h"
@@ -17,93 +18,145 @@
 #include "Output/TimetableViewBuilder.h"
 
 #include "Utils/Utils.h"
-int main()
+#include "Output/TimetableJsonWriter.h"
+#include "TTOptimizer.Engine.h"
+#include <Output/EngineResultJsonWriter.h>
+
+int RunDemoMode()
 {
-    TimetableProblem problem = CreateTestProblem2();
+	TimetableProblem problem = CreateTestProblem1();
 
-    ScheduleSlotGenerator scheduleSlotGenerator;
-    std::vector<ScheduleSlot> scheduleSlots =
-        scheduleSlotGenerator.generate(problem);
+	ScheduleSlotGenerator scheduleSlotGenerator;
+	std::vector<ScheduleSlot> scheduleSlots =
+		scheduleSlotGenerator.generate(problem);
 
-    LessonInstanceGenerator lessonInstanceGenerator;
-    std::vector<LessonInstance> lessonInstances =
-        lessonInstanceGenerator.generate(problem);
+	LessonInstanceGenerator lessonInstanceGenerator;
+	std::vector<LessonInstance> lessonInstances =
+		lessonInstanceGenerator.generate(problem);
 
-    ChromosomeFactory chromosomeFactory(123);
-    Chromosome initialChromosome =
-        chromosomeFactory.createRandom(scheduleSlots, lessonInstances);
+	ChromosomeFactory chromosomeFactory(123);
+	Chromosome initialChromosome =
+		chromosomeFactory.createRandom(scheduleSlots, lessonInstances);
 
-    FitnessEvaluator fitnessEvaluator;
+	ChromosomeValidator validator;
+	validator.validate(initialChromosome, lessonInstances, scheduleSlots);
 
-    initialChromosome.penalty = fitnessEvaluator.evaluate(
-        initialChromosome,
-        problem,
-        lessonInstances,
-        scheduleSlots);
+	FitnessEvaluator fitnessEvaluator;
 
-    std::cout << "Schedule slots: " << scheduleSlots.size() << '\n';
-    std::cout << "Lesson instances: " << lessonInstances.size() << '\n';
-    std::cout << "Initial penalty before optimizer: "
-        << initialChromosome.penalty << '\n';
+	initialChromosome.penalty = fitnessEvaluator.evaluate(
+		initialChromosome,
+		problem,
+		lessonInstances,
+		scheduleSlots);
 
-    SimpleOptimizer optimizer(456);
+	const double initialPenalty = initialChromosome.penalty;
 
-    Chromosome bestChromosome = optimizer.optimize(
-        initialChromosome,
-        problem,
-        lessonInstances,
-        scheduleSlots,
-        10000);
+	SimpleOptimizer optimizer(456);
 
-    TimetableDecoder decoder;
+	Chromosome bestChromosome = optimizer.optimize(
+		initialChromosome,
+		problem,
+		lessonInstances,
+		scheduleSlots,
+		1000);
 
-    std::vector<ScheduledLesson> scheduledLessons = decoder.decode(
-        bestChromosome,
-        problem,
-        lessonInstances,
-        scheduleSlots);
+	validator.validate(bestChromosome, lessonInstances, scheduleSlots);
 
-    std::cout << "Best penalty: " << bestChromosome.penalty << '\n';
-    std::cout << "Scheduled lessons: " << scheduledLessons.size() << '\n';
+	std::cout << "Initial penalty: " << initialPenalty << '\n';
+	std::cout << "Best penalty: " << bestChromosome.penalty << '\n';
+	std::cout << "Genes: " << bestChromosome.genes.size() << '\n';
 
-    TimetableViewBuilder viewBuilder;
-
-    std::vector<ScheduledLessonView> lessonViews = viewBuilder.build(
-        scheduledLessons,
-        problem);
-
-    std::sort(
-        lessonViews.begin(),
-        lessonViews.end(),
-        [](const ScheduledLessonView& left, const ScheduledLessonView& right)
-        {
-            if (left.day != right.day)
-            {
-                return static_cast<int>(left.day) < static_cast<int>(right.day);
-            }
-
-            if (left.lessonNumber != right.lessonNumber)
-            {
-                return left.lessonNumber < right.lessonNumber;
-            }
-
-            return left.roomName < right.roomName;
-        });
-
-    std::cout << "\nFull timetable:\n";
-
-    for (const ScheduledLessonView& lesson : lessonViews)
-    {
-        std::cout
-            << Utils::ToString(lesson.day)
-            << ", lesson " << lesson.lessonNumber
-            << ", room " << lesson.roomName
-            << " | " << lesson.classGroupName
-            << " | " << lesson.subjectName
-            << " | " << lesson.teacherName
-            << '\n';
-    }
-
-
-    return 0;
+	return 0;
 }
+
+int RunJsonMode()
+{
+	EngineResultJsonWriter jsonWriter;
+
+	try
+	{
+		TimetableProblem problem = CreateTestProblem1();
+
+		ScheduleSlotGenerator scheduleSlotGenerator;
+		std::vector<ScheduleSlot> scheduleSlots =
+			scheduleSlotGenerator.generate(problem);
+
+		LessonInstanceGenerator lessonInstanceGenerator;
+		std::vector<LessonInstance> lessonInstances =
+			lessonInstanceGenerator.generate(problem);
+
+		ChromosomeFactory chromosomeFactory(123);
+		Chromosome initialChromosome =
+			chromosomeFactory.createRandom(scheduleSlots, lessonInstances);
+
+		ChromosomeValidator validator;
+		validator.validate(initialChromosome, lessonInstances, scheduleSlots);
+
+		FitnessEvaluator fitnessEvaluator;
+
+		initialChromosome.penalty = fitnessEvaluator.evaluate(
+			initialChromosome,
+			problem,
+			lessonInstances,
+			scheduleSlots);
+
+		const double initialPenalty = initialChromosome.penalty;
+
+		SimpleOptimizer optimizer(456);
+
+		Chromosome bestChromosome = optimizer.optimize(
+			initialChromosome,
+			problem,
+			lessonInstances,
+			scheduleSlots,
+			100);
+
+		validator.validate(bestChromosome, lessonInstances, scheduleSlots);
+
+		std::cout << jsonWriter.writeSuccess(
+			initialPenalty,
+			bestChromosome.penalty,
+			bestChromosome) << '\n';
+
+		return 0;
+	}
+	catch (const std::exception& exception)
+	{
+		std::cout << jsonWriter.writeError(exception.what()) << '\n';
+		return 1;
+	}
+}
+
+int main(int argc, char* argv[])
+{
+	try
+	{
+		if (argc >= 2)
+		{
+			std::string mode = argv[1];
+
+			if (mode == "--json")
+			{
+				return RunJsonMode();
+			}
+
+			if (mode == "--demo")
+			{
+				return RunDemoMode();
+			}
+
+			std::cerr << "Unknown mode: " << mode << '\n';
+			std::cerr << "Supported modes: --demo, --json\n";
+			return 1;
+		}
+
+		return RunDemoMode();
+	}
+	catch (const std::exception& exception)
+	{
+		std::cerr << "Fatal error: " << exception.what() << '\n';
+		return 1;
+	}
+}
+
+
