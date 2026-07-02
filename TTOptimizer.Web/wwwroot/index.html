@@ -6,7 +6,7 @@
 
     <title>TTOptimizer</title>
 
-    <link rel="stylesheet" href="/css/site.css" />
+    <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
     <div class="page">
@@ -49,7 +49,21 @@
                     </button>
                 </div>
 
-                <pre id="optimizationResult" class="json-output">// Result will appear here</pre>
+                <table class="lessons-table">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Lesson</th>
+                            <th>Class</th>
+                            <th>Subject</th>
+                            <th>Teacher</th>
+                            <th>Room</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lessonsTableBody">
+                    </tbody>
+                </table>
+                <pre id="optimizationResult" class="json-output">// Raw result will appear here</pre>
             </section>
         </main>
 

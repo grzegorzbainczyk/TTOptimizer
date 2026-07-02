@@ -175,3 +175,35 @@ h2 {
         font-size: 34px;
     }
 }
+
+.lessons-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: #080d18;
+    border: 1px solid #263247;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+    .lessons-table th,
+    .lessons-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #263247;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    .lessons-table th {
+        background: #111827;
+        color: #dbeafe;
+        font-weight: 700;
+    }
+
+    .lessons-table td {
+        color: #e5e7eb;
+    }
+
+    .lessons-table tr:last-child td {
+        border-bottom: none;
+    }

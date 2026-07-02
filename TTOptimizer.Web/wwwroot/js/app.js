@@ -14,9 +14,7 @@
         resultElement.textContent = "";
 
         try {
-            const response = await fetch("http://api/optimization/run", {
-                method: "POST"
-            });
+            const response = await fetch("/api/optimization/run", { method: "POST" });
 
             const responseText = await response.text();
 
@@ -27,6 +25,7 @@
             const data = JSON.parse(responseText);
 
             resultElement.textContent = JSON.stringify(data, null, 2);
+            renderLessonsTable(data.scheduledLessons);
 
             if (data.success) {
                 statusElement.textContent =
@@ -35,11 +34,16 @@
                 statusElement.textContent = "Engine returned an error.";
             }
         } catch (error) {
+            console.error(error);
+
             statusElement.textContent = "Error while running optimization.";
-            resultElement.textContent = error.message;
+
+            if (resultElement) {
+                resultElement.textContent = error.message;
+            }
         } finally {
-            setRunningState(false);
-        }
+        setRunningState(false);
+    }
     }
 
     function clearResult() {
@@ -54,6 +58,38 @@
             runButton.textContent = "Running...";
         } else {
             runButton.textContent = "Run optimization";
+        }
+    }
+
+    function renderLessonsTable(lessons) {
+        const tableBody = document.getElementById("lessonsTableBody");
+
+        tableBody.innerHTML = "";
+
+        if (!lessons || lessons.length === 0) {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+            <td colspan="6">No lessons returned.</td>
+        `;
+
+            tableBody.appendChild(row);
+            return;
+        }
+
+        for (const lesson of lessons) {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+            <td>${lesson.day}</td>
+            <td>${lesson.lessonNumber}</td>
+            <td>${lesson.classGroup}</td>
+            <td>${lesson.subject}</td>
+            <td>${lesson.teacher}</td>
+            <td>${lesson.room}</td>
+        `;
+
+            tableBody.appendChild(row);
         }
     }
 });
