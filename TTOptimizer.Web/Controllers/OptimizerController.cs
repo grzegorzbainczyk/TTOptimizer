@@ -1,40 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TTOptimizer.Web.Models;
 using TTOptimizer.Web.Services;
 
 namespace TTOptimizer.Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class OptimizerController : ControllerBase
+public class OptimizationController : ControllerBase
 {
-    private readonly CppOptimizerService _cppOptimizerService;
+    private readonly CppOptimizerService _optimizerService;
 
-    public OptimizerController(CppOptimizerService cppOptimizerService)
+    public OptimizationController(CppOptimizerService optimizerService)
     {
-        _cppOptimizerService = cppOptimizerService;
+        _optimizerService = optimizerService;
     }
 
     [HttpPost("run")]
-    public async Task<IActionResult> Run([FromBody] OptimizationRequest request)
+    public async Task<IActionResult> Run()
     {
-        if (request.Resources <= 0)
-        {
-            return BadRequest("Resources must be greater than zero.");
-        }
+        string json = await _optimizerService.RunOptimizationAsync();
 
-        if (request.Tasks.Count == 0)
-        {
-            return BadRequest("At least one task is required.");
-        }
-
-        var result = await _cppOptimizerService.RunOptimizerAsync(request);
-
-        if (!result.Success)
-        {
-            return StatusCode(500, result);
-        }
-
-        return Content(result.OutputJson, "application/json");
+        return Content(json, "application/json");
     }
 }

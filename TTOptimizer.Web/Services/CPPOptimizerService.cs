@@ -1,77 +1,47 @@
 ﻿using System.Diagnostics;
-using System.Text.Json;
-using TTOptimizer.Web.Models;
 
 namespace TTOptimizer.Web.Services;
 
 public class CppOptimizerService
 {
-    public async Task<OptimizationResponse> RunOptimizerAsync(OptimizationRequest request)
+    private readonly string _enginePath;
+
+    public CppOptimizerService(IConfiguration configuration)
     {
-        var exePath = @"C:\TTOptimizer\x64\Debug\TTOptimizer.Engine.exe";
+        _enginePath = configuration["CppEngine:Path"]
+            ?? throw new InvalidOperationException("CppEngine:Path is not configured.");
+    }
 
-        if (!File.Exists(exePath))
+    public async Task<string> RunOptimizationAsync()
+    {
+        var startInfo = new ProcessStartInfo
         {
-            return new OptimizationResponse
-            {
-                Success = false,
-                ErrorJson = $"C++ executable not found: {exePath}"
-            };
+            FileName = _enginePath,
+            Arguments = "--json",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using var process = new Process
+        {
+            StartInfo = startInfo
+        };
+
+        process.Start();
+
+        string output = await process.StandardOutput.ReadToEndAsync();
+        string error = await process.StandardError.ReadToEndAsync();
+
+        await process.WaitForExitAsync();
+
+        if (process.ExitCode != 0)
+        {
+            throw new InvalidOperationException(
+                $"C++ engine failed with exit code {process.ExitCode}. Error: {error}. Output: {output}");
         }
 
-        var inputFilePath = Path.Combine(
-            Path.GetTempPath(),
-            $"ttoptimizer-input-{Guid.NewGuid():N}.json"
-        );
-
-        try
-        {
-            var jsonOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var inputJson = JsonSerializer.Serialize(request, jsonOptions);
-
-            await File.WriteAllTextAsync(inputFilePath, inputJson);
-
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = exePath,
-                Arguments = $"\"{inputFilePath}\"",
-                WorkingDirectory = Path.GetDirectoryName(exePath)!,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using var process = new Process
-            {
-                StartInfo = startInfo
-            };
-
-            process.Start();
-
-            string outputJson = await process.StandardOutput.ReadToEndAsync();
-            string errorJson = await process.StandardError.ReadToEndAsync();
-
-            await process.WaitForExitAsync();
-
-            return new OptimizationResponse
-            {
-                Success = process.ExitCode == 0,
-                OutputJson = outputJson,
-                ErrorJson = errorJson
-            };
-        }
-        finally
-        {
-            if (File.Exists(inputFilePath))
-            {
-                File.Delete(inputFilePath);
-            }
-        }
+        return output;
     }
 }

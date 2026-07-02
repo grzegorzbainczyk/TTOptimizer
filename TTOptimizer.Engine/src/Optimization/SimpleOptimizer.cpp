@@ -46,7 +46,7 @@ Chromosome SimpleOptimizer::optimize(
             {
                 bestChromosome = candidate;
 
-                std::cout
+                std::cerr
                     << "Iteration: " << iteration
                     << ", new best penalty: " << bestChromosome.penalty
                     << '\n';
