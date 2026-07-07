@@ -96,10 +96,21 @@
                 <!-- Filters used to narrow down displayed timetable rows -->
                 <div class="filters-row">
                     <label for="classFilter">Class:</label>
-
                     <!-- Filled dynamically from JavaScript based on generated lessons/classes -->
                     <select id="classFilter">
                         <option value="">All classes</option>
+                    </select>
+
+                    <label for="teacherFilter">Teacher:</label>
+                    <!-- Filled dynamically from JavaScript based on generated lessons/classes -->
+                    <select id="teacherFilter">
+                        <option value="">All teachers</option>
+                    </select>
+
+                    <label for="roomFilter">Room:</label>
+                    <!-- Filled dynamically from JavaScript based on generated lessons/classes -->
+                    <select id="roomFilter">
+                        <option value="">All rooms</option>
                     </select>
                 </div>
 
@@ -138,6 +149,7 @@
 
     <!-- Main JavaScript file.
          Placed at the end so HTML elements exist before JS tries to find them. -->
+    <script src="/js/filters.js"></script>
     <script src="/js/app.js"></script>
 </body>
 </html>

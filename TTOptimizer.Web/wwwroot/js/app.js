@@ -60,6 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
             // Store decoded scheduled lessons in a variable for later filtering.
             currentLessons = data.scheduledLessons ?? [];
 
+            // Fill class dropdowns dynamically from returned lessons.
+            populateClassFilter(classFilter, currentLessons);
+            populateTeacherFilter(teacherFilter, currentLessons);
+            populateRoomFilter(roomFilter, currentLessons);
+
             // Render lessons in the visible table.
             renderLessonsTable(currentLessons);
 
