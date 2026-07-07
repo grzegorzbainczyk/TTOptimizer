@@ -1,5 +1,10 @@
-﻿public class LessonRequirement
+﻿using TTOptimizer.Web.Models.Domain;
+
+public class LessonRequirement
 {
+    public int OrganizationId { get; set; }
+    public Organization Organization { get; set; } = null!;
+
     public int Id { get; set; }
 
     public int ClassGroupId { get; set; }

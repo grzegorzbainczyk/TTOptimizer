@@ -1,5 +1,6 @@
 using TTOptimizer.Web.Services;
 using Microsoft.EntityFrameworkCore;
+using TTOptimizer.Web.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

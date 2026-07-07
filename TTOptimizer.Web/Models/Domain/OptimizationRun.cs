@@ -1,5 +1,10 @@
-﻿public class OptimizationRun
+﻿using TTOptimizer.Web.Models.Domain;
+
+public class OptimizationRun
 {
+    public int OrganizationId { get; set; }
+    public Organization Organization { get; set; } = null!;
+
     public int Id { get; set; }
 
     public DateTime CreatedAtUtc { get; set; }
