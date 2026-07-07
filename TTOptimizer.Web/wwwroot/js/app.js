@@ -1,12 +1,34 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
+﻿// Wait until the whole HTML document is loaded.
+// This guarantees that elements like buttons, table body and filters already exist.
+document.addEventListener("DOMContentLoaded", () => {
+    // Main action buttons
     const runButton = document.getElementById("runOptimizationButton");
     const clearButton = document.getElementById("clearResultButton");
+
+    // Raw JSON/debug output element
     const resultElement = document.getElementById("optimizationResult");
+
+    // Status message shown to the user, for example: Ready / Running / Error
     const statusElement = document.getElementById("statusMessage");
 
+    // Summary values displayed in the three cards above the table
+    const initialPenaltyValue = document.getElementById("initialPenaltyValue");
+    const bestPenaltyValue = document.getElementById("bestPenaltyValue");
+    const lessonsCountValue = document.getElementById("lessonsCountValue");
+
+    // Dropdown used to filter timetable rows by class
+    const classFilter = document.getElementById("classFilter");
+
+    // Stores the latest lessons returned by the API.
+    // This will be useful when filtering by class without calling the API again.
+    let currentLessons = [];
+
+    // Register button click handlers
     runButton.addEventListener("click", runOptimization);
     clearButton.addEventListener("click", clearResult);
 
+    // Runs the optimization by calling the backend API.
+    // The backend then starts the C++ optimization engine.
     async function runOptimization() {
         setRunningState(true);
 
@@ -14,19 +36,39 @@
         resultElement.textContent = "";
 
         try {
-            const response = await fetch("/api/optimization/run", { method: "POST" });
+            // Call ASP.NET endpoint responsible for running the optimizer.
+            const response = await fetch("/api/optimization/run", {
+                method: "POST"
+            });
 
+            // Read response as plain text first.
+            // This helps us display useful error details when the response is not OK.
             const responseText = await response.text();
 
+            // If HTTP status is not successful, throw an error.
+            // Example: 400, 500, etc.
             if (!response.ok) {
                 throw new Error(`Request failed with status ${response.status}: ${responseText}`);
             }
 
+            // Convert JSON string returned by the API into a JavaScript object.
             const data = JSON.parse(responseText);
 
+            // Store raw JSON result for debugging.
             resultElement.textContent = JSON.stringify(data, null, 2);
-            renderLessonsTable(data.scheduledLessons);
 
+            // Store decoded scheduled lessons in a variable for later filtering.
+            currentLessons = data.scheduledLessons ?? [];
+
+            // Render lessons in the visible table.
+            renderLessonsTable(currentLessons);
+
+            // Update summary cards.
+            initialPenaltyValue.textContent = data.initialPenalty ?? "-";
+            bestPenaltyValue.textContent = data.bestPenalty ?? "-";
+            lessonsCountValue.textContent = currentLessons.length;
+
+            // Show final status message depending on optimizer result.
             if (data.success) {
                 statusElement.textContent =
                     `Done. Initial penalty: ${data.initialPenalty}, best penalty: ${data.bestPenalty}.`;
@@ -34,23 +76,35 @@
                 statusElement.textContent = "Engine returned an error.";
             }
         } catch (error) {
+            // Log full error to browser console for debugging.
             console.error(error);
 
             statusElement.textContent = "Error while running optimization.";
 
+            // Show error message in raw result area.
             if (resultElement) {
                 resultElement.textContent = error.message;
             }
         } finally {
-        setRunningState(false);
-    }
+            // Always restore button state, even if request failed.
+            setRunningState(false);
+        }
     }
 
+    // Clears currently displayed result and resets UI text.
     function clearResult() {
         resultElement.textContent = "// Result will appear here";
         statusElement.textContent = "Ready.";
+
+        initialPenaltyValue.textContent = "-";
+        bestPenaltyValue.textContent = "-";
+        lessonsCountValue.textContent = "-";
+
+        currentLessons = [];
+        renderLessonsTable(currentLessons);
     }
 
+    // Enables/disables the run button while optimization is running.
     function setRunningState(isRunning) {
         runButton.disabled = isRunning;
 
@@ -61,33 +115,37 @@
         }
     }
 
+    // Displays lessons in the timetable table.
     function renderLessonsTable(lessons) {
         const tableBody = document.getElementById("lessonsTableBody");
 
+        // Clear previous table content.
         tableBody.innerHTML = "";
 
+        // If there are no lessons, show a single information row.
         if (!lessons || lessons.length === 0) {
             const row = document.createElement("tr");
 
             row.innerHTML = `
-            <td colspan="6">No lessons returned.</td>
-        `;
+                <td colspan="6">No lessons returned.</td>
+            `;
 
             tableBody.appendChild(row);
             return;
         }
 
+        // Create one table row for each lesson returned by the optimizer.
         for (const lesson of lessons) {
             const row = document.createElement("tr");
 
             row.innerHTML = `
-            <td>${lesson.day}</td>
-            <td>${lesson.lessonNumber}</td>
-            <td>${lesson.classGroup}</td>
-            <td>${lesson.subject}</td>
-            <td>${lesson.teacher}</td>
-            <td>${lesson.room}</td>
-        `;
+                <td>${lesson.day}</td>
+                <td>${lesson.lessonNumber}</td>
+                <td>${lesson.classGroup}</td>
+                <td>${lesson.subject}</td>
+                <td>${lesson.teacher}</td>
+                <td>${lesson.room}</td>
+            `;
 
             tableBody.appendChild(row);
         }
