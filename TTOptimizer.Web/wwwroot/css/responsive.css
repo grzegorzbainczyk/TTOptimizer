@@ -1,0 +1,32 @@
+@media (max-width: 900px) {
+    .page {
+        padding: 20px;
+    }
+
+    .app-header {
+        flex-direction: column;
+    }
+
+    .main-layout {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 34px;
+    }
+}
+
+@media (max-width: 700px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .filters-row select {
+        width: 100%;
+    }
+}

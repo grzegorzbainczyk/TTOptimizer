@@ -1,0 +1,23 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-main);
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+h1 {
+    margin: 0;
+    font-size: 42px;
+    letter-spacing: 0.5px;
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: var(--space-lg);
+}

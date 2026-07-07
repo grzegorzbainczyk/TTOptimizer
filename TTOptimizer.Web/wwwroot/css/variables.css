@@ -1,0 +1,40 @@
+﻿/* =========================
+   1. Variables
+========================= */
+
+:root {
+    --color-bg: #f7efe3;
+    --color-panel: #fffaf2;
+    --color-panel-dark: #f3eadc;
+    --color-code-bg: #fffdf8;
+    --color-text: #263238;
+    --color-text-strong: #1f2933;
+    --color-text-soft: #374151;
+    --color-muted: #6b7280;
+    --color-muted-strong: #7c6f64;
+    --color-muted-dark: #8a7d72;
+    --color-info: #355070;
+    --color-border: #e4d7c5;
+    --color-border-soft: #eadfce;
+    --color-border-strong: #d5c4ad;
+    --color-border-control: #cdb89f;
+    --color-primary: #7fb3d5;
+    --color-primary-hover: #5fa3cd;
+    --color-disabled: #c2b8ad;
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 12px;
+    --radius-xl: 18px;
+    --radius-pill: 999px;
+    --space-xs: 6px;
+    --space-sm: 10px;
+    --space-md: 14px;
+    --space-lg: 16px;
+    --space-xl: 18px;
+    --space-2xl: 24px;
+    --space-3xl: 28px;
+    --space-4xl: 32px;
+    --shadow-panel: 0 16px 40px rgba(120, 90, 60, 0.14);
+    --font-main: Arial, Helvetica, sans-serif;
+    --font-mono: Consolas, "Courier New", monospace;
+}
