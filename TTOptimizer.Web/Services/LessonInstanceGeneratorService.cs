@@ -12,7 +12,7 @@ public class LessonInstanceGeneratorService
 
         foreach (var requirement in problem.LessonRequirements)
         {
-            for (int i = 0; i < requirement.WeeklyCount; i++)
+            for (int i = 0; i < requirement.HoursPerWeek; i++)
             {
                 lessonInstances.Add(new LessonInstance
                 {

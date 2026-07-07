@@ -38,11 +38,11 @@ public class TestProblemFactory
     {
         return new List<Teacher>
         {
-            new Teacher { Id = 1, Name = "Jan Kowalski", Subjects = new List<int> { 1 } },
-            new Teacher { Id = 2, Name = "Anna Nowak", Subjects = new List<int> { 2 } },
-            new Teacher { Id = 3, Name = "Piotr Zielinski", Subjects = new List<int> { 3 } },
-            new Teacher { Id = 4, Name = "Maria Wisniewska", Subjects = new List<int> { 4 } },
-            new Teacher { Id = 5, Name = "Tomasz Lewandowski", Subjects = new List<int> { 5, 6 } }
+            //new Teacher { Id = 1, Name = "Jan Kowalski", Subjects = new List<int> { 1 } },
+            //new Teacher { Id = 2, Name = "Anna Nowak", Subjects = new List<int> { 2 } },
+            //new Teacher { Id = 3, Name = "Piotr Zielinski", Subjects = new List<int> { 3 } },
+            //new Teacher { Id = 4, Name = "Maria Wisniewska", Subjects = new List<int> { 4 } },
+            //new Teacher { Id = 5, Name = "Tomasz Lewandowski", Subjects = new List<int> { 5, 6 } }
         };
     }
 
@@ -73,21 +73,21 @@ public class TestProblemFactory
     {
         return new List<LessonRequirement>
         {
-            new LessonRequirement { Id = 1, ClassGroupId = 1, SubjectId = 1, TeacherId = 1, WeeklyCount = 4 },
-            new LessonRequirement { Id = 2, ClassGroupId = 1, SubjectId = 2, TeacherId = 2, WeeklyCount = 3 },
-            new LessonRequirement { Id = 3, ClassGroupId = 1, SubjectId = 3, TeacherId = 3, WeeklyCount = 2 },
-            new LessonRequirement { Id = 4, ClassGroupId = 1, SubjectId = 4, TeacherId = 4, WeeklyCount = 2 },
-            new LessonRequirement { Id = 5, ClassGroupId = 1, SubjectId = 5, TeacherId = 5, WeeklyCount = 2 },
+            new LessonRequirement { Id = 1, ClassGroupId = 1, SubjectId = 1, TeacherId = 1, HoursPerWeek  = 4 },
+            new LessonRequirement { Id = 2, ClassGroupId = 1, SubjectId = 2, TeacherId = 2, HoursPerWeek  = 3 },
+            new LessonRequirement { Id = 3, ClassGroupId = 1, SubjectId = 3, TeacherId = 3, HoursPerWeek  = 2 },
+            new LessonRequirement { Id = 4, ClassGroupId = 1, SubjectId = 4, TeacherId = 4, HoursPerWeek  = 2 },
+            new LessonRequirement { Id = 5, ClassGroupId = 1, SubjectId = 5, TeacherId = 5, HoursPerWeek  = 2 },
 
-            new LessonRequirement { Id = 6, ClassGroupId = 2, SubjectId = 1, TeacherId = 1, WeeklyCount = 4 },
-            new LessonRequirement { Id = 7, ClassGroupId = 2, SubjectId = 2, TeacherId = 2, WeeklyCount = 3 },
-            new LessonRequirement { Id = 8, ClassGroupId = 2, SubjectId = 3, TeacherId = 3, WeeklyCount = 2 },
-            new LessonRequirement { Id = 9, ClassGroupId = 2, SubjectId = 4, TeacherId = 4, WeeklyCount = 2 },
+            new LessonRequirement { Id = 6, ClassGroupId = 2, SubjectId = 1, TeacherId = 1, HoursPerWeek  = 4 },
+            new LessonRequirement { Id = 7, ClassGroupId = 2, SubjectId = 2, TeacherId = 2, HoursPerWeek  = 3 },
+            new LessonRequirement { Id = 8, ClassGroupId = 2, SubjectId = 3, TeacherId = 3, HoursPerWeek  = 2 },
+            new LessonRequirement { Id = 9, ClassGroupId = 2, SubjectId = 4, TeacherId = 4, HoursPerWeek  = 2 },
 
-            new LessonRequirement { Id = 10, ClassGroupId = 3, SubjectId = 1, TeacherId = 1, WeeklyCount = 4 },
-            new LessonRequirement { Id = 11, ClassGroupId = 3, SubjectId = 2, TeacherId = 2, WeeklyCount = 3 },
-            new LessonRequirement { Id = 12, ClassGroupId = 3, SubjectId = 5, TeacherId = 5, WeeklyCount = 2 },
-            new LessonRequirement { Id = 13, ClassGroupId = 3, SubjectId = 6, TeacherId = 5, WeeklyCount = 1 }
+            new LessonRequirement { Id = 10, ClassGroupId = 3, SubjectId = 1, TeacherId = 1, HoursPerWeek  = 4 },
+            new LessonRequirement { Id = 11, ClassGroupId = 3, SubjectId = 2, TeacherId = 2, HoursPerWeek  = 3 },
+            new LessonRequirement { Id = 12, ClassGroupId = 3, SubjectId = 5, TeacherId = 5, HoursPerWeek  = 2 },
+            new LessonRequirement { Id = 13, ClassGroupId = 3, SubjectId = 6, TeacherId = 5, HoursPerWeek  = 1 }
         };
     }
 }

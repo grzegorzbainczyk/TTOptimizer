@@ -1,4 +1,5 @@
 using TTOptimizer.Web.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ builder.Services.AddScoped<TestProblemFactory>();
 builder.Services.AddScoped<ScheduleSlotGeneratorService>();
 builder.Services.AddScoped<LessonInstanceGeneratorService>();
 builder.Services.AddScoped<TimetableDecoderService>();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 

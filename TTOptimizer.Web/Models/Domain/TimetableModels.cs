@@ -16,48 +16,48 @@ public class TimeSlot
     public int LessonNumber { get; set; }
 }
 
-public class Subject
-{
-    public int Id { get; set; }
+//public class Subject
+//{
+//    public int Id { get; set; }
 
-    public string Name { get; set; } = "";
-}
+//    public string Name { get; set; } = "";
+//}
 
-public class Teacher
-{
-    public int Id { get; set; }
+//public class Teacher
+//{
+//    public int Id { get; set; }
 
-    public string Name { get; set; } = "";
+//    public string Name { get; set; } = "";
 
-    public List<int> Subjects { get; set; } = new();
-}
+//    public List<int> Subjects { get; set; } = new();
+//}
 
-public class ClassGroup
-{
-    public int Id { get; set; }
+//public class ClassGroup
+//{
+//    public int Id { get; set; }
 
-    public string Name { get; set; } = "";
-}
+//    public string Name { get; set; } = "";
+//}
 
-public class Room
-{
-    public int Id { get; set; }
+//public class Room
+//{
+//    public int Id { get; set; }
 
-    public string Name { get; set; } = "";
-}
+//    public string Name { get; set; } = "";
+//}
 
-public class LessonRequirement
-{
-    public int Id { get; set; }
+//public class LessonRequirement
+//{
+//    public int Id { get; set; }
 
-    public int ClassGroupId { get; set; }
+//    public int ClassGroupId { get; set; }
 
-    public int SubjectId { get; set; }
+//    public int SubjectId { get; set; }
 
-    public int TeacherId { get; set; }
+//    public int TeacherId { get; set; }
 
-    public int WeeklyCount { get; set; }
-}
+//    public int WeeklyCount { get; set; }
+//}
 
 public class LessonInstance
 {
