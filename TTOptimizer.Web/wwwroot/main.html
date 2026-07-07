@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>TTOrganizer</title>
+
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+    <div class="page">
+        <header class="app-header">
+            <div>
+                <h1>TTOrganizer</h1>
+                <p class="subtitle">
+                    Timetable optimization powered by C++ engine and ASP.NET
+                </p>
+            </div>
+
+            <div class="badge">
+                C++ Engine + .NET
+            </div>
+        </header>
+
+        <main class="main-layout">
+            <section class="panel control-panel">
+                <h2>Optimization</h2>
+
+                <p class="description">
+                    Run the C++ optimization engine and display the decoded timetable result.
+                </p>
+
+                <button id="runOptimizationButton" class="primary-button">
+                    Run optimization
+                </button>
+
+                <div id="statusMessage" class="status-message">
+                    Ready.
+                </div>
+            </section>
+
+            <section class="panel result-panel">
+                <div class="result-header">
+                    <h2>Timetable result</h2>
+
+                    <button id="clearResultButton" class="secondary-button">
+                        Clear
+                    </button>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-label">Initial penalty</div>
+                        <div id="initialPenaltyValue" class="summary-value">-</div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-label">Best penalty</div>
+                        <div id="bestPenaltyValue" class="summary-value">-</div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-label">Lessons</div>
+                        <div id="lessonsCountValue" class="summary-value">-</div>
+                    </div>
+                </div>
+
+                <div class="filters-row">
+                    <label for="classFilter">Class:</label>
+                    <select id="classFilter">
+                        <option value="">All classes</option>
+                    </select>
+
+                    <label for="teacherFilter">Teacher:</label>
+                    <select id="teacherFilter">
+                        <option value="">All teachers</option>
+                    </select>
+
+                    <label for="roomFilter">Room:</label>
+                    <select id="roomFilter">
+                        <option value="">All rooms</option>
+                    </select>
+                </div>
+
+                <table class="lessons-table">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Lesson</th>
+                            <th>Class</th>
+                            <th>Subject</th>
+                            <th>Teacher</th>
+                            <th>Room</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="lessonsTableBody">
+                        <tr>
+                            <td colspan="6">No timetable generated yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <pre id="optimizationResult" class="json-output hidden">// Raw result will appear here</pre>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            created by Grzegorz Bainczyk
+        </footer>
+    </div>
+
+    <script src="/js/filters.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

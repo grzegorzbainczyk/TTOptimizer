@@ -1,6 +1,27 @@
 ﻿// Wait until the whole HTML document is loaded.
 // This guarantees that elements like buttons, table body and filters already exist.
 document.addEventListener("DOMContentLoaded", () => {
+
+    const currentUser = localStorage.getItem("ttorganizer_user");
+
+    if (!currentUser) {
+        window.location.href = "/index.html";
+        return;
+    }
+
+    //authentication panel and app shell
+    //const authPanel = document.getElementById("authPanel");
+    //const appShell = document.getElementById("appShell");
+
+    //const loginButton = document.getElementById("loginButton");
+    //const registerButton = document.getElementById("registerButton");
+    //const demoLoginButton = document.getElementById("demoLoginButton");
+
+    //const authMessage = document.getElementById("authMessage");
+
+    //let currentUser = null;
+    //let currentOrganization = null;
+
     // Main action buttons
     const runButton = document.getElementById("runOptimizationButton");
     const clearButton = document.getElementById("clearResultButton");
@@ -20,6 +41,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const classFilter = document.getElementById("classFilter");
     const teacherFilter = document.getElementById("teacherFilter");
     const roomFilter = document.getElementById("roomFilter");
+
+    demoLoginButton.addEventListener("click", loginAsDemoUser);
+
+    loginButton.addEventListener("click", () => {
+        statusElement.textContent = "Login is not implemented yet. Use demo user for now.";
+    });
+
+    registerButton.addEventListener("click", () => {
+        statusElement.textContent = "Registration is not implemented yet. Use demo user for now.";
+    });
+
+    loginButton.addEventListener("click", () => {
+        authMessage.textContent = "Login is not implemented yet. Use demo user for now.";
+    });
+
+    registerButton.addEventListener("click", () => {
+        authMessage.textContent = "Registration is not implemented yet. Use demo user for now.";
+    });
 
     // Stores the latest lessons returned by the API.
     // This will be useful when filtering by class without calling the API again.
@@ -134,5 +173,21 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             runButton.textContent = "Run optimization";
         }
+    }
+
+    function loginAsDemoUser() {
+        currentUser = {
+            userName: "demo@ttorganizer.local",
+            displayName: "Demo User"
+        };
+
+        currentOrganization = {
+            name: "Demo School"
+        };
+
+        authPanel.classList.add("hidden");
+        appShell.classList.remove("hidden");
+
+        statusElement.textContent = "Logged in as Demo User.";
     }
 });

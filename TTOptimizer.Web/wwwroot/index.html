@@ -1,160 +1,68 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Basic document metadata -->
     <meta charset="UTF-8" />
-
-    <!-- Makes the layout responsive on mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Browser tab title -->
-    <title>TTOptimizer</title>
+    <title>TTOrganizer - Login</title>
+
     <link rel="stylesheet" href="/css/style.css" />
-    <link rel="stylesheet" href="/css/variables.css" />
-    <link rel="stylesheet" href="/css/base.css" />
-    <link rel="stylesheet" href="/css/layout.css" />
-    <link rel="stylesheet" href="/css/components.css" />
-    <link rel="stylesheet" href="/css/tables.css" />
-    <link rel="stylesheet" href="/css/responsive.css" />
 </head>
 
 <body>
-    <!-- Whole application page wrapper -->
     <div class="page">
+        <main class="auth-page">
+            <section class="auth-card">
+                <div class="auth-brand">
+                    <h1>TTOrganizer</h1>
 
-        <!-- Application header: title, subtitle and technology badge -->
-        <header class="app-header">
-            <div>
-                <h1>TTOptimizer</h1>
+                    <p class="subtitle">
+                        Organize and optimize school timetables with a C++ engine and ASP.NET.
+                    </p>
+                </div>
 
-                <p class="subtitle">
-                    Timetable optimization powered by C++ engine and ASP.NET
-                </p>
-            </div>
+                <form id="loginForm" class="auth-form">
+                    <label for="loginEmail">Email</label>
+                    <input id="loginEmail" class="text-input" type="email" placeholder="user@example.com" />
 
-            <!-- Small visual badge with technology stack -->
-            <div class="badge">
-                C++ Engine + .NET
-            </div>
-        </header>
+                    <label for="loginPassword">Password</label>
+                    <input id="loginPassword" class="text-input" type="password" placeholder="Password" />
 
-        <!-- Main two-column layout:
-             left side = controls,
-             right side = optimization result -->
-        <main class="main-layout">
+                    <button id="loginButton" class="primary-button" type="button">
+                        Log in
+                    </button>
+                </form>
 
-            <!-- Left panel: optimization controls -->
-            <section class="panel control-panel">
-                <h2>Optimization</h2>
+                <form id="registerForm" class="auth-form hidden">
+                    <label for="registerName">Name</label>
+                    <input id="registerName" class="text-input" type="text" placeholder="Your name" />
 
-                <p class="description">
-                    Run the C++ optimization engine and display the decoded timetable result.
-                </p>
+                    <label for="registerEmail">Email</label>
+                    <input id="registerEmail" class="text-input" type="email" placeholder="user@example.com" />
 
-                <!-- Starts optimization by calling JavaScript function / API endpoint -->
-                <button id="runOptimizationButton" class="primary-button">
-                    Run optimization
+                    <label for="registerPassword">Password</label>
+                    <input id="registerPassword" class="text-input" type="password" placeholder="Password" />
+
+                    <button id="registerButton" class="primary-button" type="button">
+                        Create account
+                    </button>
+                </form>
+
+                <div class="auth-separator">
+                    <span>or</span>
+                </div>
+
+                <button id="demoLoginButton" class="demo-login-button full-width-button" type="button">
+                    Continue as demo user
                 </button>
 
-                <!-- Shows current application status, for example Ready / Running / Error -->
-                <div id="statusMessage" class="status-message">
-                    Ready.
+                <div id="authMessage" class="status-message">
+                    Demo mode is available.
                 </div>
-            </section>
-
-            <!-- Right panel: decoded timetable result -->
-            <section class="panel result-panel">
-
-                <!-- Result panel header with clear button -->
-                <div class="result-header">
-                    <h2>Timetable result</h2>
-
-                    <!-- Clears currently displayed result from the UI -->
-                    <button id="clearResultButton" class="secondary-button">
-                        Clear
-                    </button>
-                </div>
-
-                <!-- Summary cards with basic optimization statistics -->
-                <div class="summary-grid">
-
-                    <!-- Penalty before optimization -->
-                    <div class="summary-card">
-                        <div class="summary-label">Initial penalty</div>
-                        <div id="initialPenaltyValue" class="summary-value">-</div>
-                    </div>
-
-                    <!-- Best penalty found by the optimizer -->
-                    <div class="summary-card">
-                        <div class="summary-label">Best penalty</div>
-                        <div id="bestPenaltyValue" class="summary-value">-</div>
-                    </div>
-
-                    <!-- Number of lessons returned in the generated timetable -->
-                    <div class="summary-card">
-                        <div class="summary-label">Lessons</div>
-                        <div id="lessonsCountValue" class="summary-value">-</div>
-                    </div>
-                </div>
-
-                <!-- Filters used to narrow down displayed timetable rows -->
-                <div class="filters-row">
-                    <label for="classFilter">Class:</label>
-                    <!-- Filled dynamically from JavaScript based on generated lessons/classes -->
-                    <select id="classFilter">
-                        <option value="">All classes</option>
-                    </select>
-
-                    <label for="teacherFilter">Teacher:</label>
-                    <!-- Filled dynamically from JavaScript based on generated lessons/classes -->
-                    <select id="teacherFilter">
-                        <option value="">All teachers</option>
-                    </select>
-
-                    <label for="roomFilter">Room:</label>
-                    <!-- Filled dynamically from JavaScript based on generated lessons/classes -->
-                    <select id="roomFilter">
-                        <option value="">All rooms</option>
-                    </select>
-                </div>
-
-                <!-- Decoded timetable displayed as a readable table -->
-                <table class="lessons-table">
-                    <thead>
-                        <tr>
-                            <th>Day</th>
-                            <th>Lesson</th>
-                            <th>Class</th>
-                            <th>Subject</th>
-                            <th>Teacher</th>
-                            <th>Room</th>
-                        </tr>
-                    </thead>
-
-                    <!-- Table body is filled dynamically by app.js -->
-                    <tbody id="lessonsTableBody">
-                        <tr>
-                            <td colspan="6">No timetable generated yet.</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Raw JSON/debug result.
-                     Hidden by default, useful while developing or debugging. -->
-                <pre id="optimizationResult" class="json-output hidden">// Raw result will appear here</pre>
             </section>
         </main>
-
-        <!-- Application footer -->
-        <footer class="app-footer">
-            created by Grzegorz Bainczyk
-        </footer>
     </div>
 
-    <!-- Main JavaScript file.
-         Placed at the end so HTML elements exist before JS tries to find them. -->
-    <script src="/js/lessons_table.js"></script>
-    <script src="/js/filters.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="/js/login.js"></script>
 </body>
 </html>
