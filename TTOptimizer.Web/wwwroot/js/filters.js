@@ -60,3 +60,22 @@ function populateRoomFilter(roomFilter, lessons) {
 
     populateFilter(roomFilter, rooms, "All rooms");
 }
+
+function getFilteredLessons(lessons) {
+    const selectedClass = classFilter.value;
+    const selectedTeacher = teacherFilter.value;
+    const selectedRoom = roomFilter.value;
+
+    return lessons.filter(lesson => {
+        const matchesClass =
+            !selectedClass || lesson.classGroup === selectedClass;
+
+        const matchesTeacher =
+            !selectedTeacher || lesson.teacher === selectedTeacher;
+
+        const matchesRoom =
+            !selectedRoom || lesson.room === selectedRoom;
+
+        return matchesClass && matchesTeacher && matchesRoom;
+    });
+}

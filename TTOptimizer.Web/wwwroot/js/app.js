@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Dropdown used to filter timetable rows by class
     const classFilter = document.getElementById("classFilter");
+    const teacherFilter = document.getElementById("teacherFilter");
+    const roomFilter = document.getElementById("roomFilter");
 
     // Stores the latest lessons returned by the API.
     // This will be useful when filtering by class without calling the API again.
@@ -26,6 +28,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // Register button click handlers
     runButton.addEventListener("click", runOptimization);
     clearButton.addEventListener("click", clearResult);
+
+    //filter handlers
+    classFilter.addEventListener("change", () => {
+        renderLessonsTable(currentLessons);
+    });
+
+    teacherFilter.addEventListener("change", () => {
+        renderLessonsTable(currentLessons);
+    });
+
+    roomFilter.addEventListener("change", () => {
+        renderLessonsTable(currentLessons);
+    });
+
 
     // Runs the optimization by calling the backend API.
     // The backend then starts the C++ optimization engine.
