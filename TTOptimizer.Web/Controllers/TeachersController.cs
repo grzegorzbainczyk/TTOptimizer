@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TTOptimizer.Web.Models;
+using TTOptimizer.Web.Data;
 
 namespace TTOptimizer.Web.Controllers;
 

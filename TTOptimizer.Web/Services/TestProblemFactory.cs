@@ -38,11 +38,11 @@ public class TestProblemFactory
     {
         return new List<Teacher>
         {
-            //new Teacher { Id = 1, Name = "Jan Kowalski", Subjects = new List<int> { 1 } },
-            //new Teacher { Id = 2, Name = "Anna Nowak", Subjects = new List<int> { 2 } },
-            //new Teacher { Id = 3, Name = "Piotr Zielinski", Subjects = new List<int> { 3 } },
-            //new Teacher { Id = 4, Name = "Maria Wisniewska", Subjects = new List<int> { 4 } },
-            //new Teacher { Id = 5, Name = "Tomasz Lewandowski", Subjects = new List<int> { 5, 6 } }
+            new Teacher { Id = 1, Name = "Jan Kowalski", Subjects = new List<int> { 1 } },
+            new Teacher { Id = 2, Name = "Anna Nowak", Subjects = new List<int> { 2 } },
+            new Teacher { Id = 3, Name = "Piotr Zielinski", Subjects = new List<int> { 3 } },
+            new Teacher { Id = 4, Name = "Maria Wisniewska", Subjects = new List<int> { 4 } },
+            new Teacher { Id = 5, Name = "Tomasz Lewandowski", Subjects = new List<int> { 5, 6 } }
         };
     }
 

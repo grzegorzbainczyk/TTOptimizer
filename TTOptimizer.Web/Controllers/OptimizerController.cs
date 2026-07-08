@@ -9,20 +9,20 @@ namespace TTOptimizer.Web.Controllers;
 public class OptimizationController : ControllerBase
 {
     private readonly CppOptimizerService _optimizerService;
-    private readonly TestProblemFactory _testProblemFactory;
+    private readonly TimetableProblemBuilder _problemBuilder;
     private readonly ScheduleSlotGeneratorService _scheduleSlotGenerator;
     private readonly LessonInstanceGeneratorService _lessonInstanceGenerator;
     private readonly TimetableDecoderService _timetableDecoder;
 
     public OptimizationController(
         CppOptimizerService optimizerService,
-        TestProblemFactory testProblemFactory,
+        TimetableProblemBuilder problemBuilder,
         ScheduleSlotGeneratorService scheduleSlotGenerator,
         LessonInstanceGeneratorService lessonInstanceGenerator,
         TimetableDecoderService timetableDecoder)
     {
         _optimizerService = optimizerService;
-        _testProblemFactory = testProblemFactory;
+        _problemBuilder = problemBuilder;
         _scheduleSlotGenerator = scheduleSlotGenerator;
         _lessonInstanceGenerator = lessonInstanceGenerator;
         _timetableDecoder = timetableDecoder;
@@ -31,6 +31,10 @@ public class OptimizationController : ControllerBase
     [HttpPost("run")]
     public async Task<IActionResult> Run()
     {
+        var organizationId = 1; // na razie demo user
+
+        var problem = await _problemBuilder.BuildAsync(organizationId);
+
         var engineResult = await _optimizerService.RunOptimizationAsync();
 
         if (!engineResult.Success)
@@ -43,8 +47,6 @@ public class OptimizationController : ControllerBase
                 Error = engineResult.Error
             });
         }
-
-        var problem = _testProblemFactory.CreateTestProblem1();
 
         var scheduleSlots = _scheduleSlotGenerator.Generate(problem);
         var lessonInstances = _lessonInstanceGenerator.Generate(problem);

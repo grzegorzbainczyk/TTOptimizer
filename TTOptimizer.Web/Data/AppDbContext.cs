@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Models.Domain;
 
-namespace TTOptimizer.Web.Models
+namespace TTOptimizer.Web.Data
 {
     public class AppDbContext : DbContext
     {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TTOptimizer.Web.Models;
+using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
 
 namespace TTOptimizer.Web.Services
