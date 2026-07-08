@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TTOrganizer - Rooms</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <div class="page-container">
+        <header class="app-header">
+            <div>
+                <h1>Rooms</h1>
+                <p class="page-subtitle">Rooms assigned to your organization</p>
+            </div>
+
+            <nav class="header-actions">
+                <button id="backToMainButton" class="secondary-button">
+                    Back
+                </button>
+
+                <button id="refreshRoomsButton" class="secondary-button">
+                    Refresh
+                </button>
+            </nav>
+        </header>
+
+        <main class="content-card">
+            <div class="section-header">
+                <h2>Rooms list</h2>
+
+                <button id="addRoomButton" class="primary-button">
+                    Add room
+                </button>
+            </div>
+
+            <table class="data-table" id="roomsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th class="table-actions-column">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3">Loading rooms...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script src="js/rooms.js"></script>
+</body>
+</html>
