@@ -26,3 +26,44 @@
     font-size: 13px;
     text-align: center;
 }
+
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+}
+
+    .app-header h1 {
+        margin: 0;
+    }
+
+
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.content-card {
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .section-header h2 {
+        margin: 0;
+    }

@@ -47,8 +47,14 @@ public class TimetableDecoderService
             Subject subject = problem.Subjects
                 .First(x => x.Id == requirement.SubjectId);
 
-            Teacher teacher = problem.Teachers
-                .First(x => x.Id == requirement.TeacherId);
+            Teacher? teacher = problem.Teachers
+                .FirstOrDefault(x => x.Id == requirement.TeacherId);
+
+            if (teacher == null)
+            {
+                throw new InvalidOperationException(
+                    $"Teacher not found. RequirementId={requirement.Id}, TeacherId={requirement.TeacherId}");
+            }
 
             Room room = problem.Rooms
                 .First(x => x.Id == scheduleSlot.RoomId);

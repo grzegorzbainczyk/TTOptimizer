@@ -42,3 +42,31 @@
     text-align: left;
     font-size: 14px;
 }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+    .data-table th,
+    .data-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+    }
+
+    .data-table th {
+        background: #f3f4f6;
+        font-weight: 700;
+    }
+
+    .data-table tr:hover {
+        background: #f9fafb;
+    }
+
+.table-actions-column {
+    width: 140px;
+}

@@ -1,3 +1,7 @@
+/* ================================
+   Filters
+   ================================ */
+
 .filters-row {
     display: flex;
     align-items: center;
@@ -5,24 +9,29 @@
     margin-bottom: var(--space-md);
 }
 
-.filters-row label {
-    color: var(--color-muted);
-    font-size: 14px;
-}
+    .filters-row label {
+        color: var(--color-muted);
+        font-size: 14px;
+    }
 
-.filters-row select {
-    min-width: 160px;
-    padding: 9px 12px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-border-control);
-    background: var(--color-code-bg);
-    color: var(--color-text-soft);
-}
+    .filters-row select {
+        min-width: 160px;
+        padding: 9px 12px;
+        border: 1px solid var(--color-border-control);
+        border-radius: var(--radius-sm);
+        background: var(--color-code-bg);
+        color: var(--color-text-soft);
+    }
 
-.filters-row select option {
-    background: var(--color-code-bg);
-    color: var(--color-text-soft);
-}
+        .filters-row select option {
+            background: var(--color-code-bg);
+            color: var(--color-text-soft);
+        }
+
+
+/* ================================
+   Panels
+   ================================ */
 
 .panel {
     background: var(--color-panel);
@@ -40,6 +49,11 @@
     min-width: 0;
 }
 
+
+/* ================================
+   Badges
+   ================================ */
+
 .badge {
     padding: 10px 16px;
     border: 1px solid var(--color-border);
@@ -50,29 +64,79 @@
     white-space: nowrap;
 }
 
+
+/* ================================
+   Buttons
+   ================================ */
+
 .primary-button,
-.secondary-button {
+.secondary-button,
+.secondary-action-button,
+.small-button {
     border: none;
-    border-radius: var(--radius-md);
     cursor: pointer;
     font-size: 15px;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+
+.primary-button,
+.secondary-action-button {
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: var(--radius-md);
+    text-align: center;
 }
 
 .primary-button {
-    width: 100%;
-    padding: 14px 18px;
     background: var(--color-primary);
     color: #1f2933;
-    font-weight: 700;
 }
 
-.primary-button:hover {
-    background: var(--color-primary-hover);
+    .primary-button:hover {
+        background: var(--color-primary-hover);
+    }
+
+.secondary-action-button {
+    background: #2563eb;
+    color: white;
 }
+
+    .secondary-action-button:hover {
+        opacity: 0.9;
+    }
 
 .secondary-button {
-    padding: 9px 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
     background: var(--color-code-bg);
     color: var(--color-text-soft);
-    border: 1px solid var(--color-border);
+}
+
+    .secondary-button:hover {
+        opacity: 0.9;
+    }
+
+.small-button {
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    background: #f3f4f6;
+    color: #111827;
+}
+
+    .small-button:hover {
+        opacity: 0.9;
+    }
+
+
+/* ================================
+   Action groups
+   ================================ */
+
+.main-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 18px;
 }
