@@ -5,6 +5,7 @@ using TTOptimizer.Web.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<DemoDataSeeder>();
 builder.Services.AddScoped<CppOptimizerService>();
 builder.Services.AddScoped<TimetableProblemBuilder>();
 builder.Services.AddScoped<ScheduleSlotGeneratorService>();

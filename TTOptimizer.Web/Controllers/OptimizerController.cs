@@ -8,7 +8,7 @@ namespace TTOptimizer.Web.Controllers;
 [Route("api/[controller]")]
 public class OptimizationController : ControllerBase
 {
-    private readonly CppOptimizerService _optimizerService;
+    private readonly CppOptimizerService _cppOptimizerService;
     private readonly TimetableProblemBuilder _problemBuilder;
     private readonly ScheduleSlotGeneratorService _scheduleSlotGenerator;
     private readonly LessonInstanceGeneratorService _lessonInstanceGenerator;
@@ -21,7 +21,7 @@ public class OptimizationController : ControllerBase
         LessonInstanceGeneratorService lessonInstanceGenerator,
         TimetableDecoderService timetableDecoder)
     {
-        _optimizerService = optimizerService;
+        _cppOptimizerService = optimizerService;
         _problemBuilder = problemBuilder;
         _scheduleSlotGenerator = scheduleSlotGenerator;
         _lessonInstanceGenerator = lessonInstanceGenerator;
@@ -31,40 +31,29 @@ public class OptimizationController : ControllerBase
     [HttpPost("run")]
     public async Task<IActionResult> Run()
     {
-        var organizationId = 1; // na razie demo user
+        int organizationId = 1; // demo na razie
 
-        var problem = await _problemBuilder.BuildAsync(organizationId);
+        var buildResult = await _problemBuilder.BuildAsync(organizationId);
 
-        var engineResult = await _optimizerService.RunOptimizationAsync();
-
-        if (!engineResult.Success)
+        if (!buildResult.Success || buildResult.Problem == null)
         {
-            return Ok(new OptimizationViewResult
+            return BadRequest(new
             {
-                Success = false,
-                InitialPenalty = engineResult.InitialPenalty,
-                BestPenalty = engineResult.BestPenalty,
-                Error = engineResult.Error
+                success = false,
+                message = buildResult.Message
             });
         }
 
-        var scheduleSlots = _scheduleSlotGenerator.Generate(problem);
-        var lessonInstances = _lessonInstanceGenerator.Generate(problem);
+        var problem = buildResult.Problem;
 
-        var scheduledLessons = _timetableDecoder.Decode(
-            engineResult,
-            problem,
-            scheduleSlots,
-            lessonInstances);
+        // Na razie CppOptimizerService nie przyjmuje problemu,
+        // tylko uruchamia silnik C++ z parametrem --json.
+        var optimizationResult = await _cppOptimizerService.RunOptimizationAsync();
 
-        var viewResult = new OptimizationViewResult
+        return Ok(new
         {
-            Success = true,
-            InitialPenalty = engineResult.InitialPenalty,
-            BestPenalty = engineResult.BestPenalty,
-            ScheduledLessons = scheduledLessons
-        };
-
-        return Ok(viewResult);
+            success = true,
+            result = optimizationResult
+        });
     }
 }
