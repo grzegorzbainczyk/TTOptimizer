@@ -16,10 +16,8 @@ public class RoomsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetRooms()
+    public async Task<IActionResult> GetRooms([FromQuery] int organizationId)
     {
-        int organizationId = 1;
-
         var rooms = await _db.Rooms
             .Where(r => r.OrganizationId == organizationId)
             .OrderBy(r => r.Name)

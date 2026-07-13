@@ -26,7 +26,6 @@ async function loadTeachers() {
     try {
         
         const organizationId = window.appContext.requireOrganizationId();
-
         const response = await fetch(`api/teachers?organizationId=${organizationId}`);
 
         if (!response.ok) {

@@ -16,11 +16,8 @@ public class ClassesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetClasses()
-    {
-        // Na razie demo. Docelowo weźmiemy OrganizationId z zalogowanego użytkownika.
-        int organizationId = 1;
-
+    public async Task<IActionResult> GetClasses([FromQuery] int organizationId)
+    {        
         var classes = await _db.ClassGroups
             .Where(t => t.OrganizationId == organizationId)
             .OrderBy(t => t.Name)

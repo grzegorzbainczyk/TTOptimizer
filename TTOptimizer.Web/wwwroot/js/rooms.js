@@ -24,10 +24,12 @@
 
 async function loadRooms() {
     try {
-        const response = await fetch("/api/rooms");
+        const organizationId = window.appContext.requireOrganizationId();
+        const response = await fetch(`api/rooms?organizationId=${organizationId}`);
 
         if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`HTTP error: ${response.status}. Response: ${errorText}`);
         }
 
         const rooms = await response.json();

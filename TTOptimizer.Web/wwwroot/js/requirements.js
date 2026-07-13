@@ -23,11 +23,13 @@
 });
 
 async function loadRequirements() {
-    try {
-        const response = await fetch("/api/requirements");
+    try {        
+        const organizationId = window.appContext.requireOrganizationId();
+        const response = await fetch(`api/requirements?organizationId=${organizationId}`);
 
         if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`HTTP error: ${response.status}. Response: ${errorText}`);
         }
 
         const requirements = await response.json();

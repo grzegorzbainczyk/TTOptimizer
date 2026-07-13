@@ -24,10 +24,12 @@
 
 async function loadSubjects() {
     try {
-        const response = await fetch("/api/subjects");
+        const organizationId = window.appContext.requireOrganizationId();
+        const response = await fetch(`api/subjects?organizationId=${organizationId}`);
 
         if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`HTTP error: ${response.status}. Response: ${errorText}`);
         }
 
         const subjects = await response.json();

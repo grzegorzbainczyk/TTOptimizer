@@ -24,13 +24,15 @@
 
 async function loadClasses() {
     try {
-        const response = await fetch("/api/classes");
+
+        const organizationId = window.appContext.requireOrganizationId();
+        const response = await fetch(`api/classes?organizationId=${organizationId}`);
 
         if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`HTTP error: ${response.status}. Response: ${errorText}`);
         }
-
-        const classes = await response.json();
+        const classes = await response.json();       
         renderClasses(classes);
     } catch (error) {
         console.error("Error loading classes:", error);

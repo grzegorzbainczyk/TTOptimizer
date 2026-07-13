@@ -16,10 +16,8 @@ public class RequirementsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetRequirements()
-    {
-        int organizationId = 1;
-
+    public async Task<IActionResult> GetRequirements([FromQuery] int organizationId)
+    {      
         var requirements = await _db.LessonRequirements
             .Where(r => r.OrganizationId == organizationId)
             .OrderBy(r => r.Id)

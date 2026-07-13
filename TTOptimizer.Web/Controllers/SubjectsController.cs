@@ -16,10 +16,8 @@ public class SubjectsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetSubjects()
+    public async Task<IActionResult> GetSubjects([FromQuery] int organizationId)
     {
-        int organizationId = 1;
-
         var subjects = await _db.Subjects
             .Where(s => s.OrganizationId == organizationId)
             .OrderBy(s => s.Name)
