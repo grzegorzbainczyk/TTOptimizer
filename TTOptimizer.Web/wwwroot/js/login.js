@@ -18,12 +18,25 @@
         authMessage.textContent = "Registration is not implemented yet. Use demo user for now.";
     }
 
-    function loginAsDemoUser() {
-        // Temporary client-side demo login.
-        // Later this should call POST /api/auth/demo-login.
-        localStorage.setItem("ttorganizer_user", "demo@ttorganizer.local");
-        localStorage.setItem("ttorganizer_organization", "Demo School");
+    async function loginAsDemoUser() {
+        try {
+            const response = await fetch("/api/demo/login", {
+                method: "POST"
+            });
 
-        window.location.href = "/main.html";
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                alert(data.message || "Demo login failed.");
+                return;
+            }
+
+            window.appContext.setLoginContext(data.userId, data.organizationId);
+
+            window.location.href = "main.html";
+        } catch (error) {
+            console.error("Demo login error:", error);
+            alert("Demo login failed. Check if the backend is running.");
+        }
     }
 });

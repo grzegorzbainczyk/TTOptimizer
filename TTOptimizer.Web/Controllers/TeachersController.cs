@@ -8,27 +8,18 @@ namespace TTOptimizer.Web.Controllers;
 [Route("api/[controller]")]
 public class TeachersController : ControllerBase
 {
-    private readonly AppDbContext _db;
+    private readonly AppDbContext _dbContext;
 
     public TeachersController(AppDbContext db)
     {
-        _db = db;
+        _dbContext = db;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTeachers()
+    public async Task<IActionResult> GetTeachers([FromQuery] int organizationId)
     {
-        // Na razie demo. Docelowo weźmiemy OrganizationId z zalogowanego użytkownika.
-        int organizationId = 1;
-
-        var teachers = await _db.Teachers
+        var teachers = await _dbContext.Teachers
             .Where(t => t.OrganizationId == organizationId)
-            .OrderBy(t => t.Name)
-            .Select(t => new
-            {
-                t.Id,
-                t.Name
-            })
             .ToListAsync();
 
         return Ok(teachers);

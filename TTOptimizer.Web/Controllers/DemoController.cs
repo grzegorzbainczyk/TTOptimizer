@@ -21,6 +21,8 @@ public class DemoController : ControllerBase
 
         return Ok(new
         {
+            success = true,
+            userId = 2, // temporary
             userName = "Demo User",
             organizationId
         });

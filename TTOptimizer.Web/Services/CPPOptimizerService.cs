@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using TTOptimizer.Web.Models;
+using TTOptimizer.Web.Models.Domain;
 
 namespace TTOptimizer.Web.Services;
 
@@ -14,55 +15,78 @@ public class CppOptimizerService
             ?? throw new InvalidOperationException("CppEngine:Path is not configured.");
     }
 
-    public async Task<EngineOptimizationResult> RunOptimizationAsync()
+    public async Task<EngineOptimizationResult> RunOptimizationAsync(TimetableProblem problem)
     {
-        var startInfo = new ProcessStartInfo
+        var inputJson = JsonSerializer.Serialize(problem, new JsonSerializerOptions
         {
-            FileName = _enginePath,
-            Arguments = "--json",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        });
 
-        using var process = new Process
+        var inputPath = Path.Combine(
+            Path.GetTempPath(),
+            $"ttoptimizer_problem_{Guid.NewGuid():N}.json");
+
+        await File.WriteAllTextAsync(inputPath, inputJson);
+
+
+        try
         {
-            StartInfo = startInfo
-        };
-
-        process.Start();
-
-        string output = await process.StandardOutput.ReadToEndAsync();
-        string error = await process.StandardError.ReadToEndAsync();
-
-        await process.WaitForExitAsync();
-
-        if (string.IsNullOrWhiteSpace(output))
-        {
-            throw new InvalidOperationException(
-                $"C++ engine returned empty output. Error: {error}");
-        }
-
-        var result = JsonSerializer.Deserialize<EngineOptimizationResult>(
-            output,
-            new JsonSerializerOptions
+            var startInfo = new ProcessStartInfo
             {
-                PropertyNameCaseInsensitive = true
-            });
+                FileName = _enginePath,
+                Arguments = $"--input \"{inputPath}\" --json",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
-        if (result is null)
-        {
-            throw new InvalidOperationException(
-                $"Could not deserialize C++ engine output. Output: {output}");
+            using var process = new Process
+            {
+                StartInfo = startInfo
+            };
+
+            process.Start();
+
+            string output = await process.StandardOutput.ReadToEndAsync();
+            string error = await process.StandardError.ReadToEndAsync();
+
+            await process.WaitForExitAsync();
+
+            if (string.IsNullOrWhiteSpace(output))
+            {
+                throw new InvalidOperationException(
+                    $"C++ engine returned empty output. Error: {error}");
+            }
+
+            var result = JsonSerializer.Deserialize<EngineOptimizationResult>(
+                output,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            if (result is null)
+            {
+                throw new InvalidOperationException(
+                    $"Could not deserialize C++ engine output. Output: {output}");
+            }
+
+            if (process.ExitCode != 0 && result.Success)
+            {
+                throw new InvalidOperationException(
+                    $"C++ engine failed with exit code {process.ExitCode}. Error: {error}");
+            }
+
+            return result;
         }
-
-        if (process.ExitCode != 0 && result.Success)
+        finally
         {
-            throw new InvalidOperationException(
-                $"C++ engine failed with exit code {process.ExitCode}. Error: {error}");
+            if (File.Exists(inputPath))
+            {
+                File.Delete(inputPath);
+            }
         }
-
-        return result;
     }
 }

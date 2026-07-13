@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include "Domain/TimetableModels.h"
 #include "TestData/test1.h"
 #include "TestData/test2.h"
@@ -129,34 +132,52 @@ int RunJsonMode()
 
 int main(int argc, char* argv[])
 {
-	try
+	bool jsonOutput = false;
+	std::string inputPath;
+
+	for (int i = 1; i < argc; ++i)
 	{
-		if (argc >= 2)
+		std::string arg = argv[i];
+
+		if (arg == "--json")
 		{
-			std::string mode = argv[1];
+			jsonOutput = true;
+		}
+		else if (arg == "--input" && i + 1 < argc)
+		{
+			inputPath = argv[++i];
+		}
+	}
 
-			if (mode == "--json")
-			{
-				return RunJsonMode();
-			}
+	std::string inputJson;
 
-			if (mode == "--demo")
-			{
-				return RunDemoMode();
-			}
+	if (!inputPath.empty())
+	{
+		std::ifstream file(inputPath);
 
-			std::cerr << "Unknown mode: " << mode << '\n';
-			std::cerr << "Supported modes: --demo, --json\n";
+		if (!file)
+		{
+			std::cerr << "Could not open input file: " << inputPath << std::endl;
 			return 1;
 		}
 
-		return RunDemoMode();
+		std::ostringstream buffer;
+		buffer << file.rdbuf();
+		inputJson = buffer.str();
 	}
-	catch (const std::exception& exception)
+
+	// TODO:
+	// 1. Parse inputJson
+	// 2. Convert JSON to TimetableProblem
+	// 3. Run optimization on that problem
+	// 4. Return result JSON to stdout
+
+	if (jsonOutput)
 	{
-		std::cerr << "Fatal error: " << exception.what() << '\n';
-		return 1;
+		std::cout << R"({"success":true,"penalty":0,"lessons":[]})" << std::endl;
 	}
+
+	return 0;
 }
 
 

@@ -6,7 +6,7 @@ namespace TTOptimizer.Web.Data;
 
 public class DemoDataSeeder
 {
-    private const string DemoOrganizationName = "Demo Organization";
+    private const string DemoOrganizationName = "Demo School";
 
     private readonly AppDbContext _context;
 
