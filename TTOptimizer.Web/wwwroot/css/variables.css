@@ -1,40 +1,32 @@
 ﻿/* =========================
    1. Variables
 ========================= */
-
 :root {
-    --color-bg: #f7efe3;
-    --color-panel: #fffaf2;
-    --color-panel-dark: #f3eadc;
-    --color-code-bg: #fffdf8;
-    --color-text: #263238;
-    --color-text-strong: #1f2933;
-    --color-text-soft: #374151;
-    --color-muted: #6b7280;
-    --color-muted-strong: #7c6f64;
-    --color-muted-dark: #8a7d72;
-    --color-info: #355070;
-    --color-border: #e4d7c5;
-    --color-border-soft: #eadfce;
-    --color-border-strong: #d5c4ad;
-    --color-border-control: #cdb89f;
-    --color-primary: #7fb3d5;
-    --color-primary-hover: #5fa3cd;
-    --color-disabled: #c2b8ad;
+    --color-bg-start: #dbeafe;
+    --color-bg-middle: #bfdbfe;
+    --color-bg-end: #e0f2fe;
+    --color-surface: rgba(255, 255, 255, 0.78);
+    --color-surface-strong: rgba(255, 255, 255, 0.94);
+    --color-surface-dark: rgba(30, 64, 175, 0.88);
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-primary-soft: rgba(37, 99, 235, 0.12);
+    --color-secondary: #0ea5e9;
+    --color-secondary-hover: #0284c7;
+    --color-warning: #f59e0b;
+    --color-danger: #dc2626;
+    --color-success: #16a34a;
+    --color-text: #0f172a;
+    --color-text-muted: #475569;
+    --color-text-light: #f8fafc;
+    --color-border: rgba(59, 130, 246, 0.22);
+    --shadow-soft: 0 10px 26px rgba(37, 99, 235, 0.12);
+    --shadow-medium: 0 16px 40px rgba(37, 99, 235, 0.18);
+    --shadow-card-hover: 0 20px 48px rgba(37, 99, 235, 0.22);
     --radius-sm: 8px;
-    --radius-md: 10px;
-    --radius-lg: 12px;
-    --radius-xl: 18px;
-    --radius-pill: 999px;
-    --space-xs: 6px;
-    --space-sm: 10px;
-    --space-md: 14px;
-    --space-lg: 16px;
-    --space-xl: 18px;
-    --space-2xl: 24px;
-    --space-3xl: 28px;
-    --space-4xl: 32px;
-    --shadow-panel: 0 16px 40px rgba(120, 90, 60, 0.14);
-    --font-main: Arial, Helvetica, sans-serif;
-    --font-mono: Consolas, "Courier New", monospace;
+    --radius-md: 14px;
+    --radius-lg: 22px;
+    --radius-xl: 30px;
+    --transition-fast: 0.18s ease;
+    --transition-normal: 0.25s ease;
 }

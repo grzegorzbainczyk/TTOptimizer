@@ -1,69 +1,215 @@
-.page {
+/* =========================================================
+   Application shell
+   ========================================================= */
+
+.app-shell {
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: var(--space-4xl);
-}
-
-.app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--space-2xl);
-    margin-bottom: var(--space-4xl);
-}
-
-.main-layout {
-    display: grid;
-    grid-template-columns: 360px 1fr;
-    gap: var(--space-2xl);
-    flex: 1;
-}
-
-.app-footer {
-    margin-top: 28px;
-    color: var(--color-muted);
-    font-size: 13px;
-    text-align: center;
-}
-
-
-.app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 28px;
     padding: 24px;
-    background: rgba(255, 255, 255, 0.94);
-    border-radius: 18px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+}
+
+.app-container {
+    width: min(1500px, calc(100vw - 48px));
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   Header
+   ========================================================= */
+
+.app-header {
+    margin-bottom: 28px;
+    padding: 26px 30px;
+    border-radius: var(--radius-xl);
+    background: linear-gradient( 135deg, rgba(37, 99, 235, 0.88), rgba(14, 165, 233, 0.82) );
+    color: var(--color-text-light);
+    box-shadow: var(--shadow-medium);
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    backdrop-filter: blur(18px);
 }
 
     .app-header h1 {
+        margin: 0 0 8px;
+        font-size: 2.2rem;
+        letter-spacing: -0.05em;
+    }
+
+    .app-header p {
         margin: 0;
+        max-width: 720px;
+        color: rgba(248, 250, 252, 0.82);
+        line-height: 1.55;
+    }
+
+        .app-header p + p {
+            margin-top: 4px;
+        }
+
+
+/* =========================================================
+   Main dashboard layout
+   ========================================================= */
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 24px;
+    align-items: stretch;
+}
+
+.dashboard-content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   Resource sidebar
+   ========================================================= */
+
+.resource-sidebar {
+    padding: 22px;
+    align-self: stretch;
+    min-height: 100%;
+}
+
+    .resource-sidebar h2 {
+        margin: 0 0 8px;
+        color: var(--color-text);
+    }
+
+.sidebar-subtitle {
+    margin: 0 0 18px;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   Panels
+   ========================================================= */
+
+.app-panel {
+    padding: 26px;
+    margin-bottom: 24px;
+}
+
+    .app-panel:last-child {
+        margin-bottom: 0;
+    }
+
+    .app-panel h2 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: var(--color-text);
+    }
+
+    .app-panel p {
+        color: var(--color-text-muted);
     }
 
 
+/* =========================================================
+   Section header row
+   ========================================================= */
 
-.header-actions {
+.section-header-row {
     display: flex;
-    gap: 12px;
-}
-
-.content-card {
-    padding: 24px;
-    background: rgba(255, 255, 255, 0.94);
-    border-radius: 18px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
-    .section-header h2 {
+    .section-header-row h2 {
         margin: 0;
     }
+
+
+/* =========================================================
+   Toolbar
+   ========================================================= */
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 18px 0;
+}
+
+
+/* =========================================================
+   Footer
+   ========================================================= */
+
+.app-footer {
+    margin-top: 24px;
+    padding: 16px;
+    text-align: center;
+    color: rgba(15, 23, 42, 0.58);
+}
+
+
+/* =========================================================
+   Optional sections
+   ========================================================= */
+
+.app-section {
+    margin-top: 24px;
+}
+
+.app-section-title {
+    margin: 0 0 16px;
+    color: var(--color-text);
+    font-size: 1.35rem;
+}
+
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 1100px) {
+    .app-container {
+        width: min(100%, calc(100vw - 32px));
+    }
+
+    .app-shell {
+        padding: 16px;
+    }
+
+    .dashboard-layout {
+        grid-template-columns: 240px minmax(0, 1fr);
+        gap: 18px;
+    }
+}
+
+@media (max-width: 900px) {
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .resource-sidebar {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .app-header {
+        padding: 22px;
+    }
+
+        .app-header h1 {
+            font-size: 1.8rem;
+        }
+
+    .app-panel {
+        padding: 20px;
+    }
+
+    .section-header-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

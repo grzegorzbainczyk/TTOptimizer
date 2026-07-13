@@ -35,13 +35,13 @@
     overflow: hidden;
 }
 
-.lessons-table th,
-.lessons-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--color-border);
-    text-align: left;
-    font-size: 14px;
-}
+    .lessons-table th,
+    .lessons-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--color-border);
+        text-align: left;
+        font-size: 14px;
+    }
 
 .data-table {
     width: 100%;
@@ -70,3 +70,61 @@
 .table-actions-column {
     width: 140px;
 }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.82);
+}
+
+    .data-table th,
+    .data-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--color-border);
+        text-align: left;
+    }
+
+    .data-table th {
+        background: rgba(37, 99, 235, 0.12);
+        color: var(--color-text);
+        font-weight: 800;
+    }
+
+    .data-table td {
+        color: var(--color-text);
+    }
+
+    .data-table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.06);
+    }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.82);
+}
+
+    .data-table th,
+    .data-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--color-border);
+        text-align: left;
+    }
+
+    .data-table th {
+        background: rgba(37, 99, 235, 0.12);
+        color: var(--color-text);
+        font-weight: 800;
+    }
+
+    .data-table td {
+        color: var(--color-text);
+    }
+
+    .data-table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.06);
+    }
