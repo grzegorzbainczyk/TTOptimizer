@@ -6,7 +6,7 @@ class LessonInstanceGenerator
 {
 public:
 
-    std::vector<LessonInstance> generate(const TimetableProblem& problem) const
+    static std::vector<LessonInstance> generate(const TimetableProblem& problem)
     {
         std::vector<LessonInstance> lessonInstances;
 

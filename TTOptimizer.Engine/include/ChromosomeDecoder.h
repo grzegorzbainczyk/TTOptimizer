@@ -7,11 +7,11 @@
 class ChromosomeDecoder
 {
 public:
-	std::vector<ScheduledLesson> decode(
+	static std::vector<ScheduledLesson> decode(
 		const Chromosome& chromosome,
 		const TimetableProblem& problem,
 		const std::vector<LessonInstance>& lessonInstances,
-		const std::vector<ScheduleSlot>& scheduleSlots) const
+		const std::vector<ScheduleSlot>& scheduleSlots)
 	{
 		if (chromosome.genes.size() != scheduleSlots.size())
 		{
@@ -42,8 +42,7 @@ public:
 			}
 
 			const LessonInstance& lessonInstance = lessonInstances[lessonIndex];
-			const LessonRequirement& requirement =
-				FindRequirementById(problem, lessonInstance.requirementId);
+			const LessonRequirement& requirement = FindRequirementById(problem, lessonInstance.requirementId);
 
 			const ScheduleSlot& scheduleSlot = scheduleSlots[slotIndex];
 
@@ -65,9 +64,9 @@ public:
 	}
 
 private:
-	const LessonRequirement& FindRequirementById(
+	static const LessonRequirement& FindRequirementById(
 		const TimetableProblem& problem,
-		LessonRequirementId requirementId) const
+		LessonRequirementId requirementId)
 	{
 		auto iterator = std::find_if(
 			problem.lessonRequirements.begin(),

@@ -131,20 +131,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Evaluation\ChromosomeValidator.cpp" />
     <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp" />
+    <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Optimization\ChromosomeMutator.cpp" />
     <ClCompile Include="src\Optimization\SimpleOptimizer.cpp" />
-    <ClCompile Include="src\Output\TimeTableDecoder.cpp" />
-    <ClCompile Include="src\Output\TimeTableViewBuilder.cpp" />
-    <ClCompile Include="src\TTOptimizer.Engine.cpp" />
+    <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Utils\Utils.cpp" />
-    <ClCompile Include="TimetableProblemJsonReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChromosomeDecoder.h" />
     <ClInclude Include="ChromosomeFactory.h" />
-    <ClInclude Include="ChromosomeOutputDecoder.h" />
     <ClInclude Include="External\nlohmann\json.hpp" />
     <ClInclude Include="include\Evaluation\ChromosomeValidator.h" />
     <ClInclude Include="include\Evaluation\FitnessEvaluator.h" />
@@ -154,14 +150,8 @@
     <ClInclude Include="include\Optimization\ChromosomeMutator.h" />
     <ClInclude Include="include\Optimization\SimpleOptimizer.h" />
     <ClInclude Include="include\Output\EngineResultJsonWriter.h" />
-    <ClInclude Include="include\Output\TimeTableDecoder.h" />
-    <ClInclude Include="include\Output\TimetableJsonWriter.h" />
-    <ClInclude Include="include\Output\TimeTableViewBuilder.h" />
-    <ClInclude Include="include\TestData\Test1.h" />
-    <ClInclude Include="include\TestData\test2.h" />
-    <ClInclude Include="include\TTOptimizer.Engine.h" />
+    <ClInclude Include="include\Engine.h" />
     <ClInclude Include="include\Utils\Utils.h" />
-    <ClInclude Include="OptimizationResult.h" />
     <ClInclude Include="OptimizationResultJsonWriter.h" />
     <ClInclude Include="ScheduledLessonResultJsonWriter.h" />
     <ClInclude Include="TimeTableModels.h" />

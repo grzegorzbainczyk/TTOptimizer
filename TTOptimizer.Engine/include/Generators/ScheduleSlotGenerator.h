@@ -6,7 +6,7 @@
 class ScheduleSlotGenerator
 {
 public:
-    std::vector<ScheduleSlot> generate(const TimetableProblem& problem) const
+    static std::vector<ScheduleSlot> generate(const TimetableProblem& problem)
     {
         std::vector<ScheduleSlot> scheduleSlots;
 

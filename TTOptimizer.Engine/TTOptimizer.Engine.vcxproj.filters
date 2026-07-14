@@ -49,14 +49,8 @@
     <Filter Include="Source Files\Generators">
       <UniqueIdentifier>{567ed871-6008-4dea-9c15-e7c84f9a3e3d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\TestData">
-      <UniqueIdentifier>{5c687ba2-a8e2-4f66-a632-783c8c1a4bfa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{56f0cf9e-8c56-4bcc-8b21-60d4d4adca3c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Output">
-      <UniqueIdentifier>{8b3ea026-4b76-4859-aacb-39bce3301f50}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Optimization">
       <UniqueIdentifier>{15ff33ac-142b-44c7-9f24-dd72d9707674}</UniqueIdentifier>
@@ -65,9 +59,6 @@
   <ItemGroup>
     <ClCompile Include="src\Utils\Utils.cpp">
       <Filter>Source Files\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Evaluation\ChromosomeValidator.cpp">
-      <Filter>Source Files\Evaluation</Filter>
     </ClCompile>
     <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp">
       <Filter>Source Files\Evaluation</Filter>
@@ -78,16 +69,10 @@
     <ClCompile Include="src\Optimization\SimpleOptimizer.cpp">
       <Filter>Source Files\Optimization</Filter>
     </ClCompile>
-    <ClCompile Include="src\Output\TimeTableDecoder.cpp">
-      <Filter>Source Files\Output</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Output\TimeTableViewBuilder.cpp">
-      <Filter>Source Files\Output</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TTOptimizer.Engine.cpp">
+    <ClCompile Include="src\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TimetableProblemJsonReader.cpp">
+    <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -119,28 +104,13 @@
     <ClInclude Include="include\Utils\Utils.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="include\TestData\Test1.h">
-      <Filter>Header Files\TestData</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Output\TimeTableDecoder.h">
-      <Filter>Header Files\Output</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Output\TimeTableViewBuilder.h">
-      <Filter>Header Files\Output</Filter>
-    </ClInclude>
     <ClInclude Include="include\Optimization\ChromosomeMutator.h">
       <Filter>Header Files\Optimization</Filter>
     </ClInclude>
     <ClInclude Include="include\Optimization\SimpleOptimizer.h">
       <Filter>Header Files\Optimization</Filter>
     </ClInclude>
-    <ClInclude Include="include\TestData\test2.h">
-      <Filter>Header Files\TestData</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Output\TimetableJsonWriter.h">
-      <Filter>Header Files\Output</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TTOptimizer.Engine.h">
+    <ClInclude Include="include\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Output\EngineResultJsonWriter.h">
@@ -151,12 +121,6 @@
     </ClInclude>
     <ClInclude Include="OptimizationResultJsonWriter.h">
       <Filter>Header Files\Output</Filter>
-    </ClInclude>
-    <ClInclude Include="OptimizationResult.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ChromosomeOutputDecoder.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ChromosomeDecoder.h">
       <Filter>Header Files</Filter>
