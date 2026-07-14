@@ -92,14 +92,17 @@ async function runOptimization() {
 }
 
 function renderOptimizationResult(data) {
-    setText("initialPenalty", data.initialPenalty ?? "-");
-    setText("bestPenalty", data.bestPenalty ?? "-");
+    const result = data.result ?? data;
 
-    const lessons = data.lessons ?? data.scheduledLessons ?? [];
-    setText("lessonsCount", lessons.length);
+    setText("initialPenalty", result.initialPenalty ?? "-");
+    setText("bestPenalty", result.bestPenalty ?? "-");
 
-    populateFilters(lessons);
-    renderTimetableRows(lessons);
+    const scheduledLessons = result.scheduledLessons ?? [];
+
+    setText("lessonsCount", scheduledLessons.length);
+
+    populateFilters(scheduledLessons);
+    renderScheduledLessonRows(scheduledLessons);
 
     const rawResult = document.getElementById("rawResult");
     if (rawResult) {
@@ -107,7 +110,7 @@ function renderOptimizationResult(data) {
     }
 }
 
-function renderTimetableRows(lessons) {
+function renderScheduledLessonRows(scheduledLessons) {
     const timetableBody = document.getElementById("timetableBody");
 
     if (!timetableBody) {
@@ -117,56 +120,69 @@ function renderTimetableRows(lessons) {
 
     timetableBody.innerHTML = "";
 
-    if (!lessons || lessons.length === 0) {
+    if (!scheduledLessons || scheduledLessons.length === 0) {
         timetableBody.innerHTML = `
             <tr>
-                <td colspan="7">No timetable generated yet.</td>
+                <td colspan="7">No scheduled lessons returned by optimizer.</td>
             </tr>
         `;
         return;
     }
 
-    for (const lesson of lessons) {
+    for (const lesson of scheduledLessons) {
         const row = document.createElement("tr");
 
-        row.dataset.className = lesson.className ?? lesson.classGroupName ?? "";
-        row.dataset.teacherName = lesson.teacherName ?? "";
-        row.dataset.roomName = lesson.roomName ?? "";
+        const classValue = lesson.classGroup ?? lesson.classGroupName ?? lesson.classGroupId ?? "";
+        const subjectValue = lesson.subject ?? lesson.subjectName ?? lesson.subjectId ?? "";
+        const teacherValue = lesson.teacher ?? lesson.teacherName ?? lesson.teacherId ?? "";
+        const roomValue = lesson.room ?? lesson.roomName ?? lesson.roomId ?? "";
+
+        row.dataset.classValue = String(classValue);
+        row.dataset.teacherValue = String(teacherValue);
+        row.dataset.roomValue = String(roomValue);
 
         row.innerHTML = `
             <td>${lesson.day ?? ""}</td>
-            <td>${lesson.slot ?? ""}</td>
-            <td>${lesson.lessonName ?? lesson.name ?? ""}</td>
-            <td>${lesson.className ?? lesson.classGroupName ?? ""}</td>
-            <td>${lesson.subjectName ?? ""}</td>
-            <td>${lesson.teacherName ?? ""}</td>
-            <td>${lesson.roomName ?? ""}</td>
+            <td>${lesson.lessonNumber ?? lesson.slot ?? ""}</td>
+            <td>${lesson.lessonInstanceId ?? ""}</td>
+            <td>${classValue}</td>
+            <td>${subjectValue}</td>
+            <td>${teacherValue}</td>
+            <td>${roomValue}</td>
         `;
 
         timetableBody.appendChild(row);
     }
+
+    applyFilters();
 }
 
-function populateFilters(lessons) {
+function populateFilters(scheduledLessons) {
     const classFilter = document.getElementById("classFilter");
     const teacherFilter = document.getElementById("teacherFilter");
     const roomFilter = document.getElementById("roomFilter");
 
     fillSelect(
         classFilter,
-        lessons.map(x => x.className ?? x.classGroupName).filter(Boolean),
+        scheduledLessons
+            .map(x => x.classGroup ?? x.classGroupName ?? x.classGroupId)
+            .filter(x => x !== undefined && x !== null && x !== ""),
         "All classes"
     );
 
     fillSelect(
         teacherFilter,
-        lessons.map(x => x.teacherName).filter(Boolean),
+        scheduledLessons
+            .map(x => x.teacher ?? x.teacherName ?? x.teacherId)
+            .filter(x => x !== undefined && x !== null && x !== ""),
         "All teachers"
     );
 
     fillSelect(
         roomFilter,
-        lessons.map(x => x.roomName).filter(Boolean),
+        scheduledLessons
+            .map(x => x.room ?? x.roomName ?? x.roomId)
+            .filter(x => x !== undefined && x !== null && x !== ""),
         "All rooms"
     );
 
@@ -178,7 +194,7 @@ function fillSelect(selectElement, values, defaultText) {
         return;
     }
 
-    const uniqueValues = [...new Set(values)].sort();
+    const uniqueValues = [...new Set(values.map(x => String(x)))].sort();
 
     selectElement.innerHTML = "";
 
@@ -194,7 +210,6 @@ function fillSelect(selectElement, values, defaultText) {
         selectElement.appendChild(option);
     }
 }
-
 function setupFilterEvents() {
     const classFilter = document.getElementById("classFilter");
     const teacherFilter = document.getElementById("teacherFilter");
@@ -221,14 +236,19 @@ function applyFilters() {
     const rows = document.querySelectorAll("#timetableBody tr");
 
     for (const row of rows) {
-        const matchesClass = !classValue || row.dataset.className === classValue;
-        const matchesTeacher = !teacherValue || row.dataset.teacherName === teacherValue;
-        const matchesRoom = !roomValue || row.dataset.roomName === roomValue;
+        const matchesClass =
+            !classValue || row.dataset.classValue === classValue;
 
-        row.style.display = matchesClass && matchesTeacher && matchesRoom ? "" : "none";
+        const matchesTeacher =
+            !teacherValue || row.dataset.teacherValue === teacherValue;
+
+        const matchesRoom =
+            !roomValue || row.dataset.roomValue === roomValue;
+
+        row.style.display =
+            matchesClass && matchesTeacher && matchesRoom ? "" : "none";
     }
 }
-
 function clearOptimizationResult() {
     setText("initialPenalty", "-");
     setText("bestPenalty", "-");

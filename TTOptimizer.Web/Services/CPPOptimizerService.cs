@@ -16,7 +16,7 @@ public class CppOptimizerService
             ?? throw new InvalidOperationException("CppEngine:Path is not configured.");
     }
 
-    public async Task<JsonDocument> RunOptimizationAsync(TimetableProblem problem)
+    public async Task<EngineOutputDto> RunOptimizationAsync(TimetableProblem problem)
     {
         JsonSerializerOptions jso = new JsonSerializerOptions
         {
@@ -83,7 +83,15 @@ public class CppOptimizerService
                     $"C++ engine created empty output file: {outputPath}. Error: {stderr}. Output: {stdout}");
             }
 
-            return JsonDocument.Parse(outputJson);
+            var result = JsonSerializer.Deserialize<EngineOutputDto>( outputJson, new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+
+            if (result is null)
+            {
+                throw new InvalidOperationException(
+                    $"Could not deserialize C++ engine output. Output: {outputJson}");
+            }
+
+            return result;
         }
         finally
         {
