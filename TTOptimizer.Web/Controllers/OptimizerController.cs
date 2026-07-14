@@ -65,12 +65,12 @@ public class OptimizationController : ControllerBase
 
         var problem = buildResult.Problem;
 
-        var optimizationResult = await _cppOptimizerService.RunOptimizationAsync(problem);
+        var resultJson = await _cppOptimizerService.RunOptimizationAsync(problem);
 
         return Ok(new
         {
             success = true,
-            result = optimizationResult
+            result = resultJson.RootElement
         });
     }
 }

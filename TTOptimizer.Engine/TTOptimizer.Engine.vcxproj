@@ -139,9 +139,12 @@
     <ClCompile Include="src\Output\TimeTableViewBuilder.cpp" />
     <ClCompile Include="src\TTOptimizer.Engine.cpp" />
     <ClCompile Include="src\Utils\Utils.cpp" />
+    <ClCompile Include="TimetableProblemJsonReader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChromosomeDecoder.h" />
     <ClInclude Include="ChromosomeFactory.h" />
+    <ClInclude Include="ChromosomeOutputDecoder.h" />
     <ClInclude Include="External\nlohmann\json.hpp" />
     <ClInclude Include="include\Evaluation\ChromosomeValidator.h" />
     <ClInclude Include="include\Evaluation\FitnessEvaluator.h" />
@@ -158,7 +161,11 @@
     <ClInclude Include="include\TestData\test2.h" />
     <ClInclude Include="include\TTOptimizer.Engine.h" />
     <ClInclude Include="include\Utils\Utils.h" />
+    <ClInclude Include="OptimizationResult.h" />
+    <ClInclude Include="OptimizationResultJsonWriter.h" />
+    <ClInclude Include="ScheduledLessonResultJsonWriter.h" />
     <ClInclude Include="TimeTableModels.h" />
+    <ClInclude Include="TimetableProblemJsonReader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
