@@ -23,6 +23,7 @@ namespace TTOptimizer.Web.Data
 
         public DbSet<OptimizationRun> OptimizationRuns => Set<OptimizationRun>();
         public DbSet<ScheduledLesson> ScheduledLessons => Set<ScheduledLesson>();
+        public DbSet<ScheduleConstraint> ScheduleConstraints { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -92,6 +93,44 @@ namespace TTOptimizer.Web.Data
             modelBuilder.Entity<OptimizationRun>()
                 .Property(x => x.CreatedAtUtc)
                 .IsRequired();
+
+            modelBuilder.Entity<ScheduleConstraint>(entity =>
+            {
+                entity.Property(x => x.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(x => x.Description)
+                    .HasMaxLength(1000);
+
+                entity.Property(x => x.ConstraintType)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(x => x.TargetType)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(x => x.Value)
+                    .HasMaxLength(500);
+
+                entity.Property(x => x.IsHard)
+                    .HasDefaultValue(true);
+
+                entity.Property(x => x.Weight)
+                    .HasDefaultValue(100);
+
+                entity.Property(x => x.IsActive)
+                    .HasDefaultValue(true);
+
+                entity.Property(x => x.CreatedAt)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.HasOne(x => x.Organization)
+                    .WithMany()
+                    .HasForeignKey(x => x.OrganizationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
         }
     }
 }
