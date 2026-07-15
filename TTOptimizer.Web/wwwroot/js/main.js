@@ -1,7 +1,14 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
+﻿const STORAGE_KEYS = {
+    lastOptimizationResult: "ttorganizer.lastOptimizationResult"
+};
+
+document.addEventListener("DOMContentLoaded", () => {
     setupNavigation();
     setupOptimization();
     setupClearResult();
+    setupExportCsv();
+
+    loadLastOptimizationResultFromStorage();
 });
 
 function setupNavigation() {
@@ -51,6 +58,17 @@ function setupClearResult() {
     });
 }
 
+function setupExportCsv() {
+    const exportCsvButton = document.getElementById("exportCsvButton");
+
+    if (!exportCsvButton) {
+        console.warn("exportCsvButton not found");
+        return;
+    }
+
+    exportCsvButton.addEventListener("click", exportVisibleTimetableRowsToCsv);
+}
+
 async function runOptimization() {
     const statusText = document.getElementById("statusText");
 
@@ -77,6 +95,9 @@ async function runOptimization() {
         console.log("Optimization result:", data);
 
         renderOptimizationResult(data);
+
+        saveLastOptimizationResultToStorage(data);
+
         setStatus("Optimization finished.");
     } catch (error) {
         setStatus("Error while running optimization.");
@@ -272,6 +293,8 @@ function clearOptimizationResult() {
     resetSelect("classFilter", "All classes");
     resetSelect("teacherFilter", "All teachers");
     resetSelect("roomFilter", "All rooms");
+
+    clearLastOptimizationResultFromStorage();
 }
 
 function resetSelect(selectId, defaultText) {
@@ -290,4 +313,119 @@ function setText(elementId, value) {
     if (element) {
         element.textContent = value;
     }
+}
+
+// -------------  Storage  ----------------
+
+function saveLastOptimizationResultToStorage(data) {
+    try {
+        localStorage.setItem(
+            STORAGE_KEYS.lastOptimizationResult,
+            JSON.stringify(data)
+        );
+    } catch (error) {
+        console.error("Could not save optimization result to localStorage.", error);
+    }
+}
+
+function loadLastOptimizationResultFromStorage() {
+    try {
+        const savedJson = localStorage.getItem(STORAGE_KEYS.lastOptimizationResult);
+
+        if (!savedJson) {
+            return;
+        }
+
+        const data = JSON.parse(savedJson);
+
+        renderOptimizationResult(data);
+
+        setText("statusText", "Loaded last optimization result.");
+    } catch (error) {
+        console.error("Could not load optimization result from localStorage.", error);
+
+        localStorage.removeItem(STORAGE_KEYS.lastOptimizationResult);
+
+        setText("statusText", "Could not load saved result.");
+    }
+}
+
+function clearLastOptimizationResultFromStorage() {
+    localStorage.removeItem(STORAGE_KEYS.lastOptimizationResult);
+}
+// ------------- end of Storage  ----------------
+
+//----------    Export CSV ---------------------
+function escapeCsvValue(value) {
+    const safeValue = String(value ?? "");
+
+    const escaped = safeValue.replaceAll('"', '""');
+
+    return `"${escaped}"`;
+}
+
+function exportVisibleTimetableRowsToCsv() {
+    const rows = document.querySelectorAll("#timetableBody tr");
+
+    if (!rows || rows.length === 0) {
+        alert("There is no timetable data to export.");
+        return;
+    }
+
+    const csvRows = [];
+
+    csvRows.push([
+        "Day",
+        "Lesson number",
+        "Lesson",
+        "Class",
+        "Subject",
+        "Teacher",
+        "Room"
+    ]);
+
+    let exportedRowsCount = 0;
+
+    for (const row of rows) {
+        if (row.style.display === "none") {
+            continue;
+        }
+
+        const cells = row.querySelectorAll("td");
+
+        if (cells.length < 7) {
+            continue;
+        }
+
+        const values = Array.from(cells).map(cell =>
+            escapeCsvValue(cell.textContent.trim())
+        );
+
+        csvRows.push(values);
+        exportedRowsCount++;
+    }
+
+    if (exportedRowsCount === 0) {
+        alert("There are no visible rows to export.");
+        return;
+    }
+
+    const csvContent = "\uFEFF" + csvRows
+        .map(row => row.join(";"))
+        .join("\r\n");
+
+    const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "timetable.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
 }
