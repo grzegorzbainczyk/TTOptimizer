@@ -46,7 +46,7 @@ function setupOptimization() {
 }
 
 function setupClearResult() {
-    const clearResultButton = document.getElementById("clearResultButton");
+    const clearResultButton = document.getElementById("clearSavedResultButton");
 
     if (!clearResultButton) {
         console.warn("clearResultButton not found");
@@ -270,6 +270,8 @@ function applyFilters() {
             matchesClass && matchesTeacher && matchesRoom ? "" : "none";
     }
 }
+
+
 function clearOptimizationResult() {
     setText("initialPenalty", "-");
     setText("bestPenalty", "-");

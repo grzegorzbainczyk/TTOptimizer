@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About TTOrganizer</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main class="app-shell">
+        <div class="app-container">
+
+            <header class="app-header">
+                <div>
+                    <h1>About TTOrganizer</h1>
+                    <p class="app-subtitle">
+                        A timetable optimization prototype built with ASP.NET Core, C++, Entity Framework Core and JavaScript.
+                    </p>
+                </div>
+
+                <div class="header-actions">
+                    <button id="backToMainButton" class="app-button app-button-secondary">
+                        Back to application
+                    </button>
+                </div>
+            </header>
+
+            <section class="app-card about-section">
+                <h2>Project overview</h2>
+                <p>
+                    TTOrganizer is a prototype web application for generating and presenting optimized school timetables.
+                    The project combines a web interface, an ASP.NET Core backend, a database layer and an external C++ optimization engine.
+                </p>
+                <p>
+                    The main goal of this project is to build a practical end-to-end application while improving skills in
+                    modern backend development, C++ integration, frontend development, data exchange formats and deployment preparation.
+                </p>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>What the application does</h2>
+                <p>
+                    The application allows the user to manage school-related resources such as teachers, classes,
+                    subjects, rooms and lesson requirements.
+                </p>
+                <p>
+                    Based on these data, the ASP.NET Core backend prepares an optimization problem and sends it to the external C++ engine.
+                    The engine generates a timetable result and returns it as JSON. The web application then maps technical identifiers
+                    to human-readable names and displays the timetable in a filterable table.
+                </p>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Architecture</h2>
+
+                <div class="architecture-flow">
+                    <div class="architecture-step">
+                        <strong>Browser</strong>
+                        <span>HTML / CSS / JavaScript</span>
+                    </div>
+
+                    <div class="architecture-arrow">→</div>
+
+                    <div class="architecture-step">
+                        <strong>ASP.NET Core API</strong>
+                        <span>Controllers / Services / DTOs</span>
+                    </div>
+
+                    <div class="architecture-arrow">→</div>
+
+                    <div class="architecture-step">
+                        <strong>C++ Engine</strong>
+                        <span>Optimization logic</span>
+                    </div>
+
+                    <div class="architecture-arrow">→</div>
+
+                    <div class="architecture-step">
+                        <strong>JSON Result</strong>
+                        <span>Optimized timetable</span>
+                    </div>
+
+                    <div class="architecture-arrow">→</div>
+
+                    <div class="architecture-step">
+                        <strong>Frontend Table</strong>
+                        <span>Filters / CSV export / localStorage</span>
+                    </div>
+                </div>
+
+                <p>
+                    JSON is used as the contract between the ASP.NET Core backend, the C++ engine and the browser.
+                    This separation keeps the optimization logic independent from the web interface.
+                </p>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Technologies used</h2>
+
+                <div class="tech-grid">
+                    <div class="tech-item">
+                        <h3>ASP.NET Core</h3>
+                        <p>Web API, controllers, services, dependency injection and backend orchestration.</p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>C++</h3>
+                        <p>External optimization engine responsible for timetable generation logic.</p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>Entity Framework Core</h3>
+                        <p>Database access, domain models, migrations and demo data handling.</p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>JavaScript</h3>
+                        <p>Frontend behavior, API calls, table rendering, filtering, CSV export and localStorage.</p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>HTML / CSS</h3>
+                        <p>Application layout, dashboard structure, tables, forms and responsive styling.</p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>JSON</h3>
+                        <p>Data exchange format between the web backend, the C++ engine and the browser.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Implemented features</h2>
+
+                <ul class="feature-list">
+                    <li>Demo login flow.</li>
+                    <li>Management pages for teachers, classes, rooms, subjects and lesson requirements.</li>
+                    <li>ASP.NET Core backend connected to a C++ optimization engine.</li>
+                    <li>JSON input and output pipeline between backend and C++ engine.</li>
+                    <li>Human-readable timetable result with teacher, class, subject and room names.</li>
+                    <li>Filtering timetable results by class, teacher and room.</li>
+                    <li>CSV export for the generated timetable.</li>
+                    <li>Saving the last optimization result in browser localStorage.</li>
+                </ul>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>What I learned</h2>
+
+                <p>
+                    While working on this project, I practiced building an end-to-end application across multiple layers:
+                    frontend, backend, database and an external C++ engine.
+                </p>
+
+                <p>
+                    I learned how to use JSON as a contract between separate technologies, how to call an external process
+                    from ASP.NET Core, how to map technical output to user-friendly data and how to build interactive frontend
+                    features with vanilla JavaScript.
+                </p>
+
+                <p>
+                    A particularly important part of the project was separating responsibilities:
+                    the C++ engine focuses on optimization, the ASP.NET Core backend prepares and maps data,
+                    and the browser displays the result in a user-friendly way.
+                </p>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Current status</h2>
+
+                <p>
+                    The application is currently a working prototype. It supports demo data, timetable generation,
+                    filtering, CSV export and local result persistence.
+                </p>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Next steps</h2>
+
+                <ul class="feature-list">
+                    <li>Store optimization runs and generated timetables in the database.</li>
+                    <li>Add professional XLSX export.</li>
+                    <li>Improve timetable constraints and optimization logic.</li>
+                    <li>Add better validation and user-friendly error messages.</li>
+                    <li>Prepare deployment to a public server.</li>
+                    <li>Consider Docker-based deployment for easier hosting.</li>
+                </ul>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        document.getElementById("backToMainButton")?.addEventListener("click", () => {
+            window.location.href = "main.html";
+        });
+    </script>
+</body>
+</html>

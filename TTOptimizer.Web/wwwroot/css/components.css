@@ -325,3 +325,26 @@
     color: var(--color-text-muted);
     font-size: 0.78rem;
 }
+
+.about-section {
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    line-height: 1.7;
+}
+
+    .about-section h2 {
+        margin-bottom: 14px;
+    }
+
+    .about-section p {
+        margin-bottom: 14px;
+    }
+
+.feature-list {
+    margin: 12px 0 0 24px;
+    padding-left: 12px;
+}
+
+    .feature-list li {
+        margin-bottom: 8px;
+    }
