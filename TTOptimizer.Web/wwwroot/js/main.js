@@ -17,6 +17,7 @@ function setupNavigation() {
     setupNavigationButton("roomsButton", "rooms.html");
     setupNavigationButton("subjectsButton", "subjects.html");
     setupNavigationButton("requirementsButton", "requirements.html");
+    setupNavigationButton("aboutProjectButton", "about.html");
 }
 
 function setupNavigationButton(buttonId, targetUrl) {
