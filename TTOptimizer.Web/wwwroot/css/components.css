@@ -404,3 +404,15 @@
     .section-actions .app-button {
         white-space: nowrap;
     }
+
+.app-button-primary-warm {
+    background: linear-gradient(135deg, var(--accent-warm), var(--accent-warm-hover));
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 12px 24px rgba(245, 158, 11, 0.28);
+}
+
+    .app-button-primary-warm:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 30px rgba(245, 158, 11, 0.34);
+    }
