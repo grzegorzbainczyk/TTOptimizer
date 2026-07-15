@@ -30,7 +30,7 @@ public class OptimizationController : ControllerBase
         _dbContext = dbContext;
         _timetableProblemBuilder = timetableProblemBuilder;
         _cppOptimizerService = cppOptimizerService;
-        
+
         _timetableProblemBuilder = timetableProblemBuilder;
         _scheduleSlotGenerator = scheduleSlotGenerator;
         _lessonInstanceGenerator = lessonInstanceGenerator;
@@ -73,32 +73,32 @@ public class OptimizationController : ControllerBase
         var teachersById = problem.Teachers.ToDictionary(x => x.Id);
         var roomsById = problem.Rooms.ToDictionary(x => x.Id);
 
-        var scheduledLessons = engineResult.ScheduledLessons
-            .Select(x => new ScheduledLessonViewDto
-            {
-                LessonInstanceId = x.LessonInstanceId,
-                RequirementId = x.RequirementId,
+        var scheduledLessonViews = engineResult.ScheduledLessons
+     .Select(x => new ScheduledLessonViewDto
+     {
+         LessonInstanceId = x.LessonInstanceId,
+         RequirementId = x.RequirementId,
 
-                ClassGroup = classGroupsById.TryGetValue(x.ClassGroupId, out var classGroup)
-                    ? classGroup.Name
-                    : $"ClassGroup #{x.ClassGroupId}",
+         ClassGroup = classGroupsById.TryGetValue(x.ClassGroupId, out var classGroup)
+             ? classGroup.Name
+             : $"Class #{x.ClassGroupId}",
 
-                Subject = subjectsById.TryGetValue(x.SubjectId, out var subject)
-                    ? subject.Name
-                    : $"Subject #{x.SubjectId}",
+         Subject = subjectsById.TryGetValue(x.SubjectId, out var subject)
+             ? subject.Name
+             : $"Subject #{x.SubjectId}",
 
-                Teacher = teachersById.TryGetValue(x.TeacherId, out var teacher)
-                    ? teacher.Name
-                    : $"Teacher #{x.TeacherId}",
+         Teacher = teachersById.TryGetValue(x.TeacherId, out var teacher)
+             ? teacher.Name
+             : $"Teacher #{x.TeacherId}",
 
-                Room = roomsById.TryGetValue(x.RoomId, out var room)
-                    ? room.Name
-                    : $"Room #{x.RoomId}",
+         Room = roomsById.TryGetValue(x.RoomId, out var room)
+             ? room.Name
+             : $"Room #{x.RoomId}",
 
-                Day = x.Day,
-                LessonNumber = x.LessonNumber
-            })
-            .ToList();
+         Day = x.Day,
+         LessonNumber = x.LessonNumber
+     })
+     .ToList();
 
         return Ok(new
         {
@@ -108,7 +108,7 @@ public class OptimizationController : ControllerBase
                 success = engineResult.Success,
                 initialPenalty = engineResult.InitialPenalty,
                 bestPenalty = engineResult.BestPenalty,
-                scheduledLessons = scheduledLessons, //dont take it from engine
+                scheduledLessons = scheduledLessonViews,
                 error = engineResult.Error
             }
         });
