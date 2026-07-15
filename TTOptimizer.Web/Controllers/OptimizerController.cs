@@ -108,7 +108,7 @@ public class OptimizationController : ControllerBase
                 success = engineResult.Success,
                 initialPenalty = engineResult.InitialPenalty,
                 bestPenalty = engineResult.BestPenalty,
-                scheduledLessons = engineResult.ScheduledLessons,
+                scheduledLessons = scheduledLessons, //dont take it from engine
                 error = engineResult.Error
             }
         });
