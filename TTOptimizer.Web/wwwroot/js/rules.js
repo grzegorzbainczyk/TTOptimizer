@@ -355,15 +355,19 @@ async function deleteRule(id) {
     try {
         setStatus("Deleting rule...");
 
-        const response = await fetch(
-            addOrganizationId(`/api/schedule-constraints/${organizationId}`),
-            {
-                method: "DELETE"
-            }
-        );
+        const baseUrl = `/api/schedule-constraints/${id}`;
+        const url = addOrganizationId(baseUrl);
+
+        const response = await fetch(url, {
+            method: "DELETE"
+        });
 
         if (!response.ok) {
-            throw new Error(`Delete failed. Status: ${response.status}`);
+            const errorText = await response.text();
+
+            throw new Error(
+                errorText || `Delete failed. Status: ${response.status}`
+            );
         }
 
         await loadRules();
@@ -371,7 +375,7 @@ async function deleteRule(id) {
 
         setStatus("Rule deleted.");
     } catch (error) {
-        console.error(error);
+        console.error("Delete rule error:", error);
         setStatus("Error while deleting rule.");
     }
 }
