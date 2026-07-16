@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TTOrganizer - Teachers</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <div class="page-container">
+        <header class="app-header">
+            <div>
+                <h1>Teachers</h1>
+                <p class="page-subtitle">Teachers assigned to your organization</p>
+            </div>
+
+            <nav class="header-actions">
+                <button id="backToMainButton" class="secondary-button">
+                    Back
+                </button>
+
+                <button id="refreshTeachersButton" class="secondary-button">
+                    Refresh
+                </button>
+            </nav>
+        </header>
+
+        <main class="content-card">
+            <div class="section-header">
+                <h2>Teachers list</h2>
+
+                <button id="addTeacherButton" class="main-action-button">
+                    Add teacher
+                </button>
+            </div>
+
+            <table class="data-table" id="teachersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th class="table-actions-column">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3">Loading teachers...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script src="js/appContext.js"></script>
+    <script src="js/teachers.js"></script>
+</body>
+</html>

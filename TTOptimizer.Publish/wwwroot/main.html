@@ -1,0 +1,204 @@
+﻿<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <title>TTOrganizer - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <main class="app-shell">
+        <div class="app-container">
+
+            <header class="app-header app-hero">
+                <div class="hero-title-row">
+                    <img src="images/logos/logo.png" alt="ClassFlow logo" class="app-logo">
+
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            Timetable optimization demo
+                        </div>
+
+                        <h1>ClassFlow</h1>
+
+                        <p class="hero-subtitle">
+                            A friendly timetable optimization prototype for schools
+                        </p>
+
+                        <p class="hero-tech">
+                            Built with ASP.NET Core, C++ and JavaScript
+                        </p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-layout">
+
+                <aside class="resource-sidebar app-card">
+                    <h2>Resources</h2>
+                    <p class="sidebar-subtitle">
+                        Manage input data used by the optimizer.
+                    </p>
+
+                    <button id="teachersButton" class="resource-button">
+                        <span class="resource-button-icon">👩‍🏫</span>
+                        <span>
+                            <strong>Teachers</strong>
+                            <small>Manage staff</small>
+                        </span>
+                    </button>
+
+                    <button id="classesButton" class="resource-button">
+                        <span class="resource-button-icon">🎓</span>
+                        <span>
+                            <strong>Classes</strong>
+                            <small>Student groups</small>
+                        </span>
+                    </button>
+
+                    <button id="roomsButton" class="resource-button">
+                        <span class="resource-button-icon">🚪</span>
+                        <span>
+                            <strong>Rooms</strong>
+                            <small>Classrooms</small>
+                        </span>
+                    </button>
+
+                    <button id="subjectsButton" class="resource-button">
+                        <span class="resource-button-icon">📚</span>
+                        <span>
+                            <strong>Subjects</strong>
+                            <small>Lesson topics</small>
+                        </span>
+                    </button>
+
+                    <button id="requirementsButton" class="resource-button">
+                        <span class="resource-button-icon">🧩</span>
+                        <span>
+                            <strong>Requirements</strong>
+                            <small>Lesson rules</small>
+                        </span>
+                    </button>
+
+                    <button id="rulesButton" class="resource-button">
+                        <span class="resource-button-icon">⚙️</span>
+                        <span>
+                            <strong>Rules</strong>
+                            <small>Availability and constraints</small>
+                        </span>
+                    </button>
+                </aside>
+
+                <div class="dashboard-content">
+
+                    <section class="app-card app-panel">
+                        <h2>Optimization</h2>
+                        <p>
+                            Run the C++ optimization engine and display the decoded timetable result.
+                        </p>
+
+                        <div class="toolbar">
+                            <button id="runOptimizationButton" class="app-button app-button-primary-warm">
+                                Run optimization
+                            </button>
+                        </div>
+
+                        <p id="statusText">Ready.</p>
+                    </section>
+
+                    <section class="app-card app-panel">
+                        <div class="section-header-row">
+                            <h2>Timetable result</h2>
+
+                            <div class="section-actions">
+                                <button id="exportCsvButton" class="app-button app-button-secondary">
+                                    Export CSV
+                                </button>
+
+                                <button id="clearSavedResultButton" class="app-button app-button-secondary">
+                                    Clear saved result
+                                </button>
+
+                                <button id="aboutProjectButton" class="app-button app-button-secondary">
+                                    About project
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="summary-grid">
+                            <div class="summary-box">
+                                <span>Initial penalty</span>
+                                <strong id="initialPenalty">-</strong>
+                            </div>
+
+                            <div class="summary-box">
+                                <span>Best penalty</span>
+                                <strong id="bestPenalty">-</strong>
+                            </div>
+
+                            <div class="summary-box">
+                                <span>Lessons</span>
+                                <strong id="lessonsCount">-</strong>
+                            </div>
+                        </div>
+
+                        <div class="filters-row">
+                            <label>
+                                Class:
+                                <select id="classFilter">
+                                    <option value="">All classes</option>
+                                </select>
+                            </label>
+
+                            <label>
+                                Teacher:
+                                <select id="teacherFilter">
+                                    <option value="">All teachers</option>
+                                </select>
+                            </label>
+
+                            <label>
+                                Room:
+                                <select id="roomFilter">
+                                    <option value="">All rooms</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Slot</th>
+                                    <th>Lesson</th>
+                                    <th>Class</th>
+                                    <th>Subject</th>
+                                    <th>Teacher</th>
+                                    <th>Room</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="timetableBody">
+                                <tr>
+                                    <td colspan="7">No timetable generated yet.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <pre id="rawResult">Raw result will appear here</pre>
+                    </section>
+
+                </div>
+
+            </div>
+
+            <footer class="app-footer">
+                Created by Grzegorz Bainczyk
+            </footer>
+
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

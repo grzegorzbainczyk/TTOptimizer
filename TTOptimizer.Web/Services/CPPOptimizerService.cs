@@ -9,11 +9,24 @@ namespace TTOptimizer.Web.Services;
 public class CppOptimizerService
 {
     private readonly string _enginePath;
+    private readonly ILogger<CppOptimizerService> _logger;
 
-    public CppOptimizerService(IConfiguration configuration)
+    public CppOptimizerService(
+    IConfiguration configuration,
+    IWebHostEnvironment environment,
+    ILogger<CppOptimizerService> logger)
     {
-        _enginePath = configuration["CppEngine:Path"]
-            ?? throw new InvalidOperationException("CppEngine:Path is not configured.");
+        _logger = logger;
+
+        var configuredPath = configuration["CppEngine:Path"]
+            ?? throw new InvalidOperationException(
+                "CppEngine:Path is not configured.");
+
+        _enginePath = Path.IsPathRooted(configuredPath)
+            ? configuredPath
+            : Path.Combine(
+                environment.ContentRootPath,
+                configuredPath);
     }
 
     public async Task<EngineOutputDto> RunOptimizationAsync(TimetableProblem problem)
@@ -40,11 +53,24 @@ public class CppOptimizerService
 
         try
         {
+            _logger.LogInformation(
+    "Starting C++ optimizer. Engine: {EnginePath}, Input: {InputPath}, Output: {OutputPath}",
+    _enginePath,
+    inputPath,
+    outputPath);
+
+            if (!File.Exists(_enginePath))
+            {
+                throw new FileNotFoundException(
+                    $"C++ optimizer executable was not found: {_enginePath}",
+                    _enginePath);
+            }
+
             var startInfo = new ProcessStartInfo
             {
                 FileName = _enginePath,
-                //Arguments = $"--input \"{inputPath}\" --output \"{outputPath}\"",
                 Arguments = $"\"{inputPath}\" \"{outputPath}\"",
+                WorkingDirectory = Path.GetDirectoryName(_enginePath) ?? throw new InvalidOperationException("Could not determine optimizer working directory."),
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -83,7 +109,7 @@ public class CppOptimizerService
                     $"C++ engine created empty output file: {outputPath}. Error: {stderr}. Output: {stdout}");
             }
 
-            var result = JsonSerializer.Deserialize<EngineOutputDto>( outputJson, new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+            var result = JsonSerializer.Deserialize<EngineOutputDto>(outputJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             if (result is null)
             {
@@ -95,17 +121,8 @@ public class CppOptimizerService
         }
         finally
         {
-            if (File.Exists(inputPath))
-            {
-                // Na razie zostawiamy do debugowania.
-                // File.Delete(inputPath);
-            }
-
-            if (File.Exists(outputPath))
-            {
-                // Na razie zostawiamy do debugowania.
-                // File.Delete(outputPath);
-            }
+            TryDeleteFile(inputPath);
+            TryDeleteFile(outputPath);
         }
     }
 
@@ -150,5 +167,23 @@ public class CppOptimizerService
                 LessonsPerWeek = req.HoursPerWeek
             }).ToList()
         };
+    }
+
+    private void TryDeleteFile(string path)
+    {
+        try
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        catch (Exception exception)
+        {
+            _logger.LogWarning(
+                exception,
+                "Could not delete temporary optimizer file: {Path}",
+                path);
+        }
     }
 }

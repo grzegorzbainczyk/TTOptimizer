@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>TTOrganizer - Login</title>
+
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+    <div class="page">
+        <main class="auth-page">
+            <section class="auth-card">
+                <div class="auth-brand">
+                    <h1>TTOrganizer</h1>
+
+                    <p class="subtitle">
+                        Organize and optimize school timetables with a C++ engine and ASP.NET.
+                    </p>
+                </div>
+
+                <form id="loginForm" class="auth-form">
+                    <label for="loginEmail">Email</label>
+                    <input id="loginEmail" class="text-input" type="email" placeholder="user@example.com" />
+
+                    <label for="loginPassword">Password</label>
+                    <input id="loginPassword" class="text-input" type="password" placeholder="Password" />
+
+                    <button id="loginButton" class="primary-button" type="button">
+                        Log in
+                    </button>
+                </form>
+
+                <form id="registerForm" class="auth-form hidden">
+                    <label for="registerName">Name</label>
+                    <input id="registerName" class="text-input" type="text" placeholder="Your name" />
+
+                    <label for="registerEmail">Email</label>
+                    <input id="registerEmail" class="text-input" type="email" placeholder="user@example.com" />
+
+                    <label for="registerPassword">Password</label>
+                    <input id="registerPassword" class="text-input" type="password" placeholder="Password" />
+
+                    <button id="registerButton" class="primary-button" type="button">
+                        Create account
+                    </button>
+                </form>
+
+                <div class="auth-separator">
+                    <span>or</span>
+                </div>
+
+                <button id="demoLoginButton" class="demo-login-button full-width-button" type="button">
+                    Continue as demo user
+                </button>
+
+                <div id="authMessage" class="status-message">
+                    Demo mode is available.
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/appContext.js"></script>
+    <script src="/js/login.js"></script>
+</body>
+</html>

@@ -6,57 +6,83 @@
 #include "TimetableProblemJsonReader.h"
 #include "Engine.h"
 
-
 int main(int argc, char* argv[])
 {
-	std::string inputPath, outputPath;
+    if (argc < 3)
+    {
+        std::cerr
+            << "Usage: TTOptimizer.Console.exe "
+            << "<input_json_path> <output_json_path>"
+            << std::endl;
 
-	inputPath = argv[1];
-	std::string inputJson;
-	outputPath = argv[2];
-	std::string outputJson;
+        return 1;
+    }
 
-	if (!inputPath.empty())
-	{
-		std::ifstream file(inputPath);
+    const std::string inputPath = argv[1];
+    const std::string outputPath = argv[2];
 
-		if (!file)
-		{
-			std::cerr << "Could not open input file: " << inputPath << std::endl;
-			return 1;
-		}
+    try
+    {
+        TimetableProblemJsonReader reader;
+        TimetableProblem problem = reader.readFromFile(inputPath);
 
-		std::ostringstream buffer;
-		buffer << file.rdbuf();
-		inputJson = buffer.str();
-	}
+        std::string outputJson;
 
-	TimetableProblemJsonReader reader;
-	TimetableProblem problem = reader.readFromFile(inputPath);
+        Engine engine;
+        engine.optimize(problem, outputJson);
 
-	std::string result;
+        if (outputJson.empty())
+        {
+            std::cerr << "Optimizer returned empty output." << std::endl;
+            return 2;
+        }
 
-	Engine engine;
-	engine.optimize(problem, outputJson);
+        std::ofstream outputFile(outputPath);
 
-	if (!outputPath.empty())
-	{
-		std::ofstream file(outputPath);
+        if (!outputFile)
+        {
+            std::cerr
+                << "Could not open output file: "
+                << outputPath
+                << std::endl;
 
-		if (!file)
-		{
-			std::cerr << "Could not open output file: " << outputPath << std::endl;
-			return 1;
-		}
+            return 3;
+        }
 
-		file << outputJson;
-	}
-	else
-	{
-		std::cout << outputJson << std::endl;
-	}
-	
-	return 0;
+        outputFile << outputJson;
+
+        if (!outputFile)
+        {
+            std::cerr
+                << "Could not write output file: "
+                << outputPath
+                << std::endl;
+
+            return 4;
+        }
+
+        std::cout
+            << "Optimization completed successfully."
+            << std::endl;
+
+        return 0;
+    }
+    catch (const std::exception& exception)
+    {
+        std::cerr
+            << "Optimizer error: "
+            << exception.what()
+            << std::endl;
+
+        return 5;
+    }
+    catch (...)
+    {
+        std::cerr
+            << "Optimizer failed with an unknown error."
+            << std::endl;
+
+        return 6;
+    }
 }
-
 

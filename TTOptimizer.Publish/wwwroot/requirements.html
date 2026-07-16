@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TTOrganizer - Requirements</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <div class="page-container">
+        <header class="app-header">
+            <div>
+                <h1>Requirements</h1>
+                <p class="page-subtitle">Lesson requirements assigned to your organization</p>
+            </div>
+
+            <nav class="header-actions">
+                <button id="backToMainButton" class="secondary-button">
+                    Back
+                </button>
+
+                <button id="refreshRequirementsButton" class="secondary-button">
+                    Refresh
+                </button>
+            </nav>
+        </header>
+
+        <main class="content-card">
+            <div class="section-header">
+                <h2>Requirements list</h2>
+
+                <button id="addRequirementButton" class="primary-button">
+                    Add requirement
+                </button>
+            </div>
+
+            <table class="data-table" id="requirementsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Teacher</th>
+                        <th>Class</th>
+                        <th>Subject</th>
+                        <th>Hours/week</th>
+                        <th class="table-actions-column">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6">Loading requirements...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script src="js/appContext.js"></script>
+    <script src="js/requirements.js"></script>
+</body>
+</html>
