@@ -11,7 +11,7 @@
         grid-template-columns: 1fr;
     }
 
-    h1 {
+    .auth-header h1 {
         font-size: 34px;
     }
 }
@@ -29,4 +29,26 @@
         .filters-row select {
             width: 100%;
         }
+
+    .demo-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .demo-button {
+        min-height: 58px;
+    }
+}
+
+@media (max-width: 520px) {
+    .auth-page {
+        padding: 20px;
+    }
+
+    .auth-container {
+        padding: 24px;
+    }
+
+    .auth-actions {
+        grid-template-columns: 1fr;
+    }
 }

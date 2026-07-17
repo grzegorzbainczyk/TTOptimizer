@@ -1,69 +1,136 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
 
-    <title>TTOrganizer - Login</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="/css/style.css" />
+    <title>ClassFlow</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
 </head>
 
-<body>
-    <div class="page">
-        <main class="auth-page">
-            <section class="auth-card">
-                <div class="auth-brand">
-                    <h1>TTOrganizer</h1>
+<body class="auth-page">
 
-                    <p class="subtitle">
-                        Organize and optimize school timetables with a C++ engine and ASP.NET.
-                    </p>
+    <main class="auth-container">
+
+        <section class="auth-panel">
+
+            <header class="auth-header">
+                <h1>ClassFlow</h1>
+
+                <p>
+                    Organize and optimize school timetables
+                    with a C++ engine and ASP.NET.
+                </p>
+            </header>
+
+            <div class="auth-form">
+
+                <div class="form-group">
+                    <label for="emailInput">
+                        Email
+                    </label>
+
+                    <input id="emailInput"
+                           name="email"
+                           type="email"
+                           placeholder="user@example.com"
+                           autocomplete="email">
                 </div>
 
-                <form id="loginForm" class="auth-form">
-                    <label for="loginEmail">Email</label>
-                    <input id="loginEmail" class="text-input" type="email" placeholder="user@example.com" />
+                <div class="form-group">
+                    <label for="passwordInput">
+                        Password
+                    </label>
 
-                    <label for="loginPassword">Password</label>
-                    <input id="loginPassword" class="text-input" type="password" placeholder="Password" />
+                    <input id="passwordInput"
+                           name="password"
+                           type="password"
+                           placeholder="Password"
+                           autocomplete="current-password">
+                </div>
 
-                    <button id="loginButton" class="primary-button" type="button">
+                <div class="auth-actions">
+                    <button id="loginButton"
+                            type="button"
+                            class="auth-button auth-button-primary">
                         Log in
                     </button>
-                </form>
 
-                <form id="registerForm" class="auth-form hidden">
-                    <label for="registerName">Name</label>
-                    <input id="registerName" class="text-input" type="text" placeholder="Your name" />
-
-                    <label for="registerEmail">Email</label>
-                    <input id="registerEmail" class="text-input" type="email" placeholder="user@example.com" />
-
-                    <label for="registerPassword">Password</label>
-                    <input id="registerPassword" class="text-input" type="password" placeholder="Password" />
-
-                    <button id="registerButton" class="primary-button" type="button">
-                        Create account
+                    <button id="registerButton"
+                            type="button"
+                            class="auth-button auth-button-secondary">
+                        Register
                     </button>
-                </form>
+                </div>
 
                 <div class="auth-separator">
-                    <span>or</span>
+                    <span>or use demo mode</span>
                 </div>
 
-                <button id="demoLoginButton" class="demo-login-button full-width-button" type="button">
-                    Continue as demo user
-                </button>
+                <div class="demo-buttons">
 
-                <div id="authMessage" class="status-message">
-                    Demo mode is available.
+                    <button id="demoEasyButton"
+                            type="button"
+                            class="demo-button">
+
+                        <span class="demo-button-title">
+                            Easy demo
+                        </span>
+
+                        <span class="demo-button-description">
+                            Small dataset
+                        </span>
+                    </button>
+
+                    <button id="demoMediumButton"
+                            type="button"
+                            class="demo-button">
+
+                        <span class="demo-button-title">
+                            Medium demo
+                        </span>
+
+                        <span class="demo-button-description">
+                            Typical school
+                        </span>
+                    </button>
+
+                    <button id="demoHardButton"
+                            type="button"
+                            class="demo-button">
+
+                        <span class="demo-button-title">
+                            Hard demo
+                        </span>
+
+                        <span class="demo-button-description">
+                            Large dataset
+                        </span>
+                    </button>
+
                 </div>
-            </section>
-        </main>
-    </div>
+
+                <p class="demo-info">
+                    Demo data is available without registration.
+                </p>
+
+                <p id="authMessage"
+                   class="auth-message"
+                   aria-live="polite">
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
 
     <script src="js/appContext.js"></script>
-    <script src="/js/login.js"></script>
+    <script src="js/login.js"></script>
+
 </body>
 </html>
