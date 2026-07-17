@@ -59,7 +59,7 @@ int Engine::optimize(const TimetableProblem& problem, std::string& result)
 			problem,
 			lessonInstances,
 			scheduleSlots,
-			100);
+			problem.iterations);
 
 		ChromosomeValidator::validate(bestChromosome, lessonInstances, scheduleSlots);
 
@@ -70,6 +70,7 @@ int Engine::optimize(const TimetableProblem& problem, std::string& result)
 		ScheduledLessonResultJsonWriter writer;
 
 		result = writer.writeSuccess(
+			problem.iterations,
 			initialPenalty,
 			bestPenalty,
 			scheduledLessons

@@ -2,6 +2,8 @@
 
 public class OptimizerInputDto
 {
+    public int Iterations { get; set; }
+
     public int DaysPerWeek { get; set; }
 
     public int SlotsPerDay { get; set; }

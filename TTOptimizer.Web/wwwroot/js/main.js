@@ -11,6 +11,27 @@ document.addEventListener("DOMContentLoaded", () => {
     loadLastOptimizationResultFromStorage();
 });
 
+const optimizationLevelInput =
+    document.getElementById("optimizationLevel");
+
+const optimizationLevelDescription =
+    document.getElementById(
+        "optimizationLevelDescription"
+    );
+
+const optimizationLevelDescriptions = {
+    1: "Fast search",
+    2: "Balanced search",
+    3: "Thorough search"
+};
+
+optimizationLevelInput.addEventListener("input", () => {
+    optimizationLevelDescription.textContent =
+        optimizationLevelDescriptions[
+        optimizationLevelInput.value
+        ];
+});
+
 function setupNavigation() {
     setupNavigationButton("teachersButton", "teachers.html");
     setupNavigationButton("classesButton", "classes.html");
@@ -89,13 +110,16 @@ async function runOptimization() {
             return;
         }
 
-        const response = await fetch("/api/optimization/run", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(organizationId)
-        });
+        const optimizationLevel = Number(optimizationLevelInput.value);
+
+        const response = await fetch(
+            `/api/optimization/run` +
+            `?organizationId=${organizationId}` +
+            `&optimizationLevel=${optimizationLevel}`,
+            {
+                method: "POST"
+            }
+        );
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -139,11 +163,6 @@ function renderOptimizationResult(data) {
 
     populateFilters(scheduledLessons);
     renderScheduledLessonRows(scheduledLessons);
-
-    const rawResult = document.getElementById("rawResult");
-    if (rawResult) {
-        rawResult.textContent = JSON.stringify(data, null, 2);
-    }
 }
 
 function renderScheduledLessonRows(scheduledLessons) {
@@ -300,11 +319,6 @@ function clearOptimizationResult() {
                 <td colspan="7">No timetable generated yet.</td>
             </tr>
         `;
-    }
-
-    const rawResult = document.getElementById("rawResult");
-    if (rawResult) {
-        rawResult.textContent = "Raw result will appear here";
     }
 
     resetSelect("classFilter", "All classes");

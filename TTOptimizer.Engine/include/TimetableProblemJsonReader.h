@@ -35,8 +35,12 @@ public:
 
         TimetableProblem problem;
 
+		problem.iterations = root.value("iterations", 1000);
+        std::cout << "iterations: " << problem.iterations << std::endl;
+
         problem.daysPerWeek = root.value("daysPerWeek", 5);
         problem.slotsPerDay = root.value("slotsPerDay", 8);
+
 
         if (root.contains("teachers") && root["teachers"].is_array())
         {

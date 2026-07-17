@@ -39,8 +39,17 @@ public class OptimizationController : ControllerBase
 
     [HttpPost("run")]
     public async Task<IActionResult> Run(
-    [FromBody] int organizationId)
+    [FromQuery] int organizationId,
+    [FromQuery] int optimizationLevel)
     {
+        var iterations = optimizationLevel switch
+        {
+            1 => 10_000,
+            2 => 100_000,
+            3 => 500_000,
+            _ => 100_000
+        };
+
         if (organizationId <= 0)
         {
             return BadRequest(new
@@ -77,7 +86,7 @@ public class OptimizationController : ControllerBase
 
         var problem = buildResult.Problem;
 
-        var engineResult = await _cppOptimizerService.RunOptimizationAsync(problem);
+        var engineResult = await _cppOptimizerService.RunOptimizationAsync(problem, iterations);
 
         var classGroupsById = problem.ClassGroups.ToDictionary(x => x.Id);
         var subjectsById = problem.Subjects.ToDictionary(x => x.Id);

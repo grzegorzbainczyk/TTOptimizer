@@ -94,6 +94,7 @@ struct Chromosome
 
 struct TimetableProblem
 {
+    int iterations;
     std::vector<Teacher> teachers;
     std::vector<ClassGroup> classGroups;
     std::vector<Subject> subjects;
