@@ -16,8 +16,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-await DatabaseSeeder.SeedDemoDataAsync(app.Services);
-
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapControllers();
