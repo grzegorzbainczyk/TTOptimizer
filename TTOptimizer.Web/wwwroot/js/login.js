@@ -13,7 +13,7 @@
 
     demoEasyButton?.addEventListener("click", loginAsEasyDemo);
     demoMediumButton?.addEventListener("click", handleMediumDemo);
-    demoHardButton?.addEventListener("click", handleHardDemo);
+    demoHardButton?.addEventListener("click",loginAsHardDemo);
 
     function handleLogin() {
         showMessage(
@@ -33,10 +33,46 @@
         );
     }
 
-    function handleHardDemo() {
-        showMessage(
-            "Hard demo is not implemented yet."
-        );
+    async function loginAsHardDemo() {
+        setDemoButtonsDisabled(true);
+        showMessage("Loading Hard demo...");
+
+        try {
+            const response = await fetch(
+                "/api/demo/login/hard",
+                {
+                    method: "POST"
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                showMessage(
+                    data.message || "Hard demo login failed."
+                );
+
+                return;
+            }
+
+            window.appContext.setLoginContext(
+                data.userId,
+                data.organizationId
+            );
+
+            window.location.href = "main.html";
+        } catch (error) {
+            console.error(
+                "Hard demo login error:",
+                error
+            );
+
+            showMessage(
+                "Hard demo login failed. Check if the backend is running."
+            );
+        } finally {
+            setDemoButtonsDisabled(false);
+        }
     }
 
     async function loginAsEasyDemo() {

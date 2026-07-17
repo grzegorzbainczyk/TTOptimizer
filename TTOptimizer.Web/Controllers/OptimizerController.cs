@@ -38,20 +38,31 @@ public class OptimizationController : ControllerBase
     }
 
     [HttpPost("run")]
-    public async Task<IActionResult> Run()
+    public async Task<IActionResult> Run(
+    [FromBody] int organizationId)
     {
-        var organization = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.Name == "Demo School");
-
-        if (organization == null)
+        if (organizationId <= 0)
         {
             return BadRequest(new
             {
                 success = false,
-                message = "Demo organization was not found."
+                message = "Organization ID is required."
             });
         }
 
-        var organizationId = organization.Id;
+        var organizationExists =
+            await _dbContext.Organizations.AnyAsync(
+                organization => organization.Id == organizationId
+            );
+
+        if (!organizationExists)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Organization was not found."
+            });
+        }
 
         var buildResult = await _timetableProblemBuilder.BuildAsync(organizationId);
 

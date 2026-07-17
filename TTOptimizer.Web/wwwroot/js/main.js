@@ -77,11 +77,24 @@ async function runOptimization() {
     try {
         setStatus("Running optimization...");
 
+        let organizationId;
+
+        try {
+            organizationId = Number(
+                window.appContext.requireOrganizationId()
+            );
+        } catch (error) {
+            console.error(error);
+            alert("Organization context is missing.");
+            return;
+        }
+
         const response = await fetch("/api/optimization/run", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            }
+            },
+            body: JSON.stringify(organizationId)
         });
 
         if (!response.ok) {

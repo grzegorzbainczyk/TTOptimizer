@@ -15,16 +15,34 @@ public class DemoController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login()
+    public async Task<IActionResult> LoginEasy()
     {
-        var organizationId = await _demoDataSeeder.ResetDemoDataAsync();
+        var organizationId =
+            await _demoDataSeeder.ResetEasyDemoDataAsync();
 
         return Ok(new
         {
             success = true,
             userId = 2, // temporary
-            userName = "Demo User",
-            organizationId
+            userName = "Demo Easy User",
+            organizationId,
+            demoLevel = "easy"
+        });
+    }
+
+    [HttpPost("login/hard")]
+    public async Task<IActionResult> LoginHard()
+    {
+        var organizationId =
+            await _demoDataSeeder.ResetHardDemoDataAsync();
+
+        return Ok(new
+        {
+            success = true,
+            userId = 2, // temporary
+            userName = "Demo Hard User",
+            organizationId,
+            demoLevel = "hard"
         });
     }
 }

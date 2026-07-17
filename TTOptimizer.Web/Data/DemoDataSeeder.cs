@@ -1,12 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TTOptimizer.Web.Models;
 using TTOptimizer.Web.Models.Domain;
 
 namespace TTOptimizer.Web.Data;
 
 public class DemoDataSeeder
 {
-    private const string DemoOrganizationName = "Demo School";
+    private const string EasyDemoOrganizationName =
+        "Demo School Easy";
+
+    private const string HardDemoOrganizationName =
+        "Demo School Hard";
 
     private readonly AppDbContext _context;
 
@@ -15,35 +18,62 @@ public class DemoDataSeeder
         _context = context;
     }
 
-    public async Task<int> ResetDemoDataAsync()
+    public async Task<int> ResetEasyDemoDataAsync()
     {
-        var organization = await _context.Organizations
-            .FirstOrDefaultAsync(o => o.Name == DemoOrganizationName);
-
-        if (organization == null)
-        {
-            organization = new Organization
-            {
-                Name = DemoOrganizationName
-            };
-
-            _context.Organizations.Add(organization);
-            await _context.SaveChangesAsync();
-        }
-
-        var organizationId = organization.Id;
+        var organizationId =
+            await GetOrCreateOrganizationAsync(
+                EasyDemoOrganizationName
+            );
 
         await ClearDemoDataAsync(organizationId);
-        await CreateDemoDataAsync(organizationId);
+        await CreateEasyDemoDataAsync(organizationId);
 
         return organizationId;
     }
 
+    public async Task<int> ResetHardDemoDataAsync()
+    {
+        var organizationId =
+            await GetOrCreateOrganizationAsync(
+                HardDemoOrganizationName
+            );
+
+        await ClearDemoDataAsync(organizationId);
+        await CreateHardDemoDataAsync(organizationId);
+
+        return organizationId;
+    }
+
+    private async Task<int> GetOrCreateOrganizationAsync(
+        string organizationName)
+    {
+        var organization = await _context.Organizations
+            .FirstOrDefaultAsync(
+                x => x.Name == organizationName
+            );
+
+        if (organization != null)
+        {
+            return organization.Id;
+        }
+
+        organization = new Organization
+        {
+            Name = organizationName
+        };
+
+        _context.Organizations.Add(organization);
+        await _context.SaveChangesAsync();
+
+        return organization.Id;
+    }
+
     private async Task ClearDemoDataAsync(int organizationId)
     {
-        var lessonRequirements = await _context.LessonRequirements
-            .Where(x => x.OrganizationId == organizationId)
-            .ToListAsync();
+        var lessonRequirements =
+            await _context.LessonRequirements
+                .Where(x => x.OrganizationId == organizationId)
+                .ToListAsync();
 
         var rooms = await _context.Rooms
             .Where(x => x.OrganizationId == organizationId)
@@ -61,7 +91,10 @@ public class DemoDataSeeder
             .Where(x => x.OrganizationId == organizationId)
             .ToListAsync();
 
-        _context.LessonRequirements.RemoveRange(lessonRequirements);
+        _context.LessonRequirements.RemoveRange(
+            lessonRequirements
+        );
+
         _context.Rooms.RemoveRange(rooms);
         _context.Subjects.RemoveRange(subjects);
         _context.ClassGroups.RemoveRange(classGroups);
@@ -70,7 +103,8 @@ public class DemoDataSeeder
         await _context.SaveChangesAsync();
     }
 
-    private async Task CreateDemoDataAsync(int organizationId)
+    private async Task CreateEasyDemoDataAsync(
+        int organizationId)
     {
         var anna = new Teacher
         {
@@ -132,67 +166,380 @@ public class DemoDataSeeder
             OrganizationId = organizationId
         };
 
-        _context.Teachers.AddRange(anna, jan, piotr);
-        _context.ClassGroups.AddRange(class1A, class1B);
-        _context.Subjects.AddRange(mathematics, polish, english);
-        _context.Rooms.AddRange(room101, room102);
+        _context.Teachers.AddRange(
+            anna,
+            jan,
+            piotr
+        );
+
+        _context.ClassGroups.AddRange(
+            class1A,
+            class1B
+        );
+
+        _context.Subjects.AddRange(
+            mathematics,
+            polish,
+            english
+        );
+
+        _context.Rooms.AddRange(
+            room101,
+            room102
+        );
 
         await _context.SaveChangesAsync();
 
-        var lessonRequirements = new List<LessonRequirement>
+        var lessonRequirements =
+            new List<LessonRequirement>
+            {
+                CreateRequirement(
+                    organizationId,
+                    class1A,
+                    mathematics,
+                    anna,
+                    4),
+
+                CreateRequirement(
+                    organizationId,
+                    class1A,
+                    polish,
+                    jan,
+                    3),
+
+                CreateRequirement(
+                    organizationId,
+                    class1A,
+                    english,
+                    piotr,
+                    2),
+
+                CreateRequirement(
+                    organizationId,
+                    class1B,
+                    mathematics,
+                    anna,
+                    4),
+
+                CreateRequirement(
+                    organizationId,
+                    class1B,
+                    polish,
+                    jan,
+                    3),
+
+                CreateRequirement(
+                    organizationId,
+                    class1B,
+                    english,
+                    piotr,
+                    2)
+            };
+
+        _context.LessonRequirements.AddRange(
+            lessonRequirements
+        );
+
+        await _context.SaveChangesAsync();
+    }
+
+    private async Task CreateHardDemoDataAsync(
+        int organizationId)
+    {
+        var teachers = CreateTeachers(
+            organizationId,
+            new[]
+            {
+                "Anna Kowalska",
+                "Marek Wiśniewski",
+                "Joanna Nowak",
+                "Tomasz Zieliński",
+                "Katarzyna Wójcik",
+                "Piotr Kamiński",
+                "Magdalena Lewandowska",
+                "Robert Dąbrowski",
+                "Agnieszka Szymańska",
+                "Paweł Woźniak",
+                "Monika Kozłowska",
+                "Krzysztof Jankowski"
+            });
+
+        var classGroups = CreateClassGroups(
+            organizationId,
+            new[]
+            {
+                "1A",
+                "1B",
+                "2A",
+                "2B",
+                "3A",
+                "3B",
+                "4A",
+                "4B"
+            });
+
+        var subjects = CreateSubjects(
+            organizationId,
+            new[]
+            {
+                "Mathematics",
+                "Polish",
+                "English",
+                "History",
+                "Geography",
+                "Biology",
+                "Physics",
+                "Chemistry",
+                "Computer Science",
+                "Physical Education"
+            });
+
+        var rooms = CreateRooms(
+            organizationId,
+            new[]
+            {
+                "101",
+                "102",
+                "103",
+                "104",
+                "201",
+                "202",
+                "Computer Lab",
+                "Physics Lab",
+                "Chemistry Lab",
+                "Gym"
+            });
+
+        _context.Teachers.AddRange(teachers.Values);
+        _context.ClassGroups.AddRange(classGroups.Values);
+        _context.Subjects.AddRange(subjects.Values);
+        _context.Rooms.AddRange(rooms);
+
+        await _context.SaveChangesAsync();
+
+        var lessonRequirements =
+            new List<LessonRequirement>();
+
+        foreach (var classGroup in classGroups.Values)
         {
-            new()
-            {
-                OrganizationId = organizationId,
-                ClassGroupId = class1A.Id,
-                SubjectId = mathematics.Id,
-                TeacherId = anna.Id,
-                HoursPerWeek = 4
-            },
-            new()
-            {
-                OrganizationId = organizationId,
-                ClassGroupId = class1A.Id,
-                SubjectId = polish.Id,
-                TeacherId = jan.Id,
-                HoursPerWeek = 3
-            },
-            new()
-            {
-                OrganizationId = organizationId,
-                ClassGroupId = class1A.Id,
-                SubjectId = english.Id,
-                TeacherId = piotr.Id,
-                HoursPerWeek = 2
-            },
-            new()
-            {
-                OrganizationId = organizationId,
-                ClassGroupId = class1B.Id,
-                SubjectId = mathematics.Id,
-                TeacherId = anna.Id,
-                HoursPerWeek = 4
-            },
-            new()
-            {
-                OrganizationId = organizationId,
-                ClassGroupId = class1B.Id,
-                SubjectId = polish.Id,
-                TeacherId = jan.Id,
-                HoursPerWeek = 3
-            },
-            new()
-            {
-                OrganizationId = organizationId,
-                ClassGroupId = class1B.Id,
-                SubjectId = english.Id,
-                TeacherId = piotr.Id,
-                HoursPerWeek = 2
-            }
-        };
+            AddHardClassRequirements(
+                organizationId,
+                classGroup,
+                teachers,
+                subjects,
+                lessonRequirements
+            );
+        }
 
-        _context.LessonRequirements.AddRange(lessonRequirements);
+        _context.LessonRequirements.AddRange(
+            lessonRequirements
+        );
 
         await _context.SaveChangesAsync();
+    }
+
+    private static void AddHardClassRequirements(
+        int organizationId,
+        ClassGroup classGroup,
+        IReadOnlyDictionary<string, Teacher> teachers,
+        IReadOnlyDictionary<string, Subject> subjects,
+        ICollection<LessonRequirement> requirements)
+    {
+        var grade = GetGradeNumber(classGroup.Name);
+
+        var mathematicsTeacher =
+            grade <= 2
+                ? teachers["Anna Kowalska"]
+                : teachers["Marek Wiśniewski"];
+
+        var polishTeacher =
+            grade <= 2
+                ? teachers["Joanna Nowak"]
+                : teachers["Tomasz Zieliński"];
+
+        var englishTeacher =
+            grade <= 2
+                ? teachers["Katarzyna Wójcik"]
+                : teachers["Piotr Kamiński"];
+
+        requirements.Add(
+            CreateRequirement(
+                organizationId,
+                classGroup,
+                subjects["Mathematics"],
+                mathematicsTeacher,
+                4)
+        );
+
+        requirements.Add(
+            CreateRequirement(
+                organizationId,
+                classGroup,
+                subjects["Polish"],
+                polishTeacher,
+                4)
+        );
+
+        requirements.Add(
+            CreateRequirement(
+                organizationId,
+                classGroup,
+                subjects["English"],
+                englishTeacher,
+                3)
+        );
+
+        requirements.Add(
+            CreateRequirement(
+                organizationId,
+                classGroup,
+                subjects["History"],
+                teachers["Magdalena Lewandowska"],
+                2)
+        );
+
+        requirements.Add(
+            CreateRequirement(
+                organizationId,
+                classGroup,
+                subjects["Geography"],
+                teachers["Robert Dąbrowski"],
+                2)
+        );
+
+        requirements.Add(
+            CreateRequirement(
+                organizationId,
+                classGroup,
+                subjects["Biology"],
+                teachers["Agnieszka Szymańska"],
+                2)
+        );
+
+        requirements.Add(
+            CreateRequirement(
+                organizationId,
+                classGroup,
+                subjects["Physics"],
+                teachers["Paweł Woźniak"],
+                grade >= 3 ? 2 : 1)
+        );
+
+        requirements.Add(
+            CreateRequirement(
+                organizationId,
+                classGroup,
+                subjects["Chemistry"],
+                teachers["Monika Kozłowska"],
+                grade >= 3 ? 2 : 1)
+        );
+
+        requirements.Add(
+            CreateRequirement(
+                organizationId,
+                classGroup,
+                subjects["Computer Science"],
+                teachers["Krzysztof Jankowski"],
+                2)
+        );
+
+        requirements.Add(
+            CreateRequirement(
+                organizationId,
+                classGroup,
+                subjects["Physical Education"],
+                teachers["Robert Dąbrowski"],
+                3)
+        );
+    }
+
+    private static LessonRequirement CreateRequirement(
+        int organizationId,
+        ClassGroup classGroup,
+        Subject subject,
+        Teacher teacher,
+        int hoursPerWeek)
+    {
+        return new LessonRequirement
+        {
+            OrganizationId = organizationId,
+            ClassGroupId = classGroup.Id,
+            SubjectId = subject.Id,
+            TeacherId = teacher.Id,
+            HoursPerWeek = hoursPerWeek
+        };
+    }
+
+    private static Dictionary<string, Teacher> CreateTeachers(
+        int organizationId,
+        IEnumerable<string> names)
+    {
+        return names.ToDictionary(
+            name => name,
+            name => new Teacher
+            {
+                Name = name,
+                OrganizationId = organizationId
+            });
+    }
+
+    private static Dictionary<string, ClassGroup>
+        CreateClassGroups(
+            int organizationId,
+            IEnumerable<string> names)
+    {
+        return names.ToDictionary(
+            name => name,
+            name => new ClassGroup
+            {
+                Name = name,
+                OrganizationId = organizationId
+            });
+    }
+
+    private static Dictionary<string, Subject> CreateSubjects(
+        int organizationId,
+        IEnumerable<string> names)
+    {
+        return names.ToDictionary(
+            name => name,
+            name => new Subject
+            {
+                Name = name,
+                OrganizationId = organizationId
+            });
+    }
+
+    private static List<Room> CreateRooms(
+        int organizationId,
+        IEnumerable<string> names)
+    {
+        return names
+            .Select(
+                name => new Room
+                {
+                    Name = name,
+                    OrganizationId = organizationId
+                })
+            .ToList();
+    }
+
+    private static int GetGradeNumber(string className)
+    {
+        if (string.IsNullOrWhiteSpace(className) ||
+            !char.IsDigit(className[0]))
+        {
+            throw new ArgumentException(
+                $"Invalid class name: '{className}'.",
+                nameof(className)
+            );
+        }
+
+        return className[0] - '0';
+    }
+
+    internal async Task ResetDemoDataAsync()
+    {
+        throw new NotImplementedException();
     }
 }
