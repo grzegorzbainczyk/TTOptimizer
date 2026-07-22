@@ -27,9 +27,10 @@ public class CppOptimizerService
             : Path.Combine(
                 environment.ContentRootPath,
                 configuredPath);
+        
     }
 
-    public async Task<EngineOutputDto> RunOptimizationAsync(TimetableProblem problem, int iterations)
+    public async Task<EngineOutputDto> RunOptimizationAsync(TimetableProblem problem)
     {
         JsonSerializerOptions jso = new JsonSerializerOptions
         {
@@ -37,7 +38,7 @@ public class CppOptimizerService
             WriteIndented = true
         };
 
-        OptimizerInputDto optimizerInputDto = CreateOptimizerInput(problem, iterations);
+        OptimizerInputDto optimizerInputDto = CreateOptimizerInput(problem);
 
         var inputJson = JsonSerializer.Serialize(optimizerInputDto, jso);
 
@@ -127,11 +128,10 @@ public class CppOptimizerService
     }
 
 
-    private OptimizerInputDto CreateOptimizerInput(TimetableProblem problem, int iterations)
+    private OptimizerInputDto CreateOptimizerInput(TimetableProblem problem)
     {
         return new OptimizerInputDto
         {
-            Iterations = iterations,
             DaysPerWeek = problem.DaysPerWeek,
             SlotsPerDay = problem.SlotsPerDay,
 
@@ -166,7 +166,9 @@ public class CppOptimizerService
                 ClassGroupId = req.ClassGroupId,
                 SubjectId = req.SubjectId,
                 LessonsPerWeek = req.HoursPerWeek
-            }).ToList()
+            }).ToList(),
+
+            OptimizationSettings = problem.OptimizationSettings
         };
     }
 

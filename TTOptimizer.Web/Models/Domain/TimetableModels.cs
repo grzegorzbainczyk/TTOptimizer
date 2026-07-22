@@ -1,4 +1,6 @@
-﻿namespace TTOptimizer.Web.Models.Domain;
+﻿using TTOptimizer.Web.Models.Optimization;
+
+namespace TTOptimizer.Web.Models.Domain;
 
 public enum DayOfWeekModel
 {
@@ -15,49 +17,6 @@ public class TimeSlot
 
     public int LessonNumber { get; set; }
 }
-
-//public class Subject
-//{
-//    public int Id { get; set; }
-
-//    public string Name { get; set; } = "";
-//}
-
-//public class Teacher
-//{
-//    public int Id { get; set; }
-
-//    public string Name { get; set; } = "";
-
-//    public List<int> Subjects { get; set; } = new();
-//}
-
-//public class ClassGroup
-//{
-//    public int Id { get; set; }
-
-//    public string Name { get; set; } = "";
-//}
-
-//public class Room
-//{
-//    public int Id { get; set; }
-
-//    public string Name { get; set; } = "";
-//}
-
-//public class LessonRequirement
-//{
-//    public int Id { get; set; }
-
-//    public int ClassGroupId { get; set; }
-
-//    public int SubjectId { get; set; }
-
-//    public int TeacherId { get; set; }
-
-//    public int WeeklyCount { get; set; }
-//}
 
 public class LessonInstance
 {
@@ -88,4 +47,6 @@ public class TimetableProblem
     public int DaysPerWeek { get; set; } = 5;
 
     public int SlotsPerDay { get; set; } = 6;
+
+    public OptimizationSettings OptimizationSettings { get; set; } = new();
 }

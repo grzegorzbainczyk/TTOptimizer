@@ -36,6 +36,12 @@ struct TimeSlot
     }
 };
 
+struct OptimizationSettings
+{
+    int iterations = 100'000;
+    unsigned int randomSeed = 12'345;
+};
+
 struct Subject
 {
     SubjectId id{};
@@ -93,8 +99,7 @@ struct Chromosome
 };
 
 struct TimetableProblem
-{
-    int iterations;
+{    
     std::vector<Teacher> teachers;
     std::vector<ClassGroup> classGroups;
     std::vector<Subject> subjects;
@@ -103,6 +108,8 @@ struct TimetableProblem
 
     int daysPerWeek = 5;
     int slotsPerDay = 8;
+
+    OptimizationSettings optimizationSettings;
 };
 
 struct ScheduledLesson

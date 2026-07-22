@@ -6,8 +6,21 @@
 #include "TimetableProblemJsonReader.h"
 #include "Engine.h"
 
+#ifdef _DEBUG
+#include <Windows.h>
+#endif
+
 int main(int argc, char* argv[])
 {
+#ifdef _DEBUG
+    while (!IsDebuggerPresent())
+    {
+        Sleep(200);
+    }
+
+    DebugBreak();
+#endif
+
     if (argc < 3)
     {
         std::cerr

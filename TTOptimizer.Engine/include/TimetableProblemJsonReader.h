@@ -35,8 +35,11 @@ public:
 
         TimetableProblem problem;
 
-		problem.iterations = root.value("iterations", 1000);
-        std::cout << "iterations: " << problem.iterations << std::endl;
+        problem.optimizationSettings.iterations =
+            root.value("iterations", 100'000);
+
+        problem.optimizationSettings.randomSeed =
+            root.value("randomSeed", 12'345u);
 
         problem.daysPerWeek = root.value("daysPerWeek", 5);
         problem.slotsPerDay = root.value("slotsPerDay", 8);

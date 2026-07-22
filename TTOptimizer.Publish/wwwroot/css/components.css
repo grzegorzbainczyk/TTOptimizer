@@ -48,11 +48,42 @@
     backdrop-filter: blur(16px);
 }
 
+.optimization-depth {
+    width: 100%;
+    max-width: 480px;
+    margin-top: 18px;
+}
 
-/* =========================================================
-   Dashboard grid / tiles
-   Optional older tile layout
-   ========================================================= */
+    .optimization-depth input[type="range"] {
+        width: 100%;
+    }
+
+    .optimization-depth label {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--color-text);
+        font-weight: 600;
+    }
+
+    .optimization-depth input[type="range"] {
+        width: 100%;
+        cursor: pointer;
+    }
+
+.optimization-depth-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.optimization-depth-description {
+    margin: 8px 0 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    text-align: center;
+}
 
 /* =========================================================
    Dashboard tiles
@@ -116,31 +147,32 @@
 
 .summary-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 14px;
-    margin: 20px 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 16px 0;
 }
 
 .summary-box {
-    padding: 18px;
+    min-height: 64px;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     background: rgba(255, 255, 255, 0.72);
-    border: 1px solid var(--color-border);
 }
 
     .summary-box span {
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 5px;
         color: var(--color-text-muted);
-        font-size: 0.9rem;
+        font-size: 0.8rem;
     }
 
     .summary-box strong {
         display: block;
-        font-size: 1.7rem;
         color: var(--color-text);
+        font-size: 1.45rem;
+        line-height: 1;
     }
-
 
 /* =========================================================
    Filters
@@ -169,22 +201,6 @@
         background: white;
         color: var(--color-text);
     }
-
-
-/* =========================================================
-   Raw result
-   ========================================================= */
-
-#rawResult {
-    margin-top: 20px;
-    padding: 16px;
-    border-radius: var(--radius-md);
-    background: rgba(15, 23, 42, 0.9);
-    color: #e5e7eb;
-    overflow-x: auto;
-    white-space: pre-wrap;
-}
-
 
 /* =========================================================
    Helpers

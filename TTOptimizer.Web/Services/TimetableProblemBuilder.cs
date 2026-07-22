@@ -2,6 +2,7 @@
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models;
 using TTOptimizer.Web.Models.Domain;
+using TTOptimizer.Web.Models.Optimization;
 
 namespace TTOptimizer.Web.Services;
 
@@ -14,7 +15,7 @@ public class TimetableProblemBuilder
         _context = context;
     }
 
-    public async Task<TimetableProblemBuildResult> BuildAsync(int organizationId)
+    public async Task<TimetableProblemBuildResult> BuildAsync(int organizationId, OptimizationSettings optimizationSettings)
     {
         var teachers = await _context.Teachers
             .Where(t => t.OrganizationId == organizationId)
@@ -56,7 +57,8 @@ public class TimetableProblemBuilder
             Rooms = rooms,
             LessonRequirements = lessonRequirements,
             DaysPerWeek = 5,
-            SlotsPerDay = 8
+            SlotsPerDay = 8,
+            OptimizationSettings = optimizationSettings
         };
 
         return TimetableProblemBuildResult.Ok(problem);

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models;
 using TTOptimizer.Web.Models.Dto;
+using TTOptimizer.Web.Models.Optimization;
 using TTOptimizer.Web.Services;
 
 namespace TTOptimizer.Web.Controllers;
@@ -50,6 +51,26 @@ public class OptimizationController : ControllerBase
             _ => 100_000
         };
 
+        if (optimizationLevel is < 1 or > 3)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Optimization level must be between 1 and 3."
+            });
+        }
+
+        var optimizationSettings = new OptimizationSettings
+        {
+            Iterations = optimizationLevel switch
+            {
+                1 => 10_000,
+                2 => 100_000,
+                3 => 500_000
+            },
+            RandomSeed = 12345
+        };
+
         if (organizationId <= 0)
         {
             return BadRequest(new
@@ -73,7 +94,7 @@ public class OptimizationController : ControllerBase
             });
         }
 
-        var buildResult = await _timetableProblemBuilder.BuildAsync(organizationId);
+        var buildResult = await _timetableProblemBuilder.BuildAsync(organizationId, optimizationSettings);
 
         if (!buildResult.Success || buildResult.Problem == null)
         {
@@ -86,7 +107,7 @@ public class OptimizationController : ControllerBase
 
         var problem = buildResult.Problem;
 
-        var engineResult = await _cppOptimizerService.RunOptimizationAsync(problem, iterations);
+        var engineResult = await _cppOptimizerService.RunOptimizationAsync(problem);
 
         var classGroupsById = problem.ClassGroups.ToDictionary(x => x.Id);
         var subjectsById = problem.Subjects.ToDictionary(x => x.Id);

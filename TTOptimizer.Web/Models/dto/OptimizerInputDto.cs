@@ -1,9 +1,9 @@
-﻿namespace TTOptimizer.Web.Models.Dto;
+﻿using TTOptimizer.Web.Models.Optimization;
+
+namespace TTOptimizer.Web.Models.Dto;
 
 public class OptimizerInputDto
 {
-    public int Iterations { get; set; }
-
     public int DaysPerWeek { get; set; }
 
     public int SlotsPerDay { get; set; }
@@ -17,6 +17,8 @@ public class OptimizerInputDto
     public List<OptimizerRoomDto> Rooms { get; set; } = new();
 
     public List<OptimizerLessonRequirementDto> LessonRequirements { get; set; } = new();
+
+    public required OptimizationSettings OptimizationSettings { get; set; }
 }
 
 public class OptimizerTeacherDto

@@ -103,6 +103,30 @@
                             </button>
                         </div>
 
+                        <div class="optimization-depth">
+                            <label for="optimizationLevel">
+                                Optimization depth
+                            </label>
+
+                            <input id="optimizationLevel"
+                                   type="range"
+                                   min="1"
+                                   max="3"
+                                   step="1"
+                                   value="2">
+
+                            <div class="optimization-depth-labels">
+                                <span>Fast</span>
+                                <span>Balanced</span>
+                                <span>Thorough</span>
+                            </div>
+
+                            <p id="optimizationLevelDescription"
+                               class="optimization-depth-description">
+                                Balanced search
+                            </p>
+                        </div>
+
                         <p id="statusText">Ready.</p>
                     </section>
 
@@ -184,8 +208,6 @@
                                 </tr>
                             </tbody>
                         </table>
-
-                        <pre id="rawResult">Raw result will appear here</pre>
                     </section>
 
                 </div>
@@ -199,6 +221,7 @@
         </div>
     </main>
 
+    <script src="js/appContext.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
