@@ -113,20 +113,14 @@
     <ClInclude Include="include\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Output\EngineResultJsonWriter.h">
-      <Filter>Header Files\Output</Filter>
-    </ClInclude>
     <ClInclude Include="TimetableProblemJsonReader.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OptimizationResultJsonWriter.h">
-      <Filter>Header Files\Output</Filter>
     </ClInclude>
     <ClInclude Include="ChromosomeDecoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ScheduledLessonResultJsonWriter.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\ScheduledLessonResultJsonWriter.h">
+      <Filter>Header Files\Output</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

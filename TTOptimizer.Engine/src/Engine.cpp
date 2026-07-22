@@ -19,14 +19,10 @@
 
 #include "Utils/Utils.h"
 #include "Engine.h"
-#include <Output/EngineResultJsonWriter.h>
 #include "TimetableProblemJsonReader.h"
-#include "Output/OptimizationResultJsonWriter.h"
 
-
-#include "OptimizationResultJsonWriter.h"
 #include "ChromosomeDecoder.h"
-#include "ScheduledLessonResultJsonWriter.h"
+#include <ScheduledLessonResultJsonWriter.h>
 
 int Engine::optimize(const TimetableProblem& problem, std::string& result)
 {

@@ -149,11 +149,9 @@
     <ClInclude Include="include\Generators\ScheduleSlotGenerator.h" />
     <ClInclude Include="include\Optimization\ChromosomeMutator.h" />
     <ClInclude Include="include\Optimization\SimpleOptimizer.h" />
-    <ClInclude Include="include\Output\EngineResultJsonWriter.h" />
     <ClInclude Include="include\Engine.h" />
+    <ClInclude Include="include\ScheduledLessonResultJsonWriter.h" />
     <ClInclude Include="include\Utils\Utils.h" />
-    <ClInclude Include="OptimizationResultJsonWriter.h" />
-    <ClInclude Include="ScheduledLessonResultJsonWriter.h" />
     <ClInclude Include="TimeTableModels.h" />
     <ClInclude Include="TimetableProblemJsonReader.h" />
   </ItemGroup>
