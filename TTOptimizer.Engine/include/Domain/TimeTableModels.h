@@ -38,7 +38,7 @@ struct TimeSlot
 
 struct OptimizationSettings
 {
-    int iterations = 100'000;
+    int iterations = 1;
     unsigned int randomSeed = 12'345;
 };
 

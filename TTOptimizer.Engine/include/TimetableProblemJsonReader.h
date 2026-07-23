@@ -35,11 +35,22 @@ public:
 
         TimetableProblem problem;
 
-        problem.optimizationSettings.iterations =
-            root.value("iterations", 100'000);
+        if (root.contains("optimizationSettings"))
+        {
+            const auto& settingsJson =
+                root.at("optimizationSettings");
 
-        problem.optimizationSettings.randomSeed =
-            root.value("randomSeed", 12'345u);
+            problem.optimizationSettings.iterations =
+                settingsJson.value(
+                    "iterations",
+                    problem.optimizationSettings.iterations);
+
+            problem.optimizationSettings.randomSeed =
+                settingsJson.value(
+                    "randomSeed",
+                    problem.optimizationSettings.randomSeed);
+        }
+
 
         problem.daysPerWeek = root.value("daysPerWeek", 5);
         problem.slotsPerDay = root.value("slotsPerDay", 8);

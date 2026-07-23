@@ -46,8 +46,8 @@ public class OptimizationController : ControllerBase
     {
         var iterations = optimizationLevel switch
         {
-            1 => 10_000,
-            2 => 100_000,
+            1 => 1000,
+            2 => 10_000,
             3 => 500_000,
             _ => 100_000
         };
@@ -65,8 +65,8 @@ public class OptimizationController : ControllerBase
         {
             Iterations = optimizationLevel switch
             {
-                1 => 10_000,
-                2 => 100_000,
+                1 => 1_000,
+                2 => 10_000,
                 3 => 500_000
             },
             RandomSeed = 12345
