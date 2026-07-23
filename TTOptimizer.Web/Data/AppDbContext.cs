@@ -126,10 +126,32 @@ namespace TTOptimizer.Web.Data
                 .IsRequired()
                 .HasMaxLength(200);
 
-            modelBuilder.Entity<Room>()
-                .Property(x => x.Name)
-                .IsRequired()
-                .HasMaxLength(100);
+            modelBuilder.Entity<Room>(entity =>
+            {
+                entity.Property(room => room.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(room => room.Info)
+                    .HasMaxLength(2000);
+
+                entity.HasIndex(room => new
+                {
+                    room.OrganizationId,
+                    room.Name
+                })
+                .IsUnique();
+
+                entity.HasOne(room => room.RestrictedToSubject)
+                    .WithMany()
+                    .HasForeignKey(room => room.RestrictedToSubjectId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(room => room.PreferredSubject)
+                    .WithMany()
+                    .HasForeignKey(room => room.PreferredSubjectId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
 
             modelBuilder.Entity<LessonRequirement>()
                 .Property(x => x.HoursPerWeek)

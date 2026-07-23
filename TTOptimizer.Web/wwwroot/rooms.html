@@ -2,24 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TTOrganizer - Rooms</title>
-    <link rel="stylesheet" href="css/style.css" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>ClassFlow - Rooms</title>
+
+    <link rel="stylesheet"
+          href="css/style.css" />
 </head>
+
 <body>
     <div class="page-container">
         <header class="app-header">
             <div>
                 <h1>Rooms</h1>
-                <p class="page-subtitle">Rooms assigned to your organization</p>
+
+                <p class="page-subtitle">
+                    Rooms assigned to your organization
+                </p>
             </div>
 
             <nav class="header-actions">
-                <button id="backToMainButton" class="secondary-button">
+                <button id="backToMainButton"
+                        class="secondary-button"
+                        type="button">
                     Back
                 </button>
 
-                <button id="refreshRoomsButton" class="secondary-button">
+                <button id="refreshRoomsButton"
+                        class="secondary-button"
+                        type="button">
                     Refresh
                 </button>
             </nav>
@@ -29,25 +42,118 @@
             <div class="section-header">
                 <h2>Rooms list</h2>
 
-                <button id="addRoomButton" class="primary-button">
+                <button id="addRoomButton"
+                        class="primary-button"
+                        type="button">
                     Add room
                 </button>
             </div>
 
-            <table class="data-table" id="roomsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th class="table-actions-column">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="3">Loading rooms...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <section id="roomFormSection"
+                     class="resource-form-section"
+                     hidden>
+
+                <h3 id="roomFormTitle">
+                    Add room
+                </h3>
+
+                <input id="roomId"
+                       type="hidden" />
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="roomName">
+                            Name
+                        </label>
+
+                        <input id="roomName"
+                               type="text"
+                               maxlength="100"
+                               required />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="restrictedToSubjectId">
+                            Restricted to subject
+                        </label>
+
+                        <select id="restrictedToSubjectId">
+                            <option value="">
+                                No restriction
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="preferredSubjectId">
+                            Preferred subject
+                        </label>
+
+                        <select id="preferredSubjectId">
+                            <option value="">
+                                No preference
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-field form-field-full-width">
+                        <label for="roomInfo">
+                            Info
+                        </label>
+
+                        <textarea id="roomInfo"
+                                  maxlength="2000"
+                                  rows="4"
+                                  placeholder="Optional information about the room"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="saveRoomButton"
+                            class="primary-button"
+                            type="button">
+                        Save
+                    </button>
+
+                    <button id="cancelRoomButton"
+                            class="secondary-button"
+                            type="button">
+                        Cancel
+                    </button>
+                </div>
+
+                <p id="roomFormMessage"
+                   class="form-message"
+                   aria-live="polite">
+                </p>
+            </section>
+
+            <div class="table-wrapper">
+                <table class="data-table"
+                       id="roomsTable">
+
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Restricted to</th>
+                            <th>Preferred subject</th>
+                            <th>Info</th>
+
+                            <th class="table-actions-column">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                Loading rooms...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </main>
     </div>
 

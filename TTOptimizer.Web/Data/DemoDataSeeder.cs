@@ -325,6 +325,8 @@ public class DemoDataSeeder
                 "Gym"
             });
 
+        ConfigureHardDemoRooms(rooms, subjects);
+
         ConfigureHardDemoClassGroups(
             classGroups,
             teachers,
@@ -357,6 +359,29 @@ public class DemoDataSeeder
         );
 
         await _context.SaveChangesAsync();
+    }
+
+    private static void ConfigureHardDemoRooms(
+    IReadOnlyDictionary<string, Room> rooms,
+    IReadOnlyDictionary<string, Subject> subjects)
+    {
+        rooms["Gym"].RestrictedToSubject =
+            subjects["Physical Education"];
+
+        rooms["Gym"].PreferredSubject =
+            subjects["Physical Education"];
+
+        rooms["Chemistry Lab"].RestrictedToSubject =
+            subjects["Chemistry"];
+
+        rooms["Chemistry Lab"].PreferredSubject =
+            subjects["Chemistry"];
+
+        rooms["Physics Lab"].PreferredSubject =
+            subjects["Physics"];
+
+        rooms["Computer Lab"].PreferredSubject =
+            subjects["Computer Science"];
     }
 
     private static void ConfigureHardDemoClassGroups(
