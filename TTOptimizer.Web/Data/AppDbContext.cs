@@ -121,10 +121,22 @@ namespace TTOptimizer.Web.Data
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            modelBuilder.Entity<Subject>()
-                .Property(x => x.Name)
-                .IsRequired()
-                .HasMaxLength(200);
+            modelBuilder.Entity<Subject>(entity =>
+            {
+                entity.Property(subject => subject.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(subject => subject.Info)
+                    .HasMaxLength(2000);
+
+                entity.HasIndex(subject => new
+                {
+                    subject.OrganizationId,
+                    subject.Name
+                })
+                .IsUnique();
+            });
 
             modelBuilder.Entity<Room>(entity =>
             {

@@ -2,24 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TTOrganizer - Subjects</title>
-    <link rel="stylesheet" href="css/style.css" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>ClassFlow - Subjects</title>
+
+    <link rel="stylesheet"
+          href="css/style.css" />
 </head>
+
 <body>
     <div class="page-container">
         <header class="app-header">
             <div>
                 <h1>Subjects</h1>
-                <p class="page-subtitle">Subjects assigned to your organization</p>
+
+                <p class="page-subtitle">
+                    Subjects assigned to your organization
+                </p>
             </div>
 
             <nav class="header-actions">
-                <button id="backToMainButton" class="secondary-button">
+                <button id="backToMainButton"
+                        class="secondary-button"
+                        type="button">
                     Back
                 </button>
 
-                <button id="refreshSubjectsButton" class="secondary-button">
+                <button id="refreshSubjectsButton"
+                        class="secondary-button"
+                        type="button">
                     Refresh
                 </button>
             </nav>
@@ -29,25 +42,92 @@
             <div class="section-header">
                 <h2>Subjects list</h2>
 
-                <button id="addSubjectButton" class="primary-button">
+                <button id="addSubjectButton"
+                        class="primary-button"
+                        type="button">
                     Add subject
                 </button>
             </div>
 
-            <table class="data-table" id="subjectsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th class="table-actions-column">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="3">Loading subjects...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <section id="subjectFormSection"
+                     class="resource-form-section"
+                     hidden>
+
+                <h3 id="subjectFormTitle">
+                    Add subject
+                </h3>
+
+                <input id="subjectId"
+                       type="hidden" />
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="subjectName">
+                            Name
+                        </label>
+
+                        <input id="subjectName"
+                               type="text"
+                               maxlength="100"
+                               required />
+                    </div>
+
+                    <div class="form-field form-field-full-width">
+                        <label for="subjectInfo">
+                            Info
+                        </label>
+
+                        <textarea id="subjectInfo"
+                                  maxlength="2000"
+                                  rows="4"
+                                  placeholder="Optional information about the subject"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="saveSubjectButton"
+                            class="primary-button"
+                            type="button">
+                        Save
+                    </button>
+
+                    <button id="cancelSubjectButton"
+                            class="secondary-button"
+                            type="button">
+                        Cancel
+                    </button>
+                </div>
+
+                <p id="subjectFormMessage"
+                   class="form-message"
+                   aria-live="polite">
+                </p>
+            </section>
+
+            <div class="table-wrapper">
+                <table class="data-table"
+                       id="subjectsTable">
+
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Info</th>
+
+                            <th class="table-actions-column">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td colspan="3">
+                                Loading subjects...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </main>
     </div>
 
