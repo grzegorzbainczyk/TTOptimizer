@@ -12,16 +12,16 @@
 
 int main(int argc, char* argv[])
 {
-#ifdef _DEBUG
-    while (!IsDebuggerPresent())
-    {
-        Sleep(200);
-    }
+//#ifdef _DEBUG
+//    while (!IsDebuggerPresent())
+//    {
+//        Sleep(200);
+//    }
+//
+//    DebugBreak();
+//#endif
 
-    DebugBreak();
-#endif
-
-   /* if (argc < 3)
+    if (argc < 3)
     {
         std::cerr
             << "Usage: TTOptimizer.Console.exe "
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
             << std::endl;
 
         return 1;
-    }*/
+    }
 
     const std::string inputPath = argv[1];
     const std::string outputPath = argv[2];

@@ -1,4 +1,4 @@
-﻿namespace TTOptimizer.Web.Models.Dto;
+﻿namespace TTOptimizer.Web.Models.DTO;
 public class EngineOutputDto
 {
     public bool Success { get; set; }

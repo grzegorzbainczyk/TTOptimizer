@@ -3,23 +3,33 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TTOrganizer - Teachers</title>
+
+    <title>ClassFlow - Teachers</title>
+
     <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
     <div class="page-container">
         <header class="app-header">
             <div>
                 <h1>Teachers</h1>
-                <p class="page-subtitle">Teachers assigned to your organization</p>
+
+                <p class="page-subtitle">
+                    Teachers assigned to your organization
+                </p>
             </div>
 
             <nav class="header-actions">
-                <button id="backToMainButton" class="secondary-button">
+                <button id="backToMainButton"
+                        class="secondary-button"
+                        type="button">
                     Back
                 </button>
 
-                <button id="refreshTeachersButton" class="secondary-button">
+                <button id="refreshTeachersButton"
+                        class="secondary-button"
+                        type="button">
                     Refresh
                 </button>
             </nav>
@@ -29,25 +39,119 @@
             <div class="section-header">
                 <h2>Teachers list</h2>
 
-                <button id="addTeacherButton" class="main-action-button">
+                <button id="addTeacherButton"
+                        class="main-action-button"
+                        type="button">
                     Add teacher
                 </button>
             </div>
 
-            <table class="data-table" id="teachersTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th class="table-actions-column">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="3">Loading teachers...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <section id="teacherFormSection"
+                     class="resource-form-section"
+                     hidden>
+
+                <h3 id="teacherFormTitle">
+                    Add teacher
+                </h3>
+
+                <input id="teacherId"
+                       type="hidden" />
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="teacherNumber">
+                            Teacher number
+                        </label>
+
+                        <input id="teacherNumber"
+                               type="text"
+                               readonly
+                               placeholder="Assigned automatically" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="teacherName">
+                            Name
+                        </label>
+
+                        <input id="teacherName"
+                               type="text"
+                               maxlength="200"
+                               required />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="teacherAlias">
+                            Alias
+                        </label>
+
+                        <input id="teacherAlias"
+                               type="text"
+                               maxlength="30"
+                               placeholder="Generated automatically" />
+
+                        <small>
+                            Leave empty when adding to generate an alias.
+                        </small>
+                    </div>
+
+                    <div class="form-field form-field-full-width">
+                        <label for="teacherInfo">
+                            Info
+                        </label>
+
+                        <textarea id="teacherInfo"
+                                  maxlength="2000"
+                                  rows="4"
+                                  placeholder="Optional notes about the teacher"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="saveTeacherButton"
+                            class="main-action-button"
+                            type="button">
+                        Save
+                    </button>
+
+                    <button id="cancelTeacherButton"
+                            class="secondary-button"
+                            type="button">
+                        Cancel
+                    </button>
+                </div>
+
+                <p id="teacherFormMessage"
+                   class="form-message"
+                   aria-live="polite">
+                </p>
+            </section>
+
+            <div class="table-wrapper">
+                <table class="data-table"
+                       id="teachersTable">
+
+                    <thead>
+                        <tr>
+                            <th>Number</th>
+                            <th>Name</th>
+                            <th>Alias</th>
+                            <th>Info</th>
+                            <th class="table-actions-column">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                Loading teachers...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </main>
     </div>
 

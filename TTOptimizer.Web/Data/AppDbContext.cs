@@ -66,10 +66,33 @@ namespace TTOptimizer.Web.Data
                 .IsRequired()
                 .HasMaxLength(50);
 
-            modelBuilder.Entity<Teacher>()
-                .Property(x => x.Name)
-                .IsRequired()
-                .HasMaxLength(200);
+            modelBuilder.Entity<Teacher>(entity =>
+            {
+                entity.Property(t => t.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(t => t.Alias)
+                    .IsRequired()
+                    .HasMaxLength(30);
+
+                entity.Property(t => t.Info)
+                    .HasMaxLength(2000);
+
+                entity.HasIndex(t => new
+                {
+                    t.OrganizationId,
+                    t.TeacherNumber
+                })
+                .IsUnique();
+
+                entity.HasIndex(t => new
+                {
+                    t.OrganizationId,
+                    t.Alias
+                })
+                .IsUnique();
+            });
 
             modelBuilder.Entity<ClassGroup>()
                 .Property(x => x.Name)

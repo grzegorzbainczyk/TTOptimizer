@@ -108,19 +108,28 @@ public class DemoDataSeeder
     {
         var anna = new Teacher
         {
+            TeacherNumber = 1,
             Name = "Anna Kowalska",
+            Alias = "AK",
+            Info = "Prefers morning lessons.",
             OrganizationId = organizationId
         };
 
         var jan = new Teacher
         {
+            TeacherNumber = 2,
             Name = "Jan Nowak",
+            Alias = "JN",
+            Info = null,
             OrganizationId = organizationId
         };
 
         var piotr = new Teacher
         {
+            TeacherNumber = 3,
             Name = "Piotr Zieliński",
+            Alias = "PZ",
+            Info = null,
             OrganizationId = organizationId
         };
 
@@ -471,16 +480,25 @@ public class DemoDataSeeder
     }
 
     private static Dictionary<string, Teacher> CreateTeachers(
-        int organizationId,
-        IEnumerable<string> names)
+    int organizationId,
+    IEnumerable<string> names)
     {
-        return names.ToDictionary(
-            name => name,
-            name => new Teacher
+        return names
+            .Select((name, index) => new
             {
                 Name = name,
-                OrganizationId = organizationId
-            });
+                Teacher = new Teacher
+                {
+                    TeacherNumber = index + 1,
+                    Name = name,
+                    Alias = GenerateAlias(name, index + 1),
+                    Info = null,
+                    OrganizationId = organizationId
+                }
+            })
+            .ToDictionary(
+                x => x.Name,
+                x => x.Teacher);
     }
 
     private static Dictionary<string, ClassGroup>
@@ -538,8 +556,20 @@ public class DemoDataSeeder
         return className[0] - '0';
     }
 
-    internal async Task ResetDemoDataAsync()
+    private static string GenerateAlias(
+    string name,
+    int teacherNumber)
     {
-        throw new NotImplementedException();
+        var parts = name
+            .Split(
+                ' ',
+                StringSplitOptions.RemoveEmptyEntries |
+                StringSplitOptions.TrimEntries);
+
+        var initials = string.Concat(
+            parts.Select(part =>
+                char.ToUpperInvariant(part[0])));
+
+        return $"{initials}{teacherNumber}";
     }
 }

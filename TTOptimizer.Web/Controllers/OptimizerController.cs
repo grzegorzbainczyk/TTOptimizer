@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models;
-using TTOptimizer.Web.Models.Dto;
+using TTOptimizer.Web.Models.DTO;
 using TTOptimizer.Web.Models.Optimization;
 using TTOptimizer.Web.Services;
 

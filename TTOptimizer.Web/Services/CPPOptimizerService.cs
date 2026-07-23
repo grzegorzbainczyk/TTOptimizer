@@ -2,7 +2,7 @@
 using System.Text.Json;
 using TTOptimizer.Web.Models;
 using TTOptimizer.Web.Models.Domain;
-using TTOptimizer.Web.Models.Dto;
+using TTOptimizer.Web.Models.DTO;
 
 namespace TTOptimizer.Web.Services;
 

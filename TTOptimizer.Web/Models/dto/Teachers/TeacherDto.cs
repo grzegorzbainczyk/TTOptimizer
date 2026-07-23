@@ -1,10 +1,8 @@
-﻿using TTOptimizer.Web.Models.Domain;
+﻿namespace TTOptimizer.Web.Models.DTO.Teachers;
 
-public class Teacher
+public class TeacherDto
 {
     public int Id { get; set; }
-
-    public int OrganizationId { get; set; }
 
     public int TeacherNumber { get; set; }
 
@@ -13,6 +11,4 @@ public class Teacher
     public string Alias { get; set; } = string.Empty;
 
     public string? Info { get; set; }
-
-    public Organization Organization { get; set; } = null!;
 }

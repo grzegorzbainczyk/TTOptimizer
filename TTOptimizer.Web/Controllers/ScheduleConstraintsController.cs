@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
-using TTOptimizer.Web.Models.Dto;
+using TTOptimizer.Web.Models.DTO;
 
 namespace TTOptimizer.Web.Controllers
 {

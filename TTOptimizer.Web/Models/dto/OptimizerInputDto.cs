@@ -1,6 +1,6 @@
 ﻿using TTOptimizer.Web.Models.Optimization;
 
-namespace TTOptimizer.Web.Models.Dto;
+namespace TTOptimizer.Web.Models.DTO;
 
 public class OptimizerInputDto
 {
