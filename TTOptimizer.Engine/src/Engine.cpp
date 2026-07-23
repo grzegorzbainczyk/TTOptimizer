@@ -63,12 +63,16 @@ int Engine::optimize(const TimetableProblem& problem, std::string& result)
 		
 		std::vector<ScheduledLesson> scheduledLessons = ChromosomeDecoder::decode(bestChromosome, problem, lessonInstances, scheduleSlots);
 
+		OptimizationInfo feedback;
+		feedback.Message = "Witaj po drugiej stronie lustra.";
+
 		ScheduledLessonResultJsonWriter writer;
 
 		result = writer.writeSuccess(
 			initialPenalty,
 			bestPenalty,
-			scheduledLessons
+			scheduledLessons,
+			feedback
 		);
 
 		return 0;

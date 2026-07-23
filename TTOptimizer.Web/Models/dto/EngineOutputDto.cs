@@ -10,7 +10,18 @@ public class EngineOutputDto
     public List<EngineScheduledLessonDto> ScheduledLessons { get; set; } = new();
 
     public string? Error { get; set; }
+
+    required public OptimizationInfo OptimizationInfo { get; set; }
 }
+
+public class OptimizationInfo
+{
+    public int iterations { get; set; }
+    public int randomSeed { get; set; }
+    public int threadCount { get; set; }
+    public  long durationMilliseconds { get; set; }
+    required public string Message { get; set; }
+};
 
 public class EngineScheduledLessonDto
 {

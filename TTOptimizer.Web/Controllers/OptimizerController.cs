@@ -38,6 +38,7 @@ public class OptimizationController : ControllerBase
         _timetableDecoder = timetableDecoder;
     }
 
+    
     [HttpPost("run")]
     public async Task<IActionResult> Run(
     [FromQuery] int organizationId,
@@ -146,6 +147,7 @@ public class OptimizationController : ControllerBase
             success = true,
             result = new
             {
+                feedback = engineResult.OptimizationInfo.Message,
                 success = engineResult.Success,
                 initialPenalty = engineResult.InitialPenalty,
                 bestPenalty = engineResult.BestPenalty,

@@ -13,12 +13,12 @@
 int main(int argc, char* argv[])
 {
 #ifdef _DEBUG
-    while (!IsDebuggerPresent())
+    /*while (!IsDebuggerPresent())
     {
         Sleep(200);
     }
 
-    DebugBreak();
+    DebugBreak();*/
 #endif
 
     if (argc < 3)
