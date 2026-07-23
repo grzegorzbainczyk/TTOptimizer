@@ -2,24 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TTOrganizer - Requirements</title>
-    <link rel="stylesheet" href="css/style.css" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>ClassFlow - Requirements</title>
+
+    <link rel="stylesheet"
+          href="css/style.css" />
 </head>
+
 <body>
     <div class="page-container">
         <header class="app-header">
             <div>
                 <h1>Requirements</h1>
-                <p class="page-subtitle">Lesson requirements assigned to your organization</p>
+
+                <p class="page-subtitle">
+                    Lesson requirements assigned to your organization
+                </p>
             </div>
 
             <nav class="header-actions">
-                <button id="backToMainButton" class="secondary-button">
+                <button id="backToMainButton"
+                        class="secondary-button"
+                        type="button">
                     Back
                 </button>
 
-                <button id="refreshRequirementsButton" class="secondary-button">
+                <button id="refreshRequirementsButton"
+                        class="secondary-button"
+                        type="button">
                     Refresh
                 </button>
             </nav>
@@ -29,28 +42,124 @@
             <div class="section-header">
                 <h2>Requirements list</h2>
 
-                <button id="addRequirementButton" class="primary-button">
+                <button id="addRequirementButton"
+                        class="primary-button"
+                        type="button">
                     Add requirement
                 </button>
             </div>
 
-            <table class="data-table" id="requirementsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Teacher</th>
-                        <th>Class</th>
-                        <th>Subject</th>
-                        <th>Hours/week</th>
-                        <th class="table-actions-column">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="6">Loading requirements...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <section id="requirementFormSection"
+                     class="resource-form-section"
+                     hidden>
+
+                <h3 id="requirementFormTitle">
+                    Add requirement
+                </h3>
+
+                <input id="requirementId"
+                       type="hidden" />
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="requirementClassGroupId">
+                            Class
+                        </label>
+
+                        <select id="requirementClassGroupId"
+                                required>
+                            <option value="">
+                                Select class
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="requirementSubjectId">
+                            Subject
+                        </label>
+
+                        <select id="requirementSubjectId"
+                                required>
+                            <option value="">
+                                Select subject
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="requirementTeacherId">
+                            Teacher
+                        </label>
+
+                        <select id="requirementTeacherId"
+                                required>
+                            <option value="">
+                                Select teacher
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="requirementHoursPerWeek">
+                            Hours per week
+                        </label>
+
+                        <input id="requirementHoursPerWeek"
+                               type="number"
+                               min="1"
+                               max="40"
+                               value="1"
+                               required />
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="saveRequirementButton"
+                            class="primary-button"
+                            type="button">
+                        Save
+                    </button>
+
+                    <button id="cancelRequirementButton"
+                            class="secondary-button"
+                            type="button">
+                        Cancel
+                    </button>
+                </div>
+
+                <p id="requirementFormMessage"
+                   class="form-message"
+                   aria-live="polite">
+                </p>
+            </section>
+
+            <div class="table-wrapper">
+                <table class="data-table"
+                       id="requirementsTable">
+
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Subject</th>
+                            <th>Teacher</th>
+                            <th>Hours/week</th>
+
+                            <th class="table-actions-column">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                Loading requirements...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </main>
     </div>
 
