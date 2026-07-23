@@ -3,23 +3,32 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TTOrganizer - Classes</title>
+
+    <title>ClassFlow - Classes</title>
+
     <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
     <div class="page-container">
         <header class="app-header">
             <div>
                 <h1>Classes</h1>
-                <p class="page-subtitle">Classes assigned to your organization</p>
+                <p class="page-subtitle">
+                    Classes assigned to your organization
+                </p>
             </div>
 
             <nav class="header-actions">
-                <button id="backToMainButton" class="secondary-button">
+                <button id="backToMainButton"
+                        class="secondary-button"
+                        type="button">
                     Back
                 </button>
 
-                <button id="refreshClassesButton" class="secondary-button">
+                <button id="refreshClassesButton"
+                        class="secondary-button"
+                        type="button">
                     Refresh
                 </button>
             </nav>
@@ -29,25 +38,104 @@
             <div class="section-header">
                 <h2>Classes list</h2>
 
-                <button id="addClassButton" class="main-action-button">
-                    Add Class
+                <button id="addClassButton"
+                        class="main-action-button"
+                        type="button">
+                    Add class
                 </button>
             </div>
 
-            <table class="data-table" id="classesTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th class="table-actions-column">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="3">Loading classes...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <section id="classFormSection"
+                     class="resource-form-section"
+                     hidden>
+
+                <h3 id="classFormTitle">Add class</h3>
+
+                <input id="classId" type="hidden" />
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="className">Name</label>
+
+                        <input id="className"
+                               type="text"
+                               maxlength="50"
+                               required />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="homeroomTeacherId">
+                            Homeroom teacher
+                        </label>
+
+                        <select id="homeroomTeacherId">
+                            <option value="">None</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="defaultRoomId">
+                            Default room
+                        </label>
+
+                        <select id="defaultRoomId">
+                            <option value="">None</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field form-field-full-width">
+                        <label for="classInfo">Info</label>
+
+                        <textarea id="classInfo"
+                                  maxlength="2000"
+                                  rows="4"
+                                  placeholder="Optional notes about the class"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="saveClassButton"
+                            class="main-action-button"
+                            type="button">
+                        Save
+                    </button>
+
+                    <button id="cancelClassButton"
+                            class="secondary-button"
+                            type="button">
+                        Cancel
+                    </button>
+                </div>
+
+                <p id="classFormMessage"
+                   class="form-message"
+                   aria-live="polite">
+                </p>
+            </section>
+
+            <div class="table-wrapper">
+                <table class="data-table" id="classesTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Homeroom teacher</th>
+                            <th>Default room</th>
+                            <th>Info</th>
+                            <th class="table-actions-column">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                Loading classes...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </main>
     </div>
 

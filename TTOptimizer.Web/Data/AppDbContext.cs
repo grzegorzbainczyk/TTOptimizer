@@ -94,10 +94,32 @@ namespace TTOptimizer.Web.Data
                 .IsUnique();
             });
 
-            modelBuilder.Entity<ClassGroup>()
-                .Property(x => x.Name)
-                .IsRequired()
-                .HasMaxLength(100);
+            modelBuilder.Entity<ClassGroup>(entity =>
+            {
+                entity.Property(classGroup => classGroup.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(classGroup => classGroup.Info)
+                    .HasMaxLength(2000);
+
+                entity.HasIndex(classGroup => new
+                {
+                    classGroup.OrganizationId,
+                    classGroup.Name
+                })
+                .IsUnique();
+
+                entity.HasOne(classGroup => classGroup.HomeroomTeacher)
+                    .WithMany()
+                    .HasForeignKey(classGroup => classGroup.HomeroomTeacherId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(classGroup => classGroup.DefaultRoom)
+                    .WithMany()
+                    .HasForeignKey(classGroup => classGroup.DefaultRoomId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
 
             modelBuilder.Entity<Subject>()
                 .Property(x => x.Name)

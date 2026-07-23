@@ -95,9 +95,9 @@ public class DemoDataSeeder
             lessonRequirements
         );
 
+        _context.ClassGroups.RemoveRange(classGroups);
         _context.Rooms.RemoveRange(rooms);
         _context.Subjects.RemoveRange(subjects);
-        _context.ClassGroups.RemoveRange(classGroups);
         _context.Teachers.RemoveRange(teachers);
 
         await _context.SaveChangesAsync();
@@ -133,15 +133,33 @@ public class DemoDataSeeder
             OrganizationId = organizationId
         };
 
+        var room101 = new Room
+        {
+            Name = "101",
+            OrganizationId = organizationId
+        };
+
+        var room102 = new Room
+        {
+            Name = "102",
+            OrganizationId = organizationId
+        };
+
         var class1A = new ClassGroup
         {
             Name = "1A",
+            Info = "Main classroom for group 1A.",
+            HomeroomTeacher = anna,
+            DefaultRoom = room101,
             OrganizationId = organizationId
         };
 
         var class1B = new ClassGroup
         {
             Name = "1B",
+            Info = "Main classroom for group 1B.",
+            HomeroomTeacher = jan,
+            DefaultRoom = room102,
             OrganizationId = organizationId
         };
 
@@ -163,22 +181,15 @@ public class DemoDataSeeder
             OrganizationId = organizationId
         };
 
-        var room101 = new Room
-        {
-            Name = "101",
-            OrganizationId = organizationId
-        };
-
-        var room102 = new Room
-        {
-            Name = "102",
-            OrganizationId = organizationId
-        };
-
         _context.Teachers.AddRange(
             anna,
             jan,
             piotr
+        );
+
+        _context.Rooms.AddRange(
+            room101,
+            room102
         );
 
         _context.ClassGroups.AddRange(
@@ -190,11 +201,6 @@ public class DemoDataSeeder
             mathematics,
             polish,
             english
-        );
-
-        _context.Rooms.AddRange(
-            room101,
-            room102
         );
 
         await _context.SaveChangesAsync();
@@ -319,10 +325,16 @@ public class DemoDataSeeder
                 "Gym"
             });
 
+        ConfigureHardDemoClassGroups(
+            classGroups,
+            teachers,
+            rooms
+        );
+
         _context.Teachers.AddRange(teachers.Values);
+        _context.Rooms.AddRange(rooms.Values);
         _context.ClassGroups.AddRange(classGroups.Values);
         _context.Subjects.AddRange(subjects.Values);
-        _context.Rooms.AddRange(rooms);
 
         await _context.SaveChangesAsync();
 
@@ -345,6 +357,63 @@ public class DemoDataSeeder
         );
 
         await _context.SaveChangesAsync();
+    }
+
+    private static void ConfigureHardDemoClassGroups(
+        IDictionary<string, ClassGroup> classGroups,
+        IReadOnlyDictionary<string, Teacher> teachers,
+        IReadOnlyDictionary<string, Room> rooms)
+    {
+        SetClassGroupDetails(
+            classGroups["1A"],
+            teachers["Anna Kowalska"],
+            rooms["101"]);
+
+        SetClassGroupDetails(
+            classGroups["1B"],
+            teachers["Joanna Nowak"],
+            rooms["102"]);
+
+        SetClassGroupDetails(
+            classGroups["2A"],
+            teachers["Katarzyna Wójcik"],
+            rooms["103"]);
+
+        SetClassGroupDetails(
+            classGroups["2B"],
+            teachers["Piotr Kamiński"],
+            rooms["104"]);
+
+        SetClassGroupDetails(
+            classGroups["3A"],
+            teachers["Magdalena Lewandowska"],
+            rooms["201"]);
+
+        SetClassGroupDetails(
+            classGroups["3B"],
+            teachers["Robert Dąbrowski"],
+            rooms["202"]);
+
+        SetClassGroupDetails(
+            classGroups["4A"],
+            teachers["Agnieszka Szymańska"],
+            rooms["Physics Lab"]);
+
+        SetClassGroupDetails(
+            classGroups["4B"],
+            teachers["Monika Kozłowska"],
+            rooms["Chemistry Lab"]);
+    }
+
+    private static void SetClassGroupDetails(
+        ClassGroup classGroup,
+        Teacher homeroomTeacher,
+        Room defaultRoom)
+    {
+        classGroup.HomeroomTeacher = homeroomTeacher;
+        classGroup.DefaultRoom = defaultRoom;
+        classGroup.Info =
+            $"Demo information for class {classGroup.Name}.";
     }
 
     private static void AddHardClassRequirements(
@@ -480,8 +549,8 @@ public class DemoDataSeeder
     }
 
     private static Dictionary<string, Teacher> CreateTeachers(
-    int organizationId,
-    IEnumerable<string> names)
+        int organizationId,
+        IEnumerable<string> names)
     {
         return names
             .Select((name, index) => new
@@ -528,18 +597,17 @@ public class DemoDataSeeder
             });
     }
 
-    private static List<Room> CreateRooms(
+    private static Dictionary<string, Room> CreateRooms(
         int organizationId,
         IEnumerable<string> names)
     {
-        return names
-            .Select(
-                name => new Room
-                {
-                    Name = name,
-                    OrganizationId = organizationId
-                })
-            .ToList();
+        return names.ToDictionary(
+            name => name,
+            name => new Room
+            {
+                Name = name,
+                OrganizationId = organizationId
+            });
     }
 
     private static int GetGradeNumber(string className)
@@ -557,8 +625,8 @@ public class DemoDataSeeder
     }
 
     private static string GenerateAlias(
-    string name,
-    int teacherNumber)
+        string name,
+        int teacherNumber)
     {
         var parts = name
             .Split(
