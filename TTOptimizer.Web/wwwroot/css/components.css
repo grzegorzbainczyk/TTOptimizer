@@ -430,3 +430,32 @@
         grid-template-columns: 1fr;
     }
 }
+
+.availability-cell {
+    min-width: 110px;
+    padding: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+    .availability-cell:hover {
+        transform: translateY(-1px);
+    }
+
+    .availability-cell.available {
+        background-color: #e7f6ea;
+        color: #205c2d;
+    }
+
+    .availability-cell.unavailable {
+        background-color: #f8dddd;
+        color: #7a2424;
+        font-weight: 600;
+    }
+
+    .availability-cell:focus {
+        outline: 2px solid currentColor;
+        outline-offset: -3px;
+    }

@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>ClassFlow - Resource Availability</title>
+
+    <link rel="stylesheet"
+          href="css/style.css" />
+</head>
+
+<body>
+    <div class="page-container">
+        <header class="app-header">
+            <div>
+                <h1 id="availabilityPageTitle">
+                    Resource availability
+                </h1>
+
+                <p id="availabilityResourceName"
+                   class="page-subtitle">
+                    Loading resource...
+                </p>
+            </div>
+
+            <nav class="header-actions">
+                <button id="backButton"
+                        class="secondary-button"
+                        type="button">
+                    Back
+                </button>
+
+                <button id="refreshAvailabilityButton"
+                        class="secondary-button"
+                        type="button">
+                    Refresh
+                </button>
+            </nav>
+        </header>
+
+        <main class="content-card">
+            <div class="section-header">
+                <div>
+                    <h2>Weekly availability</h2>
+
+                    <p class="page-subtitle">
+                        Click a cell to switch between available
+                        and unavailable.
+                    </p>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button id="markAllAvailableButton"
+                        class="secondary-button"
+                        type="button">
+                    Mark all available
+                </button>
+
+                <button id="markAllUnavailableButton"
+                        class="secondary-button"
+                        type="button">
+                    Mark all unavailable
+                </button>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="availabilityTable"
+                       class="data-table">
+
+                    <thead>
+                        <tr>
+                            <th>Lesson</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-actions">
+                <button id="saveAvailabilityButton"
+                        class="main-action-button"
+                        type="button">
+                    Save availability
+                </button>
+            </div>
+
+            <p id="availabilityMessage"
+               class="form-message"
+               aria-live="polite">
+            </p>
+        </main>
+    </div>
+
+    <script src="js/appContext.js"></script>
+    <script src="js/availability.js"></script>
+</body>
+</html>

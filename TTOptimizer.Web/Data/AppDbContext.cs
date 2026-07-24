@@ -25,6 +25,10 @@ namespace TTOptimizer.Web.Data
         public DbSet<ScheduledLesson> ScheduledLessons => Set<ScheduledLesson>();
         public DbSet<ScheduleConstraint> ScheduleConstraints { get; set; }
 
+        public DbSet<TeacherUnavailability> TeacherUnavailabilities { get; set; }
+        public DbSet<ClassGroupUnavailability> ClassGroupUnavailabilities { get; set; }
+        public DbSet<RoomUnavailability> RoomUnavailabilities { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -210,6 +214,62 @@ namespace TTOptimizer.Web.Data
                     .HasForeignKey(x => x.OrganizationId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
+
+            modelBuilder.Entity<TeacherUnavailability>(entity =>
+            {
+                entity.HasIndex(item => new
+                {
+                    item.TeacherId,
+                    item.DayIndex,
+                    item.SlotIndex
+                })
+                .IsUnique();
+
+                entity.HasOne(item => item.Teacher)
+                    .WithMany()
+                    .HasForeignKey(item => item.TeacherId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ClassGroupUnavailability>(entity =>
+            {
+                entity.HasIndex(item => new
+                {
+                    item.ClassGroupId,
+                    item.DayIndex,
+                    item.SlotIndex
+                })
+                .IsUnique();
+
+                entity.HasOne(item => item.ClassGroup)
+                    .WithMany()
+                    .HasForeignKey(item => item.ClassGroupId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<RoomUnavailability>(entity =>
+            {
+                entity.HasIndex(item => new
+                {
+                    item.RoomId,
+                    item.DayIndex,
+                    item.SlotIndex
+                })
+                .IsUnique();
+
+                entity.HasOne(item => item.Room)
+                    .WithMany()
+                    .HasForeignKey(item => item.RoomId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<TeacherUnavailability>()
+            .ToTable(table =>
+            table.HasCheckConstraint(
+                "CK_TeacherUnavailability_DayIndex",
+                "\"DayIndex\" >= 0 AND \"DayIndex\" <= 4"
+        )
+    );
         }
     }
 }

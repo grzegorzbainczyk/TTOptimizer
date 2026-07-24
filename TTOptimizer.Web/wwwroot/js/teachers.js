@@ -96,7 +96,6 @@ async function loadTeachers() {
         );
     }
 }
-
 function renderTeachers(teachers) {
     const tbody =
         document.querySelector("#teachersTable tbody");
@@ -118,7 +117,8 @@ function renderTeachers(teachers) {
     }
 
     teachers.forEach(teacher => {
-        const row = document.createElement("tr");
+        const row =
+            document.createElement("tr");
 
         row.appendChild(
             createTableCell(teacher.teacherNumber)
@@ -136,10 +136,16 @@ function renderTeachers(teachers) {
             createTableCell(teacher.info ?? "")
         );
 
-        const actionsCell = document.createElement("td");
-        actionsCell.classList.add("table-actions-column");
+        const actionsCell =
+            document.createElement("td");
 
-        const editButton = document.createElement("button");
+        actionsCell.classList.add(
+            "table-actions-column"
+        );
+
+        const editButton =
+            document.createElement("button");
+
         editButton.type = "button";
         editButton.className = "small-button";
         editButton.textContent = "Edit";
@@ -148,7 +154,25 @@ function renderTeachers(teachers) {
             openEditTeacherForm(teacher);
         });
 
-        const deleteButton = document.createElement("button");
+        const availabilityButton =
+            document.createElement("button");
+
+        availabilityButton.type = "button";
+        availabilityButton.className = "small-button";
+        availabilityButton.textContent = "Availability";
+
+        availabilityButton.addEventListener("click", () => {
+            const url =
+                "availability.html" +
+                "?resourceType=teacher" +
+                `&resourceId=${encodeURIComponent(teacher.id)}`;
+
+            window.location.href = url;
+        });
+
+        const deleteButton =
+            document.createElement("button");
+
         deleteButton.type = "button";
         deleteButton.className = "small-button";
         deleteButton.textContent = "Delete";
@@ -157,7 +181,12 @@ function renderTeachers(teachers) {
             await deleteTeacher(teacher);
         });
 
-        actionsCell.append(editButton, deleteButton);
+        actionsCell.append(
+            editButton,
+            availabilityButton,
+            deleteButton
+        );
+
         row.appendChild(actionsCell);
 
         tbody.appendChild(row);
