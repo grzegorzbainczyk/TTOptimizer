@@ -44,9 +44,13 @@ public class TimetableProblem
 
     public List<LessonRequirement> LessonRequirements { get; set; } = new();
 
+    public List<TeacherUnavailabilityInput> TeacherUnavailabilities { get; set; } = new();
+    public List<ClassGroupUnavailabilityInput> ClassGroupUnavailabilities { get; set; } = new();
+    public List<RoomUnavailabilityInput> RoomUnavailabilities { get; set; } = new();
+
     public int DaysPerWeek { get; set; } = 5;
 
-    public int SlotsPerDay { get; set; } = 6;
+    public int SlotsPerDay { get; set; } = 8;
 
     public OptimizationSettings OptimizationSettings { get; set; } = new();
 }

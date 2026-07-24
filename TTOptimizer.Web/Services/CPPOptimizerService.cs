@@ -3,6 +3,7 @@ using System.Text.Json;
 using TTOptimizer.Web.Models;
 using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO;
+using TTOptimizer.Web.Models.Optimization;
 
 namespace TTOptimizer.Web.Services;
 
@@ -128,47 +129,78 @@ public class CppOptimizerService
     }
 
 
-    private OptimizerInputDto CreateOptimizerInput(TimetableProblem problem)
+    private OptimizerInputDto CreateOptimizerInput(
+    TimetableProblem problem)
     {
         return new OptimizerInputDto
         {
             DaysPerWeek = problem.DaysPerWeek,
             SlotsPerDay = problem.SlotsPerDay,
 
-            Teachers = problem.Teachers.Select(t => new OptimizerTeacherDto
-            {
-                Id = t.Id,
-                Name = t.Name
-            }).ToList(),
+            Teachers = problem.Teachers
+                .Select(teacher =>
+                    new OptimizerTeacherDto
+                    {
+                        Id = teacher.Id,
+                        Name = teacher.Name
+                    })
+                .ToList(),
 
-            Classes = problem.ClassGroups.Select(c => new OptimizerClassGroupDto
-            {
-                Id = c.Id,
-                Name = c.Name
-            }).ToList(),
+            Classes = problem.ClassGroups
+                .Select(classGroup =>
+                    new OptimizerClassGroupDto
+                    {
+                        Id = classGroup.Id,
+                        Name = classGroup.Name
+                    })
+                .ToList(),
 
-            Subjects = problem.Subjects.Select(s => new OptimizerSubjectDto
-            {
-                Id = s.Id,
-                Name = s.Name
-            }).ToList(),
+            Subjects = problem.Subjects
+                .Select(subject =>
+                    new OptimizerSubjectDto
+                    {
+                        Id = subject.Id,
+                        Name = subject.Name
+                    })
+                .ToList(),
 
-            Rooms = problem.Rooms.Select(r => new OptimizerRoomDto
-            {
-                Id = r.Id,
-                Name = r.Name
-            }).ToList(),
+            Rooms = problem.Rooms
+                .Select(room =>
+                    new OptimizerRoomDto
+                    {
+                        Id = room.Id,
+                        Name = room.Name
+                    })
+                .ToList(),
 
-            LessonRequirements = problem.LessonRequirements.Select(req => new OptimizerLessonRequirementDto
-            {
-                Id = req.Id,
-                TeacherId = req.TeacherId,
-                ClassGroupId = req.ClassGroupId,
-                SubjectId = req.SubjectId,
-                LessonsPerWeek = req.HoursPerWeek
-            }).ToList(),
+            LessonRequirements =
+                problem.LessonRequirements
+                    .Select(requirement =>
+                        new OptimizerLessonRequirementDto
+                        {
+                            Id = requirement.Id,
+                            TeacherId =
+                                requirement.TeacherId,
+                            ClassGroupId =
+                                requirement.ClassGroupId,
+                            SubjectId =
+                                requirement.SubjectId,
+                            LessonsPerWeek =
+                                requirement.HoursPerWeek
+                        })
+                    .ToList(),
 
-            OptimizationSettings = problem.OptimizationSettings
+            TeacherUnavailabilities =
+    problem.TeacherUnavailabilities,
+
+            ClassGroupUnavailabilities =
+    problem.ClassGroupUnavailabilities,
+
+            RoomUnavailabilities =
+    problem.RoomUnavailabilities,
+
+            OptimizationSettings =
+                problem.OptimizationSettings
         };
     }
 
@@ -178,7 +210,7 @@ public class CppOptimizerService
         {
             if (File.Exists(path))
             {
-                File.Delete(path);
+                //File.Delete(path);
             }
         }
         catch (Exception exception)

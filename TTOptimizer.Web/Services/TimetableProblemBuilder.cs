@@ -42,6 +42,54 @@ public class TimetableProblemBuilder
             .OrderBy(lr => lr.Id)
             .ToListAsync();
 
+        var teacherUnavailabilities =
+    await _context.TeacherUnavailabilities
+        .AsNoTracking()
+        .Where(item =>
+            item.Teacher.OrganizationId == organizationId)
+        .OrderBy(item => item.TeacherId)
+        .ThenBy(item => item.DayIndex)
+        .ThenBy(item => item.SlotIndex)
+        .Select(item => new TeacherUnavailabilityInput
+        {
+            TeacherId = item.TeacherId,
+            DayIndex = item.DayIndex,
+            SlotIndex = item.SlotIndex
+        })
+        .ToListAsync();
+
+        var classGroupUnavailabilities =
+            await _context.ClassGroupUnavailabilities
+                .AsNoTracking()
+                .Where(item =>
+                    item.ClassGroup.OrganizationId == organizationId)
+                .OrderBy(item => item.ClassGroupId)
+                .ThenBy(item => item.DayIndex)
+                .ThenBy(item => item.SlotIndex)
+                .Select(item => new ClassGroupUnavailabilityInput
+                {
+                    ClassGroupId = item.ClassGroupId,
+                    DayIndex = item.DayIndex,
+                    SlotIndex = item.SlotIndex
+                })
+                .ToListAsync();
+
+        var roomUnavailabilities =
+            await _context.RoomUnavailabilities
+                .AsNoTracking()
+                .Where(item =>
+                    item.Room.OrganizationId == organizationId)
+                .OrderBy(item => item.RoomId)
+                .ThenBy(item => item.DayIndex)
+                .ThenBy(item => item.SlotIndex)
+                .Select(item => new RoomUnavailabilityInput
+                {
+                    RoomId = item.RoomId,
+                    DayIndex = item.DayIndex,
+                    SlotIndex = item.SlotIndex
+                })
+                .ToListAsync();
+
         ValidationResult validate = ValidateData(teachers,classGroups,subjects,rooms,lessonRequirements);
 
         if (!validate.Success)
@@ -56,6 +104,16 @@ public class TimetableProblemBuilder
             Subjects = subjects,
             Rooms = rooms,
             LessonRequirements = lessonRequirements,
+
+            TeacherUnavailabilities =
+         teacherUnavailabilities,
+
+            ClassGroupUnavailabilities =
+         classGroupUnavailabilities,
+
+            RoomUnavailabilities =
+         roomUnavailabilities,
+
             DaysPerWeek = 5,
             SlotsPerDay = 8,
             OptimizationSettings = optimizationSettings

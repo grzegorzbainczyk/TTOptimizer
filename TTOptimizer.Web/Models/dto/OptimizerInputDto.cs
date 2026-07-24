@@ -18,6 +18,18 @@ public class OptimizerInputDto
 
     public List<OptimizerLessonRequirementDto> LessonRequirements { get; set; } = new();
 
+    public List<TeacherUnavailabilityInput>
+    TeacherUnavailabilities
+    { get; set; } = new();
+
+    public List<ClassGroupUnavailabilityInput>
+        ClassGroupUnavailabilities
+    { get; set; } = new();
+
+    public List<RoomUnavailabilityInput>
+        RoomUnavailabilities
+    { get; set; } = new();
+
     public required OptimizationSettings OptimizationSettings { get; set; }
 }
 
