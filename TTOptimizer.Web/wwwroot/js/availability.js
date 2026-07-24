@@ -73,7 +73,8 @@ function readResourceParameters() {
 
     const supportedResourceTypes = [
         "teacher",
-        "class"
+        "class",
+        "room"
     ];
 
     if (
@@ -342,6 +343,10 @@ function getAvailabilityEndpoint(
             resourcePath = "classes";
             break;
 
+        case "room":
+            resourcePath = "rooms";
+            break;
+
         default:
             throw new Error(
                 `Unsupported resource type: ${resourceType}`
@@ -370,7 +375,8 @@ function updatePageHeader(resourceName) {
 
     const resourceLabels = {
         teacher: "Teacher",
-        class: "Class"
+        class: "Class",
+        room: "Room"
     };
 
     const resourceLabel =
@@ -521,7 +527,8 @@ function isValidSlot(
 function goBack() {
     const backPages = {
         teacher: "teachers.html",
-        class: "classes.html"
+        class: "classes.html",
+        room: "rooms.html"
     };
 
     window.location.href =

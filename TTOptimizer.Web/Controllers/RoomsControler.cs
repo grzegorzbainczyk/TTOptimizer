@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
+using TTOptimizer.Web.Models.DTO.ResourceAvailability;
 using TTOptimizer.Web.Models.DTO.Rooms;
 
 namespace TTOptimizer.Web.Controllers;
@@ -259,6 +260,163 @@ public class RoomsController : ControllerBase
         );
 
         return Ok(result);
+    }
+
+    [HttpGet("{id:int}/availability")]
+    public async Task<IActionResult> GetAvailability(
+    int id,
+    [FromQuery] int organizationId)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                message = "Organization ID is required."
+            });
+        }
+
+        var room = await _db.Rooms
+            .AsNoTracking()
+            .Where(item =>
+                item.Id == id &&
+                item.OrganizationId == organizationId)
+            .Select(item => new
+            {
+                item.Id,
+                item.Name
+            })
+            .FirstOrDefaultAsync();
+
+        if (room == null)
+        {
+            return NotFound(new
+            {
+                message = "Room not found."
+            });
+        }
+
+        var unavailableSlots =
+            await _db.RoomUnavailabilities
+                .AsNoTracking()
+                .Where(item => item.RoomId == id)
+                .OrderBy(item => item.DayIndex)
+                .ThenBy(item => item.SlotIndex)
+                .Select(item => new AvailabilitySlotDTO
+                {
+                    DayIndex = item.DayIndex,
+                    SlotIndex = item.SlotIndex
+                })
+                .ToListAsync();
+
+        return Ok(new
+        {
+            success = true,
+            resourceType = "room",
+            resourceId = room.Id,
+            resourceName = room.Name,
+            unavailableSlots
+        });
+    }
+
+
+    [HttpPut("{id:int}/availability")]
+    public async Task<IActionResult> UpdateAvailability(
+    int id,
+    [FromQuery] int organizationId,
+    [FromBody] UpdateAvailabilityRequest request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                message = "Organization ID is required."
+            });
+        }
+
+        var roomExists =
+            await _db.Rooms.AnyAsync(item =>
+                item.Id == id &&
+                item.OrganizationId == organizationId);
+
+        if (!roomExists)
+        {
+            return NotFound(new
+            {
+                message = "Room not found."
+            });
+        }
+
+        if (request.UnavailableSlots == null)
+        {
+            return BadRequest(new
+            {
+                message =
+                    "Unavailable slots collection is required."
+            });
+        }
+
+        var invalidSlot = request.UnavailableSlots
+            .FirstOrDefault(slot =>
+                slot.DayIndex < 0 ||
+                slot.DayIndex > 4 ||
+                slot.SlotIndex < 0 ||
+                slot.SlotIndex > 7);
+
+        if (invalidSlot != null)
+        {
+            return BadRequest(new
+            {
+                message =
+                    "Day index must be between 0 and 4, " +
+                    "and slot index between 0 and 7."
+            });
+        }
+
+        var normalizedSlots = request.UnavailableSlots
+            .GroupBy(slot => new
+            {
+                slot.DayIndex,
+                slot.SlotIndex
+            })
+            .Select(group => group.First())
+            .ToList();
+
+        await using var transaction =
+            await _db.Database.BeginTransactionAsync();
+
+        var existingSlots =
+            await _db.RoomUnavailabilities
+                .Where(item => item.RoomId == id)
+                .ToListAsync();
+
+        _db.RoomUnavailabilities.RemoveRange(
+            existingSlots
+        );
+
+        var newSlots = normalizedSlots
+            .Select(slot => new RoomUnavailability
+            {
+                RoomId = id,
+                DayIndex = slot.DayIndex,
+                SlotIndex = slot.SlotIndex
+            })
+            .ToList();
+
+        _db.RoomUnavailabilities.AddRange(
+            newSlots
+        );
+
+        await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
+
+        return Ok(new
+        {
+            success = true,
+            message = "Room availability was updated.",
+            unavailableSlots = normalizedSlots
+                .OrderBy(slot => slot.DayIndex)
+                .ThenBy(slot => slot.SlotIndex)
+        });
     }
 
     [HttpDelete("{id:int}")]

@@ -209,15 +209,13 @@ function renderRooms(rooms) {
 
         row.appendChild(
             createTableCell(
-                room.restrictedToSubjectName ??
-                ""
+                room.restrictedToSubjectName ?? ""
             )
         );
 
         row.appendChild(
             createTableCell(
-                room.preferredSubjectName ??
-                ""
+                room.preferredSubjectName ?? ""
             )
         );
 
@@ -238,9 +236,7 @@ function renderRooms(rooms) {
             document.createElement("button");
 
         editButton.type = "button";
-        editButton.className =
-            "small-button";
-
+        editButton.className = "small-button";
         editButton.textContent = "Edit";
 
         editButton.addEventListener(
@@ -250,15 +246,33 @@ function renderRooms(rooms) {
             }
         );
 
+        const availabilityButton =
+            document.createElement("button");
+
+        availabilityButton.type = "button";
+        availabilityButton.className = "small-button";
+        availabilityButton.textContent = "Availability";
+
+        availabilityButton.addEventListener(
+            "click",
+            () => {
+                const url =
+                    "availability.html" +
+                    "?resourceType=room" +
+                    `&resourceId=${encodeURIComponent(
+                        room.id
+                    )}`;
+
+                window.location.href = url;
+            }
+        );
+
         const deleteButton =
             document.createElement("button");
 
         deleteButton.type = "button";
-        deleteButton.className =
-            "small-button";
-
-        deleteButton.textContent =
-            "Delete";
+        deleteButton.className = "small-button";
+        deleteButton.textContent = "Delete";
 
         deleteButton.addEventListener(
             "click",
@@ -269,6 +283,7 @@ function renderRooms(rooms) {
 
         actionsCell.append(
             editButton,
+            availabilityButton,
             deleteButton
         );
 
