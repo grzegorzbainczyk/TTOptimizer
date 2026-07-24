@@ -71,8 +71,13 @@ function readResourceParameters() {
     resourceId =
         Number(parameters.get("resourceId"));
 
+    const supportedResourceTypes = [
+        "teacher",
+        "class"
+    ];
+
     if (
-        resourceType !== "teacher" ||
+        !supportedResourceTypes.includes(resourceType) ||
         !Number.isInteger(resourceId) ||
         resourceId <= 0
     ) {
@@ -326,18 +331,29 @@ async function saveAvailability() {
 function getAvailabilityEndpoint(
     organizationId
 ) {
-    if (resourceType === "teacher") {
-        return (
-            `/api/teachers/${encodeURIComponent(
-                resourceId
-            )}/availability?organizationId=${encodeURIComponent(
-                organizationId
-            )}`
-        );
+    let resourcePath;
+
+    switch (resourceType) {
+        case "teacher":
+            resourcePath = "teachers";
+            break;
+
+        case "class":
+            resourcePath = "classes";
+            break;
+
+        default:
+            throw new Error(
+                `Unsupported resource type: ${resourceType}`
+            );
     }
 
-    throw new Error(
-        `Unsupported resource type: ${resourceType}`
+    return (
+        `/api/${resourcePath}/${encodeURIComponent(
+            resourceId
+        )}/availability?organizationId=${encodeURIComponent(
+            organizationId
+        )}`
     );
 }
 
@@ -352,15 +368,24 @@ function updatePageHeader(resourceName) {
             "availabilityResourceName"
         );
 
+    const resourceLabels = {
+        teacher: "Teacher",
+        class: "Class"
+    };
+
+    const resourceLabel =
+        resourceLabels[resourceType] ??
+        "Resource";
+
     if (pageTitle) {
         pageTitle.textContent =
-            "Teacher availability";
+            `${resourceLabel} availability`;
     }
 
     if (resourceNameElement) {
         resourceNameElement.textContent =
             resourceName ||
-            `Teacher #${resourceId}`;
+            `${resourceLabel} #${resourceId}`;
     }
 }
 
@@ -494,14 +519,13 @@ function isValidSlot(
 }
 
 function goBack() {
-    if (resourceType === "teacher") {
-        window.location.href =
-            "teachers.html";
-
-        return;
-    }
+    const backPages = {
+        teacher: "teachers.html",
+        class: "classes.html"
+    };
 
     window.location.href =
+        backPages[resourceType] ??
         "main.html";
 }
 

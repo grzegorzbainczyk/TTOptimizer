@@ -195,7 +195,8 @@ function renderClasses(classes) {
     }
 
     classes.forEach(classGroup => {
-        const row = document.createElement("tr");
+        const row =
+            document.createElement("tr");
 
         row.appendChild(
             createTableCell(classGroup.name)
@@ -217,7 +218,8 @@ function renderClasses(classes) {
             createTableCell(classGroup.info ?? "")
         );
 
-        const actionsCell = document.createElement("td");
+        const actionsCell =
+            document.createElement("td");
 
         actionsCell.classList.add(
             "table-actions-column"
@@ -232,6 +234,24 @@ function renderClasses(classes) {
 
         editButton.addEventListener("click", () => {
             openEditClassForm(classGroup);
+        });
+
+        const availabilityButton =
+            document.createElement("button");
+
+        availabilityButton.type = "button";
+        availabilityButton.className = "small-button";
+        availabilityButton.textContent = "Availability";
+
+        availabilityButton.addEventListener("click", () => {
+            const url =
+                "availability.html" +
+                "?resourceType=class" +
+                `&resourceId=${encodeURIComponent(
+                    classGroup.id
+                )}`;
+
+            window.location.href = url;
         });
 
         const deleteButton =
@@ -250,6 +270,7 @@ function renderClasses(classes) {
 
         actionsCell.append(
             editButton,
+            availabilityButton,
             deleteButton
         );
 
