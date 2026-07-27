@@ -67,7 +67,8 @@ public class OptimizationController : ControllerBase
             {
                 1 => 1_000,
                 2 => 10_000,
-                3 => 500_000
+                3 => 500_000,
+                _ => throw new NotImplementedException()
             },
             RandomSeed = 12345
         };

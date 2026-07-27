@@ -156,9 +156,4 @@ public class TimetableProblemBuilder
 
         return ValidationResult.Ok();
     }
-
-    internal async Task BuildProblemAsync(int organizationId)
-    {
-        throw new NotImplementedException();
-    }
 }

@@ -1,6 +1,6 @@
-﻿namespace TTOptimizer.Web.Models.DTO
+﻿namespace TTOptimizer.Web.Models.DTO.ScheduleConstraints
 {
-    public class CreateScheduleConstraintRequest
+    public class UpdateScheduleConstraintRequest
     {
         public string Name { get; set; } = string.Empty;
 
@@ -12,9 +12,9 @@
 
         public int TargetId { get; set; }
 
-        public bool IsHard { get; set; } = true;
+        public bool IsHard { get; set; }
 
-        public int Weight { get; set; } = 100;
+        public int Weight { get; set; }
 
         public int? DayOfWeek { get; set; }
 
@@ -22,6 +22,6 @@
 
         public string? Value { get; set; }
 
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; }
     }
 }
