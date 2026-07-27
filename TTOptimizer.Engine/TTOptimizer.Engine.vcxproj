@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GeneticOptimizer.cpp" />
     <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Optimization\ChromosomeMutator.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="ChromosomeDecoder.h" />
     <ClInclude Include="External\nlohmann\json.hpp" />
     <ClInclude Include="FitnessScore.h" />
+    <ClInclude Include="GeneticOptimizer.h" />
     <ClInclude Include="include\Domain\TimeTableModels.h" />
     <ClInclude Include="include\Domain\TimetableProblem.h" />
     <ClInclude Include="include\Evaluation\ChromosomeValidator.h" />

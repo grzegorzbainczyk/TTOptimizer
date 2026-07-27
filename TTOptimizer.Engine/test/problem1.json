@@ -1,0 +1,226 @@
+{
+  "daysPerWeek": 5,
+  "slotsPerDay": 8,
+  "teachers": [
+    {
+      "id": 376,
+      "name": "Anna Kowalska"
+    },
+    {
+      "id": 377,
+      "name": "Jan Nowak"
+    },
+    {
+      "id": 378,
+      "name": "Piotr Zieli\u0144ski"
+    }
+  ],
+  "classes": [
+    {
+      "id": 248,
+      "name": "1A"
+    },
+    {
+      "id": 249,
+      "name": "1B"
+    }
+  ],
+  "subjects": [
+    {
+      "id": 359,
+      "name": "Mathematics"
+    },
+    {
+      "id": 360,
+      "name": "Polish"
+    },
+    {
+      "id": 361,
+      "name": "English"
+    }
+  ],
+  "rooms": [
+    {
+      "id": 267,
+      "name": "101",
+      "capacity": 0
+    },
+    {
+      "id": 268,
+      "name": "102",
+      "capacity": 0
+    }
+  ],
+  "lessonRequirements": [
+    {
+      "id": 1135,
+      "teacherId": 376,
+      "classGroupId": 248,
+      "subjectId": 359,
+      "lessonsPerWeek": 4
+    },
+    {
+      "id": 1136,
+      "teacherId": 377,
+      "classGroupId": 248,
+      "subjectId": 360,
+      "lessonsPerWeek": 3
+    },
+    {
+      "id": 1137,
+      "teacherId": 378,
+      "classGroupId": 248,
+      "subjectId": 361,
+      "lessonsPerWeek": 2
+    },
+    {
+      "id": 1138,
+      "teacherId": 376,
+      "classGroupId": 249,
+      "subjectId": 359,
+      "lessonsPerWeek": 4
+    },
+    {
+      "id": 1139,
+      "teacherId": 377,
+      "classGroupId": 249,
+      "subjectId": 360,
+      "lessonsPerWeek": 3
+    },
+    {
+      "id": 1140,
+      "teacherId": 378,
+      "classGroupId": 249,
+      "subjectId": 361,
+      "lessonsPerWeek": 2
+    }
+  ],
+  "teacherUnavailabilities": [
+    {
+      "teacherId": 378,
+      "dayIndex": 0,
+      "slotIndex": 0
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 0,
+      "slotIndex": 1
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 0,
+      "slotIndex": 2
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 0,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 0,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 0,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 0,
+      "slotIndex": 6
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 0,
+      "slotIndex": 7
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 1,
+      "slotIndex": 0
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 1,
+      "slotIndex": 1
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 1,
+      "slotIndex": 2
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 1,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 1,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 1,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 1,
+      "slotIndex": 6
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 1,
+      "slotIndex": 7
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 2,
+      "slotIndex": 0
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 2,
+      "slotIndex": 1
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 2,
+      "slotIndex": 2
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 2,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 2,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 2,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 2,
+      "slotIndex": 6
+    },
+    {
+      "teacherId": 378,
+      "dayIndex": 2,
+      "slotIndex": 7
+    }
+  ],
+  "classGroupUnavailabilities": [],
+  "roomUnavailabilities": [],
+  "optimizationSettings": {
+    "iterations": 10000,
+    "randomSeed": 12345
+  }
+}

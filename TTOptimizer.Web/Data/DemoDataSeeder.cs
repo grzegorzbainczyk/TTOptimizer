@@ -18,6 +18,36 @@ public class DemoDataSeeder
         _context = context;
     }
 
+    public async Task<int> EnsureEasyDemoDataAsync()
+    {
+        var organizationId =
+            await GetOrCreateOrganizationAsync(
+                EasyDemoOrganizationName
+            );
+
+        if (!await DemoDataExistsAsync(organizationId))
+        {
+            await CreateEasyDemoDataAsync(organizationId);
+        }
+
+        return organizationId;
+    }
+
+    public async Task<int> EnsureHardDemoDataAsync()
+    {
+        var organizationId =
+            await GetOrCreateOrganizationAsync(
+                HardDemoOrganizationName
+            );
+
+        if (!await DemoDataExistsAsync(organizationId))
+        {
+            await CreateHardDemoDataAsync(organizationId);
+        }
+
+        return organizationId;
+    }
+
     public async Task<int> ResetEasyDemoDataAsync()
     {
         var organizationId =
@@ -42,6 +72,14 @@ public class DemoDataSeeder
         await CreateHardDemoDataAsync(organizationId);
 
         return organizationId;
+    }
+
+    private Task<bool> DemoDataExistsAsync(int organizationId)
+    {
+        return _context.Teachers.AnyAsync(
+            teacher =>
+                teacher.OrganizationId == organizationId
+        );
     }
 
     private async Task<int> GetOrCreateOrganizationAsync(

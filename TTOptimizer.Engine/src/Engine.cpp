@@ -15,7 +15,8 @@
 #include "Evaluation/ChromosomeValidator.h"
 
 #include "Optimization/ChromosomeMutator.h"
-#include "Optimization/SimpleOptimizer.h"
+//#include "Optimization/SimpleOptimizer.h"
+#include "Optimization/GeneticOptimizer.h"
 
 
 #include "Utils/Utils.h"
@@ -36,7 +37,7 @@ void Engine::CreateInitialChromosome(Chromosome& initialChromosome,
 		chromosomeFactory.createRandom(scheduleSlots, lessonInstances);
 	ChromosomeValidator::validate(initialChromosome, lessonInstances, scheduleSlots);
 
-	initialChromosome.fitnessScore = fitnessEvaluator.evaluate(
+	initialChromosome.fitness = fitnessEvaluator.evaluate(
 		initialChromosome,
 		problem,
 		lessonInstances,
@@ -59,16 +60,24 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
 
 		CreateInitialChromosome(initialChromosome, scheduleSlots, lessonInstances, fitnessEvaluator, problem);
 
-		const double initialPenalty = initialChromosome.fitnessScore.softPenalty;
+		const double initialPenalty = initialChromosome.fitness.softPenalty;
 
-		SimpleOptimizer optimizer(456);
+		//SimpleOptimizer optimizer(456);
+
+		GeneticOptimizer optimizer(
+			problem.optimizationSettings.randomSeed);
+
 		Chromosome bestChromosome = optimizer.optimize(
 			initialChromosome,
 			problem,
 			lessonInstances,
 			scheduleSlots,
-			problem.optimizationSettings.iterations);
+			1000,  // generations
+			100,   // populationSize
+			5,     // eliteCount
+			3);    // tournamentSize
 
+		
 		ChromosomeValidator::validate(bestChromosome, lessonInstances, scheduleSlots);
 
 		FitnessScore score = fitnessEvaluator.evaluate(bestChromosome, problem, lessonInstances, scheduleSlots);		

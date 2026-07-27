@@ -1,11 +1,21 @@
 #include "Optimization/SimpleOptimizer.h"
 
+#include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <random>
 
-#include "Domain/TimetableProblem.h"
+namespace
+{
+    constexpr double HardViolationEnergy = 1'000'000.0;
+    constexpr double InitialTemperature = 1'000'000.0;
+    constexpr double CoolingRate = 0.9995;
+    constexpr double MinimumTemperature = 0.0001;
+}
 
 SimpleOptimizer::SimpleOptimizer(unsigned int seed)
-    : mutator(seed)
+    : mutator(seed),
+    randomEngine(seed)
 {
 }
 
@@ -18,7 +28,7 @@ Chromosome SimpleOptimizer::optimize(
 {
     Chromosome bestChromosome = initialChromosome;
 
-    bestChromosome.fitnessScore = fitnessEvaluator.evaluate(
+    bestChromosome.fitness = fitnessEvaluator.evaluate(
         bestChromosome,
         problem,
         lessonInstances,
@@ -26,11 +36,13 @@ Chromosome SimpleOptimizer::optimize(
 
     Chromosome currentChromosome = bestChromosome;
 
+    double temperature = InitialTemperature;
+
     std::cerr
         << "Initial fitness: hard violations = "
-        << bestChromosome.fitnessScore.hardViolationCount
+        << bestChromosome.fitness.hardViolationCount
         << ", soft penalty = "
-        << bestChromosome.fitnessScore.softPenalty
+        << bestChromosome.fitness.softPenalty
         << '\n';
 
     for (int iteration = 1; iteration <= iterations; ++iteration)
@@ -39,40 +51,95 @@ Chromosome SimpleOptimizer::optimize(
 
         mutator.mutateBySwap(candidate);
 
-        candidate.fitnessScore = fitnessEvaluator.evaluate(
+        candidate.fitness = fitnessEvaluator.evaluate(
             candidate,
             problem,
             lessonInstances,
             scheduleSlots);
 
-        if (candidate.fitnessScore.isBetterThan(
-            currentChromosome.fitnessScore))
+        const bool candidateIsBetter =
+            candidate.fitness.isBetterThan(
+                currentChromosome.fitness);
+
+        const bool acceptWorseCandidate =
+            !candidateIsBetter
+            && shouldAcceptWorseCandidate(
+                candidate.fitness,
+                currentChromosome.fitness,
+                temperature);
+
+        if (candidateIsBetter || acceptWorseCandidate)
         {
             currentChromosome = candidate;
-
-            if (candidate.fitnessScore.isBetterThan(
-                bestChromosome.fitnessScore))
-            {
-                bestChromosome = candidate;
-
-                std::cerr
-                    << "Iteration: "
-                    << iteration
-                    << ", new best fitness: hard violations = "
-                    << bestChromosome.fitnessScore.hardViolationCount
-                    << ", soft penalty = "
-                    << bestChromosome.fitnessScore.softPenalty
-                    << '\n';
-            }
         }
+
+        if (candidate.fitness.isBetterThan(
+            bestChromosome.fitness))
+        {
+            bestChromosome = candidate;
+
+            std::cerr
+                << "Iteration: "
+                << iteration
+                << ", new best fitness: hard violations = "
+                << bestChromosome.fitness.hardViolationCount
+                << ", soft penalty = "
+                << bestChromosome.fitness.softPenalty
+                << ", temperature = "
+                << temperature
+                << '\n';
+        }
+
+        temperature = std::max(
+            temperature * CoolingRate,
+            MinimumTemperature);
     }
 
     std::cerr
         << "Final fitness: hard violations = "
-        << bestChromosome.fitnessScore.hardViolationCount
+        << bestChromosome.fitness.hardViolationCount
         << ", soft penalty = "
-        << bestChromosome.fitnessScore.softPenalty
+        << bestChromosome.fitness.softPenalty
         << '\n';
 
     return bestChromosome;
+}
+
+double SimpleOptimizer::calculateEnergy(
+    const FitnessScore& score)
+{
+    return
+        static_cast<double>(score.hardViolationCount)
+        * HardViolationEnergy
+        + score.softPenalty;
+}
+
+bool SimpleOptimizer::shouldAcceptWorseCandidate(
+    const FitnessScore& candidate,
+    const FitnessScore& current,
+    double temperature)
+{
+    const double candidateEnergy =
+        calculateEnergy(candidate);
+
+    const double currentEnergy =
+        calculateEnergy(current);
+
+    const double energyDifference =
+        candidateEnergy - currentEnergy;
+
+    if (energyDifference <= 0.0)
+    {
+        return true;
+    }
+
+    const double acceptanceProbability =
+        std::exp(-energyDifference / temperature);
+
+    std::uniform_real_distribution<double> distribution(
+        0.0,
+        1.0);
+
+    return distribution(randomEngine)
+        < acceptanceProbability;
 }

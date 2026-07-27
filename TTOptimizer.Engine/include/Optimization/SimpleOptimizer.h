@@ -1,10 +1,12 @@
 #pragma once
 
+#include <random>
 #include <vector>
 
-#include "Domain/TimetableModels.h"
+#include "Domain/TimeTableModels.h"
+#include "Domain/TimetableProblem.h"
 #include "Evaluation/FitnessEvaluator.h"
-#include "ChromosomeMutator.h"
+#include "Optimization/ChromosomeMutator.h"
 
 class SimpleOptimizer
 {
@@ -19,6 +21,15 @@ public:
         int iterations);
 
 private:
+    static double calculateEnergy(
+        const FitnessScore& score);
+
+    bool shouldAcceptWorseCandidate(
+        const FitnessScore& candidate,
+        const FitnessScore& current,
+        double temperature);
+
     ChromosomeMutator mutator;
     FitnessEvaluator fitnessEvaluator;
+    std::mt19937 randomEngine;
 };

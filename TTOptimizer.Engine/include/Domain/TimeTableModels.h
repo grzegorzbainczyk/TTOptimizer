@@ -107,7 +107,7 @@ struct ScheduleSlot
 struct Chromosome
 {
     std::vector<std::optional<LessonInstanceIndex>> genes;
-	FitnessScore fitnessScore;
+	FitnessScore fitness;
 };
 
 struct ScheduledLesson

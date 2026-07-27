@@ -18,7 +18,7 @@ public class DemoController : ControllerBase
     public async Task<IActionResult> LoginEasy()
     {
         var organizationId =
-            await _demoDataSeeder.ResetEasyDemoDataAsync();
+            await _demoDataSeeder.EnsureEasyDemoDataAsync();
 
         return Ok(new
         {
@@ -34,7 +34,7 @@ public class DemoController : ControllerBase
     public async Task<IActionResult> LoginHard()
     {
         var organizationId =
-            await _demoDataSeeder.ResetHardDemoDataAsync();
+            await _demoDataSeeder.EnsureHardDemoDataAsync();
 
         return Ok(new
         {
