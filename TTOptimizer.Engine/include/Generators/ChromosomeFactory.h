@@ -27,7 +27,7 @@ public:
 
         Chromosome chromosome;
         chromosome.genes.resize(scheduleSlots.size(), std::nullopt);
-        chromosome.penalty = 0.0;
+        chromosome.fitnessScore.softPenalty = 0.0;
 
         std::vector<ScheduleSlotIndex> freeSlotIndices;
         freeSlotIndices.reserve(scheduleSlots.size());

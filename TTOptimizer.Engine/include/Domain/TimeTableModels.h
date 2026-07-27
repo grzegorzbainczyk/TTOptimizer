@@ -4,6 +4,8 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include "Evaluation/FitnessScore.h"
+
 
 using TeacherId = int;
 using ClassGroupId = int;
@@ -24,6 +26,14 @@ enum class DayOfWeek
     Friday = 4
 };
 
+struct PenaltySettings
+{
+    int low = 10;
+    int medium = 100;
+    int high = 1000;
+    int hard = 1'000'000;
+};
+
 struct TimeSlot
 {
     DayOfWeek day{};
@@ -40,6 +50,8 @@ struct OptimizationSettings
 {
     int iterations = 1;
     unsigned int randomSeed = 12'345;
+    
+    PenaltySettings penalties;
 };
 
 struct Subject
@@ -95,7 +107,7 @@ struct ScheduleSlot
 struct Chromosome
 {
     std::vector<std::optional<LessonInstanceIndex>> genes;
-    double penalty = 0.0;
+	FitnessScore fitnessScore;
 };
 
 struct ScheduledLesson
@@ -122,13 +134,6 @@ struct ScheduledLessonView
 
     DayOfWeek day{};
     int lessonNumber{};
-};
-
-struct TeacherUnavailability
-{
-    int teacherId{};
-    int dayIndex{};
-    int slotIndex{};
 };
 
 

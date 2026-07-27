@@ -14,14 +14,14 @@
 
 int main(int argc, char* argv[])
 {
-//#ifdef _DEBUG
-//    while (!IsDebuggerPresent())
-//    {
-//        Sleep(200);
-//    }
-//
-//    DebugBreak();
-//#endif
+#ifdef _DEBUG
+    while (!IsDebuggerPresent())
+    {
+        Sleep(200);
+    }
+
+    DebugBreak();
+#endif
 
     if (argc < 3)
     {

@@ -121,6 +121,67 @@ public:
             }
         }
 
+
+        if (root.contains("teacherUnavailabilities")
+            && root["teacherUnavailabilities"].is_array())
+        {
+            for (const auto& item : root["teacherUnavailabilities"])
+            {
+                TeacherUnavailability unavailability;
+
+                unavailability.teacherId =
+                    item.value("teacherId", 0);
+
+                unavailability.dayIndex =
+                    item.value("dayIndex", 0);
+
+                unavailability.slotIndex =
+                    item.value("slotIndex", 0);
+
+                problem.teacherUnavailabilities.push_back(unavailability);
+            }
+        }
+
+        if (root.contains("classGroupUnavailabilities")
+            && root["classGroupUnavailabilities"].is_array())
+        {
+            for (const auto& item : root["classGroupUnavailabilities"])
+            {
+                ClassGroupUnavailability unavailability;
+
+                unavailability.classGroupId =
+                    item.value("classGroupId", 0);
+
+                unavailability.dayIndex =
+                    item.value("dayIndex", 0);
+
+                unavailability.slotIndex =
+                    item.value("slotIndex", 0);
+
+                problem.classGroupUnavailabilities.push_back(unavailability);
+            }
+        }
+
+        if (root.contains("roomUnavailabilities")
+            && root["roomUnavailabilities"].is_array())
+        {
+            for (const auto& item : root["roomUnavailabilities"])
+            {
+                RoomUnavailability unavailability;
+
+                unavailability.roomId =
+                    item.value("roomId", 0);
+
+                unavailability.dayIndex =
+                    item.value("dayIndex", 0);
+
+                unavailability.slotIndex =
+                    item.value("slotIndex", 0);
+
+                problem.roomUnavailabilities.push_back(unavailability);
+            }
+        }
+
         return problem;
     }
 };

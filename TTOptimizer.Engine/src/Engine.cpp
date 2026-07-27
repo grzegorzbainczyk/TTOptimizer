@@ -36,7 +36,7 @@ void Engine::CreateInitialChromosome(Chromosome& initialChromosome,
 		chromosomeFactory.createRandom(scheduleSlots, lessonInstances);
 	ChromosomeValidator::validate(initialChromosome, lessonInstances, scheduleSlots);
 
-	initialChromosome.penalty = fitnessEvaluator.evaluate(
+	initialChromosome.fitnessScore = fitnessEvaluator.evaluate(
 		initialChromosome,
 		problem,
 		lessonInstances,
@@ -59,7 +59,7 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
 
 		CreateInitialChromosome(initialChromosome, scheduleSlots, lessonInstances, fitnessEvaluator, problem);
 
-		const double initialPenalty = initialChromosome.penalty;
+		const double initialPenalty = initialChromosome.fitnessScore.softPenalty;
 
 		SimpleOptimizer optimizer(456);
 		Chromosome bestChromosome = optimizer.optimize(
@@ -71,7 +71,7 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
 
 		ChromosomeValidator::validate(bestChromosome, lessonInstances, scheduleSlots);
 
-		double bestPenalty = fitnessEvaluator.evaluate(bestChromosome, problem, lessonInstances, scheduleSlots);		
+		FitnessScore score = fitnessEvaluator.evaluate(bestChromosome, problem, lessonInstances, scheduleSlots);		
 		std::vector<ScheduledLesson> scheduledLessons = ChromosomeDecoder::decode(bestChromosome, problem, lessonInstances, scheduleSlots);
 
 
@@ -87,7 +87,7 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
 
 		result = writer.writeSuccess(
 			initialPenalty,
-			bestPenalty,
+			score,
 			scheduledLessons,
 			feedback
 		);

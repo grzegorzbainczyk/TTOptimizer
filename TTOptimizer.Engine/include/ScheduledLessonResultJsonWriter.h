@@ -23,7 +23,7 @@ class ScheduledLessonResultJsonWriter
 public:
     std::string writeSuccess(
         double initialPenalty,
-        double bestPenalty,
+        FitnessScore score,
         const std::vector<ScheduledLesson>& scheduledLessons,
         const OptimizationInfo& info ) const
     {
@@ -31,7 +31,8 @@ public:
 
         result["success"] = true;
         result["initialPenalty"] = initialPenalty;
-        result["bestPenalty"] = bestPenalty;
+        result["hardViolationCount"] = score.hardViolationCount;
+        result["bestPenalty"] = score.softPenalty;
         result["scheduledLessons"] = json::array();
 
         for (const ScheduledLesson& lesson : scheduledLessons)

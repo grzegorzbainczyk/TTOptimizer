@@ -1,7 +1,8 @@
 #include "Optimization/SimpleOptimizer.h"
 
 #include <iostream>
-#include <Domain/TimetableProblem.h>
+
+#include "Domain/TimetableProblem.h"
 
 SimpleOptimizer::SimpleOptimizer(unsigned int seed)
     : mutator(seed)
@@ -17,7 +18,7 @@ Chromosome SimpleOptimizer::optimize(
 {
     Chromosome bestChromosome = initialChromosome;
 
-    bestChromosome.penalty = fitnessEvaluator.evaluate(
+    bestChromosome.fitnessScore = fitnessEvaluator.evaluate(
         bestChromosome,
         problem,
         lessonInstances,
@@ -25,7 +26,12 @@ Chromosome SimpleOptimizer::optimize(
 
     Chromosome currentChromosome = bestChromosome;
 
-    std::cerr << "Initial penalty: " << bestChromosome.penalty << '\n';
+    std::cerr
+        << "Initial fitness: hard violations = "
+        << bestChromosome.fitnessScore.hardViolationCount
+        << ", soft penalty = "
+        << bestChromosome.fitnessScore.softPenalty
+        << '\n';
 
     for (int iteration = 1; iteration <= iterations; ++iteration)
     {
@@ -33,29 +39,40 @@ Chromosome SimpleOptimizer::optimize(
 
         mutator.mutateBySwap(candidate);
 
-        candidate.penalty = fitnessEvaluator.evaluate(
+        candidate.fitnessScore = fitnessEvaluator.evaluate(
             candidate,
             problem,
             lessonInstances,
             scheduleSlots);
 
-        if (candidate.penalty < currentChromosome.penalty)
+        if (candidate.fitnessScore.isBetterThan(
+            currentChromosome.fitnessScore))
         {
             currentChromosome = candidate;
 
-            if (candidate.penalty < bestChromosome.penalty)
+            if (candidate.fitnessScore.isBetterThan(
+                bestChromosome.fitnessScore))
             {
                 bestChromosome = candidate;
 
                 std::cerr
-                    << "Iteration: " << iteration
-                    << ", new best penalty: " << bestChromosome.penalty
+                    << "Iteration: "
+                    << iteration
+                    << ", new best fitness: hard violations = "
+                    << bestChromosome.fitnessScore.hardViolationCount
+                    << ", soft penalty = "
+                    << bestChromosome.fitnessScore.softPenalty
                     << '\n';
             }
         }
     }
 
-    std::cerr << "Final penalty: " << bestChromosome.penalty << '\n';
+    std::cerr
+        << "Final fitness: hard violations = "
+        << bestChromosome.fitnessScore.hardViolationCount
+        << ", soft penalty = "
+        << bestChromosome.fitnessScore.softPenalty
+        << '\n';
 
     return bestChromosome;
 }

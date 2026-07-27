@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <vector>
 #include <Domain/TimeTableModels.h>
+#include <Domain/TimeTableProblem.h>
 
 class ChromosomeDecoder
 {

@@ -3,9 +3,8 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include "Evaluation/FitnessEvaluator.h"
-#include "Domain/TimetableProblem.h"
 
+#include "Evaluation/FitnessEvaluator.h"
 
 namespace
 {
@@ -13,7 +12,7 @@ namespace
         const TimetableProblem& problem,
         LessonRequirementId requirementId)
     {
-        auto iterator = std::find_if(
+        const auto iterator = std::find_if(
             problem.lessonRequirements.begin(),
             problem.lessonRequirements.end(),
             [requirementId](const LessonRequirement& requirement)
@@ -29,31 +28,11 @@ namespace
         return *iterator;
     }
 
-    const Teacher& FindTeacherById(
-        const TimetableProblem& problem,
-        TeacherId teacherId)
-    {
-        auto iterator = std::find_if(
-            problem.teachers.begin(),
-            problem.teachers.end(),
-            [teacherId](const Teacher& teacher)
-            {
-                return teacher.id == teacherId;
-            });
-
-        if (iterator == problem.teachers.end())
-        {
-            throw std::runtime_error("Teacher not found.");
-        }
-
-        return *iterator;
-    }
-
     const Room& FindRoomById(
         const TimetableProblem& problem,
         RoomId roomId)
     {
-        auto iterator = std::find_if(
+        const auto iterator = std::find_if(
             problem.rooms.begin(),
             problem.rooms.end(),
             [roomId](const Room& room)
@@ -69,22 +48,21 @@ namespace
         return *iterator;
     }
 
-    bool IsSameTimeSlot(const TimeSlot& first, const TimeSlot& second)
-    {
-        return first.day == second.day
-            && first.lessonNumber == second.lessonNumber;
-    }
-
-    bool ContainsTimeSlot(
-        const std::vector<TimeSlot>& timeSlots,
-        const TimeSlot& searchedTimeSlot)
+    bool IsTeacherUnavailable(
+        const TimetableProblem& problem,
+        TeacherId teacherId,
+        int dayIndex,
+        int slotIndex)
     {
         return std::any_of(
-            timeSlots.begin(),
-            timeSlots.end(),
-            [&searchedTimeSlot](const TimeSlot& timeSlot)
+            problem.teacherUnavailabilities.begin(),
+            problem.teacherUnavailabilities.end(),
+            [teacherId, dayIndex, slotIndex](
+                const TeacherUnavailability& unavailability)
             {
-                return IsSameTimeSlot(timeSlot, searchedTimeSlot);
+                return unavailability.teacherId == teacherId
+                    && unavailability.dayIndex == dayIndex
+                    && unavailability.slotIndex == slotIndex;
             });
     }
 
@@ -92,63 +70,79 @@ namespace
         const std::vector<SubjectId>& subjects,
         SubjectId subjectId)
     {
-        return std::find(subjects.begin(), subjects.end(), subjectId) != subjects.end();
+        return std::find(
+            subjects.begin(),
+            subjects.end(),
+            subjectId) != subjects.end();
     }
 }
 
-double FitnessEvaluator::evaluate(
+FitnessScore FitnessEvaluator::evaluate(
     const Chromosome& chromosome,
     const TimetableProblem& problem,
     const std::vector<LessonInstance>& lessonInstances,
     const std::vector<ScheduleSlot>& scheduleSlots) const
 {
-    double penalty = 0.0;
+    FitnessScore score;
 
     if (chromosome.genes.size() != scheduleSlots.size())
     {
-        return 1'000'000.0;
+        score.hardViolationCount++;
+        return score;
     }
 
-    // Counts how many times each lesson instance appears in chromosome.
     std::vector<int> lessonUsageCount(lessonInstances.size(), 0);
 
-    // Key: teacher + time slot.
-    std::map<std::pair<TeacherId, std::pair<int, int>>, int> teacherTimeUsage;
+    std::map<std::pair<TeacherId, std::pair<int, int>>, int>
+        teacherTimeUsage;
 
-    // Key: class group + time slot.
-    std::map<std::pair<ClassGroupId, std::pair<int, int>>, int> classTimeUsage;
+    std::map<std::pair<ClassGroupId, std::pair<int, int>>, int>
+        classTimeUsage;
 
-    for (ScheduleSlotIndex slotIndex = 0; slotIndex < chromosome.genes.size(); ++slotIndex)
+    for (ScheduleSlotIndex slotIndex = 0;
+         slotIndex < chromosome.genes.size();
+         ++slotIndex)
     {
-        const std::optional<LessonInstanceIndex>& gene = chromosome.genes[slotIndex];
+        const std::optional<LessonInstanceIndex>& gene =
+            chromosome.genes[slotIndex];
 
         if (!gene.has_value())
         {
             continue;
         }
 
-        LessonInstanceIndex lessonIndex = gene.value();
+        const LessonInstanceIndex lessonIndex = gene.value();
 
         if (lessonIndex >= lessonInstances.size())
         {
-            penalty += 100'000.0;
+            score.hardViolationCount++;
             continue;
         }
 
         lessonUsageCount[lessonIndex]++;
 
-        const LessonInstance& lessonInstance = lessonInstances[lessonIndex];
+        const LessonInstance& lessonInstance =
+            lessonInstances[lessonIndex];
+
         const LessonRequirement& requirement =
-            FindRequirementById(problem, lessonInstance.requirementId);
+            FindRequirementById(
+                problem,
+                lessonInstance.requirementId);
 
-        const ScheduleSlot& scheduleSlot = scheduleSlots[slotIndex];
-        const Teacher& teacher = FindTeacherById(problem, requirement.teacherId);
-        const Room& room = FindRoomById(problem, scheduleSlot.roomId);
+        const ScheduleSlot& scheduleSlot =
+            scheduleSlots[slotIndex];
 
-        const int day = static_cast<int>(scheduleSlot.timeSlot.day);
-        const int lessonNumber = scheduleSlot.timeSlot.lessonNumber;
+        const Room& room =
+            FindRoomById(problem, scheduleSlot.roomId);
 
-        const auto timeKey = std::make_pair(day, lessonNumber);
+        const int day =
+            static_cast<int>(scheduleSlot.timeSlot.day);
+
+        const int lessonNumber =
+            scheduleSlot.timeSlot.lessonNumber;
+
+        const auto timeKey =
+            std::make_pair(day, lessonNumber);
 
         const auto teacherTimeKey =
             std::make_pair(requirement.teacherId, timeKey);
@@ -159,40 +153,47 @@ double FitnessEvaluator::evaluate(
         teacherTimeUsage[teacherTimeKey]++;
         classTimeUsage[classTimeKey]++;
 
-        // Teacher unavailable slot.
-        if (ContainsTimeSlot(teacher.unavailableSlots, scheduleSlot.timeSlot))
+        // Hard constraint: teacher unavailable.
+        if (IsTeacherUnavailable(
+            problem,
+            requirement.teacherId,
+            day,
+            lessonNumber))
         {
-            penalty += 500.0;
+            score.hardViolationCount++;
         }
 
-        // Subject not allowed in this room.
-        if (!ContainsSubject(room.allowedSubjects, requirement.subjectId))
+        // Soft constraint for now:
+        // subject is not preferred/allowed in the selected room.
+        if (!ContainsSubject(
+            room.allowedSubjects,
+            requirement.subjectId))
         {
-            penalty += 300.0;
+            score.softPenalty += ToPenalty(PenaltyLevel::Medium);
         }
     }
 
-    // Teacher conflicts.
+    // Hard constraint: teacher conflict.
     for (const auto& item : teacherTimeUsage)
     {
-        int usageCount = item.second;
+        const int usageCount = item.second;
 
         if (usageCount > 1)
         {
-            penalty += 1000.0 * static_cast<double>(usageCount - 1);
+            score.hardViolationCount += usageCount - 1;
         }
     }
 
-    // Class group conflicts.
+    // Hard constraint: class group conflict.
     for (const auto& item : classTimeUsage)
     {
-        int usageCount = item.second;
+        const int usageCount = item.second;
 
         if (usageCount > 1)
         {
-            penalty += 1000.0 * static_cast<double>(usageCount - 1);
+            score.hardViolationCount += usageCount - 1;
         }
     }
 
-    return penalty;
+    return score;
 }
