@@ -1,6 +1,7 @@
 #include "Optimization/SimpleOptimizer.h"
 
 #include <iostream>
+#include <Domain/TimetableProblem.h>
 
 SimpleOptimizer::SimpleOptimizer(unsigned int seed)
     : mutator(seed)

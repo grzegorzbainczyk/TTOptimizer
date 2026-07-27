@@ -5,10 +5,12 @@
 #include <sstream>
 #include "TimetableProblemJsonReader.h"
 #include "Engine.h"
+#include "Domain/TimetableProblem.h"
 
 #ifdef _DEBUG
 #include <Windows.h>
 #endif
+
 
 int main(int argc, char* argv[])
 {

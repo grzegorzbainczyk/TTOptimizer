@@ -98,20 +98,6 @@ struct Chromosome
     double penalty = 0.0;
 };
 
-struct TimetableProblem
-{    
-    std::vector<Teacher> teachers;
-    std::vector<ClassGroup> classGroups;
-    std::vector<Subject> subjects;
-    std::vector<Room> rooms;
-    std::vector<LessonRequirement> lessonRequirements;
-
-    int daysPerWeek = 5;
-    int slotsPerDay = 8;
-
-    OptimizationSettings optimizationSettings;
-};
-
 struct ScheduledLesson
 {
     LessonInstanceId lessonInstanceId{};
@@ -136,6 +122,13 @@ struct ScheduledLessonView
 
     DayOfWeek day{};
     int lessonNumber{};
+};
+
+struct TeacherUnavailability
+{
+    int teacherId{};
+    int dayIndex{};
+    int slotIndex{};
 };
 
 

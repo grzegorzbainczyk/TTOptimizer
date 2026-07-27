@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "Domain/TimetableModels.h"
+#include <Domain/TimetableProblem.h>
 
 class ScheduleSlotGenerator
 {

@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 #include "Evaluation/FitnessEvaluator.h"
+#include "Domain/TimetableProblem.h"
 
 
 namespace

@@ -140,8 +140,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChromosomeDecoder.h" />
-    <ClInclude Include="ChromosomeFactory.h" />
     <ClInclude Include="External\nlohmann\json.hpp" />
+    <ClInclude Include="include\Domain\TimeTableModels.h" />
+    <ClInclude Include="include\Domain\TimetableProblem.h" />
     <ClInclude Include="include\Evaluation\ChromosomeValidator.h" />
     <ClInclude Include="include\Evaluation\FitnessEvaluator.h" />
     <ClInclude Include="include\Generators\ChromosomeFactory.h" />
@@ -152,7 +153,6 @@
     <ClInclude Include="include\Engine.h" />
     <ClInclude Include="include\ScheduledLessonResultJsonWriter.h" />
     <ClInclude Include="include\Utils\Utils.h" />
-    <ClInclude Include="TimeTableModels.h" />
     <ClInclude Include="TimetableProblemJsonReader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

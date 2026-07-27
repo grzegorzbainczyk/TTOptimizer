@@ -1,11 +1,12 @@
 #pragma once
 
 #include <string>
-#include <../External/nlohmann/json.hpp>
-#include "Domain/TimetableModels.h"
-
 #include <fstream>
 #include <stdexcept>
+#include <../External/nlohmann/json.hpp>
+#include "Domain/TimetableModels.h"
+#include "Domain/TimetableProblem.h"
+
 using json = nlohmann::json;
 
 class TimetableProblemJsonReader
