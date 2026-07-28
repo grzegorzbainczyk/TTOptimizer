@@ -86,8 +86,11 @@ async function loadTeachers() {
             : data?.teachers ?? [];
 
         renderTeachers(teachers);
+        updateTeachersCount(teachers.length);
     } catch (error) {
         console.error("Error loading teachers:", error);
+
+        updateTeachersCount(null);
 
         showTeachersError(
             error instanceof Error
@@ -120,6 +123,8 @@ function renderTeachers(teachers) {
         const row =
             document.createElement("tr");
 
+        row.className = "teacher-row";
+
         row.appendChild(
             createTableCell(teacher.teacherNumber)
         );
@@ -147,7 +152,7 @@ function renderTeachers(teachers) {
             document.createElement("button");
 
         editButton.type = "button";
-        editButton.className = "small-button";
+        editButton.className = "small-button teacher-action-button teacher-edit-button";
         editButton.textContent = "Edit";
 
         editButton.addEventListener("click", () => {
@@ -158,7 +163,7 @@ function renderTeachers(teachers) {
             document.createElement("button");
 
         availabilityButton.type = "button";
-        availabilityButton.className = "small-button";
+        availabilityButton.className = "small-button teacher-action-button teacher-availability-button";
         availabilityButton.textContent = "Availability";
 
         availabilityButton.addEventListener("click", () => {
@@ -174,23 +179,47 @@ function renderTeachers(teachers) {
             document.createElement("button");
 
         deleteButton.type = "button";
-        deleteButton.className = "small-button";
+        deleteButton.className = "small-button teacher-action-button teacher-delete-button";
         deleteButton.textContent = "Delete";
 
         deleteButton.addEventListener("click", async () => {
             await deleteTeacher(teacher);
         });
 
-        actionsCell.append(
+        const actionsContainer =
+            document.createElement("div");
+
+        actionsContainer.className = "teacher-actions";
+
+        actionsContainer.append(
             editButton,
             availabilityButton,
             deleteButton
         );
 
+        actionsCell.appendChild(actionsContainer);
+
         row.appendChild(actionsCell);
 
         tbody.appendChild(row);
     });
+}
+
+function updateTeachersCount(count) {
+    const element = document.getElementById("teachersCount");
+
+    if (!element) {
+        return;
+    }
+
+    if (!Number.isInteger(count)) {
+        element.textContent = "Could not determine the number of teachers.";
+        return;
+    }
+
+    element.textContent = count === 1
+        ? "1 teacher"
+        : `${count} teachers`;
 }
 
 function createTableCell(value) {

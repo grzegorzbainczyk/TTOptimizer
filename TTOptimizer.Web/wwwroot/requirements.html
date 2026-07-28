@@ -1,169 +1,116 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
-
-    <title>ClassFlow - Requirements</title>
-
-    <link rel="stylesheet"
-          href="css/style.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClassFlow - Requirements</title>
+<link href="css/style.css" rel="stylesheet"/>
 </head>
+<body class="teachers-page">
+<div class="page-container">
+<header class="app-header teachers-header">
 
-<body>
-    <div class="page-container">
-        <header class="app-header">
-            <div>
-                <h1>Requirements</h1>
 
-                <p class="page-subtitle">
+<div class="teachers-header-content"><div class="teachers-title-group">
+<span class="teachers-page-label">Timetable input</span><h1>Requirements</h1>
+<p class="page-subtitle">
                     Lesson requirements assigned to your organization
                 </p>
-            </div>
-
-            <nav class="header-actions">
-                <button id="backToMainButton"
-                        class="secondary-button"
-                        type="button">
+</div><nav class="header-actions">
+<button class="secondary-button teachers-header-button" id="backToMainButton" type="button">
                     Back
                 </button>
-
-                <button id="refreshRequirementsButton"
-                        class="secondary-button"
-                        type="button">
+<button class="secondary-button teachers-header-button" id="refreshRequirementsButton" type="button">
                     Refresh
                 </button>
-            </nav>
-        </header>
+</nav></div></header>
+<main class="content-card teachers-card">
+<div class="section-header teachers-section-header"><div><h2>Requirements list</h2><p class="teachers-section-description">Connect classes, subjects and teachers with weekly lesson hours.</p></div>
 
-        <main class="content-card">
-            <div class="section-header">
-                <h2>Requirements list</h2>
-
-                <button id="addRequirementButton"
-                        class="primary-button"
-                        type="button">
+<button class="primary-button teachers-add-button" id="addRequirementButton" type="button"><span aria-hidden="true">+</span>
                     Add requirement
                 </button>
-            </div>
-
-            <section id="requirementFormSection"
-                     class="resource-form-section"
-                     hidden>
-
-                <h3 id="requirementFormTitle">
+</div>
+<section class="resource-form-section teachers-form-section" hidden="" id="requirementFormSection">
+<h3 id="requirementFormTitle">
                     Add requirement
                 </h3>
-
-                <input id="requirementId"
-                       type="hidden" />
-
-                <div class="form-grid">
-                    <div class="form-field">
-                        <label for="requirementClassGroupId">
+<input id="requirementId" type="hidden"/>
+<div class="form-grid teachers-form-grid">
+<div class="form-field">
+<label for="requirementClassGroupId">
                             Class
                         </label>
-
-                        <select id="requirementClassGroupId"
-                                required>
-                            <option value="">
+<select id="requirementClassGroupId" required="">
+<option value="">
                                 Select class
                             </option>
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="requirementSubjectId">
+</select>
+</div>
+<div class="form-field">
+<label for="requirementSubjectId">
                             Subject
                         </label>
-
-                        <select id="requirementSubjectId"
-                                required>
-                            <option value="">
+<select id="requirementSubjectId" required="">
+<option value="">
                                 Select subject
                             </option>
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="requirementTeacherId">
+</select>
+</div>
+<div class="form-field">
+<label for="requirementTeacherId">
                             Teacher
                         </label>
-
-                        <select id="requirementTeacherId"
-                                required>
-                            <option value="">
+<select id="requirementTeacherId" required="">
+<option value="">
                                 Select teacher
                             </option>
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="requirementHoursPerWeek">
+</select>
+</div>
+<div class="form-field">
+<label for="requirementHoursPerWeek">
                             Hours per week
                         </label>
-
-                        <input id="requirementHoursPerWeek"
-                               type="number"
-                               min="1"
-                               max="40"
-                               value="1"
-                               required />
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button id="saveRequirementButton"
-                            class="primary-button"
-                            type="button">
+<input id="requirementHoursPerWeek" max="40" min="1" required="" type="number" value="1"/>
+</div>
+</div>
+<div class="form-actions teachers-form-actions">
+<button class="primary-button" id="saveRequirementButton" type="button">
                         Save
                     </button>
-
-                    <button id="cancelRequirementButton"
-                            class="secondary-button"
-                            type="button">
+<button class="secondary-button" id="cancelRequirementButton" type="button">
                         Cancel
                     </button>
-                </div>
-
-                <p id="requirementFormMessage"
-                   class="form-message"
-                   aria-live="polite">
-                </p>
-            </section>
-
-            <div class="table-wrapper">
-                <table class="data-table"
-                       id="requirementsTable">
-
-                    <thead>
-                        <tr>
-                            <th>Class</th>
-                            <th>Subject</th>
-                            <th>Teacher</th>
-                            <th>Hours/week</th>
-
-                            <th class="table-actions-column">
+</div>
+<p aria-live="polite" class="form-message" id="requirementFormMessage">
+</p>
+</section>
+<div class="teachers-table-summary"><span id="requirementsCount">Loading requirements...</span></div><div class="table-wrapper teachers-table-wrapper">
+<table class="data-table teachers-table" id="requirementsTable">
+<thead>
+<tr>
+<th>Class</th>
+<th>Subject</th>
+<th>Teacher</th>
+<th>Hours/week</th>
+<th class="table-actions-column">
                                 Actions
                             </th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr>
-                            <td colspan="5">
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="teachers-table-state" colspan="5">
                                 Loading requirements...
                             </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div>
-
-    <script src="js/appContext.js"></script>
-    <script src="js/requirements.js"></script>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+</div>
+<script src="js/appContext.js"></script>
+<script src="js/requirements.js"></script>
 </body>
 </html>

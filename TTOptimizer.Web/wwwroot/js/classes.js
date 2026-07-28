@@ -1,4 +1,4 @@
-﻿let availableTeachers = [];
+let availableTeachers = [];
 let availableRooms = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -133,7 +133,7 @@ async function loadClasses() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="5">Loading classes...</td>
+            <td colspan="5" class="teachers-table-state">Loading classes...</td>
         </tr>
     `;
 
@@ -163,8 +163,11 @@ async function loadClasses() {
             : data?.classes ?? data?.classGroups ?? [];
 
         renderClasses(classes);
+        updateClassesCount(classes.length);
     } catch (error) {
         console.error("Error loading classes:", error);
+
+        updateClassesCount(null);
 
         showClassesError(
             error instanceof Error
@@ -187,7 +190,7 @@ function renderClasses(classes) {
     if (!Array.isArray(classes) || classes.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5">No classes found.</td>
+                <td colspan="5" class="teachers-table-state">No classes found.</td>
             </tr>
         `;
 
@@ -197,6 +200,8 @@ function renderClasses(classes) {
     classes.forEach(classGroup => {
         const row =
             document.createElement("tr");
+
+        row.className = "teacher-row";
 
         row.appendChild(
             createTableCell(classGroup.name)
@@ -229,7 +234,8 @@ function renderClasses(classes) {
             document.createElement("button");
 
         editButton.type = "button";
-        editButton.className = "small-button";
+        editButton.className =
+            "small-button teacher-action-button teacher-edit-button";
         editButton.textContent = "Edit";
 
         editButton.addEventListener("click", () => {
@@ -240,7 +246,8 @@ function renderClasses(classes) {
             document.createElement("button");
 
         availabilityButton.type = "button";
-        availabilityButton.className = "small-button";
+        availabilityButton.className =
+            "small-button teacher-action-button teacher-availability-button";
         availabilityButton.textContent = "Availability";
 
         availabilityButton.addEventListener("click", () => {
@@ -258,7 +265,8 @@ function renderClasses(classes) {
             document.createElement("button");
 
         deleteButton.type = "button";
-        deleteButton.className = "small-button";
+        deleteButton.className =
+            "small-button teacher-action-button teacher-delete-button";
         deleteButton.textContent = "Delete";
 
         deleteButton.addEventListener(
@@ -268,15 +276,43 @@ function renderClasses(classes) {
             }
         );
 
-        actionsCell.append(
+                const actionsContainer =
+            document.createElement("div");
+
+        actionsContainer.className =
+            "teacher-actions";
+
+        actionsContainer.append(
             editButton,
             availabilityButton,
             deleteButton
         );
 
+        actionsCell.appendChild(actionsContainer);
+
         row.appendChild(actionsCell);
         tbody.appendChild(row);
     });
+}
+
+function updateClassesCount(count) {
+    const countElement =
+        document.getElementById("classesCount");
+
+    if (!countElement) {
+        return;
+    }
+
+    if (!Number.isInteger(count)) {
+        countElement.textContent =
+            "Could not determine the number of classes.";
+        return;
+    }
+
+    countElement.textContent =
+        count === 1
+            ? "1 class"
+            : `${count} classes`;
 }
 
 function createTableCell(value) {

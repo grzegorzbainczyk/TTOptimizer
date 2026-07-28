@@ -1,4 +1,4 @@
-﻿let availableSubjects = [];
+let availableSubjects = [];
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -121,9 +121,7 @@ async function loadRooms() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="5">
-                Loading rooms...
-            </td>
+            <td colspan="5" class="teachers-table-state">Loading rooms...</td>
         </tr>
     `;
 
@@ -158,11 +156,14 @@ async function loadRooms() {
                 : data?.rooms ?? [];
 
         renderRooms(rooms);
+        updateRoomsCount(rooms.length);
     } catch (error) {
         console.error(
             "Error loading rooms:",
             error
         );
+
+        updateRoomsCount(null);
 
         showRoomsError(
             error instanceof Error
@@ -190,9 +191,7 @@ function renderRooms(rooms) {
     ) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5">
-                    No rooms found.
-                </td>
+                <td colspan="5" class="teachers-table-state">No rooms found.</td>
             </tr>
         `;
 
@@ -202,6 +201,8 @@ function renderRooms(rooms) {
     rooms.forEach(room => {
         const row =
             document.createElement("tr");
+
+        row.className = "teacher-row";
 
         row.appendChild(
             createTableCell(room.name)
@@ -236,7 +237,8 @@ function renderRooms(rooms) {
             document.createElement("button");
 
         editButton.type = "button";
-        editButton.className = "small-button";
+        editButton.className =
+            "small-button teacher-action-button teacher-edit-button";
         editButton.textContent = "Edit";
 
         editButton.addEventListener(
@@ -250,7 +252,8 @@ function renderRooms(rooms) {
             document.createElement("button");
 
         availabilityButton.type = "button";
-        availabilityButton.className = "small-button";
+        availabilityButton.className =
+            "small-button teacher-action-button teacher-availability-button";
         availabilityButton.textContent = "Availability";
 
         availabilityButton.addEventListener(
@@ -271,7 +274,8 @@ function renderRooms(rooms) {
             document.createElement("button");
 
         deleteButton.type = "button";
-        deleteButton.className = "small-button";
+        deleteButton.className =
+            "small-button teacher-action-button teacher-delete-button";
         deleteButton.textContent = "Delete";
 
         deleteButton.addEventListener(
@@ -281,16 +285,44 @@ function renderRooms(rooms) {
             }
         );
 
-        actionsCell.append(
+                const actionsContainer =
+            document.createElement("div");
+
+        actionsContainer.className =
+            "teacher-actions";
+
+        actionsContainer.append(
             editButton,
             availabilityButton,
             deleteButton
         );
 
+        actionsCell.appendChild(actionsContainer);
+
         row.appendChild(actionsCell);
 
         tbody.appendChild(row);
     });
+}
+
+function updateRoomsCount(count) {
+    const countElement =
+        document.getElementById("roomsCount");
+
+    if (!countElement) {
+        return;
+    }
+
+    if (!Number.isInteger(count)) {
+        countElement.textContent =
+            "Could not determine the number of rooms.";
+        return;
+    }
+
+    countElement.textContent =
+        count === 1
+            ? "1 room"
+            : `${count} rooms`;
 }
 
 function createTableCell(value) {

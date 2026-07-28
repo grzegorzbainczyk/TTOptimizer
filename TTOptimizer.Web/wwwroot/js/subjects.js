@@ -1,4 +1,4 @@
-﻿document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const backToMainButton =
         document.getElementById("backToMainButton");
 
@@ -51,9 +51,7 @@ async function loadSubjects() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="3">
-                Loading subjects...
-            </td>
+            <td colspan="3" class="teachers-table-state">Loading subjects...</td>
         </tr>
     `;
 
@@ -83,11 +81,14 @@ async function loadSubjects() {
             : data?.subjects ?? [];
 
         renderSubjects(subjects);
+        updateSubjectsCount(subjects.length);
     } catch (error) {
         console.error(
             "Error loading subjects:",
             error
         );
+
+        updateSubjectsCount(null);
 
         showSubjectsError(
             error instanceof Error
@@ -113,9 +114,7 @@ function renderSubjects(subjects) {
     ) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="3">
-                    No subjects found.
-                </td>
+                <td colspan="3" class="teachers-table-state">No subjects found.</td>
             </tr>
         `;
 
@@ -124,6 +123,8 @@ function renderSubjects(subjects) {
 
     subjects.forEach(subject => {
         const row = document.createElement("tr");
+
+        row.className = "teacher-row";
 
         row.appendChild(
             createTableCell(subject.name)
@@ -144,7 +145,8 @@ function renderSubjects(subjects) {
             document.createElement("button");
 
         editButton.type = "button";
-        editButton.className = "small-button";
+        editButton.className =
+            "small-button teacher-action-button teacher-edit-button";
         editButton.textContent = "Edit";
 
         editButton.addEventListener(
@@ -158,7 +160,8 @@ function renderSubjects(subjects) {
             document.createElement("button");
 
         deleteButton.type = "button";
-        deleteButton.className = "small-button";
+        deleteButton.className =
+            "small-button teacher-action-button teacher-delete-button";
         deleteButton.textContent = "Delete";
 
         deleteButton.addEventListener(
@@ -168,14 +171,42 @@ function renderSubjects(subjects) {
             }
         );
 
-        actionsCell.append(
+                const actionsContainer =
+            document.createElement("div");
+
+        actionsContainer.className =
+            "teacher-actions";
+
+        actionsContainer.append(
             editButton,
             deleteButton
         );
 
+        actionsCell.appendChild(actionsContainer);
+
         row.appendChild(actionsCell);
         tbody.appendChild(row);
     });
+}
+
+function updateSubjectsCount(count) {
+    const countElement =
+        document.getElementById("subjectsCount");
+
+    if (!countElement) {
+        return;
+    }
+
+    if (!Number.isInteger(count)) {
+        countElement.textContent =
+            "Could not determine the number of subjects.";
+        return;
+    }
+
+    countElement.textContent =
+        count === 1
+            ? "1 subject"
+            : `${count} subjects`;
 }
 
 function createTableCell(value) {

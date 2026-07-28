@@ -1,4 +1,4 @@
-﻿let availableTeachers = [];
+let availableTeachers = [];
 let availableClasses = [];
 let availableSubjects = [];
 
@@ -172,9 +172,7 @@ async function loadRequirements() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="5">
-                Loading requirements...
-            </td>
+            <td colspan="5" class="teachers-table-state">Loading requirements...</td>
         </tr>
     `;
 
@@ -204,11 +202,14 @@ async function loadRequirements() {
             : data?.requirements ?? [];
 
         renderRequirements(requirements);
+        updateRequirementsCount(requirements.length);
     } catch (error) {
         console.error(
             "Error loading requirements:",
             error
         );
+
+        updateRequirementsCount(null);
 
         showRequirementsError(
             error instanceof Error
@@ -234,9 +235,7 @@ function renderRequirements(requirements) {
     ) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5">
-                    No requirements found.
-                </td>
+                <td colspan="5" class="teachers-table-state">No requirements found.</td>
             </tr>
         `;
 
@@ -245,6 +244,8 @@ function renderRequirements(requirements) {
 
     requirements.forEach(requirement => {
         const row = document.createElement("tr");
+
+        row.className = "teacher-row";
 
         row.appendChild(
             createTableCell(requirement.className)
@@ -273,7 +274,8 @@ function renderRequirements(requirements) {
             document.createElement("button");
 
         editButton.type = "button";
-        editButton.className = "small-button";
+        editButton.className =
+            "small-button teacher-action-button teacher-edit-button";
         editButton.textContent = "Edit";
 
         editButton.addEventListener("click", () => {
@@ -284,7 +286,8 @@ function renderRequirements(requirements) {
             document.createElement("button");
 
         deleteButton.type = "button";
-        deleteButton.className = "small-button";
+        deleteButton.className =
+            "small-button teacher-action-button teacher-delete-button";
         deleteButton.textContent = "Delete";
 
         deleteButton.addEventListener(
@@ -294,14 +297,42 @@ function renderRequirements(requirements) {
             }
         );
 
-        actionsCell.append(
+                const actionsContainer =
+            document.createElement("div");
+
+        actionsContainer.className =
+            "teacher-actions";
+
+        actionsContainer.append(
             editButton,
             deleteButton
         );
 
+        actionsCell.appendChild(actionsContainer);
+
         row.appendChild(actionsCell);
         tbody.appendChild(row);
     });
+}
+
+function updateRequirementsCount(count) {
+    const countElement =
+        document.getElementById("requirementsCount");
+
+    if (!countElement) {
+        return;
+    }
+
+    if (!Number.isInteger(count)) {
+        countElement.textContent =
+            "Could not determine the number of requirements.";
+        return;
+    }
+
+    countElement.textContent =
+        count === 1
+            ? "1 requirement"
+            : `${count} requirements`;
 }
 
 function createTableCell(value) {
