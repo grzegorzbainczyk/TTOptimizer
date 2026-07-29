@@ -1,53 +1,169 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TTOrganizer - Teachers</title>
+
+    <title>ClassFlow - Teachers</title>
+
     <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+
+<body class="teachers-page">
     <div class="page-container">
-        <header class="app-header">
-            <div>
-                <h1>Teachers</h1>
-                <p class="page-subtitle">Teachers assigned to your organization</p>
-            </div>
+        <header class="app-header teachers-header">
+            <div class="teachers-header-content">
+                <div>
+                    <span class="teachers-page-label">Organization resources</span>
+                    <h1>Teachers</h1>
+
+                    <p class="page-subtitle">
+                        Manage teachers, aliases and availability for your organization.
+                    </p>
+                </div>
 
             <nav class="header-actions">
-                <button id="backToMainButton" class="secondary-button">
+                <button id="backToMainButton"
+                        class="secondary-button"
+                        type="button">
                     Back
                 </button>
 
-                <button id="refreshTeachersButton" class="secondary-button">
+                <button id="refreshTeachersButton"
+                        class="secondary-button"
+                        type="button">
                     Refresh
                 </button>
             </nav>
+            </div>
         </header>
 
-        <main class="content-card">
-            <div class="section-header">
-                <h2>Teachers list</h2>
+        <main class="content-card teachers-card">
+            <div class="section-header teachers-section-header">
+                <div>
+                    <h2>Teachers list</h2>
+                    <p class="teachers-section-description">
+                        Add teachers, edit their details and define unavailable lesson slots.
+                    </p>
+                </div>
 
-                <button id="addTeacherButton" class="main-action-button">
-                    Add teacher
+                <button id="addTeacherButton"
+                        class="main-action-button teachers-add-button"
+                        type="button">
+                    <span aria-hidden="true">+</span> Add teacher
                 </button>
             </div>
 
-            <table class="data-table" id="teachersTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th class="table-actions-column">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="3">Loading teachers...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <section id="teacherFormSection"
+                     class="resource-form-section teachers-form-section"
+                     hidden>
+
+                <h3 id="teacherFormTitle">
+                    Add teacher
+                </h3>
+
+                <input id="teacherId"
+                       type="hidden" />
+
+                <div class="form-grid teachers-form-grid">
+                    <div class="form-field">
+                        <label for="teacherNumber">
+                            Teacher number
+                        </label>
+
+                        <input id="teacherNumber"
+                               type="text"
+                               readonly
+                               placeholder="Assigned automatically" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="teacherName">
+                            Name
+                        </label>
+
+                        <input id="teacherName"
+                               type="text"
+                               maxlength="200"
+                               required />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="teacherAlias">
+                            Alias
+                        </label>
+
+                        <input id="teacherAlias"
+                               type="text"
+                               maxlength="30"
+                               placeholder="Generated automatically" />
+
+                        <small>
+                            Leave empty when adding to generate an alias.
+                        </small>
+                    </div>
+
+                    <div class="form-field form-field-full-width">
+                        <label for="teacherInfo">
+                            Info
+                        </label>
+
+                        <textarea id="teacherInfo"
+                                  maxlength="2000"
+                                  rows="4"
+                                  placeholder="Optional notes about the teacher"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions teachers-form-actions">
+                    <button id="saveTeacherButton"
+                            class="main-action-button"
+                            type="button">
+                        Save
+                    </button>
+
+                    <button id="cancelTeacherButton"
+                            class="secondary-button"
+                            type="button">
+                        Cancel
+                    </button>
+                </div>
+
+                <p id="teacherFormMessage"
+                   class="form-message"
+                   aria-live="polite">
+                </p>
+            </section>
+
+            <div class="teachers-table-summary">
+                <span id="teachersCount">Loading teachers...</span>
+            </div>
+
+            <div class="table-wrapper teachers-table-wrapper">
+                <table class="data-table teachers-table"
+                       id="teachersTable">
+
+                    <thead>
+                        <tr>
+                            <th class="teacher-number-column">Number</th>
+                            <th>Name</th>
+                            <th class="teacher-alias-column">Alias</th>
+                            <th>Info</th>
+                            <th class="table-actions-column">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                Loading teachers...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </main>
     </div>
 

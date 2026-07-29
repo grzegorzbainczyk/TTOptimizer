@@ -22,7 +22,7 @@ public:
         {
             for (int day = 0; day < problem.daysPerWeek; ++day)
             {
-                for (int lessonNumber = 1; lessonNumber <= problem.slotsPerDay; ++lessonNumber)
+                for (int lessonNumber = 0; lessonNumber < problem.slotsPerDay; ++lessonNumber)
                 {
                     ScheduleSlot scheduleSlot;
                     scheduleSlot.roomId = room.id;

@@ -45,10 +45,7 @@ Chromosome GeneticOptimizer::optimize(
             "Tournament size must be between 1 and population size.");
     }
 
-    std::vector<Chromosome> population =
-        createInitialPopulation(
-            initialChromosome,
-            populationSize);
+    std::vector<Chromosome> population = createInitialPopulation(initialChromosome, populationSize);
 
     evaluatePopulation(
         population,
@@ -67,15 +64,12 @@ Chromosome GeneticOptimizer::optimize(
         << bestChromosome.fitness.softPenalty
         << '\n';
 
-    for (int generation = 1;
-        generation <= generations;
-        ++generation)
+    for (int generation = 1; generation <= generations; ++generation)
     {
         sortPopulation(population);
 
         std::vector<Chromosome> nextPopulation;
-        nextPopulation.reserve(
-            static_cast<std::size_t>(populationSize));
+        nextPopulation.reserve(static_cast<std::size_t>(populationSize));
 
         // Elitism: copy the best chromosomes unchanged.
         for (int index = 0; index < eliteCount; ++index)
@@ -147,6 +141,14 @@ Chromosome GeneticOptimizer::optimize(
         << bestChromosome.fitness.softPenalty
         << '\n';
 
+
+    //test
+    bestChromosome.fitness = fitnessEvaluator.evaluate(
+        bestChromosome,
+        problem,
+        lessonInstances,
+        scheduleSlots);
+
     return bestChromosome;
 }
 
@@ -169,12 +171,7 @@ GeneticOptimizer::createInitialPopulation(
         Chromosome chromosome = initialChromosome;
 
         // Apply several random swaps to increase population diversity.
-        const int mutationCount =
-            1 + populationIndex
-            % std::max(
-                1,
-                static_cast<int>(
-                    initialChromosome.genes.size() / 4));
+        const int mutationCount = 1 + populationIndex % std::max( 1, static_cast<int>( initialChromosome.genes.size() / 4));
 
         for (int mutationIndex = 0;
             mutationIndex < mutationCount;

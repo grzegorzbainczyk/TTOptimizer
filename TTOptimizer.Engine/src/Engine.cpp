@@ -67,16 +67,21 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
 		GeneticOptimizer optimizer(
 			problem.optimizationSettings.randomSeed);
 
+
+		const int generations = 1000; // Number of generations: how many evolutionary iterations the algorithm performs.
+		const int populationSize = 100; // Population size: number of chromosomes evaluated in each generation.
+		const int eliteCount = 5; // Elite count: number of the best chromosomes copied unchanged to the next generation.
+		const int tournamentSize = 3; // Tournament size: number of randomly selected chromosomes competing during parent selection.
+
 		Chromosome bestChromosome = optimizer.optimize(
 			initialChromosome,
 			problem,
 			lessonInstances,
 			scheduleSlots,
-			1000,  // generations
-			100,   // populationSize
-			5,     // eliteCount
-			3);    // tournamentSize
-
+			generations,
+			populationSize,
+			eliteCount,
+			tournamentSize);
 		
 		ChromosomeValidator::validate(bestChromosome, lessonInstances, scheduleSlots);
 

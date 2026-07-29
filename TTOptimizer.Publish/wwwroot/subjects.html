@@ -1,57 +1,90 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TTOrganizer - Subjects</title>
-    <link rel="stylesheet" href="css/style.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClassFlow - Subjects</title>
+<link href="css/style.css" rel="stylesheet"/>
 </head>
-<body>
-    <div class="page-container">
-        <header class="app-header">
-            <div>
-                <h1>Subjects</h1>
-                <p class="page-subtitle">Subjects assigned to your organization</p>
-            </div>
+<body class="teachers-page">
+<div class="page-container">
+<header class="app-header teachers-header">
 
-            <nav class="header-actions">
-                <button id="backToMainButton" class="secondary-button">
+
+<div class="teachers-header-content"><div class="teachers-title-group">
+<span class="teachers-page-label">Organization resources</span><h1>Subjects</h1>
+<p class="page-subtitle">
+                    Subjects assigned to your organization
+                </p>
+</div><nav class="header-actions">
+<button class="secondary-button teachers-header-button" id="backToMainButton" type="button">
                     Back
                 </button>
-
-                <button id="refreshSubjectsButton" class="secondary-button">
+<button class="secondary-button teachers-header-button" id="refreshSubjectsButton" type="button">
                     Refresh
                 </button>
-            </nav>
-        </header>
+</nav></div></header>
+<main class="content-card teachers-card">
+<div class="section-header teachers-section-header"><div><h2>Subjects list</h2><p class="teachers-section-description">Manage subjects and optional information used by the timetable.</p></div>
 
-        <main class="content-card">
-            <div class="section-header">
-                <h2>Subjects list</h2>
-
-                <button id="addSubjectButton" class="primary-button">
+<button class="primary-button teachers-add-button" id="addSubjectButton" type="button"><span aria-hidden="true">+</span>
                     Add subject
                 </button>
-            </div>
-
-            <table class="data-table" id="subjectsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th class="table-actions-column">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="3">Loading subjects...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </main>
-    </div>
-
-    <script src="js/appContext.js"></script>
-    <script src="js/subjects.js"></script>
+</div>
+<section class="resource-form-section teachers-form-section" hidden="" id="subjectFormSection">
+<h3 id="subjectFormTitle">
+                    Add subject
+                </h3>
+<input id="subjectId" type="hidden"/>
+<div class="form-grid teachers-form-grid">
+<div class="form-field">
+<label for="subjectName">
+                            Name
+                        </label>
+<input id="subjectName" maxlength="100" required="" type="text"/>
+</div>
+<div class="form-field form-field-full-width">
+<label for="subjectInfo">
+                            Info
+                        </label>
+<textarea id="subjectInfo" maxlength="2000" placeholder="Optional information about the subject" rows="4"></textarea>
+</div>
+</div>
+<div class="form-actions teachers-form-actions">
+<button class="primary-button" id="saveSubjectButton" type="button">
+                        Save
+                    </button>
+<button class="secondary-button" id="cancelSubjectButton" type="button">
+                        Cancel
+                    </button>
+</div>
+<p aria-live="polite" class="form-message" id="subjectFormMessage">
+</p>
+</section>
+<div class="teachers-table-summary"><span id="subjectsCount">Loading subjects...</span></div><div class="table-wrapper teachers-table-wrapper">
+<table class="data-table teachers-table" id="subjectsTable">
+<thead>
+<tr>
+<th>Name</th>
+<th>Info</th>
+<th class="table-actions-column">
+                                Actions
+                            </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="teachers-table-state" colspan="3">
+                                Loading subjects...
+                            </td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+</div>
+<script src="js/appContext.js"></script>
+<script src="js/subjects.js"></script>
 </body>
 </html>

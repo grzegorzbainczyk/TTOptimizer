@@ -154,6 +154,8 @@ async function runOptimization() {
 function renderOptimizationResult(data) {
     const result = data.result ?? data;
 
+    setText("feedback", result.feedback ?? "-");
+
     setText("initialPenalty", result.initialPenalty ?? "-");
     setText("bestPenalty", result.bestPenalty ?? "-");
 
