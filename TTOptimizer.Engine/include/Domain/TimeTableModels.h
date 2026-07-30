@@ -49,8 +49,70 @@ struct TimeSlot
 
 struct OptimizationSettings
 {
-    int iterations = 1;
+    /*
+     * Population settings.
+     */
+
+     // Number of chromosomes in each generation.
+    int populationSize = 100;
+
+    // Number of generations processed by the genetic algorithm.
+    int iterations = 10'000;
+
+    // Number of the best chromosomes copied unchanged
+    // to the next generation.
+    int eliteCount = 5;
+
+    // Number of chromosomes taking part in tournament selection.
+    int tournamentSize = 3;
+
+    /*
+     * Mutation settings.
+     */
+
+     // Number of independently mutated candidates tested
+     // when creating one child.
+    int mutationAttempts = 5;
+
+    // Probability that mutation is performed for a child.
+    // Range: 0.0 to 1.0.
+    double mutationProbability = 1.0;
+
+    /*
+     * Randomization and parallel execution.
+     */
+
+     // Seed used by random number generators.
     unsigned int randomSeed = 12'345;
+
+    // Number of worker threads used by the optimizer.
+    // Multithreaded evaluation will be implemented later.
+    int threadCount = 1;
+
+    /*
+     * Stopping conditions.
+     */
+
+     // Stop when a feasible solution with zero soft penalty is found.
+    bool stopWhenPerfect = true;
+
+    // Stop when the best score has not improved for this many
+    // consecutive generations. Zero disables this condition.
+    int stagnationGenerationLimit = 0;
+
+    /*
+     * Diagnostics.
+     */
+
+     // Enables progress information written by the engine.
+    bool enableProgressLogging = true;
+
+    // Number of generations between progress messages.
+    int progressLogInterval = 100;
+
+    /*
+     * Fitness evaluation settings.
+     */
 
     PenaltySettings penalties;
 };

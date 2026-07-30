@@ -7,10 +7,12 @@
 
 #include "Evaluation/ChromosomeValidator.h"
 
-GeneticOptimizer::GeneticOptimizer(unsigned int seed)
-    : chromosomeFactory(seed),
-    mutator(seed),
-    randomEngine(seed)
+GeneticOptimizer::GeneticOptimizer(
+    const OptimizationSettings& settings)
+    : settings(settings),
+    chromosomeFactory(settings.randomSeed),
+    mutator(settings.randomSeed),
+    randomEngine(settings.randomSeed)
 {
 }
 
@@ -18,9 +20,11 @@ std::vector<Chromosome>
 GeneticOptimizer::createInitialPopulation(
     const TimetableProblem& problem,
     const std::vector<LessonInstance>& lessonInstances,
-    const std::vector<ScheduleSlot>& scheduleSlots,
-    int populationSize)
+    const std::vector<ScheduleSlot>& scheduleSlots)
 {
+    const int populationSize =
+        settings.populationSize;
+
     if (populationSize <= 0)
     {
         throw std::invalid_argument(
@@ -63,11 +67,14 @@ Chromosome GeneticOptimizer::optimize(
     std::vector<Chromosome> initialPopulation,
     const TimetableProblem& problem,
     const std::vector<LessonInstance>& lessonInstances,
-    const std::vector<ScheduleSlot>& scheduleSlots,
-    int generations,
-    int eliteCount,
-    int tournamentSize)
+    const std::vector<ScheduleSlot>& scheduleSlots)
 {
+    const int generations = settings.iterations;
+
+    const int eliteCount = settings.eliteCount;
+
+    const int tournamentSize = settings.tournamentSize;
+
     if (generations <= 0)
     {
         throw std::invalid_argument(
@@ -88,9 +95,7 @@ Chromosome GeneticOptimizer::optimize(
             "when lesson instances exist.");
     }
 
-    const int populationSize =
-        static_cast<int>(
-            initialPopulation.size());
+    const int populationSize = static_cast<int>(initialPopulation.size());
 
     if (eliteCount < 0 ||
         eliteCount >= populationSize)
@@ -108,19 +113,13 @@ Chromosome GeneticOptimizer::optimize(
             "and population size.");
     }
 
-    std::vector<Chromosome> population =
-        std::move(initialPopulation);
+    std::vector<Chromosome> population = std::move(initialPopulation);
 
-    evaluatePopulation(
-        population,
-        problem,
-        lessonInstances,
-        scheduleSlots);
-
+    evaluatePopulation( population, problem, lessonInstances, scheduleSlots);
+    
     sortPopulation(population);
-
-    Chromosome bestChromosome =
-        population.front();
+    
+    Chromosome bestChromosome = population.front();
 
     std::cerr
         << "Initial population best: hard violations = "
@@ -129,43 +128,28 @@ Chromosome GeneticOptimizer::optimize(
         << bestChromosome.fitness.softPenalty
         << '\n';
 
-    for (int generation = 1;
-        generation <= generations;
-        ++generation)
+    for (int generation = 1; generation <= generations; ++generation)
     {
         sortPopulation(population);
 
         std::vector<Chromosome> nextPopulation;
-        nextPopulation.reserve(
-            static_cast<std::size_t>(
-                populationSize));
+        nextPopulation.reserve( static_cast<std::size_t>(populationSize));
 
-        for (int index = 0;
-            index < eliteCount;
-            ++index)
+        for (int index = 0; index < eliteCount; ++index)
         {
-            nextPopulation.push_back(
-                population[
-                    static_cast<std::size_t>(
-                        index)]);
+            nextPopulation.push_back( population[ static_cast<std::size_t>( index)]);
         }
 
         while (nextPopulation.size() <
             static_cast<std::size_t>(
                 populationSize))
         {
-            const Chromosome& parent =
-                selectByTournament(
-                    population,
-                    tournamentSize);
+            const Chromosome& parent = selectByTournament(population);
 
             Chromosome child = parent;
+            
 
-            constexpr int mutationAttempts = 5;
-
-            for (int attempt = 0;
-                attempt < mutationAttempts;
-                ++attempt)
+            for (int attempt = 0; attempt < settings.mutationAttempts; ++attempt)
             {
                 Chromosome candidate = parent;
 
@@ -217,11 +201,11 @@ Chromosome GeneticOptimizer::optimize(
                 << '\n';
         }
 
-        if (bestChromosome.fitness.isFeasible() &&
-            bestChromosome.fitness.softPenalty == 0.0)
+        if (settings.stopWhenPerfect
+            && bestChromosome.fitness.isFeasible()
+            && bestChromosome.fitness.softPenalty == 0.0)
         {
-            std::cerr
-                << "Perfect solution found in generation "
+            std::cerr << "Perfect solution found in generation "
                 << generation
                 << ".\n";
 
@@ -270,30 +254,23 @@ void GeneticOptimizer::sortPopulation(
         isBetter);
 }
 
-const Chromosome&
-GeneticOptimizer::selectByTournament(
-    const std::vector<Chromosome>& population,
-    int tournamentSize)
+const Chromosome& GeneticOptimizer::selectByTournament( const std::vector<Chromosome>& population)
 {
-    std::uniform_int_distribution<std::size_t>
-        distribution(
-            0,
-            population.size() - 1);
+    const int tournamentSize = settings.tournamentSize;
+
+    std::uniform_int_distribution<std::size_t> distribution(0, population.size() - 1);
 
     const Chromosome* winner =
         &population[
             distribution(randomEngine)];
 
-    for (int index = 1;
-        index < tournamentSize;
-        ++index)
+    for (int index = 1; index < tournamentSize; ++index)
     {
         const Chromosome& competitor =
             population[
                 distribution(randomEngine)];
 
-        if (competitor.fitness.isBetterThan(
-            winner->fitness))
+        if (competitor.fitness.isBetterThan(winner->fitness))
         {
             winner = &competitor;
         }

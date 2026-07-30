@@ -12,22 +12,19 @@
 class GeneticOptimizer
 {
 public:
-    explicit GeneticOptimizer(unsigned int seed);
+    explicit GeneticOptimizer(
+        const OptimizationSettings& settings);
 
     std::vector<Chromosome> createInitialPopulation(
         const TimetableProblem& problem,
         const std::vector<LessonInstance>& lessonInstances,
-        const std::vector<ScheduleSlot>& scheduleSlots,
-        int populationSize);
+        const std::vector<ScheduleSlot>& scheduleSlots);
 
     Chromosome optimize(
         std::vector<Chromosome> initialPopulation,
         const TimetableProblem& problem,
         const std::vector<LessonInstance>& lessonInstances,
-        const std::vector<ScheduleSlot>& scheduleSlots,
-        int generations,
-        int eliteCount,
-        int tournamentSize);
+        const std::vector<ScheduleSlot>& scheduleSlots);
 
 private:
     void evaluatePopulation(
@@ -36,18 +33,21 @@ private:
         const std::vector<LessonInstance>& lessonInstances,
         const std::vector<ScheduleSlot>& scheduleSlots);
 
-    static void sortPopulation(std::vector<Chromosome>& population);
+    static void sortPopulation(
+        std::vector<Chromosome>& population);
 
     const Chromosome& selectByTournament(
-        const std::vector<Chromosome>& population,
-        int tournamentSize);
+        const std::vector<Chromosome>& population);
 
     static bool isBetter(
         const Chromosome& first,
         const Chromosome& second);
 
+    OptimizationSettings settings;
+
     ChromosomeFactory chromosomeFactory;
     ChromosomeMutator mutator;
     FitnessEvaluator fitnessEvaluator;
+
     std::mt19937 randomEngine;
 };

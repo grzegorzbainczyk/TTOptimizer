@@ -14,20 +14,17 @@
 #include "Optimization/GeneticOptimizer.h"
 #include "Engine.h"
 #include "ChromosomeDecoder.h"
-#include <ScheduledLessonResultJsonWriter.h>
+#include <ResultJsonWriter.h>
 #include <Preprocessing/TimetablePreprocessor.h>
 
-int Engine::execute(
-    const TimetableProblem& problem,
-    std::string& result)
+int Engine::execute(const TimetableProblem& problem, std::string& result)
 {
     try
     {
         TimetablePreprocessor preprocessor;
         ResultJsonWriter writer;
 
-        PreprocessingResult preprocessingResult =
-            preprocessor.process(problem);
+        PreprocessingResult preprocessingResult = preprocessor.process(problem);
 
         if (!preprocessingResult.canOptimize)
         {
@@ -35,96 +32,55 @@ int Engine::execute(
             return 0;
         }
 
-
-        std::vector<ScheduleSlot> scheduleSlots =
-            ScheduleSlotGenerator::generate(problem);
-
-        std::vector<LessonInstance> lessonInstances =
-            LessonInstanceGenerator::generate(problem);
+        std::vector<ScheduleSlot> scheduleSlots = ScheduleSlotGenerator::generate(problem);
+        std::vector<LessonInstance> lessonInstances = LessonInstanceGenerator::generate(problem);
 
         FitnessEvaluator fitnessEvaluator;
 
         const auto startTime = std::chrono::steady_clock::now();
-        GeneticOptimizer optimizer(problem.optimizationSettings.randomSeed);
 
-        const int generations = 1000;
-        const int populationSize = 100;
-        const int eliteCount = 5;
-        const int tournamentSize = 3;
+        GeneticOptimizer optimizer(problem.optimizationSettings);
 
         std::vector<Chromosome> initialPopulation =
-            optimizer.createInitialPopulation(
-                problem,
-                lessonInstances,
-                scheduleSlots,
-                populationSize);
+            optimizer.createInitialPopulation(problem, lessonInstances, scheduleSlots);
 
-        const auto bestInitialChromosome =
-            std::min_element(
-                initialPopulation.begin(),
-                initialPopulation.end(),
-                [](const Chromosome& first,
-                    const Chromosome& second)
-                {
-                    return first.fitness.isBetterThan(
-                        second.fitness);
-                });
+        const auto bestInitialChromosome = std::min_element(
+            initialPopulation.begin(),
+            initialPopulation.end(),
+            [](const Chromosome& first, const Chromosome& second)
+            {
+                return first.fitness.isBetterThan(second.fitness);
+            });
 
         if (bestInitialChromosome == initialPopulation.end())
         {
-            throw std::runtime_error(
-                "Initial population is empty.");
+            throw std::runtime_error("Initial population is empty.");
         }
 
-        const double initialPenalty =
-            bestInitialChromosome->fitness.softPenalty;
+        const double initialPenalty = bestInitialChromosome->fitness.softPenalty;
 
-        Chromosome bestChromosome = optimizer.optimize(
-            std::move(initialPopulation),
-            problem,
-            lessonInstances,
-            scheduleSlots,
-            generations,
-            eliteCount,
-            tournamentSize);
+        Chromosome bestChromosome =
+            optimizer.optimize(std::move(initialPopulation), problem, lessonInstances, scheduleSlots);
 
-        ChromosomeValidator::validate(
-            bestChromosome,
-            lessonInstances,
-            scheduleSlots);
+        ChromosomeValidator::validate(bestChromosome, lessonInstances, scheduleSlots);
 
-        FitnessScore score = fitnessEvaluator.evaluate(
-            bestChromosome,
-            problem,
-            lessonInstances,
-            scheduleSlots);
+        FitnessScore score =
+            fitnessEvaluator.evaluate(bestChromosome, problem, lessonInstances, scheduleSlots);
 
         std::vector<ScheduledLesson> scheduledLessons =
-            ChromosomeDecoder::decode(
-                bestChromosome,
-                problem,
-                lessonInstances,
-                scheduleSlots);
+            ChromosomeDecoder::decode(bestChromosome, problem, lessonInstances, scheduleSlots);
 
-        const auto endTime =
-            std::chrono::steady_clock::now();
+        const auto endTime = std::chrono::steady_clock::now();
 
         const auto durationMilliseconds =
-            std::chrono::duration_cast<std::chrono::milliseconds>(
-                endTime - startTime)
-            .count();
+            std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 
         OptimizationInfo feedback;
         feedback.durationMilliseconds = durationMilliseconds;
-        feedback.iterations = problem.optimizationSettings.iterations; //why copy input to output ?
-        feedback.randomSeed = problem.optimizationSettings.randomSeed; //why copy input to output ?
-      
+        feedback.iterations = problem.optimizationSettings.iterations;
+        feedback.randomSeed = problem.optimizationSettings.randomSeed;
 
-        result = writer.writeSuccess(
-            initialPenalty,
-            score,
-            scheduledLessons,
-            feedback);
+        result = writer.writeSuccess(initialPenalty, score, scheduledLessons, feedback);
 
         return 0;
     }

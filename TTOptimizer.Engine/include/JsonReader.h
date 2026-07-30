@@ -9,7 +9,7 @@
 
 using json = nlohmann::json;
 
-class TimetableProblemJsonReader
+class JsonReader
 {
 public:
     TimetableProblem readFromFile(const std::string& filePath) const
@@ -41,15 +41,94 @@ public:
             const auto& settingsJson =
                 root.at("optimizationSettings");
 
-            problem.optimizationSettings.iterations =
+            auto& settings =
+                problem.optimizationSettings;
+
+            settings.populationSize =
+                settingsJson.value(
+                    "populationSize",
+                    settings.populationSize);
+
+            settings.iterations =
                 settingsJson.value(
                     "iterations",
-                    problem.optimizationSettings.iterations);
+                    settings.iterations);
 
-            problem.optimizationSettings.randomSeed =
+            settings.eliteCount =
+                settingsJson.value(
+                    "eliteCount",
+                    settings.eliteCount);
+
+            settings.tournamentSize =
+                settingsJson.value(
+                    "tournamentSize",
+                    settings.tournamentSize);
+
+            settings.mutationAttempts =
+                settingsJson.value(
+                    "mutationAttempts",
+                    settings.mutationAttempts);
+
+            settings.mutationProbability =
+                settingsJson.value(
+                    "mutationProbability",
+                    settings.mutationProbability);
+
+            settings.randomSeed =
                 settingsJson.value(
                     "randomSeed",
-                    problem.optimizationSettings.randomSeed);
+                    settings.randomSeed);
+
+            settings.threadCount =
+                settingsJson.value(
+                    "threadCount",
+                    settings.threadCount);
+
+            settings.stopWhenPerfect =
+                settingsJson.value(
+                    "stopWhenPerfect",
+                    settings.stopWhenPerfect);
+
+            settings.stagnationGenerationLimit =
+                settingsJson.value(
+                    "stagnationGenerationLimit",
+                    settings.stagnationGenerationLimit);
+
+            settings.enableProgressLogging =
+                settingsJson.value(
+                    "enableProgressLogging",
+                    settings.enableProgressLogging);
+
+            settings.progressLogInterval =
+                settingsJson.value(
+                    "progressLogInterval",
+                    settings.progressLogInterval);
+
+            if (settingsJson.contains("penalties"))
+            {
+                const auto& penaltiesJson =
+                    settingsJson.at("penalties");
+
+                settings.penalties.low =
+                    penaltiesJson.value(
+                        "low",
+                        settings.penalties.low);
+
+                settings.penalties.medium =
+                    penaltiesJson.value(
+                        "medium",
+                        settings.penalties.medium);
+
+                settings.penalties.high =
+                    penaltiesJson.value(
+                        "high",
+                        settings.penalties.high);
+
+                settings.penalties.hard =
+                    penaltiesJson.value(
+                        "hard",
+                        settings.penalties.hard);
+            }
         }
 
 

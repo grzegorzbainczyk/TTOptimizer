@@ -158,8 +158,8 @@
     <ClInclude Include="include\Preprocessing\ReferenceIntegrityValidator.h" />
     <ClInclude Include="include\Preprocessing\StructuralProblemValidator.h" />
     <ClInclude Include="include\Preprocessing\TimetablePreprocessor.h" />
-    <ClInclude Include="include\ScheduledLessonResultJsonWriter.h" />
-    <ClInclude Include="include\TimetableProblemJsonReader.h" />
+    <ClInclude Include="include\ResultJsonWriter.h" />
+    <ClInclude Include="include\JsonReader.h" />
     <ClInclude Include="include\Utils\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

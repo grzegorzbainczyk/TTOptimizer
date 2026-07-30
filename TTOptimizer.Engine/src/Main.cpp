@@ -3,7 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include "TimetableProblemJsonReader.h"
+#include "JsonReader.h"
 #include "Engine.h"
 #include "Domain/TimetableProblem.h"
 
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        TimetableProblemJsonReader reader;
+        JsonReader reader;
         TimetableProblem problem = reader.readFromFile(inputPath);
 
         std::string outputJson;
