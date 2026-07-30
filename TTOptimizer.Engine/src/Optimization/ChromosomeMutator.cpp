@@ -5,49 +5,26 @@ ChromosomeMutator::ChromosomeMutator(unsigned int seed)
 {
 }
 
-void ChromosomeMutator::mutateAssignment(
-    Chromosome& chromosome,
-    std::size_t scheduleSlotCount)
+void ChromosomeMutator::mutateAssignment(Chromosome& chromosome, std::size_t scheduleSlotCount)
 {
-    if (chromosome.genes.empty() ||
-        scheduleSlotCount < 2)
+    if (chromosome.genes.empty() || scheduleSlotCount < 2)
     {
         return;
     }
 
-    std::uniform_int_distribution<LessonInstanceIndex>
-        lessonDistribution(
-            0,
-            chromosome.genes.size() - 1);
+    std::uniform_int_distribution<LessonInstanceIndex> lessonDistribution(0, chromosome.genes.size() - 1);
 
-    std::uniform_int_distribution<ScheduleSlotIndex>
-        slotDistribution(
-            0,
-            scheduleSlotCount - 1);
+    const LessonInstanceIndex lessonIndex = lessonDistribution(randomEngine);
+    const ScheduleSlotIndex currentSlotIndex = chromosome.genes[lessonIndex];
 
-    const LessonInstanceIndex lessonIndex =
-        lessonDistribution(randomEngine);
+    std::uniform_int_distribution<ScheduleSlotIndex> slotDistribution(0, scheduleSlotCount - 2);
 
-    const ScheduleSlotIndex currentSlotIndex =
-        chromosome.genes[lessonIndex];
+    ScheduleSlotIndex newSlotIndex = slotDistribution(randomEngine);
 
-    ScheduleSlotIndex newSlotIndex =
-        slotDistribution(randomEngine);
-
-    constexpr std::size_t maxAttempts = 20;
-
-    for (std::size_t attempt = 0;
-        attempt < maxAttempts &&
-        newSlotIndex == currentSlotIndex;
-        ++attempt)
+    if (newSlotIndex >= currentSlotIndex)
     {
-        newSlotIndex =
-            slotDistribution(randomEngine);
+        ++newSlotIndex;
     }
 
-    if (newSlotIndex != currentSlotIndex)
-    {
-        chromosome.genes[lessonIndex] =
-            newSlotIndex;
-    }
+    chromosome.genes[lessonIndex] = newSlotIndex;
 }

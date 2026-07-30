@@ -9,10 +9,7 @@ class ChromosomeMutator
 {
 public:
     explicit ChromosomeMutator(unsigned int seed);
-
-    void mutateAssignment(
-        Chromosome& chromosome,
-        std::size_t scheduleSlotCount);
+    void mutateAssignment(Chromosome& chromosome, std::size_t scheduleSlotCount);
 
 private:
     std::mt19937 randomEngine;
