@@ -1,32 +1,29 @@
 #pragma once
-#include <cstddef>
-#include <optional>
-#include <string>
+
 #include <vector>
+
 #include "TimeTableModels.h"
 
 struct TeacherUnavailability
 {
-    int teacherId;
-    int dayIndex;
-    int slotIndex;
+    TeacherId teacherId{};
+    int dayIndex{};
+    int slotIndex{};
 };
 
 struct ClassGroupUnavailability
 {
-    int classGroupId;
-    int dayIndex;
-    int slotIndex;
+    ClassGroupId classGroupId{};
+    int dayIndex{};
+    int slotIndex{};
 };
 
 struct RoomUnavailability
 {
-    int roomId;
-    int dayIndex;
-    int slotIndex;
+    RoomId roomId{};
+    int dayIndex{};
+    int slotIndex{};
 };
-
-
 
 struct TimetableProblem
 {

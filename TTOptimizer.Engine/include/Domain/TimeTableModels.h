@@ -1,11 +1,10 @@
 #pragma once
 
 #include <cstddef>
-#include <optional>
 #include <string>
 #include <vector>
-#include "Evaluation/FitnessScore.h"
 
+#include "Evaluation/FitnessScore.h"
 
 using TeacherId = int;
 using ClassGroupId = int;
@@ -23,21 +22,23 @@ enum class DayOfWeek
     Tuesday = 1,
     Wednesday = 2,
     Thursday = 3,
-    Friday = 4
+    Friday = 4,
+    Saturday = 5,
+    Sunday = 6
 };
 
 struct PenaltySettings
 {
     int low = 10;
     int medium = 100;
-    int high = 1000;
+    int high = 1'000;
     int hard = 1'000'000;
 };
 
 struct TimeSlot
 {
     DayOfWeek day{};
-    int lessonNumber{}; // 1 = first lesson of the day
+    int lessonNumber{};
 
     bool operator==(const TimeSlot& other) const
     {
@@ -50,7 +51,7 @@ struct OptimizationSettings
 {
     int iterations = 1;
     unsigned int randomSeed = 12'345;
-    
+
     PenaltySettings penalties;
 };
 
@@ -106,8 +107,21 @@ struct ScheduleSlot
 
 struct Chromosome
 {
-    std::vector<std::optional<LessonInstanceIndex>> genes;
-	FitnessScore fitness;
+    /*
+     * Each gene represents one lesson instance.
+     *
+     * Gene index:
+     *     index of a lesson instance in the lessonInstances collection.
+     *
+     * Gene value:
+     *     index of the schedule slot assigned to that lesson instance.
+     *
+     * Therefore:
+     *     genes[lessonInstanceIndex] = scheduleSlotIndex;
+     */
+    std::vector<ScheduleSlotIndex> genes;
+
+    FitnessScore fitness;
 };
 
 struct ScheduledLesson
@@ -135,5 +149,3 @@ struct ScheduledLessonView
     DayOfWeek day{};
     int lessonNumber{};
 };
-
-

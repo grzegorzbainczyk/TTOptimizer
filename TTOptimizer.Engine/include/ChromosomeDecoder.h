@@ -1,88 +1,113 @@
 #pragma once
+
 #include <algorithm>
 #include <stdexcept>
 #include <vector>
-#include <Domain/TimeTableModels.h>
-#include <Domain/TimeTableProblem.h>
+
+#include "Domain/TimeTableModels.h"
+#include "Domain/TimeTableProblem.h"
 
 class ChromosomeDecoder
 {
 public:
-	static std::vector<ScheduledLesson> decode(
-		const Chromosome& chromosome,
-		const TimetableProblem& problem,
-		const std::vector<LessonInstance>& lessonInstances,
-		const std::vector<ScheduleSlot>& scheduleSlots)
-	{
-		if (chromosome.genes.size() != scheduleSlots.size())
-		{
-			throw std::runtime_error(
-				"Cannot decode chromosome: genes size must be equal to schedule slots size.");
-		}
+    static std::vector<ScheduledLesson> decode(
+        const Chromosome& chromosome,
+        const TimetableProblem& problem,
+        const std::vector<LessonInstance>& lessonInstances,
+        const std::vector<ScheduleSlot>& scheduleSlots)
+    {
+        /*
+         * In the current chromosome model:
+         *
+         * gene index = lesson instance index
+         * gene value = assigned schedule slot index
+         */
+        if (chromosome.genes.size() != lessonInstances.size())
+        {
+            throw std::runtime_error(
+                "Cannot decode chromosome: genes size must be equal "
+                "to lesson instances size.");
+        }
 
-		std::vector<ScheduledLesson> scheduledLessons;
-		scheduledLessons.reserve(lessonInstances.size());
+        std::vector<ScheduledLesson> scheduledLessons;
+        scheduledLessons.reserve(lessonInstances.size());
 
-		for (ScheduleSlotIndex slotIndex = 0;
-			slotIndex < chromosome.genes.size();
-			++slotIndex)
-		{
-			const auto& gene = chromosome.genes[slotIndex];
+        for (LessonInstanceIndex lessonIndex = 0;
+            lessonIndex < chromosome.genes.size();
+            ++lessonIndex)
+        {
+            const ScheduleSlotIndex scheduleSlotIndex =
+                chromosome.genes[lessonIndex];
 
-			if (!gene.has_value())
-			{
-				continue;
-			}
+            if (scheduleSlotIndex >= scheduleSlots.size())
+            {
+                throw std::runtime_error(
+                    "Cannot decode chromosome: schedule slot index "
+                    "is out of range.");
+            }
 
-			LessonInstanceIndex lessonIndex = gene.value();
+            const LessonInstance& lessonInstance =
+                lessonInstances[lessonIndex];
 
-			if (lessonIndex >= lessonInstances.size())
-			{
-				throw std::runtime_error(
-					"Cannot decode chromosome: lesson instance index is out of range.");
-			}
+            const LessonRequirement& requirement =
+                FindRequirementById(
+                    problem,
+                    lessonInstance.requirementId);
 
-			const LessonInstance& lessonInstance = lessonInstances[lessonIndex];
-			const LessonRequirement& requirement = FindRequirementById(problem, lessonInstance.requirementId);
+            const ScheduleSlot& scheduleSlot =
+                scheduleSlots[scheduleSlotIndex];
 
-			const ScheduleSlot& scheduleSlot = scheduleSlots[slotIndex];
+            ScheduledLesson scheduledLesson;
 
-			ScheduledLesson scheduledLesson;
-			scheduledLesson.lessonInstanceId = lessonInstance.id;
-			scheduledLesson.requirementId = requirement.id;
+            scheduledLesson.lessonInstanceId =
+                lessonInstance.id;
 
-			scheduledLesson.classGroupId = requirement.classGroupId;
-			scheduledLesson.subjectId = requirement.subjectId;
-			scheduledLesson.teacherId = requirement.teacherId;
-			scheduledLesson.roomId = scheduleSlot.roomId;
+            scheduledLesson.requirementId =
+                requirement.id;
 
-			scheduledLesson.timeSlot = scheduleSlot.timeSlot;
+            scheduledLesson.classGroupId =
+                requirement.classGroupId;
 
-			scheduledLessons.push_back(scheduledLesson);
-		}
+            scheduledLesson.subjectId =
+                requirement.subjectId;
 
-		return scheduledLessons;
-	}
+            scheduledLesson.teacherId =
+                requirement.teacherId;
+
+            scheduledLesson.roomId =
+                scheduleSlot.roomId;
+
+            scheduledLesson.timeSlot =
+                scheduleSlot.timeSlot;
+
+            scheduledLessons.push_back(
+                scheduledLesson);
+        }
+
+        return scheduledLessons;
+    }
 
 private:
-	static const LessonRequirement& FindRequirementById(
-		const TimetableProblem& problem,
-		LessonRequirementId requirementId)
-	{
-		auto iterator = std::find_if(
-			problem.lessonRequirements.begin(),
-			problem.lessonRequirements.end(),
-			[requirementId](const LessonRequirement& requirement)
-			{
-				return requirement.id == requirementId;
-			});
+    static const LessonRequirement& FindRequirementById(
+        const TimetableProblem& problem,
+        LessonRequirementId requirementId)
+    {
+        const auto iterator = std::find_if(
+            problem.lessonRequirements.begin(),
+            problem.lessonRequirements.end(),
+            [requirementId](
+                const LessonRequirement& requirement)
+            {
+                return requirement.id ==
+                    requirementId;
+            });
 
-		if (iterator == problem.lessonRequirements.end())
-		{
-			throw std::runtime_error("Lesson requirement not found.");
-		}
+        if (iterator == problem.lessonRequirements.end())
+        {
+            throw std::runtime_error(
+                "Lesson requirement not found.");
+        }
 
-		return *iterator;
-	}
+        return *iterator;
+    }
 };
-

@@ -45,9 +45,6 @@
     <ClCompile Include="src\Optimization\ChromosomeMutator.cpp">
       <Filter>Source Files\Optimization</Filter>
     </ClCompile>
-    <ClCompile Include="src\Optimization\SimpleOptimizer.cpp">
-      <Filter>Source Files\Optimization</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -63,9 +60,6 @@
       <Filter>External\nlohmann</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ChromosomeDecoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Generators\ChromosomeFactory.h">
@@ -89,9 +83,6 @@
     <ClInclude Include="include\Optimization\ChromosomeMutator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Optimization\SimpleOptimizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ScheduledLessonResultJsonWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -107,7 +98,10 @@
     <ClInclude Include="FitnessScore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GeneticOptimizer.h">
+    <ClInclude Include="include\Optimization\GeneticOptimizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ChromosomeDecoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

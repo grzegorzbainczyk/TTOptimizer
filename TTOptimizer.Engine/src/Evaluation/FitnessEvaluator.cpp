@@ -22,7 +22,8 @@ namespace
 
         if (iterator == problem.lessonRequirements.end())
         {
-            throw std::runtime_error("Lesson requirement not found.");
+            throw std::runtime_error(
+                "Lesson requirement not found.");
         }
 
         return *iterator;
@@ -42,7 +43,8 @@ namespace
 
         if (iterator == problem.rooms.end())
         {
-            throw std::runtime_error("Room not found.");
+            throw std::runtime_error(
+                "Room not found.");
         }
 
         return *iterator;
@@ -61,6 +63,42 @@ namespace
                 const TeacherUnavailability& unavailability)
             {
                 return unavailability.teacherId == teacherId
+                    && unavailability.dayIndex == dayIndex
+                    && unavailability.slotIndex == slotIndex;
+            });
+    }
+
+    bool IsClassGroupUnavailable(
+        const TimetableProblem& problem,
+        ClassGroupId classGroupId,
+        int dayIndex,
+        int slotIndex)
+    {
+        return std::any_of(
+            problem.classGroupUnavailabilities.begin(),
+            problem.classGroupUnavailabilities.end(),
+            [classGroupId, dayIndex, slotIndex](
+                const ClassGroupUnavailability& unavailability)
+            {
+                return unavailability.classGroupId == classGroupId
+                    && unavailability.dayIndex == dayIndex
+                    && unavailability.slotIndex == slotIndex;
+            });
+    }
+
+    bool IsRoomUnavailable(
+        const TimetableProblem& problem,
+        RoomId roomId,
+        int dayIndex,
+        int slotIndex)
+    {
+        return std::any_of(
+            problem.roomUnavailabilities.begin(),
+            problem.roomUnavailabilities.end(),
+            [roomId, dayIndex, slotIndex](
+                const RoomUnavailability& unavailability)
+            {
+                return unavailability.roomId == roomId
                     && unavailability.dayIndex == dayIndex
                     && unavailability.slotIndex == slotIndex;
             });
@@ -85,13 +123,24 @@ FitnessScore FitnessEvaluator::evaluate(
 {
     FitnessScore score;
 
-    if (chromosome.genes.size() != scheduleSlots.size())
+    /*
+     * In the current chromosome model:
+     *
+     * gene index = lesson instance index
+     * gene value = assigned schedule slot index
+     */
+    if (chromosome.genes.size() != lessonInstances.size())
     {
         score.hardViolationCount++;
         return score;
     }
 
-    std::vector<int> lessonUsageCount(lessonInstances.size(), 0);
+    /*
+     * Counts how many lessons use the same physical schedule slot.
+     *
+     * A ScheduleSlot represents a room together with a day and lesson number.
+     */
+    std::map<ScheduleSlotIndex, int> scheduleSlotUsage;
 
     std::map<std::pair<TeacherId, std::pair<int, int>>, int>
         teacherTimeUsage;
@@ -99,27 +148,18 @@ FitnessScore FitnessEvaluator::evaluate(
     std::map<std::pair<ClassGroupId, std::pair<int, int>>, int>
         classTimeUsage;
 
-    for (ScheduleSlotIndex slotIndex = 0;
-         slotIndex < chromosome.genes.size();
-         ++slotIndex)
+    for (LessonInstanceIndex lessonIndex = 0;
+        lessonIndex < chromosome.genes.size();
+        ++lessonIndex)
     {
-        const std::optional<LessonInstanceIndex>& gene =
-            chromosome.genes[slotIndex];
+        const ScheduleSlotIndex scheduleSlotIndex =
+            chromosome.genes[lessonIndex];
 
-        if (!gene.has_value())
-        {
-            continue;
-        }
-
-        const LessonInstanceIndex lessonIndex = gene.value();
-
-        if (lessonIndex >= lessonInstances.size())
+        if (scheduleSlotIndex >= scheduleSlots.size())
         {
             score.hardViolationCount++;
             continue;
         }
-
-        lessonUsageCount[lessonIndex]++;
 
         const LessonInstance& lessonInstance =
             lessonInstances[lessonIndex];
@@ -130,46 +170,91 @@ FitnessScore FitnessEvaluator::evaluate(
                 lessonInstance.requirementId);
 
         const ScheduleSlot& scheduleSlot =
-            scheduleSlots[slotIndex];
+            scheduleSlots[scheduleSlotIndex];
 
         const Room& room =
-            FindRoomById(problem, scheduleSlot.roomId);
+            FindRoomById(
+                problem,
+                scheduleSlot.roomId);
 
-        const int day =
-            static_cast<int>(scheduleSlot.timeSlot.day);
+        const int dayIndex =
+            static_cast<int>(
+                scheduleSlot.timeSlot.day);
 
-        const int lessonNumber =
+        const int slotIndex =
             scheduleSlot.timeSlot.lessonNumber;
 
         const auto timeKey =
-            std::make_pair(day, lessonNumber);
+            std::make_pair(
+                dayIndex,
+                slotIndex);
 
         const auto teacherTimeKey =
-            std::make_pair(requirement.teacherId, timeKey);
+            std::make_pair(
+                requirement.teacherId,
+                timeKey);
 
         const auto classTimeKey =
-            std::make_pair(requirement.classGroupId, timeKey);
+            std::make_pair(
+                requirement.classGroupId,
+                timeKey);
 
+        scheduleSlotUsage[scheduleSlotIndex]++;
         teacherTimeUsage[teacherTimeKey]++;
         classTimeUsage[classTimeKey]++;
 
-        // Hard constraint: teacher unavailable.
+        // Hard constraint: teacher is unavailable.
         if (IsTeacherUnavailable(
             problem,
             requirement.teacherId,
-            day,
-            lessonNumber))
+            dayIndex,
+            slotIndex))
         {
             score.hardViolationCount++;
         }
 
-        // Soft constraint for now:
-        // subject is not preferred/allowed in the selected room.
+        // Hard constraint: class group is unavailable.
+        if (IsClassGroupUnavailable(
+            problem,
+            requirement.classGroupId,
+            dayIndex,
+            slotIndex))
+        {
+            score.hardViolationCount++;
+        }
+
+        // Hard constraint: room is unavailable.
+        if (IsRoomUnavailable(
+            problem,
+            scheduleSlot.roomId,
+            dayIndex,
+            slotIndex))
+        {
+            score.hardViolationCount++;
+        }
+
+        /*
+         * Soft constraint:
+         * the selected room does not allow or prefer this subject.
+         */
         if (!ContainsSubject(
             room.allowedSubjects,
             requirement.subjectId))
         {
-            score.softPenalty += ToPenalty(PenaltyLevel::Medium);
+            score.softPenalty +=
+                ToPenalty(PenaltyLevel::Medium);
+        }
+    }
+
+    // Hard constraint: multiple lessons use the same room and time.
+    for (const auto& item : scheduleSlotUsage)
+    {
+        const int usageCount = item.second;
+
+        if (usageCount > 1)
+        {
+            score.hardViolationCount +=
+                usageCount - 1;
         }
     }
 
@@ -180,7 +265,8 @@ FitnessScore FitnessEvaluator::evaluate(
 
         if (usageCount > 1)
         {
-            score.hardViolationCount += usageCount - 1;
+            score.hardViolationCount +=
+                usageCount - 1;
         }
     }
 
@@ -191,7 +277,8 @@ FitnessScore FitnessEvaluator::evaluate(
 
         if (usageCount > 1)
         {
-            score.hardViolationCount += usageCount - 1;
+            score.hardViolationCount +=
+                usageCount - 1;
         }
     }
 

@@ -1,32 +1,53 @@
 #include "Optimization/ChromosomeMutator.h"
 
-#include <algorithm>
-
 ChromosomeMutator::ChromosomeMutator(unsigned int seed)
     : randomEngine(seed)
 {
 }
 
-void ChromosomeMutator::mutateBySwap(Chromosome& chromosome)
+void ChromosomeMutator::mutateAssignment(
+    Chromosome& chromosome,
+    std::size_t scheduleSlotCount)
 {
-    if (chromosome.genes.size() < 2)
+    if (chromosome.genes.empty() ||
+        scheduleSlotCount < 2)
     {
         return;
     }
 
-    std::uniform_int_distribution<std::size_t> distribution(
-        0,
-        chromosome.genes.size() - 1);
+    std::uniform_int_distribution<LessonInstanceIndex>
+        lessonDistribution(
+            0,
+            chromosome.genes.size() - 1);
 
-    std::size_t firstIndex = distribution(randomEngine);
-    std::size_t secondIndex = distribution(randomEngine);
+    std::uniform_int_distribution<ScheduleSlotIndex>
+        slotDistribution(
+            0,
+            scheduleSlotCount - 1);
 
-    while (secondIndex == firstIndex)
+    const LessonInstanceIndex lessonIndex =
+        lessonDistribution(randomEngine);
+
+    const ScheduleSlotIndex currentSlotIndex =
+        chromosome.genes[lessonIndex];
+
+    ScheduleSlotIndex newSlotIndex =
+        slotDistribution(randomEngine);
+
+    constexpr std::size_t maxAttempts = 20;
+
+    for (std::size_t attempt = 0;
+        attempt < maxAttempts &&
+        newSlotIndex == currentSlotIndex;
+        ++attempt)
     {
-        secondIndex = distribution(randomEngine);
+        newSlotIndex =
+            slotDistribution(randomEngine);
     }
 
-    std::swap(
-        chromosome.genes[firstIndex],
-        chromosome.genes[secondIndex]);
+    if (newSlotIndex != currentSlotIndex)
+    {
+        chromosome.genes[lessonIndex] =
+            newSlotIndex;
+    }
 }

@@ -6,6 +6,7 @@
 #include "Domain/TimeTableModels.h"
 #include "Domain/TimetableProblem.h"
 #include "Evaluation/FitnessEvaluator.h"
+#include "Generators/ChromosomeFactory.h"
 #include "Optimization/ChromosomeMutator.h"
 
 class GeneticOptimizer
@@ -13,29 +14,29 @@ class GeneticOptimizer
 public:
     explicit GeneticOptimizer(unsigned int seed);
 
+    std::vector<Chromosome> createInitialPopulation(
+        const TimetableProblem& problem,
+        const std::vector<LessonInstance>& lessonInstances,
+        const std::vector<ScheduleSlot>& scheduleSlots,
+        int populationSize);
+
     Chromosome optimize(
-        const Chromosome& initialChromosome,
+        std::vector<Chromosome> initialPopulation,
         const TimetableProblem& problem,
         const std::vector<LessonInstance>& lessonInstances,
         const std::vector<ScheduleSlot>& scheduleSlots,
         int generations,
-        int populationSize,
         int eliteCount,
         int tournamentSize);
 
 private:
-    std::vector<Chromosome> createInitialPopulation(
-        const Chromosome& initialChromosome,
-        int populationSize);
-
     void evaluatePopulation(
         std::vector<Chromosome>& population,
         const TimetableProblem& problem,
         const std::vector<LessonInstance>& lessonInstances,
         const std::vector<ScheduleSlot>& scheduleSlots);
 
-    static void sortPopulation(
-        std::vector<Chromosome>& population);
+    static void sortPopulation(std::vector<Chromosome>& population);
 
     const Chromosome& selectByTournament(
         const std::vector<Chromosome>& population,
@@ -45,6 +46,7 @@ private:
         const Chromosome& first,
         const Chromosome& second);
 
+    ChromosomeFactory chromosomeFactory;
     ChromosomeMutator mutator;
     FitnessEvaluator fitnessEvaluator;
     std::mt19937 randomEngine;

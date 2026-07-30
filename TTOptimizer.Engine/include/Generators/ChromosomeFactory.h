@@ -1,16 +1,17 @@
-#include <algorithm>
-#include <stdexcept>
-#include <random>
-#include <vector>
-#include "Domain/TimetableModels.h"
+#pragma once
 
-using LessonInstanceIndex = std::size_t;
-using ScheduleSlotIndex = std::size_t;
+#include <algorithm>
+#include <cstddef>
+#include <random>
+#include <stdexcept>
+#include <vector>
+
+#include "Domain/TimetableModels.h"
 
 class ChromosomeFactory
 {
 public:
-    ChromosomeFactory(unsigned int seed)
+    explicit ChromosomeFactory(unsigned int seed)
         : randomEngine(seed)
     {
     }
@@ -19,36 +20,51 @@ public:
         const std::vector<ScheduleSlot>& scheduleSlots,
         const std::vector<LessonInstance>& lessonInstances)
     {
+        if (lessonInstances.empty())
+        {
+            return Chromosome{};
+        }
+
+        if (scheduleSlots.empty())
+        {
+            throw std::runtime_error(
+                "Cannot create chromosome: no schedule slots are available.");
+        }
+
         if (lessonInstances.size() > scheduleSlots.size())
         {
             throw std::runtime_error(
-                "Cannot create chromosome: there are more lesson instances than schedule slots.");
+                "Cannot create chromosome: there are more lesson instances "
+                "than schedule slots.");
         }
 
-        Chromosome chromosome;
-        chromosome.genes.resize(scheduleSlots.size(), std::nullopt);
-        chromosome.fitness.softPenalty = 0.0;
+        std::vector<ScheduleSlotIndex> availableSlotIndices;
+        availableSlotIndices.reserve(scheduleSlots.size());
 
-        std::vector<ScheduleSlotIndex> freeSlotIndices;
-        freeSlotIndices.reserve(scheduleSlots.size());
-
-        for (ScheduleSlotIndex i = 0; i < scheduleSlots.size(); ++i)
+        for (ScheduleSlotIndex slotIndex = 0;
+            slotIndex < scheduleSlots.size();
+            ++slotIndex)
         {
-            freeSlotIndices.push_back(i);
+            availableSlotIndices.push_back(slotIndex);
         }
 
         std::shuffle(
-            freeSlotIndices.begin(),
-            freeSlotIndices.end(),
+            availableSlotIndices.begin(),
+            availableSlotIndices.end(),
             randomEngine);
+
+        Chromosome chromosome;
+        chromosome.genes.resize(lessonInstances.size());
 
         for (LessonInstanceIndex lessonIndex = 0;
             lessonIndex < lessonInstances.size();
             ++lessonIndex)
         {
-            ScheduleSlotIndex slotIndex = freeSlotIndices[lessonIndex];
-            chromosome.genes[slotIndex] = lessonIndex;
+            chromosome.genes[lessonIndex] =
+                availableSlotIndices[lessonIndex];
         }
+
+        chromosome.fitness = FitnessScore{};
 
         return chromosome;
     }
