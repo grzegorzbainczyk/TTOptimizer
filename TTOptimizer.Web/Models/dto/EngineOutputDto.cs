@@ -46,6 +46,67 @@ public class EngineOutputDto
     /// execution duration, and engine message.
     /// </summary>
     public required OptimizationInfo OptimizationInfo { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the input data
+    /// passed preprocessing and the optimizer may be started.
+    /// </summary>
+    public bool CanOptimize { get; set; }
+
+    /// <summary>
+    /// Gets or sets the general result message returned by the engine.
+    /// </summary>
+    public string? Message { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of hard constraint violations
+    /// in the final timetable.
+    /// </summary>
+    public int HardViolationCount { get; set; }
+
+    /// <summary>
+    /// Gets or sets preprocessing issues detected before optimization.
+    /// </summary>
+    public List<PreprocessingIssueDto> PreprocessingIssues { get; set; } = new();
+}
+
+/// <summary>
+/// Represents a problem detected during timetable preprocessing.
+/// </summary>
+public class PreprocessingIssueDto
+{
+    /// <summary>
+    /// Gets or sets the issue severity, for example Error or Warning.
+    /// </summary>
+    public string Severity { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the machine-readable issue code.
+    /// </summary>
+    public string Code { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the human-readable description of the issue.
+    /// </summary>
+    public string Message { get; set; } = string.Empty;
+
+    public int TeacherId { get; set; }
+
+    public int ClassGroupId { get; set; }
+
+    public int SubjectId { get; set; }
+
+    public int RoomId { get; set; }
+
+    public int RequirementId { get; set; }
+
+    public int DayIndex { get; set; } = -1;
+
+    public int SlotIndex { get; set; } = -1;
+
+    public int RequiredCount { get; set; }
+
+    public int AvailableCount { get; set; }
 }
 
 /// <summary>

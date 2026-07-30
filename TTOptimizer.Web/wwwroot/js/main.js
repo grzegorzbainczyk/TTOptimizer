@@ -151,20 +151,412 @@ async function runOptimization() {
     }
 }
 
+function normalizeOptimizationResult(data) {
+    let result = data?.result ?? data ?? {};
+
+    /*
+     * Czasami backend zwraca wynik C++ jako tekst JSON,
+     * zamiast jako gotowy obiekt JavaScript.
+     */
+    if (typeof result === "string") {
+        try {
+            result = JSON.parse(result);
+        } catch (error) {
+            console.error(
+                "Could not parse optimization result JSON.",
+                error
+            );
+
+            return {
+                success: false,
+                canOptimize: false,
+                message:
+                    "The optimization result could not be parsed.",
+                preprocessingIssues: [],
+                scheduledLessons: []
+            };
+        }
+    }
+
+    /*
+     * Obsługa dodatkowego zagnieżdżenia, jeśli API zwraca:
+     * { result: { result: ... } }
+     */
+    if (result?.result) {
+        if (typeof result.result === "string") {
+            try {
+                return JSON.parse(result.result);
+            } catch (error) {
+                console.error(
+                    "Could not parse nested optimization result.",
+                    error
+                );
+            }
+        }
+
+        if (typeof result.result === "object") {
+            return result.result;
+        }
+    }
+
+    return result;
+}
+
+
 function renderOptimizationResult(data) {
-    const result = data.result ?? data;
+    const result = normalizeOptimizationResult(data);
 
-    setText("feedback", result.feedback ?? "-");
+    console.log(
+        "Normalized optimization result:",
+        result
+    );
 
-    setText("initialPenalty", result.initialPenalty ?? "-");
-    setText("bestPenalty", result.bestPenalty ?? "-");
+    const scheduledLessons =
+        Array.isArray(result.scheduledLessons)
+            ? result.scheduledLessons
+            : [];
 
-    const scheduledLessons = result.scheduledLessons ?? [];
+    const preprocessingIssues =
+        Array.isArray(result.preprocessingIssues)
+            ? result.preprocessingIssues
+            : [];
 
-    setText("lessonsCount", scheduledLessons.length);
+    const optimizationFailed =
+        result.success === false;
+
+    const preprocessingFailed =
+        result.canOptimize === false ||
+        preprocessingIssues.some(issue =>
+            String(issue.severity).toLowerCase() === "error"
+        );
+
+    if (optimizationFailed || preprocessingFailed) {
+        renderPreprocessingFailure(
+            result,
+            preprocessingIssues
+        );
+
+        populateFilters([]);
+        renderScheduledLessonRows([]);
+
+        return;
+    }
+
+    renderOptimizationSuccess(
+        result,
+        scheduledLessons
+    );
 
     populateFilters(scheduledLessons);
     renderScheduledLessonRows(scheduledLessons);
+}
+
+function renderPreprocessingFailure(
+    result,
+    preprocessingIssues
+) {
+    const generalMessage =
+        result.message ??
+        result.error ??
+        result.optimizationInfo?.message ??
+        "The input data contains blocking errors.";
+
+    setResultMessage(
+        "error",
+        "Optimization cannot be started",
+        generalMessage
+    );
+
+    renderPreprocessingIssues(
+        preprocessingIssues
+    );
+
+    setTimetableContentVisible(false);
+}
+
+
+function renderOptimizationSuccess(
+    result,
+    scheduledLessons
+) {
+    const lessonCount =
+        scheduledLessons.length;
+
+    const optimizationMessage =
+        result.optimizationInfo?.message;
+
+    const message =
+        optimizationMessage ??
+        `The optimizer scheduled ${lessonCount} lessons.`;
+
+    setResultMessage(
+        "success",
+        "Optimization completed",
+        message
+    );
+
+    hidePreprocessingIssues();
+    setTimetableContentVisible(true);
+}
+
+
+function setResultMessage(
+    type,
+    title,
+    message
+) {
+    const panel =
+        document.getElementById(
+            "resultMessagePanel"
+        );
+
+    const titleElement =
+        document.getElementById(
+            "resultMessageTitle"
+        );
+
+    const messageElement =
+        document.getElementById(
+            "resultMessageText"
+        );
+
+    const iconElement =
+        panel?.querySelector(
+            ".result-message-icon"
+        );
+
+    if (!panel ||
+        !titleElement ||
+        !messageElement) {
+        return;
+    }
+
+    panel.classList.remove(
+        "result-message-neutral",
+        "result-message-success",
+        "result-message-error",
+        "result-message-warning"
+    );
+
+    panel.classList.add(
+        `result-message-${type}`
+    );
+
+    titleElement.textContent = title;
+    messageElement.textContent = message;
+
+    if (iconElement) {
+        iconElement.textContent =
+            getResultMessageIcon(type);
+    }
+}
+
+
+function getResultMessageIcon(type) {
+    switch (type) {
+        case "success":
+            return "✓";
+
+        case "error":
+            return "!";
+
+        case "warning":
+            return "⚠";
+
+        default:
+            return "i";
+    }
+}
+
+
+function renderPreprocessingIssues(issues) {
+    const details =
+        document.getElementById(
+            "preprocessingDetails"
+        );
+
+    const issuesList =
+        document.getElementById(
+            "preprocessingIssuesList"
+        );
+
+    const issueCount =
+        document.getElementById(
+            "preprocessingIssueCount"
+        );
+
+    if (!details ||
+        !issuesList ||
+        !issueCount) {
+        return;
+    }
+
+    issuesList.innerHTML = "";
+
+    if (!issues || issues.length === 0) {
+        details.classList.add("hidden");
+        return;
+    }
+
+    for (const issue of issues) {
+        const listItem =
+            document.createElement("li");
+
+        const severity =
+            String(
+                issue.severity ?? "Error"
+            ).toLowerCase();
+
+        listItem.className =
+            `preprocessing-issue preprocessing-issue-${severity}`;
+
+        const heading =
+            document.createElement("div");
+
+        heading.className =
+            "preprocessing-issue-heading";
+
+        const title =
+            document.createElement("strong");
+
+        title.textContent =
+            formatIssueCode(issue.code);
+
+        const badge =
+            document.createElement("span");
+
+        badge.className =
+            "preprocessing-issue-severity";
+
+        badge.textContent =
+            issue.severity ?? "Error";
+
+        heading.appendChild(title);
+        heading.appendChild(badge);
+
+        const message =
+            document.createElement("p");
+
+        message.textContent =
+            issue.message ??
+            "An unspecified preprocessing problem was found.";
+
+        listItem.appendChild(heading);
+        listItem.appendChild(message);
+
+        const counts =
+            createIssueCountsElement(issue);
+
+        if (counts) {
+            listItem.appendChild(counts);
+        }
+
+        issuesList.appendChild(listItem);
+    }
+
+    issueCount.textContent =
+        issues.length === 1
+            ? "1 problem"
+            : `${issues.length} problems`;
+
+    details.classList.remove("hidden");
+}
+
+
+function createIssueCountsElement(issue) {
+    const hasRequiredCount =
+        Number.isFinite(
+            Number(issue.requiredCount)
+        );
+
+    const hasAvailableCount =
+        Number.isFinite(
+            Number(issue.availableCount)
+        );
+
+    if (!hasRequiredCount ||
+        !hasAvailableCount) {
+        return null;
+    }
+
+    const requiredCount =
+        Number(issue.requiredCount);
+
+    const availableCount =
+        Number(issue.availableCount);
+
+    if (requiredCount === 0 &&
+        availableCount === 0) {
+        return null;
+    }
+
+    const element =
+        document.createElement("div");
+
+    element.className =
+        "preprocessing-issue-counts";
+
+    element.innerHTML = `
+        <span>
+            Required:
+            <strong>${requiredCount}</strong>
+        </span>
+        <span>
+            Available:
+            <strong>${availableCount}</strong>
+        </span>
+    `;
+
+    return element;
+}
+
+
+function formatIssueCode(code) {
+    if (!code) {
+        return "Preprocessing problem";
+    }
+
+    return String(code)
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2");
+}
+
+
+function hidePreprocessingIssues() {
+    const details =
+        document.getElementById(
+            "preprocessingDetails"
+        );
+
+    const issuesList =
+        document.getElementById(
+            "preprocessingIssuesList"
+        );
+
+    if (details) {
+        details.classList.add("hidden");
+    }
+
+    if (issuesList) {
+        issuesList.innerHTML = "";
+    }
+}
+
+
+function setTimetableContentVisible(isVisible) {
+    const timetableContent =
+        document.getElementById(
+            "timetableContent"
+        );
+
+    if (!timetableContent) {
+        return;
+    }
+
+    timetableContent.classList.toggle(
+        "hidden",
+        !isVisible
+    );
 }
 
 function renderScheduledLessonRows(scheduledLessons) {
@@ -309,23 +701,46 @@ function applyFilters() {
 
 
 function clearOptimizationResult() {
-    setText("initialPenalty", "-");
-    setText("bestPenalty", "-");
-    setText("lessonsCount", "-");
+    setResultMessage(
+        "neutral",
+        "No optimization result yet",
+        "Run the optimizer to generate a timetable."
+    );
+
+    hidePreprocessingIssues();
+    setTimetableContentVisible(true);
+
     setText("statusText", "Ready.");
 
-    const timetableBody = document.getElementById("timetableBody");
+    const timetableBody =
+        document.getElementById(
+            "timetableBody"
+        );
+
     if (timetableBody) {
         timetableBody.innerHTML = `
             <tr>
-                <td colspan="7">No timetable generated yet.</td>
+                <td colspan="7">
+                    No timetable generated yet.
+                </td>
             </tr>
         `;
     }
 
-    resetSelect("classFilter", "All classes");
-    resetSelect("teacherFilter", "All teachers");
-    resetSelect("roomFilter", "All rooms");
+    resetSelect(
+        "classFilter",
+        "All classes"
+    );
+
+    resetSelect(
+        "teacherFilter",
+        "All teachers"
+    );
+
+    resetSelect(
+        "roomFilter",
+        "All rooms"
+    );
 
     clearLastOptimizationResultFromStorage();
 }

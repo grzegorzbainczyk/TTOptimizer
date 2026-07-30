@@ -148,11 +148,19 @@ public class OptimizationController : ControllerBase
             success = true,
             result = new
             {
-                feedback = engineResult.OptimizationInfo.Message,
                 success = engineResult.Success,
+                canOptimize = engineResult.CanOptimize,
+                message = engineResult.Message,
+                feedback = engineResult.OptimizationInfo.Message,
+
                 initialPenalty = engineResult.InitialPenalty,
                 bestPenalty = engineResult.BestPenalty,
+                hardViolationCount = engineResult.HardViolationCount,
+
+                preprocessingIssues = engineResult.PreprocessingIssues,
                 scheduledLessons = scheduledLessonViews,
+
+                optimizationInfo = engineResult.OptimizationInfo,
                 error = engineResult.Error
             }
         });

@@ -149,69 +149,95 @@
                             </div>
                         </div>
 
-                        <div class="summary-grid">
-                            <div class="summary-box">
-                                <span>Feedback</span>
-                                <strong id="feedback">-</strong>
-                            </div>
-                            <div class="summary-box">
-                                <span>Initial penalty</span>
-                                <strong id="initialPenalty">-</strong>
-                            </div>
+                        <div id="resultMessages" class="result-messages">
+                            <section id="resultMessagePanel"
+                                     class="result-message-panel result-message-neutral">
+                                <div class="result-message-icon" aria-hidden="true">
+                                    ℹ️
+                                </div>
 
-                            <div class="summary-box">
-                                <span>Best penalty</span>
-                                <strong id="bestPenalty">-</strong>
-                            </div>
+                                <div class="result-message-content">
+                                    <span class="result-message-label">
+                                        Optimization result
+                                    </span>
 
-                            <div class="summary-box">
-                                <span>Lessons</span>
-                                <strong id="lessonsCount">-</strong>
-                            </div>
+                                    <h3 id="resultMessageTitle">
+                                        No optimization result yet
+                                    </h3>
+
+                                    <p id="resultMessageText">
+                                        Run the optimizer to generate a timetable.
+                                    </p>
+                                </div>
+                            </section>
+
+                            <section id="preprocessingDetails"
+                                     class="preprocessing-details hidden">
+                                <div class="preprocessing-details-header">
+                                    <div>
+                                        <span class="result-message-label">
+                                            Problem details
+                                        </span>
+
+                                        <h3>Input data requires attention</h3>
+                                    </div>
+
+                                    <span id="preprocessingIssueCount"
+                                          class="issue-count-badge">
+                                        0 problems
+                                    </span>
+                                </div>
+
+                                <ul id="preprocessingIssuesList"
+                                    class="preprocessing-issues-list">
+                                </ul>
+                            </section>
                         </div>
 
-                        <div class="filters-row">
-                            <label>
-                                Class:
-                                <select id="classFilter">
-                                    <option value="">All classes</option>
-                                </select>
-                            </label>
+                        <div id="timetableContent">
+                            <div class="filters-row">
+                                <label>
+                                    Class:
+                                    <select id="classFilter">
+                                        <option value="">All classes</option>
+                                    </select>
+                                </label>
 
-                            <label>
-                                Teacher:
-                                <select id="teacherFilter">
-                                    <option value="">All teachers</option>
-                                </select>
-                            </label>
+                                <label>
+                                    Teacher:
+                                    <select id="teacherFilter">
+                                        <option value="">All teachers</option>
+                                    </select>
+                                </label>
 
-                            <label>
-                                Room:
-                                <select id="roomFilter">
-                                    <option value="">All rooms</option>
-                                </select>
-                            </label>
+                                <label>
+                                    Room:
+                                    <select id="roomFilter">
+                                        <option value="">All rooms</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Slot</th>
+                                        <th>Lesson</th>
+                                        <th>Class</th>
+                                        <th>Subject</th>
+                                        <th>Teacher</th>
+                                        <th>Room</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="timetableBody">
+                                    <tr>
+                                        <td colspan="7">No timetable generated yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Day</th>
-                                    <th>Slot</th>
-                                    <th>Lesson</th>
-                                    <th>Class</th>
-                                    <th>Subject</th>
-                                    <th>Teacher</th>
-                                    <th>Room</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="timetableBody">
-                                <tr>
-                                    <td colspan="7">No timetable generated yet.</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </section>
 
                 </div>
