@@ -1,265 +1,32 @@
 {
-  "bestPenalty": 2500.0,
-  "hardViolationCount": 1,
-  "initialPenalty": 2500.0,
+  "bestPenalty": 0.0,
+  "canOptimize": false,
+  "hardViolationCount": 0,
+  "initialPenalty": 0.0,
+  "message": "The timetable problem contains invalid or infeasible constraints.",
   "optimizationInfo": {
     "durationMilliseconds": 0,
     "iterations": 0,
-    "message": "123095",
+    "message": "Optimization was not started because preprocessing found blocking errors.",
     "randomSeed": 0,
     "threadCount": 1
   },
-  "scheduledLessons": [
+  "preprocessingIssues": [
     {
-      "classGroupId": 256,
-      "day": "Monday",
-      "lessonInstanceId": 1,
-      "lessonNumber": 6,
-      "requirementId": 1159,
-      "roomId": 278,
-      "subjectId": 371,
-      "teacherId": 388
-    },
-    {
-      "classGroupId": 256,
-      "day": "Monday",
-      "lessonInstanceId": 2,
-      "lessonNumber": 7,
-      "requirementId": 1159,
-      "roomId": 277,
-      "subjectId": 371,
-      "teacherId": 388
-    },
-    {
-      "classGroupId": 256,
-      "day": "Thursday",
-      "lessonInstanceId": 3,
-      "lessonNumber": 1,
-      "requirementId": 1159,
-      "roomId": 276,
-      "subjectId": 371,
-      "teacherId": 388
-    },
-    {
-      "classGroupId": 256,
-      "day": "Friday",
-      "lessonInstanceId": 4,
-      "lessonNumber": 2,
-      "requirementId": 1159,
-      "roomId": 278,
-      "subjectId": 371,
-      "teacherId": 388
-    },
-    {
-      "classGroupId": 256,
-      "day": "Monday",
-      "lessonInstanceId": 5,
-      "lessonNumber": 0,
-      "requirementId": 1160,
-      "roomId": 277,
-      "subjectId": 372,
-      "teacherId": 389
-    },
-    {
-      "classGroupId": 256,
-      "day": "Friday",
-      "lessonInstanceId": 6,
-      "lessonNumber": 3,
-      "requirementId": 1160,
-      "roomId": 277,
-      "subjectId": 372,
-      "teacherId": 389
-    },
-    {
-      "classGroupId": 256,
-      "day": "Wednesday",
-      "lessonInstanceId": 7,
-      "lessonNumber": 0,
-      "requirementId": 1160,
-      "roomId": 276,
-      "subjectId": 372,
-      "teacherId": 389
-    },
-    {
-      "classGroupId": 256,
-      "day": "Friday",
-      "lessonInstanceId": 8,
-      "lessonNumber": 7,
-      "requirementId": 1161,
-      "roomId": 278,
-      "subjectId": 373,
-      "teacherId": 390
-    },
-    {
-      "classGroupId": 256,
-      "day": "Thursday",
-      "lessonInstanceId": 9,
-      "lessonNumber": 7,
-      "requirementId": 1161,
-      "roomId": 278,
-      "subjectId": 373,
-      "teacherId": 390
-    },
-    {
-      "classGroupId": 257,
-      "day": "Thursday",
-      "lessonInstanceId": 10,
-      "lessonNumber": 3,
-      "requirementId": 1162,
-      "roomId": 275,
-      "subjectId": 371,
-      "teacherId": 388
-    },
-    {
-      "classGroupId": 257,
-      "day": "Tuesday",
-      "lessonInstanceId": 11,
-      "lessonNumber": 5,
-      "requirementId": 1162,
-      "roomId": 276,
-      "subjectId": 371,
-      "teacherId": 388
-    },
-    {
-      "classGroupId": 257,
-      "day": "Thursday",
-      "lessonInstanceId": 12,
-      "lessonNumber": 6,
-      "requirementId": 1162,
-      "roomId": 276,
-      "subjectId": 371,
-      "teacherId": 388
-    },
-    {
-      "classGroupId": 257,
-      "day": "Wednesday",
-      "lessonInstanceId": 13,
-      "lessonNumber": 3,
-      "requirementId": 1162,
-      "roomId": 276,
-      "subjectId": 371,
-      "teacherId": 388
-    },
-    {
-      "classGroupId": 257,
-      "day": "Tuesday",
-      "lessonInstanceId": 14,
-      "lessonNumber": 3,
-      "requirementId": 1163,
-      "roomId": 276,
-      "subjectId": 372,
-      "teacherId": 389
-    },
-    {
-      "classGroupId": 257,
-      "day": "Friday",
-      "lessonInstanceId": 15,
-      "lessonNumber": 0,
-      "requirementId": 1163,
-      "roomId": 276,
-      "subjectId": 372,
-      "teacherId": 389
-    },
-    {
-      "classGroupId": 257,
-      "day": "Friday",
-      "lessonInstanceId": 16,
-      "lessonNumber": 4,
-      "requirementId": 1163,
-      "roomId": 276,
-      "subjectId": 372,
-      "teacherId": 389
-    },
-    {
-      "classGroupId": 257,
-      "day": "Tuesday",
-      "lessonInstanceId": 17,
-      "lessonNumber": 7,
-      "requirementId": 1164,
-      "roomId": 277,
-      "subjectId": 373,
-      "teacherId": 390
-    },
-    {
-      "classGroupId": 257,
-      "day": "Tuesday",
-      "lessonInstanceId": 18,
-      "lessonNumber": 6,
-      "requirementId": 1164,
-      "roomId": 277,
-      "subjectId": 373,
-      "teacherId": 390
-    },
-    {
-      "classGroupId": 257,
-      "day": "Thursday",
-      "lessonInstanceId": 19,
-      "lessonNumber": 4,
-      "requirementId": 1165,
-      "roomId": 278,
-      "subjectId": 371,
+      "availableCount": 5,
+      "classGroupId": 0,
+      "code": "TeacherInsufficientAvailability",
+      "dayIndex": -1,
+      "message": "Teacher Magdalena Kozłowska (ID 391) requires 6 weekly lessons, but has only 5 available time periods.",
+      "requiredCount": 6,
+      "requirementId": 0,
+      "roomId": 0,
+      "severity": "Error",
+      "slotIndex": -1,
+      "subjectId": 0,
       "teacherId": 391
-    },
-    {
-      "classGroupId": 257,
-      "day": "Wednesday",
-      "lessonInstanceId": 20,
-      "lessonNumber": 7,
-      "requirementId": 1165,
-      "roomId": 276,
-      "subjectId": 371,
-      "teacherId": 391
-    },
-    {
-      "classGroupId": 257,
-      "day": "Thursday",
-      "lessonInstanceId": 21,
-      "lessonNumber": 0,
-      "requirementId": 1165,
-      "roomId": 277,
-      "subjectId": 371,
-      "teacherId": 391
-    },
-    {
-      "classGroupId": 257,
-      "day": "Wednesday",
-      "lessonInstanceId": 22,
-      "lessonNumber": 6,
-      "requirementId": 1165,
-      "roomId": 275,
-      "subjectId": 371,
-      "teacherId": 391
-    },
-    {
-      "classGroupId": 258,
-      "day": "Thursday",
-      "lessonInstanceId": 23,
-      "lessonNumber": 1,
-      "requirementId": 1166,
-      "roomId": 275,
-      "subjectId": 375,
-      "teacherId": 391
-    },
-    {
-      "classGroupId": 258,
-      "day": "Thursday",
-      "lessonInstanceId": 24,
-      "lessonNumber": 2,
-      "requirementId": 1166,
-      "roomId": 275,
-      "subjectId": 375,
-      "teacherId": 391
-    },
-    {
-      "classGroupId": 259,
-      "day": "Wednesday",
-      "lessonInstanceId": 25,
-      "lessonNumber": 4,
-      "requirementId": 1167,
-      "roomId": 276,
-      "subjectId": 371,
-      "teacherId": 388
     }
   ],
-  "success": true
+  "scheduledLessons": [],
+  "success": false
 }

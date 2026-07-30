@@ -15,6 +15,7 @@
 #include "Engine.h"
 #include "ChromosomeDecoder.h"
 #include <ScheduledLessonResultJsonWriter.h>
+#include <Preprocessing/TimetablePreprocessor.h>
 
 int Engine::execute(
     const TimetableProblem& problem,
@@ -22,6 +23,19 @@ int Engine::execute(
 {
     try
     {
+        TimetablePreprocessor preprocessor;
+        ResultJsonWriter writer;
+
+        PreprocessingResult preprocessingResult =
+            preprocessor.process(problem);
+
+        if (!preprocessingResult.canOptimize)
+        {
+            result = writer.writePreprocessingFailure(preprocessingResult);
+            return 0;
+        }
+
+
         std::vector<ScheduleSlot> scheduleSlots =
             ScheduleSlotGenerator::generate(problem);
 
@@ -30,11 +44,8 @@ int Engine::execute(
 
         FitnessEvaluator fitnessEvaluator;
 
-        const auto startTime =
-            std::chrono::steady_clock::now();
-
-        GeneticOptimizer optimizer(
-            problem.optimizationSettings.randomSeed);
+        const auto startTime = std::chrono::steady_clock::now();
+        GeneticOptimizer optimizer(problem.optimizationSettings.randomSeed);
 
         const int generations = 1000;
         const int populationSize = 100;
@@ -104,10 +115,10 @@ int Engine::execute(
             .count();
 
         OptimizationInfo feedback;
-        feedback.Message =
-            std::to_string(durationMilliseconds);
-
-        ScheduledLessonResultJsonWriter writer;
+        feedback.durationMilliseconds = durationMilliseconds;
+        feedback.iterations = problem.optimizationSettings.iterations; //why copy input to output ?
+        feedback.randomSeed = problem.optimizationSettings.randomSeed; //why copy input to output ?
+      
 
         result = writer.writeSuccess(
             initialPenalty,

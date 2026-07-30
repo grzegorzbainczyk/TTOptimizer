@@ -54,6 +54,9 @@
     <ClCompile Include="GeneticOptimizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\Preprocessing\TimetablePreprocessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\nlohmann\json.hpp">
@@ -95,13 +98,28 @@
     <ClInclude Include="include\TimetableProblemJsonReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FitnessScore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Optimization\GeneticOptimizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ChromosomeDecoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Evaluation\FitnessScore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Preprocessing\PreprocessingModels.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Preprocessing\StructuralProblemValidator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Preprocessing\ReferenceIntegrityValidator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Preprocessing\AvailabilityValidator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Preprocessing\TimetablePreprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

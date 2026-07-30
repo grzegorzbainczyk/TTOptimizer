@@ -132,6 +132,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GeneticOptimizer.cpp" />
+    <ClCompile Include="include\Preprocessing\TimetablePreprocessor.cpp" />
     <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Optimization\ChromosomeMutator.cpp" />
@@ -140,18 +141,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\nlohmann\json.hpp" />
-    <ClInclude Include="FitnessScore.h" />
     <ClInclude Include="include\ChromosomeDecoder.h" />
     <ClInclude Include="include\Domain\TimeTableModels.h" />
     <ClInclude Include="include\Domain\TimetableProblem.h" />
     <ClInclude Include="include\Evaluation\ChromosomeValidator.h" />
     <ClInclude Include="include\Evaluation\FitnessEvaluator.h" />
+    <ClInclude Include="include\Evaluation\FitnessScore.h" />
     <ClInclude Include="include\Generators\ChromosomeFactory.h" />
     <ClInclude Include="include\Generators\LessonInstanceGenerator.h" />
     <ClInclude Include="include\Generators\ScheduleSlotGenerator.h" />
     <ClInclude Include="include\Optimization\ChromosomeMutator.h" />
     <ClInclude Include="include\Optimization\GeneticOptimizer.h" />
     <ClInclude Include="include\Engine.h" />
+    <ClInclude Include="include\Preprocessing\AvailabilityValidator.h" />
+    <ClInclude Include="include\Preprocessing\PreprocessingModels.h" />
+    <ClInclude Include="include\Preprocessing\ReferenceIntegrityValidator.h" />
+    <ClInclude Include="include\Preprocessing\StructuralProblemValidator.h" />
+    <ClInclude Include="include\Preprocessing\TimetablePreprocessor.h" />
     <ClInclude Include="include\ScheduledLessonResultJsonWriter.h" />
     <ClInclude Include="include\TimetableProblemJsonReader.h" />
     <ClInclude Include="include\Utils\Utils.h" />
