@@ -1,5 +1,27 @@
 ﻿const STORAGE_KEYS = {
-    lastOptimizationResult: "ttorganizer.lastOptimizationResult"
+    lastOptimizationResult: "ttorganizer.lastOptimizationResult",
+    optimizationSettings: "classflow.optimizationSettings"
+};
+
+const DEFAULT_OPTIMIZATION_SETTINGS = {
+    populationSize: 100,
+    iterations: 10000,
+    eliteCount: 5,
+    tournamentSize: 3,
+    mutationAttempts: 5,
+    mutationProbability: 1.0,
+    randomSeed: 12345,
+    threadCount: 1,
+    stopWhenPerfect: true,
+    stagnationGenerationLimit: 0,
+    enableProgressLogging: true,
+    progressLogInterval: 100,
+    penalties: {
+        low: 10,
+        medium: 100,
+        high: 1000,
+        hard: 1000000
+    }
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -7,29 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupOptimization();
     setupClearResult();
     setupExportCsv();
-
     loadLastOptimizationResultFromStorage();
-});
-
-const optimizationLevelInput =
-    document.getElementById("optimizationLevel");
-
-const optimizationLevelDescription =
-    document.getElementById(
-        "optimizationLevelDescription"
-    );
-
-const optimizationLevelDescriptions = {
-    1: "Fast search",
-    2: "Balanced search",
-    3: "Thorough search"
-};
-
-optimizationLevelInput.addEventListener("input", () => {
-    optimizationLevelDescription.textContent =
-        optimizationLevelDescriptions[
-        optimizationLevelInput.value
-        ];
 });
 
 function setupNavigation() {
@@ -38,8 +38,9 @@ function setupNavigation() {
     setupNavigationButton("roomsButton", "rooms.html");
     setupNavigationButton("subjectsButton", "subjects.html");
     setupNavigationButton("requirementsButton", "requirements.html");
-    setupNavigationButton("aboutProjectButton", "about.html");
     setupNavigationButton("rulesButton", "rules.html");
+    setupNavigationButton("aboutProjectButton", "about.html");
+    setupNavigationButton("optimizationSettingsButton", "optimization-settings.html");
 }
 
 function setupNavigationButton(buttonId, targetUrl) {
@@ -63,9 +64,7 @@ function setupOptimization() {
         return;
     }
 
-    runOptimizationButton.addEventListener("click", async () => {
-        await runOptimization();
-    });
+    runOptimizationButton.addEventListener("click", runOptimization);
 }
 
 function setupClearResult() {
@@ -76,9 +75,7 @@ function setupClearResult() {
         return;
     }
 
-    clearResultButton.addEventListener("click", () => {
-        clearOptimizationResult();
-    });
+    clearResultButton.addEventListener("click", clearOptimizationResult);
 }
 
 function setupExportCsv() {
@@ -94,32 +91,32 @@ function setupExportCsv() {
 
 async function runOptimization() {
     const statusText = document.getElementById("statusText");
+    const runButton = document.getElementById("runOptimizationButton");
 
     try {
+        clearOptimizationResultForNewRun();
         setStatus("Running optimization...");
+        setRunningState(true);
 
         let organizationId;
 
         try {
-            organizationId = Number(
-                window.appContext.requireOrganizationId()
-            );
+            organizationId = Number(window.appContext.requireOrganizationId());
         } catch (error) {
             console.error(error);
             alert("Organization context is missing.");
             return;
         }
 
-        const optimizationLevel = Number(optimizationLevelInput.value);
+        const optimizationSettings = loadOptimizationSettings();
 
-        const response = await fetch(
-            `/api/optimization/run` +
-            `?organizationId=${organizationId}` +
-            `&optimizationLevel=${optimizationLevel}`,
-            {
-                method: "POST"
-            }
-        );
+        const response = await fetch(`/api/optimization/run?organizationId=${organizationId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(optimizationSettings)
+        });
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -134,14 +131,14 @@ async function runOptimization() {
         console.log("Optimization result:", data);
 
         renderOptimizationResult(data);
-
         saveLastOptimizationResultToStorage(data);
-
         setStatus("Optimization finished.");
     } catch (error) {
         setStatus("Error while running optimization.");
         console.error("Error while running optimization:", error);
         alert("Error while running optimization. Check console for details.");
+    } finally {
+        setRunningState(false);
     }
 
     function setStatus(message) {
@@ -149,48 +146,74 @@ async function runOptimization() {
             statusText.textContent = message;
         }
     }
+
+    function setRunningState(isRunning) {
+        if (!runButton) {
+            return;
+        }
+
+        runButton.disabled = isRunning;
+        runButton.textContent = isRunning ? "Running..." : "Run optimization";
+    }
+}
+
+function loadOptimizationSettings() {
+    const savedJson = localStorage.getItem(STORAGE_KEYS.optimizationSettings);
+
+    if (!savedJson) {
+        return {
+            ...DEFAULT_OPTIMIZATION_SETTINGS,
+            penalties: { ...DEFAULT_OPTIMIZATION_SETTINGS.penalties }
+        };
+    }
+
+    try {
+        const savedSettings = JSON.parse(savedJson);
+
+        return {
+            ...DEFAULT_OPTIMIZATION_SETTINGS,
+            ...savedSettings,
+            penalties: {
+                ...DEFAULT_OPTIMIZATION_SETTINGS.penalties,
+                ...(savedSettings.penalties ?? {})
+            }
+        };
+    } catch (error) {
+        console.error("Could not read optimization settings from localStorage.", error);
+        localStorage.removeItem(STORAGE_KEYS.optimizationSettings);
+
+        return {
+            ...DEFAULT_OPTIMIZATION_SETTINGS,
+            penalties: { ...DEFAULT_OPTIMIZATION_SETTINGS.penalties }
+        };
+    }
 }
 
 function normalizeOptimizationResult(data) {
     let result = data?.result ?? data ?? {};
 
-    /*
-     * Czasami backend zwraca wynik C++ jako tekst JSON,
-     * zamiast jako gotowy obiekt JavaScript.
-     */
     if (typeof result === "string") {
         try {
             result = JSON.parse(result);
         } catch (error) {
-            console.error(
-                "Could not parse optimization result JSON.",
-                error
-            );
+            console.error("Could not parse optimization result JSON.", error);
 
             return {
                 success: false,
                 canOptimize: false,
-                message:
-                    "The optimization result could not be parsed.",
+                message: "The optimization result could not be parsed.",
                 preprocessingIssues: [],
                 scheduledLessons: []
             };
         }
     }
 
-    /*
-     * Obsługa dodatkowego zagnieżdżenia, jeśli API zwraca:
-     * { result: { result: ... } }
-     */
     if (result?.result) {
         if (typeof result.result === "string") {
             try {
                 return JSON.parse(result.result);
             } catch (error) {
-                console.error(
-                    "Could not parse nested optimization result.",
-                    error
-                );
+                console.error("Could not parse nested optimization result.", error);
             }
         }
 
@@ -202,132 +225,59 @@ function normalizeOptimizationResult(data) {
     return result;
 }
 
-
 function renderOptimizationResult(data) {
     const result = normalizeOptimizationResult(data);
 
-    console.log(
-        "Normalized optimization result:",
-        result
-    );
+    console.log("Normalized optimization result:", result);
 
-    const scheduledLessons =
-        Array.isArray(result.scheduledLessons)
-            ? result.scheduledLessons
-            : [];
+    const scheduledLessons = Array.isArray(result.scheduledLessons) ? result.scheduledLessons : [];
+    const preprocessingIssues = Array.isArray(result.preprocessingIssues) ? result.preprocessingIssues : [];
 
-    const preprocessingIssues =
-        Array.isArray(result.preprocessingIssues)
-            ? result.preprocessingIssues
-            : [];
-
-    const optimizationFailed =
-        result.success === false;
-
+    const optimizationFailed = result.success === false;
     const preprocessingFailed =
         result.canOptimize === false ||
-        preprocessingIssues.some(issue =>
-            String(issue.severity).toLowerCase() === "error"
-        );
+        preprocessingIssues.some(issue => String(issue.severity).toLowerCase() === "error");
 
     if (optimizationFailed || preprocessingFailed) {
-        renderPreprocessingFailure(
-            result,
-            preprocessingIssues
-        );
-
+        renderPreprocessingFailure(result, preprocessingIssues);
         populateFilters([]);
         renderScheduledLessonRows([]);
-
         return;
     }
 
-    renderOptimizationSuccess(
-        result,
-        scheduledLessons
-    );
-
+    renderOptimizationSuccess(result, scheduledLessons);
     populateFilters(scheduledLessons);
     renderScheduledLessonRows(scheduledLessons);
 }
 
-function renderPreprocessingFailure(
-    result,
-    preprocessingIssues
-) {
+function renderPreprocessingFailure(result, preprocessingIssues) {
     const generalMessage =
         result.message ??
         result.error ??
         result.optimizationInfo?.message ??
         "The input data contains blocking errors.";
 
-    setResultMessage(
-        "error",
-        "Optimization cannot be started",
-        generalMessage
-    );
-
-    renderPreprocessingIssues(
-        preprocessingIssues
-    );
-
+    setResultMessage("error", "Optimization cannot be started", generalMessage);
+    renderPreprocessingIssues(preprocessingIssues);
     setTimetableContentVisible(false);
 }
 
+function renderOptimizationSuccess(result, scheduledLessons) {
+    const lessonCount = scheduledLessons.length;
+    const message = result.optimizationInfo?.message ?? `The optimizer scheduled ${lessonCount} lessons.`;
 
-function renderOptimizationSuccess(
-    result,
-    scheduledLessons
-) {
-    const lessonCount =
-        scheduledLessons.length;
-
-    const optimizationMessage =
-        result.optimizationInfo?.message;
-
-    const message =
-        optimizationMessage ??
-        `The optimizer scheduled ${lessonCount} lessons.`;
-
-    setResultMessage(
-        "success",
-        "Optimization completed",
-        message
-    );
-
+    setResultMessage("success", "Optimization completed", message);
     hidePreprocessingIssues();
     setTimetableContentVisible(true);
 }
 
+function setResultMessage(type, title, message) {
+    const panel = document.getElementById("resultMessagePanel");
+    const titleElement = document.getElementById("resultMessageTitle");
+    const messageElement = document.getElementById("resultMessageText");
+    const iconElement = panel?.querySelector(".result-message-icon");
 
-function setResultMessage(
-    type,
-    title,
-    message
-) {
-    const panel =
-        document.getElementById(
-            "resultMessagePanel"
-        );
-
-    const titleElement =
-        document.getElementById(
-            "resultMessageTitle"
-        );
-
-    const messageElement =
-        document.getElementById(
-            "resultMessageText"
-        );
-
-    const iconElement =
-        panel?.querySelector(
-            ".result-message-icon"
-        );
-
-    if (!panel ||
-        !titleElement ||
-        !messageElement) {
+    if (!panel || !titleElement || !messageElement) {
         return;
     }
 
@@ -338,56 +288,34 @@ function setResultMessage(
         "result-message-warning"
     );
 
-    panel.classList.add(
-        `result-message-${type}`
-    );
-
+    panel.classList.add(`result-message-${type}`);
     titleElement.textContent = title;
     messageElement.textContent = message;
 
     if (iconElement) {
-        iconElement.textContent =
-            getResultMessageIcon(type);
+        iconElement.textContent = getResultMessageIcon(type);
     }
 }
-
 
 function getResultMessageIcon(type) {
     switch (type) {
         case "success":
             return "✓";
-
         case "error":
             return "!";
-
         case "warning":
             return "⚠";
-
         default:
             return "i";
     }
 }
 
-
 function renderPreprocessingIssues(issues) {
-    const details =
-        document.getElementById(
-            "preprocessingDetails"
-        );
+    const details = document.getElementById("preprocessingDetails");
+    const issuesList = document.getElementById("preprocessingIssuesList");
+    const issueCount = document.getElementById("preprocessingIssueCount");
 
-    const issuesList =
-        document.getElementById(
-            "preprocessingIssuesList"
-        );
-
-    const issueCount =
-        document.getElementById(
-            "preprocessingIssueCount"
-        );
-
-    if (!details ||
-        !issuesList ||
-        !issueCount) {
+    if (!details || !issuesList || !issueCount) {
         return;
     }
 
@@ -399,53 +327,31 @@ function renderPreprocessingIssues(issues) {
     }
 
     for (const issue of issues) {
-        const listItem =
-            document.createElement("li");
+        const listItem = document.createElement("li");
+        const severity = String(issue.severity ?? "Error").toLowerCase();
 
-        const severity =
-            String(
-                issue.severity ?? "Error"
-            ).toLowerCase();
+        listItem.className = `preprocessing-issue preprocessing-issue-${severity}`;
 
-        listItem.className =
-            `preprocessing-issue preprocessing-issue-${severity}`;
+        const heading = document.createElement("div");
+        heading.className = "preprocessing-issue-heading";
 
-        const heading =
-            document.createElement("div");
+        const title = document.createElement("strong");
+        title.textContent = formatIssueCode(issue.code);
 
-        heading.className =
-            "preprocessing-issue-heading";
-
-        const title =
-            document.createElement("strong");
-
-        title.textContent =
-            formatIssueCode(issue.code);
-
-        const badge =
-            document.createElement("span");
-
-        badge.className =
-            "preprocessing-issue-severity";
-
-        badge.textContent =
-            issue.severity ?? "Error";
+        const badge = document.createElement("span");
+        badge.className = "preprocessing-issue-severity";
+        badge.textContent = issue.severity ?? "Error";
 
         heading.appendChild(title);
         heading.appendChild(badge);
 
-        const message =
-            document.createElement("p");
-
-        message.textContent =
-            issue.message ??
-            "An unspecified preprocessing problem was found.";
+        const message = document.createElement("p");
+        message.textContent = issue.message ?? "An unspecified preprocessing problem was found.";
 
         listItem.appendChild(heading);
         listItem.appendChild(message);
 
-        const counts =
-            createIssueCountsElement(issue);
+        const counts = createIssueCountsElement(issue);
 
         if (counts) {
             listItem.appendChild(counts);
@@ -454,62 +360,31 @@ function renderPreprocessingIssues(issues) {
         issuesList.appendChild(listItem);
     }
 
-    issueCount.textContent =
-        issues.length === 1
-            ? "1 problem"
-            : `${issues.length} problems`;
-
+    issueCount.textContent = issues.length === 1 ? "1 problem" : `${issues.length} problems`;
     details.classList.remove("hidden");
 }
 
-
 function createIssueCountsElement(issue) {
-    const hasRequiredCount =
-        Number.isFinite(
-            Number(issue.requiredCount)
-        );
+    const requiredCount = Number(issue.requiredCount);
+    const availableCount = Number(issue.availableCount);
 
-    const hasAvailableCount =
-        Number.isFinite(
-            Number(issue.availableCount)
-        );
-
-    if (!hasRequiredCount ||
-        !hasAvailableCount) {
+    if (!Number.isFinite(requiredCount) || !Number.isFinite(availableCount)) {
         return null;
     }
 
-    const requiredCount =
-        Number(issue.requiredCount);
-
-    const availableCount =
-        Number(issue.availableCount);
-
-    if (requiredCount === 0 &&
-        availableCount === 0) {
+    if (requiredCount === 0 && availableCount === 0) {
         return null;
     }
 
-    const element =
-        document.createElement("div");
-
-    element.className =
-        "preprocessing-issue-counts";
-
+    const element = document.createElement("div");
+    element.className = "preprocessing-issue-counts";
     element.innerHTML = `
-        <span>
-            Required:
-            <strong>${requiredCount}</strong>
-        </span>
-        <span>
-            Available:
-            <strong>${availableCount}</strong>
-        </span>
+        <span>Required: <strong>${requiredCount}</strong></span>
+        <span>Available: <strong>${availableCount}</strong></span>
     `;
 
     return element;
 }
-
 
 function formatIssueCode(code) {
     if (!code) {
@@ -521,42 +396,19 @@ function formatIssueCode(code) {
         .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2");
 }
 
-
 function hidePreprocessingIssues() {
-    const details =
-        document.getElementById(
-            "preprocessingDetails"
-        );
+    const details = document.getElementById("preprocessingDetails");
+    const issuesList = document.getElementById("preprocessingIssuesList");
 
-    const issuesList =
-        document.getElementById(
-            "preprocessingIssuesList"
-        );
-
-    if (details) {
-        details.classList.add("hidden");
-    }
+    details?.classList.add("hidden");
 
     if (issuesList) {
         issuesList.innerHTML = "";
     }
 }
 
-
 function setTimetableContentVisible(isVisible) {
-    const timetableContent =
-        document.getElementById(
-            "timetableContent"
-        );
-
-    if (!timetableContent) {
-        return;
-    }
-
-    timetableContent.classList.toggle(
-        "hidden",
-        !isVisible
-    );
+    document.getElementById("timetableContent")?.classList.toggle("hidden", !isVisible);
 }
 
 function renderScheduledLessonRows(scheduledLessons) {
@@ -607,12 +459,8 @@ function renderScheduledLessonRows(scheduledLessons) {
 }
 
 function populateFilters(scheduledLessons) {
-    const classFilter = document.getElementById("classFilter");
-    const teacherFilter = document.getElementById("teacherFilter");
-    const roomFilter = document.getElementById("roomFilter");
-
     fillSelect(
-        classFilter,
+        document.getElementById("classFilter"),
         scheduledLessons
             .map(x => x.classGroup ?? x.classGroupName ?? x.classGroupId)
             .filter(x => x !== undefined && x !== null && x !== ""),
@@ -620,7 +468,7 @@ function populateFilters(scheduledLessons) {
     );
 
     fillSelect(
-        teacherFilter,
+        document.getElementById("teacherFilter"),
         scheduledLessons
             .map(x => x.teacher ?? x.teacherName ?? x.teacherId)
             .filter(x => x !== undefined && x !== null && x !== ""),
@@ -628,7 +476,7 @@ function populateFilters(scheduledLessons) {
     );
 
     fillSelect(
-        roomFilter,
+        document.getElementById("roomFilter"),
         scheduledLessons
             .map(x => x.room ?? x.roomName ?? x.roomId)
             .filter(x => x !== undefined && x !== null && x !== ""),
@@ -659,6 +507,7 @@ function fillSelect(selectElement, values, defaultText) {
         selectElement.appendChild(option);
     }
 }
+
 function setupFilterEvents() {
     const classFilter = document.getElementById("classFilter");
     const teacherFilter = document.getElementById("teacherFilter");
@@ -682,77 +531,70 @@ function applyFilters() {
     const teacherValue = document.getElementById("teacherFilter")?.value ?? "";
     const roomValue = document.getElementById("roomFilter")?.value ?? "";
 
-    const rows = document.querySelectorAll("#timetableBody tr");
+    for (const row of document.querySelectorAll("#timetableBody tr")) {
+        const matchesClass = !classValue || row.dataset.classValue === classValue;
+        const matchesTeacher = !teacherValue || row.dataset.teacherValue === teacherValue;
+        const matchesRoom = !roomValue || row.dataset.roomValue === roomValue;
 
-    for (const row of rows) {
-        const matchesClass =
-            !classValue || row.dataset.classValue === classValue;
-
-        const matchesTeacher =
-            !teacherValue || row.dataset.teacherValue === teacherValue;
-
-        const matchesRoom =
-            !roomValue || row.dataset.roomValue === roomValue;
-
-        row.style.display =
-            matchesClass && matchesTeacher && matchesRoom ? "" : "none";
+        row.style.display = matchesClass && matchesTeacher && matchesRoom ? "" : "none";
     }
 }
 
-
 function clearOptimizationResult() {
+    setResultMessage("neutral", "No optimization result yet", "Run the optimizer to generate a timetable.");
+
+    hidePreprocessingIssues();
+    setTimetableContentVisible(true);
+    setText("statusText", "Ready.");
+
+    const timetableBody = document.getElementById("timetableBody");
+
+    if (timetableBody) {
+        timetableBody.innerHTML = `
+            <tr>
+                <td colspan="7">No timetable generated yet.</td>
+            </tr>
+        `;
+    }
+
+    resetSelect("classFilter", "All classes");
+    resetSelect("teacherFilter", "All teachers");
+    resetSelect("roomFilter", "All rooms");
+    clearLastOptimizationResultFromStorage();
+}
+
+function clearOptimizationResultForNewRun() {
     setResultMessage(
         "neutral",
-        "No optimization result yet",
-        "Run the optimizer to generate a timetable."
+        "Optimization in progress",
+        "The previous result has been cleared. Please wait for the new timetable."
     );
 
     hidePreprocessingIssues();
     setTimetableContentVisible(true);
 
-    setText("statusText", "Ready.");
-
-    const timetableBody =
-        document.getElementById(
-            "timetableBody"
-        );
+    const timetableBody = document.getElementById("timetableBody");
 
     if (timetableBody) {
         timetableBody.innerHTML = `
             <tr>
-                <td colspan="7">
-                    No timetable generated yet.
-                </td>
+                <td colspan="7">Optimization is running...</td>
             </tr>
         `;
     }
 
-    resetSelect(
-        "classFilter",
-        "All classes"
-    );
-
-    resetSelect(
-        "teacherFilter",
-        "All teachers"
-    );
-
-    resetSelect(
-        "roomFilter",
-        "All rooms"
-    );
-
+    resetSelect("classFilter", "All classes");
+    resetSelect("teacherFilter", "All teachers");
+    resetSelect("roomFilter", "All rooms");
     clearLastOptimizationResultFromStorage();
 }
 
 function resetSelect(selectId, defaultText) {
     const select = document.getElementById(selectId);
 
-    if (!select) {
-        return;
+    if (select) {
+        select.innerHTML = `<option value="">${defaultText}</option>`;
     }
-
-    select.innerHTML = `<option value="">${defaultText}</option>`;
 }
 
 function setText(elementId, value) {
@@ -763,14 +605,9 @@ function setText(elementId, value) {
     }
 }
 
-// -------------  Storage  ----------------
-
 function saveLastOptimizationResultToStorage(data) {
     try {
-        localStorage.setItem(
-            STORAGE_KEYS.lastOptimizationResult,
-            JSON.stringify(data)
-        );
+        localStorage.setItem(STORAGE_KEYS.lastOptimizationResult, JSON.stringify(data));
     } catch (error) {
         console.error("Could not save optimization result to localStorage.", error);
     }
@@ -787,13 +624,10 @@ function loadLastOptimizationResultFromStorage() {
         const data = JSON.parse(savedJson);
 
         renderOptimizationResult(data);
-
         setText("statusText", "Loaded last optimization result.");
     } catch (error) {
         console.error("Could not load optimization result from localStorage.", error);
-
         localStorage.removeItem(STORAGE_KEYS.lastOptimizationResult);
-
         setText("statusText", "Could not load saved result.");
     }
 }
@@ -801,15 +635,10 @@ function loadLastOptimizationResultFromStorage() {
 function clearLastOptimizationResultFromStorage() {
     localStorage.removeItem(STORAGE_KEYS.lastOptimizationResult);
 }
-// ------------- end of Storage  ----------------
 
-//----------    Export CSV ---------------------
 function escapeCsvValue(value) {
     const safeValue = String(value ?? "");
-
-    const escaped = safeValue.replaceAll('"', '""');
-
-    return `"${escaped}"`;
+    return `"${safeValue.replaceAll('"', '""')}"`;
 }
 
 function exportVisibleTimetableRowsToCsv() {
@@ -820,9 +649,7 @@ function exportVisibleTimetableRowsToCsv() {
         return;
     }
 
-    const csvRows = [];
-
-    csvRows.push([
+    const csvRows = [[
         "Day",
         "Lesson number",
         "Lesson",
@@ -830,7 +657,7 @@ function exportVisibleTimetableRowsToCsv() {
         "Subject",
         "Teacher",
         "Room"
-    ]);
+    ]];
 
     let exportedRowsCount = 0;
 
@@ -845,11 +672,7 @@ function exportVisibleTimetableRowsToCsv() {
             continue;
         }
 
-        const values = Array.from(cells).map(cell =>
-            escapeCsvValue(cell.textContent.trim())
-        );
-
-        csvRows.push(values);
+        csvRows.push(Array.from(cells).map(cell => escapeCsvValue(cell.textContent.trim())));
         exportedRowsCount++;
     }
 
@@ -858,19 +681,14 @@ function exportVisibleTimetableRowsToCsv() {
         return;
     }
 
-    const csvContent = "\uFEFF" + csvRows
-        .map(row => row.join(";"))
-        .join("\r\n");
-
-    const blob = new Blob([csvContent], {
-        type: "text/csv;charset=utf-8;"
-    });
-
+    const csvContent = "﻿" + csvRows.map(row => row.join(";")).join("");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-
     const link = document.createElement("a");
+
     link.href = url;
     link.download = "timetable.csv";
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

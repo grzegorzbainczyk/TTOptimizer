@@ -153,6 +153,86 @@
       "slotIndex": 3
     },
     {
+      "teacherId": 390,
+      "dayIndex": 0,
+      "slotIndex": 0
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 0,
+      "slotIndex": 1
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 0,
+      "slotIndex": 2
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 0,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 0,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 0,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 0,
+      "slotIndex": 6
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 0,
+      "slotIndex": 7
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 1,
+      "slotIndex": 0
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 1,
+      "slotIndex": 1
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 1,
+      "slotIndex": 2
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 1,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 1,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 1,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 1,
+      "slotIndex": 6
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 1,
+      "slotIndex": 7
+    },
+    {
       "teacherId": 391,
       "dayIndex": 0,
       "slotIndex": 0
@@ -231,81 +311,6 @@
       "teacherId": 391,
       "dayIndex": 1,
       "slotIndex": 7
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 2,
-      "slotIndex": 0
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 2,
-      "slotIndex": 1
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 2,
-      "slotIndex": 2
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 2,
-      "slotIndex": 3
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 2,
-      "slotIndex": 4
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 2,
-      "slotIndex": 5
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 3,
-      "slotIndex": 3
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 3,
-      "slotIndex": 4
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 3,
-      "slotIndex": 5
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 3,
-      "slotIndex": 6
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 3,
-      "slotIndex": 7
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 4,
-      "slotIndex": 0
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 4,
-      "slotIndex": 1
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 4,
-      "slotIndex": 2
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 4,
-      "slotIndex": 3
     },
     {
       "teacherId": 391,
@@ -331,7 +336,23 @@
   "classGroupUnavailabilities": [],
   "roomUnavailabilities": [],
   "optimizationSettings": {
-    "iterations": 100,
-    "randomSeed": 12345
+    "populationSize": 100,
+    "iterations": 10000,
+    "eliteCount": 5,
+    "tournamentSize": 5,
+    "mutationAttempts": 5,
+    "mutationProbability": 1,
+    "randomSeed": 12345,
+    "threadCount": 1,
+    "stopWhenPerfect": true,
+    "stagnationGenerationLimit": 0,
+    "enableProgressLogging": true,
+    "progressLogInterval": 100,
+    "penalties": {
+      "low": 10,
+      "medium": 100,
+      "high": 1000,
+      "hard": 1000000
+    }
   }
 }

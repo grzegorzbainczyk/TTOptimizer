@@ -35,6 +35,48 @@
         box-shadow: var(--shadow-soft);
     }
 
+.icon-button {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.settings-button {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .settings-button:hover {
+        background: rgba(255, 255, 255, 0.28);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(35, 74, 140, 0.18);
+    }
+
+    .settings-button:active {
+        transform: translateY(0);
+    }
+
+.settings-button-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
 
 /* =========================================================
    Cards

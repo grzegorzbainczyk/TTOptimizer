@@ -123,8 +123,8 @@ public class CppOptimizerService
         }
         finally
         {
-            TryDeleteFile(inputPath);
-            TryDeleteFile(outputPath);
+            //TryDeleteFile(inputPath);
+            //TryDeleteFile(outputPath);
         }
     }
 

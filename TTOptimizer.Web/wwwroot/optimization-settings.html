@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassFlow - Optimization settings</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/optimization-settings.css" />
+</head>
+<body>
+    <main class="app-shell">
+        <div class="app-container">
+            <header class="app-header app-hero">
+                <div class="hero-title-row">
+                    <img src="images/logos/logo.png" alt="ClassFlow logo" class="app-logo">
+                    <div class="hero-content">
+                        <div class="hero-badge">Developer configuration</div>
+                        <h1>Optimization settings</h1>
+                        <p class="hero-subtitle">Configure parameters used by the genetic optimization engine.</p>
+                        <p class="hero-tech">These settings are stored locally in this browser.</p>
+                    </div>
+                </div>
+            </header>
+
+            <section class="app-card app-panel settings-page">
+                <div class="settings-page-header">
+                    <div>
+                        <h2>Genetic algorithm configuration</h2>
+                        <p>Values saved here are intended for development and testing.</p>
+                    </div>
+                    <button id="backToMainButton" class="app-button app-button-secondary" type="button">Back to main</button>
+                </div>
+
+                <form id="optimizationSettingsForm">
+                    <section class="settings-section">
+                        <h3>Genetic algorithm</h3>
+                        <div class="settings-grid">
+                            <label class="settings-field" for="populationSize">
+                                <span>Population size</span>
+                                <input id="populationSize" name="populationSize" type="number" min="1" step="1" required />
+                                <small>Number of chromosomes in each generation.</small>
+                            </label>
+                            <label class="settings-field" for="iterations">
+                                <span>Iterations</span>
+                                <input id="iterations" name="iterations" type="number" min="1" step="1" required />
+                                <small>Maximum number of generations.</small>
+                            </label>
+                            <label class="settings-field" for="eliteCount">
+                                <span>Elite count</span>
+                                <input id="eliteCount" name="eliteCount" type="number" min="0" step="1" required />
+                                <small>Best chromosomes copied unchanged.</small>
+                            </label>
+                            <label class="settings-field" for="tournamentSize">
+                                <span>Tournament size</span>
+                                <input id="tournamentSize" name="tournamentSize" type="number" min="1" step="1" required />
+                                <small>Number of candidates used during parent selection.</small>
+                            </label>
+                            <label class="settings-field" for="mutationAttempts">
+                                <span>Mutation attempts</span>
+                                <input id="mutationAttempts" name="mutationAttempts" type="number" min="0" step="1" required />
+                                <small>Mutated candidates tested for each child.</small>
+                            </label>
+                            <label class="settings-field" for="mutationProbability">
+                                <span>Mutation probability</span>
+                                <input id="mutationProbability" name="mutationProbability" type="number" min="0" max="1" step="0.01" required />
+                                <small>Value from 0.0 to 1.0.</small>
+                            </label>
+                            <label class="settings-field" for="randomSeed">
+                                <span>Random seed</span>
+                                <input id="randomSeed" name="randomSeed" type="number" min="0" step="1" required />
+                                <small>Allows an optimization run to be reproduced.</small>
+                            </label>
+                            <label class="settings-field" for="threadCount">
+                                <span>Thread count</span>
+                                <input id="threadCount" name="threadCount" type="number" min="1" step="1" required />
+                                <small>Reserved for parallel evaluation.</small>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="settings-section">
+                        <h3>Stopping conditions</h3>
+                        <div class="settings-grid">
+                            <label class="settings-field settings-checkbox-field" for="stopWhenPerfect">
+                                <span>Stop when perfect</span>
+                                <span class="checkbox-row"><input id="stopWhenPerfect" name="stopWhenPerfect" type="checkbox" /> Stop after finding a feasible timetable with zero soft penalty.</span>
+                            </label>
+                            <label class="settings-field" for="stagnationGenerationLimit">
+                                <span>Stagnation generation limit</span>
+                                <input id="stagnationGenerationLimit" name="stagnationGenerationLimit" type="number" min="0" step="1" required />
+                                <small>Zero disables this condition.</small>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="settings-section">
+                        <h3>Diagnostics</h3>
+                        <div class="settings-grid">
+                            <label class="settings-field settings-checkbox-field" for="enableProgressLogging">
+                                <span>Enable progress logging</span>
+                                <span class="checkbox-row"><input id="enableProgressLogging" name="enableProgressLogging" type="checkbox" /> Write progress information to the engine console.</span>
+                            </label>
+                            <label class="settings-field" for="progressLogInterval">
+                                <span>Progress log interval</span>
+                                <input id="progressLogInterval" name="progressLogInterval" type="number" min="1" step="1" required />
+                                <small>Number of generations between progress messages.</small>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="settings-section">
+                        <h3>Penalty settings</h3>
+                        <div class="settings-grid settings-grid-penalties">
+                            <label class="settings-field" for="penaltyLow"><span>Low</span><input id="penaltyLow" name="penaltyLow" type="number" min="0" step="1" required /></label>
+                            <label class="settings-field" for="penaltyMedium"><span>Medium</span><input id="penaltyMedium" name="penaltyMedium" type="number" min="0" step="1" required /></label>
+                            <label class="settings-field" for="penaltyHigh"><span>High</span><input id="penaltyHigh" name="penaltyHigh" type="number" min="0" step="1" required /></label>
+                            <label class="settings-field" for="penaltyHard"><span>Hard</span><input id="penaltyHard" name="penaltyHard" type="number" min="0" step="1" required /></label>
+                        </div>
+                    </section>
+
+                    <div class="settings-actions">
+                        <button class="app-button app-button-primary-warm" type="submit">Save settings</button>
+                        <button id="resetSettingsButton" class="app-button app-button-secondary" type="button">Reset defaults</button>
+                    </div>
+                    <p id="settingsStatus" class="settings-status" role="status" aria-live="polite"></p>
+                </form>
+            </section>
+
+            <footer class="app-footer">Created by Grzegorz Bainczyk</footer>
+        </div>
+    </main>
+    <script src="js/optimization-settings.js"></script>
+</body>
+</html>

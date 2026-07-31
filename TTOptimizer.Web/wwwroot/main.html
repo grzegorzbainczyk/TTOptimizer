@@ -1,8 +1,10 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8" />
-    <title>TTOrganizer - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassFlow - Dashboard</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -29,6 +31,14 @@
                             Built with ASP.NET Core, C++ and JavaScript
                         </p>
                     </div>
+
+                    <button id="optimizationSettingsButton"
+                            class="settings-button"
+                            type="button"
+                            title="Optimization settings">
+                        <span class="settings-button-icon">⚙️</span>
+                        <span>Settings</span>
+                    </button>
                 </div>
             </header>
 
@@ -36,12 +46,13 @@
 
                 <aside class="resource-sidebar app-card">
                     <h2>Resources</h2>
+
                     <p class="sidebar-subtitle">
                         Manage input data used by the optimizer.
                     </p>
 
                     <button id="teachersButton" class="resource-button">
-                        <span class="resource-button-icon">👩‍🏫</span>
+                        <span class="resource-button-icon">👤</span>
                         <span>
                             <strong>Teachers</strong>
                             <small>Manage staff</small>
@@ -93,6 +104,7 @@
 
                     <section class="app-card app-panel">
                         <h2>Optimization</h2>
+
                         <p>
                             Run the C++ optimization engine and display the decoded timetable result.
                         </p>
@@ -101,30 +113,6 @@
                             <button id="runOptimizationButton" class="app-button app-button-primary-warm">
                                 Run optimization
                             </button>
-                        </div>
-
-                        <div class="optimization-depth">
-                            <label for="optimizationLevel">
-                                Optimization depth
-                            </label>
-
-                            <input id="optimizationLevel"
-                                   type="range"
-                                   min="1"
-                                   max="3"
-                                   step="1"
-                                   value="2">
-
-                            <div class="optimization-depth-labels">
-                                <span>Fast</span>
-                                <span>Balanced</span>
-                                <span>Thorough</span>
-                            </div>
-
-                            <p id="optimizationLevelDescription"
-                               class="optimization-depth-description">
-                                Balanced search
-                            </p>
                         </div>
 
                         <p id="statusText">Ready.</p>
@@ -241,7 +229,6 @@
                     </section>
 
                 </div>
-
             </div>
 
             <footer class="app-footer">
