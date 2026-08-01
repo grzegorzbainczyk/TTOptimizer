@@ -1,8 +1,9 @@
-#include <string>
-#include <iostream>
-#include <vector>
 #include <fstream>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
+
 #include "JsonReader.h"
 #include "Engine.h"
 #include "Domain/TimetableProblem.h"
@@ -11,16 +12,17 @@
 #include <Windows.h>
 #endif
 
-
 int main(int argc, char* argv[])
 {
 #ifdef _DEBUG
+    
   /*  while (!IsDebuggerPresent())
     {
         Sleep(200);
     }
 
     DebugBreak();*/
+    
 #endif
 
     if (argc < 3)
@@ -44,7 +46,17 @@ int main(int argc, char* argv[])
         std::string outputJson;
 
         Engine engine;
-        engine.execute(problem, outputJson);
+        const int engineResult = engine.execute(problem, outputJson);
+
+        if (engineResult != 0)
+        {
+            std::cerr
+                << "Optimizer engine failed with exit code: "
+                << engineResult
+                << std::endl;
+
+            return engineResult;
+        }
 
         if (outputJson.empty())
         {
@@ -76,7 +88,7 @@ int main(int argc, char* argv[])
             return 4;
         }
 
-        std::cout
+        std::cerr
             << "Optimization completed successfully."
             << std::endl;
 
@@ -100,4 +112,3 @@ int main(int argc, char* argv[])
         return 6;
     }
 }
-

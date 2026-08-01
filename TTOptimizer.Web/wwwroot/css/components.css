@@ -35,48 +35,6 @@
         box-shadow: var(--shadow-soft);
     }
 
-.icon-button {
-    width: 42px;
-    height: 42px;
-    padding: 0;
-    border-radius: 50%;
-    font-size: 1.25rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.settings-button {
-    margin-left: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.7rem 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.18);
-    color: #ffffff;
-    font: inherit;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-    .settings-button:hover {
-        background: rgba(255, 255, 255, 0.28);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(35, 74, 140, 0.18);
-    }
-
-    .settings-button:active {
-        transform: translateY(0);
-    }
-
-.settings-button-icon {
-    font-size: 1.1rem;
-    line-height: 1;
-}
 
 /* =========================================================
    Cards
@@ -215,232 +173,6 @@
         font-size: 1.45rem;
         line-height: 1;
     }
-
-/* =========================================================
-   Optimization result messages
-   ========================================================= */
-
-.result-messages {
-    display: grid;
-    gap: 14px;
-    margin: 16px 0 20px;
-}
-
-.result-message-panel {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 18px 20px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.82);
-}
-
-.result-message-icon {
-    width: 42px;
-    height: 42px;
-    flex: 0 0 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 13px;
-    font-family: "Segoe UI", system-ui, sans-serif;
-    font-size: 1.25rem;
-    font-weight: 900;
-}
-
-.result-message-content {
-    min-width: 0;
-}
-
-.result-message-label {
-    display: block;
-    margin-bottom: 4px;
-    color: var(--color-text-muted);
-    font-size: 0.76rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
-
-.result-message-panel h3,
-.preprocessing-details h3 {
-    margin: 0;
-    color: var(--color-text);
-    font-size: 1.15rem;
-    line-height: 1.3;
-}
-
-.result-message-panel p {
-    margin: 7px 0 0;
-    color: var(--color-text-muted);
-    line-height: 1.55;
-}
-
-.result-message-neutral {
-    border-color: rgba(59, 130, 246, 0.22);
-    background: linear-gradient( 135deg, rgba(239, 246, 255, 0.9), rgba(255, 255, 255, 0.9) );
-}
-
-    .result-message-neutral .result-message-icon {
-        color: #1d4ed8;
-        background: #dbeafe;
-    }
-
-.result-message-success {
-    border-color: rgba(16, 185, 129, 0.3);
-    background: linear-gradient( 135deg, rgba(236, 253, 245, 0.95), rgba(255, 255, 255, 0.92) );
-}
-
-    .result-message-success .result-message-icon {
-        color: #047857;
-        background: #d1fae5;
-    }
-
-.result-message-error {
-    border-color: rgba(239, 68, 68, 0.3);
-    background: linear-gradient( 135deg, rgba(254, 242, 242, 0.96), rgba(255, 255, 255, 0.94) );
-}
-
-    .result-message-error .result-message-icon {
-        color: #b91c1c;
-        background: #fee2e2;
-    }
-
-.result-message-warning {
-    border-color: rgba(245, 158, 11, 0.34);
-    background: linear-gradient( 135deg, rgba(255, 251, 235, 0.96), rgba(255, 255, 255, 0.94) );
-}
-
-    .result-message-warning .result-message-icon {
-        color: #b45309;
-        background: #fef3c7;
-    }
-
-
-/* =========================================================
-   Preprocessing issues
-   ========================================================= */
-
-.preprocessing-details {
-    overflow: hidden;
-    border: 1px solid rgba(239, 68, 68, 0.24);
-    border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.86);
-}
-
-.preprocessing-details-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 16px 20px;
-    border-bottom: 1px solid rgba(239, 68, 68, 0.16);
-    background: rgba(254, 242, 242, 0.7);
-}
-
-.issue-count-badge {
-    flex: 0 0 auto;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: #fee2e2;
-    color: #991b1b;
-    font-size: 0.78rem;
-    font-weight: 800;
-}
-
-.preprocessing-issues-list {
-    display: grid;
-    gap: 10px;
-    margin: 0;
-    padding: 16px 20px 20px;
-    list-style: none;
-}
-
-.preprocessing-issue {
-    padding: 14px 16px;
-    border: 1px solid rgba(148, 163, 184, 0.24);
-    border-left-width: 4px;
-    border-radius: 12px;
-    background: #ffffff;
-}
-
-.preprocessing-issue-error {
-    border-left-color: #ef4444;
-}
-
-.preprocessing-issue-warning {
-    border-left-color: #f59e0b;
-}
-
-.preprocessing-issue-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-    .preprocessing-issue-heading strong {
-        color: var(--color-text);
-        font-size: 0.96rem;
-    }
-
-.preprocessing-issue-severity {
-    padding: 4px 8px;
-    border-radius: 999px;
-    background: #fee2e2;
-    color: #991b1b;
-    font-size: 0.7rem;
-    font-weight: 800;
-    text-transform: uppercase;
-}
-
-.preprocessing-issue-warning
-.preprocessing-issue-severity {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.preprocessing-issue p {
-    margin: 7px 0 0;
-    color: var(--color-text-muted);
-    line-height: 1.5;
-}
-
-.preprocessing-issue-counts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 11px;
-}
-
-    .preprocessing-issue-counts span {
-        padding: 6px 9px;
-        border-radius: 8px;
-        background: #f8fafc;
-        color: var(--color-text-muted);
-        font-size: 0.8rem;
-    }
-
-    .preprocessing-issue-counts strong {
-        color: var(--color-text);
-    }
-
-@media (max-width: 640px) {
-    .result-message-panel {
-        padding: 16px;
-    }
-
-    .preprocessing-details-header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .preprocessing-issue-heading {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-}
 
 /* =========================================================
    Filters
@@ -1058,4 +790,17 @@
     .teachers-table {
         min-width: 800px;
     }
+}
+
+
+/* Optimization controls */
+.app-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(0.8);
+    box-shadow: none;
+}
+
+.app-button:disabled:hover {
+    transform: none;
 }

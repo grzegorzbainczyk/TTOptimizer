@@ -110,9 +110,38 @@
                         </p>
 
                         <div class="toolbar">
-                            <button id="runOptimizationButton" class="app-button app-button-primary-warm">
+                            <button id="runOptimizationButton"
+                                    class="app-button app-button-primary-warm">
                                 Run optimization
                             </button>
+
+                            <button id="stopOptimizationButton"
+                                    class="app-button app-button-secondary"
+                                    type="button"
+                                    disabled>
+                                Stop
+                            </button>
+                        </div>
+
+                        <div id="optimizationProgressPanel"
+                             class="optimization-progress-panel hidden">
+
+                            <div class="optimization-progress-header">
+                                <strong>Optimization in progress</strong>
+
+                                <span id="optimizationProgressPercentage">
+                                    0%
+                                </span>
+                            </div>
+
+                            <progress id="optimizationProgressBar"
+                                      max="100"
+                                      value="0">
+                            </progress>
+
+                            <p id="optimizationGenerationText">
+                                Generation: 0 / 0
+                            </p>
                         </div>
 
                         <p id="statusText">Ready.</p>
@@ -140,9 +169,7 @@
                         <div id="resultMessages" class="result-messages">
                             <section id="resultMessagePanel"
                                      class="result-message-panel result-message-neutral">
-                                <div class="result-message-icon" aria-hidden="true">
-                                    ℹ️
-                                </div>
+                                <div class="result-message-icon" aria-hidden="true">ℹ️</div>
 
                                 <div class="result-message-content">
                                     <span class="result-message-label">
@@ -238,7 +265,8 @@
         </div>
     </main>
 
-    <script src="js/appContext.js"></script>
-    <script src="js/main.js"></script>
+    <script src="/js/appContext.js"></script>
+    <script src="/js/signalr/dist/browser/signalr.min.js"></script>
+    <script src="/js/main.js"></script>
 </body>
 </html>

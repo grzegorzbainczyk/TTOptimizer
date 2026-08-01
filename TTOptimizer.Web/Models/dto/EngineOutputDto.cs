@@ -42,7 +42,7 @@ public class EngineOutputDto
 
     /// <summary>
     /// Gets or sets additional information about the optimization execution,
-    /// such as the number of iterations, random seed, thread count,
+    /// such as the number of generations, random seed, thread count,
     /// execution duration, and engine message.
     /// </summary>
     public required OptimizationInfo OptimizationInfo { get; set; }
@@ -115,11 +115,11 @@ public class PreprocessingIssueDto
 public class OptimizationInfo
 {
     /// <summary>
-    /// Gets or sets the number of optimization iterations performed
+    /// Gets or sets the number of optimization generations performed
     /// by the engine.
     /// </summary>
-    [JsonPropertyName("iterations")]
-    public int Iterations { get; set; }
+    [JsonPropertyName("generations")]
+    public int Generations { get; set; }
 
     /// <summary>
     /// Gets or sets the random seed used by the optimization algorithm.

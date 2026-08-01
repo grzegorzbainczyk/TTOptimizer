@@ -7,7 +7,7 @@ public class OptimizationSettings
 {
     public int PopulationSize { get; set; } = 100;
 
-    public int Iterations { get; set; } = 10_000;
+    public int Generations { get; set; } = 100;
 
     public int EliteCount { get; set; } = 5;
 

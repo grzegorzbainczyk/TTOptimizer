@@ -6,16 +6,19 @@
 #include <utility>
 #include <vector>
 
+#include <../External/nlohmann/json.hpp>
+
 #include "Domain/TimetableModels.h"
 #include "Generators/ScheduleSlotGenerator.h"
 #include "Generators/LessonInstanceGenerator.h"
 #include "Evaluation/FitnessEvaluator.h"
 #include "Evaluation/ChromosomeValidator.h"
 #include "Optimization/GeneticOptimizer.h"
+#include "Optimization/OptimizationProgress.h"
 #include "Engine.h"
 #include "ChromosomeDecoder.h"
-#include <ResultJsonWriter.h>
-#include <Preprocessing/TimetablePreprocessor.h>
+#include "ResultJsonWriter.h"
+#include "Preprocessing/TimetablePreprocessor.h"
 
 int Engine::execute(const TimetableProblem& problem, std::string& result)
 {
@@ -39,7 +42,23 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
 
         const auto startTime = std::chrono::steady_clock::now();
 
-        GeneticOptimizer optimizer(problem.optimizationSettings);
+        const auto progressCallback =
+            [](const OptimizationProgress& progress)
+            {
+                const nlohmann::json message =
+                {
+                    { "type", "progress" },
+                    { "generation", progress.generation },
+                    { "totalGenerations", progress.totalGenerations },
+                    { "percentage", progress.percentage }
+                };
+
+                std::cout << message.dump() << '\n' << std::flush;
+            };
+
+        GeneticOptimizer optimizer(
+            problem.optimizationSettings,
+            progressCallback);
 
         std::vector<Chromosome> initialPopulation =
             optimizer.createInitialPopulation(problem, lessonInstances, scheduleSlots);
@@ -77,7 +96,7 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
 
         OptimizationInfo feedback;
         feedback.durationMilliseconds = durationMilliseconds;
-        feedback.iterations = problem.optimizationSettings.iterations;
+        feedback.iterations = problem.optimizationSettings.generations;
         feedback.randomSeed = problem.optimizationSettings.randomSeed;
 
         result = writer.writeSuccess(initialPenalty, score, scheduledLessons, feedback);
@@ -86,7 +105,7 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
     }
     catch (const std::exception& exception)
     {
-        std::cout << exception.what() << '\n';
+        std::cerr << exception.what() << '\n';
         return 1;
     }
 }

@@ -1,32 +1,267 @@
 {
-  "bestPenalty": 0.0,
-  "canOptimize": false,
+  "bestPenalty": 2500.0,
+  "canOptimize": true,
   "hardViolationCount": 0,
-  "initialPenalty": 0.0,
-  "message": "The timetable problem contains invalid or infeasible constraints.",
+  "initialPenalty": 2500.0,
   "optimizationInfo": {
-    "durationMilliseconds": 0,
-    "iterations": 0,
-    "message": "Optimization was not started because preprocessing found blocking errors.",
-    "randomSeed": 0,
+    "durationMilliseconds": 1109879,
+    "iterations": 10000,
+    "message": "Feedback!!!",
+    "randomSeed": 12345,
     "threadCount": 1
   },
-  "preprocessingIssues": [
+  "preprocessingIssues": [],
+  "scheduledLessons": [
     {
-      "availableCount": 5,
-      "classGroupId": 0,
-      "code": "TeacherInsufficientAvailability",
-      "dayIndex": -1,
-      "message": "Teacher Magdalena Kozłowska (ID 391) requires 6 weekly lessons, but has only 5 available time periods.",
-      "requiredCount": 6,
-      "requirementId": 0,
-      "roomId": 0,
-      "severity": "Error",
-      "slotIndex": -1,
-      "subjectId": 0,
+      "classGroupId": 256,
+      "day": "Monday",
+      "lessonInstanceId": 1,
+      "lessonNumber": 4,
+      "requirementId": 1159,
+      "roomId": 275,
+      "subjectId": 371,
+      "teacherId": 388
+    },
+    {
+      "classGroupId": 256,
+      "day": "Monday",
+      "lessonInstanceId": 2,
+      "lessonNumber": 3,
+      "requirementId": 1159,
+      "roomId": 278,
+      "subjectId": 371,
+      "teacherId": 388
+    },
+    {
+      "classGroupId": 256,
+      "day": "Friday",
+      "lessonInstanceId": 3,
+      "lessonNumber": 7,
+      "requirementId": 1159,
+      "roomId": 278,
+      "subjectId": 371,
+      "teacherId": 388
+    },
+    {
+      "classGroupId": 256,
+      "day": "Thursday",
+      "lessonInstanceId": 4,
+      "lessonNumber": 4,
+      "requirementId": 1159,
+      "roomId": 277,
+      "subjectId": 371,
+      "teacherId": 388
+    },
+    {
+      "classGroupId": 256,
+      "day": "Tuesday",
+      "lessonInstanceId": 5,
+      "lessonNumber": 5,
+      "requirementId": 1160,
+      "roomId": 275,
+      "subjectId": 372,
+      "teacherId": 389
+    },
+    {
+      "classGroupId": 256,
+      "day": "Wednesday",
+      "lessonInstanceId": 6,
+      "lessonNumber": 2,
+      "requirementId": 1160,
+      "roomId": 277,
+      "subjectId": 372,
+      "teacherId": 389
+    },
+    {
+      "classGroupId": 256,
+      "day": "Thursday",
+      "lessonInstanceId": 7,
+      "lessonNumber": 6,
+      "requirementId": 1160,
+      "roomId": 276,
+      "subjectId": 372,
+      "teacherId": 389
+    },
+    {
+      "classGroupId": 256,
+      "day": "Wednesday",
+      "lessonInstanceId": 8,
+      "lessonNumber": 5,
+      "requirementId": 1161,
+      "roomId": 278,
+      "subjectId": 373,
+      "teacherId": 390
+    },
+    {
+      "classGroupId": 256,
+      "day": "Wednesday",
+      "lessonInstanceId": 9,
+      "lessonNumber": 4,
+      "requirementId": 1161,
+      "roomId": 276,
+      "subjectId": 373,
+      "teacherId": 390
+    },
+    {
+      "classGroupId": 257,
+      "day": "Friday",
+      "lessonInstanceId": 10,
+      "lessonNumber": 0,
+      "requirementId": 1162,
+      "roomId": 277,
+      "subjectId": 371,
+      "teacherId": 388
+    },
+    {
+      "classGroupId": 257,
+      "day": "Wednesday",
+      "lessonInstanceId": 11,
+      "lessonNumber": 1,
+      "requirementId": 1162,
+      "roomId": 278,
+      "subjectId": 371,
+      "teacherId": 388
+    },
+    {
+      "classGroupId": 257,
+      "day": "Monday",
+      "lessonInstanceId": 12,
+      "lessonNumber": 5,
+      "requirementId": 1162,
+      "roomId": 275,
+      "subjectId": 371,
+      "teacherId": 388
+    },
+    {
+      "classGroupId": 257,
+      "day": "Wednesday",
+      "lessonInstanceId": 13,
+      "lessonNumber": 2,
+      "requirementId": 1162,
+      "roomId": 278,
+      "subjectId": 371,
+      "teacherId": 388
+    },
+    {
+      "classGroupId": 257,
+      "day": "Wednesday",
+      "lessonInstanceId": 14,
+      "lessonNumber": 0,
+      "requirementId": 1163,
+      "roomId": 278,
+      "subjectId": 372,
+      "teacherId": 389
+    },
+    {
+      "classGroupId": 257,
+      "day": "Tuesday",
+      "lessonInstanceId": 15,
+      "lessonNumber": 6,
+      "requirementId": 1163,
+      "roomId": 277,
+      "subjectId": 372,
+      "teacherId": 389
+    },
+    {
+      "classGroupId": 257,
+      "day": "Thursday",
+      "lessonInstanceId": 16,
+      "lessonNumber": 5,
+      "requirementId": 1163,
+      "roomId": 276,
+      "subjectId": 372,
+      "teacherId": 389
+    },
+    {
+      "classGroupId": 257,
+      "day": "Thursday",
+      "lessonInstanceId": 17,
+      "lessonNumber": 1,
+      "requirementId": 1164,
+      "roomId": 277,
+      "subjectId": 373,
+      "teacherId": 390
+    },
+    {
+      "classGroupId": 257,
+      "day": "Thursday",
+      "lessonInstanceId": 18,
+      "lessonNumber": 7,
+      "requirementId": 1164,
+      "roomId": 276,
+      "subjectId": 373,
+      "teacherId": 390
+    },
+    {
+      "classGroupId": 257,
+      "day": "Thursday",
+      "lessonInstanceId": 19,
+      "lessonNumber": 0,
+      "requirementId": 1165,
+      "roomId": 275,
+      "subjectId": 371,
       "teacherId": 391
+    },
+    {
+      "classGroupId": 257,
+      "day": "Friday",
+      "lessonInstanceId": 20,
+      "lessonNumber": 3,
+      "requirementId": 1165,
+      "roomId": 277,
+      "subjectId": 371,
+      "teacherId": 391
+    },
+    {
+      "classGroupId": 257,
+      "day": "Thursday",
+      "lessonInstanceId": 21,
+      "lessonNumber": 6,
+      "requirementId": 1165,
+      "roomId": 277,
+      "subjectId": 371,
+      "teacherId": 391
+    },
+    {
+      "classGroupId": 257,
+      "day": "Thursday",
+      "lessonInstanceId": 22,
+      "lessonNumber": 4,
+      "requirementId": 1165,
+      "roomId": 275,
+      "subjectId": 371,
+      "teacherId": 391
+    },
+    {
+      "classGroupId": 258,
+      "day": "Thursday",
+      "lessonInstanceId": 23,
+      "lessonNumber": 3,
+      "requirementId": 1166,
+      "roomId": 277,
+      "subjectId": 375,
+      "teacherId": 391
+    },
+    {
+      "classGroupId": 258,
+      "day": "Thursday",
+      "lessonInstanceId": 24,
+      "lessonNumber": 2,
+      "requirementId": 1166,
+      "roomId": 277,
+      "subjectId": 375,
+      "teacherId": 391
+    },
+    {
+      "classGroupId": 259,
+      "day": "Wednesday",
+      "lessonInstanceId": 25,
+      "lessonNumber": 7,
+      "requirementId": 1167,
+      "roomId": 275,
+      "subjectId": 371,
+      "teacherId": 388
     }
   ],
-  "scheduledLessons": [],
-  "success": false
+  "success": true
 }

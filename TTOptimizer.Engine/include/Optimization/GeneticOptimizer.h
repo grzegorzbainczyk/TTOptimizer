@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <random>
 #include <vector>
 
@@ -8,11 +9,16 @@
 #include "Evaluation/FitnessEvaluator.h"
 #include "Generators/ChromosomeFactory.h"
 #include "Optimization/ChromosomeMutator.h"
+#include "Optimization/OptimizationProgress.h"
 
 class GeneticOptimizer
 {
 public:
-    explicit GeneticOptimizer(const OptimizationSettings& settings);
+    using ProgressCallback = std::function<void(const OptimizationProgress&)>;
+
+    explicit GeneticOptimizer(
+        const OptimizationSettings& settings,
+        ProgressCallback progressCallback = nullptr);
 
     std::vector<Chromosome> createInitialPopulation(
         const TimetableProblem& problem,
@@ -26,19 +32,10 @@ public:
         const std::vector<ScheduleSlot>& scheduleSlots);
 
 private:
-    void validateOptimizationInput(
-        const std::vector<Chromosome>& initialPopulation,
-        const std::vector<LessonInstance>& lessonInstances,
-        const std::vector<ScheduleSlot>& scheduleSlots) const;
-
-    Chromosome createChild(
-        const Chromosome& parent,
-        const TimetableProblem& problem,
-        const std::vector<LessonInstance>& lessonInstances,
-        const std::vector<ScheduleSlot>& scheduleSlots,
-        std::bernoulli_distribution& mutationDistribution);
-
-    bool shouldStop(const Chromosome& bestChromosome) const;
+    void reportProgress(
+        int generation,
+        int totalGenerations,
+        int& lastReportedPercentage) const;
 
     void evaluatePopulation(
         std::vector<Chromosome>& population,
@@ -46,13 +43,18 @@ private:
         const std::vector<LessonInstance>& lessonInstances,
         const std::vector<ScheduleSlot>& scheduleSlots);
 
-    static void sortPopulation(std::vector<Chromosome>& population);
+    static void sortPopulation(
+        std::vector<Chromosome>& population);
 
-    const Chromosome& selectByTournament(const std::vector<Chromosome>& population);
+    const Chromosome& selectByTournament(
+        const std::vector<Chromosome>& population);
 
-    static bool isBetter(const Chromosome& first, const Chromosome& second);
+    static bool isBetter(
+        const Chromosome& first,
+        const Chromosome& second);
 
     OptimizationSettings settings;
+    ProgressCallback progressCallback;
 
     ChromosomeFactory chromosomeFactory;
     ChromosomeMutator mutator;

@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using TTOptimizer.Web.Models;
 using TTOptimizer.Web.Models.Domain;
@@ -12,10 +14,17 @@ public class CppOptimizerService
     private readonly string _enginePath;
     private readonly ILogger<CppOptimizerService> _logger;
 
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true
+    };
+
     public CppOptimizerService(
-    IConfiguration configuration,
-    IWebHostEnvironment environment,
-    ILogger<CppOptimizerService> logger)
+        IConfiguration configuration,
+        IWebHostEnvironment environment,
+        ILogger<CppOptimizerService> logger)
     {
         _logger = logger;
 
@@ -28,38 +37,39 @@ public class CppOptimizerService
             : Path.Combine(
                 environment.ContentRootPath,
                 configuredPath);
-        
     }
 
-    public async Task<EngineOutputDto> RunOptimizationAsync(TimetableProblem problem)
+    public async Task<EngineOutputDto> RunOptimizationAsync(
+        TimetableProblem problem,
+        Func<OptimizationProgressDto, CancellationToken, Task>? progressCallback = null,
+        CancellationToken cancellationToken = default)
     {
-        JsonSerializerOptions jso = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
-
         OptimizerInputDto optimizerInputDto = CreateOptimizerInput(problem);
 
-        var inputJson = JsonSerializer.Serialize(optimizerInputDto, jso);
+        string inputJson = JsonSerializer.Serialize(
+            optimizerInputDto,
+            JsonOptions);
 
-        var inputPath = Path.Combine(
+        string inputPath = Path.Combine(
             Path.GetTempPath(),
             $"ttoptimizer_problem_{Guid.NewGuid():N}.json");
 
-        var outputPath = Path.Combine(
+        string outputPath = Path.Combine(
             Path.GetTempPath(),
             $"ttoptimizer_result_{Guid.NewGuid():N}.json");
 
-        await File.WriteAllTextAsync(inputPath, inputJson);
+        await File.WriteAllTextAsync(
+            inputPath,
+            inputJson,
+            cancellationToken);
 
         try
         {
             _logger.LogInformation(
-    "Starting C++ optimizer. Engine: {EnginePath}, Input: {InputPath}, Output: {OutputPath}",
-    _enginePath,
-    inputPath,
-    outputPath);
+                "Starting C++ optimizer. Engine: {EnginePath}, Input: {InputPath}, Output: {OutputPath}",
+                _enginePath,
+                inputPath,
+                outputPath);
 
             if (!File.Exists(_enginePath))
             {
@@ -72,7 +82,10 @@ public class CppOptimizerService
             {
                 FileName = _enginePath,
                 Arguments = $"\"{inputPath}\" \"{outputPath}\"",
-                WorkingDirectory = Path.GetDirectoryName(_enginePath) ?? throw new InvalidOperationException("Could not determine optimizer working directory."),
+                WorkingDirectory =
+                    Path.GetDirectoryName(_enginePath)
+                    ?? throw new InvalidOperationException(
+                        "Could not determine optimizer working directory."),
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -86,32 +99,72 @@ public class CppOptimizerService
 
             process.Start();
 
-            string stdout = await process.StandardOutput.ReadToEndAsync();
-            string stderr = await process.StandardError.ReadToEndAsync();
+            Task<string> stdoutTask = ReadStandardOutputAsync(
+                process,
+                progressCallback,
+                cancellationToken);
 
-            await process.WaitForExitAsync();
+            Task<string> stderrTask =
+                process.StandardError.ReadToEndAsync(cancellationToken);
+
+            string stdout;
+            string stderr;
+
+            try
+            {
+                await process.WaitForExitAsync(cancellationToken);
+
+                stdout = await stdoutTask;
+                stderr = await stderrTask;
+            }
+            catch (OperationCanceledException)
+                when (cancellationToken.IsCancellationRequested)
+            {
+                TryKillProcess(process);
+
+                try
+                {
+                    await process.WaitForExitAsync(CancellationToken.None);
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogDebug(
+                        exception,
+                        "The C++ optimizer process was already stopped.");
+                }
+
+                throw;
+            }
 
             if (process.ExitCode != 0)
             {
                 throw new InvalidOperationException(
-                    $"C++ engine failed with exit code {process.ExitCode}. Error: {stderr}. Output: {stdout}");
+                    $"C++ engine failed with exit code {process.ExitCode}. " +
+                    $"Error: {stderr}. Output: {stdout}");
             }
 
             if (!File.Exists(outputPath))
             {
                 throw new InvalidOperationException(
-                    $"C++ engine did not create output file: {outputPath}. Error: {stderr}. Output: {stdout}");
+                    $"C++ engine did not create output file: {outputPath}. " +
+                    $"Error: {stderr}. Output: {stdout}");
             }
 
-            string outputJson = await File.ReadAllTextAsync(outputPath);
+            string outputJson = await File.ReadAllTextAsync(
+                outputPath,
+                cancellationToken);
 
             if (string.IsNullOrWhiteSpace(outputJson))
             {
                 throw new InvalidOperationException(
-                    $"C++ engine created empty output file: {outputPath}. Error: {stderr}. Output: {stdout}");
+                    $"C++ engine created empty output file: {outputPath}. " +
+                    $"Error: {stderr}. Output: {stdout}");
             }
 
-            var result = JsonSerializer.Deserialize<EngineOutputDto>(outputJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            EngineOutputDto? result =
+                JsonSerializer.Deserialize<EngineOutputDto>(
+                    outputJson,
+                    JsonOptions);
 
             if (result is null)
             {
@@ -123,14 +176,84 @@ public class CppOptimizerService
         }
         finally
         {
-            //TryDeleteFile(inputPath);
-            //TryDeleteFile(outputPath);
+            TryDeleteFile(inputPath);
+            TryDeleteFile(outputPath);
         }
     }
 
+    private async Task<string> ReadStandardOutputAsync(
+        Process process,
+        Func<OptimizationProgressDto, CancellationToken, Task>? progressCallback,
+        CancellationToken cancellationToken)
+    {
+        var completeOutput = new StringBuilder();
+
+        while (true)
+        {
+            string? line =
+                await process.StandardOutput.ReadLineAsync(
+                    cancellationToken);
+
+            if (line is null)
+            {
+                break;
+            }
+
+            completeOutput.AppendLine(line);
+
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            await TryReportProgressAsync(
+                line,
+                progressCallback,
+                cancellationToken);
+        }
+
+        return completeOutput.ToString();
+    }
+
+    private async Task TryReportProgressAsync(
+        string line,
+        Func<OptimizationProgressDto, CancellationToken, Task>? progressCallback,
+        CancellationToken cancellationToken)
+    {
+        if (progressCallback is null)
+        {
+            return;
+        }
+
+        try
+        {
+            OptimizationProgressDto? message =
+                JsonSerializer.Deserialize<OptimizationProgressDto>(
+                    line,
+                    JsonOptions);
+
+            if (message is null ||
+                !string.Equals(
+                    message.Type,
+                    "progress",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            await progressCallback(message, cancellationToken);
+        }
+        catch (JsonException exception)
+        {
+            _logger.LogWarning(
+                exception,
+                "Could not parse C++ optimizer stdout line as progress JSON: {Line}",
+                line);
+        }
+    }
 
     private OptimizerInputDto CreateOptimizerInput(
-    TimetableProblem problem)
+        TimetableProblem problem)
     {
         return new OptimizerInputDto
         {
@@ -179,29 +302,43 @@ public class CppOptimizerService
                         new OptimizerLessonRequirementDto
                         {
                             Id = requirement.Id,
-                            TeacherId =
-                                requirement.TeacherId,
-                            ClassGroupId =
-                                requirement.ClassGroupId,
-                            SubjectId =
-                                requirement.SubjectId,
-                            LessonsPerWeek =
-                                requirement.HoursPerWeek
+                            TeacherId = requirement.TeacherId,
+                            ClassGroupId = requirement.ClassGroupId,
+                            SubjectId = requirement.SubjectId,
+                            LessonsPerWeek = requirement.HoursPerWeek
                         })
                     .ToList(),
 
             TeacherUnavailabilities =
-    problem.TeacherUnavailabilities,
+                problem.TeacherUnavailabilities,
 
             ClassGroupUnavailabilities =
-    problem.ClassGroupUnavailabilities,
+                problem.ClassGroupUnavailabilities,
 
             RoomUnavailabilities =
-    problem.RoomUnavailabilities,
+                problem.RoomUnavailabilities,
 
             OptimizationSettings =
                 problem.OptimizationSettings
         };
+    }
+
+
+    private void TryKillProcess(Process process)
+    {
+        try
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+            }
+        }
+        catch (Exception exception)
+        {
+            _logger.LogWarning(
+                exception,
+                "Could not stop the C++ optimizer process.");
+        }
     }
 
     private void TryDeleteFile(string path)
@@ -210,7 +347,7 @@ public class CppOptimizerService
         {
             if (File.Exists(path))
             {
-                //File.Delete(path);
+                File.Delete(path);
             }
         }
         catch (Exception exception)

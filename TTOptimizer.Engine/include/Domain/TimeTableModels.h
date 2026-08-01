@@ -57,7 +57,7 @@ struct OptimizationSettings
     int populationSize = 100;
 
     // Number of generations processed by the genetic algorithm.
-    int iterations = 10'000;
+    int generations = 10'000;
 
     // Number of the best chromosomes copied unchanged
     // to the next generation.

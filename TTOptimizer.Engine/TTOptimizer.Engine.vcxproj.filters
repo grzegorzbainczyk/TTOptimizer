@@ -122,5 +122,8 @@
     <ClInclude Include="include\Preprocessing\TimetablePreprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Optimization\OptimizationProgress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,8 +7,11 @@
 
 #include "Evaluation/ChromosomeValidator.h"
 
-GeneticOptimizer::GeneticOptimizer(const OptimizationSettings& settings)
+GeneticOptimizer::GeneticOptimizer(
+    const OptimizationSettings& settings,
+    ProgressCallback progressCallback)
     : settings(settings),
+    progressCallback(std::move(progressCallback)),
     chromosomeFactory(settings.randomSeed),
     mutator(settings.randomSeed),
     randomEngine(settings.randomSeed)
@@ -24,7 +27,8 @@ std::vector<Chromosome> GeneticOptimizer::createInitialPopulation(
 
     if (populationSize <= 0)
     {
-        throw std::invalid_argument("Population size must be greater than zero.");
+        throw std::invalid_argument(
+            "Population size must be greater than zero.");
     }
 
     std::vector<Chromosome> population;
@@ -50,11 +54,45 @@ Chromosome GeneticOptimizer::optimize(
     const std::vector<LessonInstance>& lessonInstances,
     const std::vector<ScheduleSlot>& scheduleSlots)
 {
-    validateOptimizationInput(initialPopulation, lessonInstances, scheduleSlots);
-
-    const int generations = settings.iterations;
+    const int generations = settings.generations;
     const int eliteCount = settings.eliteCount;
+    const int tournamentSize = settings.tournamentSize;
     const int populationSize = static_cast<int>(initialPopulation.size());
+
+    if (generations <= 0)
+    {
+        throw std::invalid_argument("Generations must be greater than zero.");
+    }
+
+    if (initialPopulation.empty())
+    {
+        throw std::invalid_argument("Initial population cannot be empty.");
+    }
+
+    if (scheduleSlots.empty() && !lessonInstances.empty())
+    {
+        throw std::invalid_argument("Schedule slots cannot be empty when lesson instances exist.");
+    }
+
+    if (eliteCount < 0 || eliteCount >= populationSize)
+    {
+        throw std::invalid_argument("Elite count must be non-negative and smaller than population size.");
+    }
+
+    if (tournamentSize <= 0 || tournamentSize > populationSize)
+    {
+        throw std::invalid_argument("Tournament size must be between 1 and population size.");
+    }
+
+    if (settings.mutationAttempts < 0)
+    {
+        throw std::invalid_argument("Mutation attempts cannot be negative.");
+    }
+
+    if (settings.mutationProbability < 0.0 || settings.mutationProbability > 1.0)
+    {
+        throw std::invalid_argument("Mutation probability must be between 0.0 and 1.0.");
+    }
 
     std::vector<Chromosome> population = std::move(initialPopulation);
 
@@ -71,6 +109,8 @@ Chromosome GeneticOptimizer::optimize(
         << bestChromosome.fitness.softPenalty
         << '\n';
 
+    int lastReportedPercentage = 0;
+
     for (int generation = 1; generation <= generations; ++generation)
     {
         sortPopulation(population);
@@ -86,13 +126,33 @@ Chromosome GeneticOptimizer::optimize(
         while (nextPopulation.size() < static_cast<std::size_t>(populationSize))
         {
             const Chromosome& parent = selectByTournament(population);
+            Chromosome child = parent;
 
-            nextPopulation.push_back(
-                createChild(parent, problem, lessonInstances, scheduleSlots, mutationDistribution));
+            if (mutationDistribution(randomEngine))
+            {
+                for (int attempt = 0; attempt < settings.mutationAttempts; ++attempt)
+                {
+                    Chromosome candidate = parent;
+
+                    mutator.mutateAssignment(candidate, scheduleSlots.size());
+
+                    candidate.fitness = fitnessEvaluator.evaluate(
+                        candidate,
+                        problem,
+                        lessonInstances,
+                        scheduleSlots);
+
+                    if (candidate.fitness.isBetterThan(child.fitness))
+                    {
+                        child = std::move(candidate);
+                    }
+                }
+            }
+
+            nextPopulation.push_back(std::move(child));
         }
 
         population = std::move(nextPopulation);
-
         sortPopulation(population);
 
         if (population.front().fitness.isBetterThan(bestChromosome.fitness))
@@ -108,97 +168,51 @@ Chromosome GeneticOptimizer::optimize(
                 << '\n';
         }
 
-        if (shouldStop(bestChromosome))
+        reportProgress(generation, generations, lastReportedPercentage);
+
+        if (settings.stopWhenPerfect
+            && bestChromosome.fitness.isFeasible()
+            && bestChromosome.fitness.softPenalty == 0.0)
         {
             std::cerr << "Perfect solution found in generation " << generation << ".\n";
             break;
         }
     }
 
-    bestChromosome.fitness = fitnessEvaluator.evaluate(bestChromosome, problem, lessonInstances, scheduleSlots);
+    bestChromosome.fitness = fitnessEvaluator.evaluate(
+        bestChromosome,
+        problem,
+        lessonInstances,
+        scheduleSlots);
 
     return bestChromosome;
 }
 
-void GeneticOptimizer::validateOptimizationInput(
-    const std::vector<Chromosome>& initialPopulation,
-    const std::vector<LessonInstance>& lessonInstances,
-    const std::vector<ScheduleSlot>& scheduleSlots) const
+void GeneticOptimizer::reportProgress(
+    int generation,
+    int totalGenerations,
+    int& lastReportedPercentage) const
 {
-    const int populationSize = static_cast<int>(initialPopulation.size());
-
-    if (settings.iterations <= 0)
+    if (!progressCallback)
     {
-        throw std::invalid_argument("Generations must be greater than zero.");
+        return;
     }
 
-    if (initialPopulation.empty())
+    const int percentage = generation * 100 / totalGenerations;
+
+    if (percentage == lastReportedPercentage)
     {
-        throw std::invalid_argument("Initial population cannot be empty.");
+        return;
     }
 
-    if (scheduleSlots.empty() && !lessonInstances.empty())
-    {
-        throw std::invalid_argument("Schedule slots cannot be empty when lesson instances exist.");
-    }
+    OptimizationProgress progress;
+    progress.generation = generation;
+    progress.totalGenerations = totalGenerations;
+    progress.percentage = percentage;
 
-    if (settings.eliteCount < 0 || settings.eliteCount >= populationSize)
-    {
-        throw std::invalid_argument("Elite count must be non-negative and smaller than population size.");
-    }
+    progressCallback(progress);
 
-    if (settings.tournamentSize <= 0 || settings.tournamentSize > populationSize)
-    {
-        throw std::invalid_argument("Tournament size must be between 1 and population size.");
-    }
-
-    if (settings.mutationAttempts < 0)
-    {
-        throw std::invalid_argument("Mutation attempts cannot be negative.");
-    }
-
-    if (settings.mutationProbability < 0.0 || settings.mutationProbability > 1.0)
-    {
-        throw std::invalid_argument("Mutation probability must be between 0.0 and 1.0.");
-    }
-}
-
-Chromosome GeneticOptimizer::createChild(
-    const Chromosome& parent,
-    const TimetableProblem& problem,
-    const std::vector<LessonInstance>& lessonInstances,
-    const std::vector<ScheduleSlot>& scheduleSlots,
-    std::bernoulli_distribution& mutationDistribution)
-{
-    Chromosome child = parent;
-
-    if (!mutationDistribution(randomEngine))
-    {
-        return child;
-    }
-
-    for (int attempt = 0; attempt < settings.mutationAttempts; ++attempt)
-    {
-        Chromosome candidate = parent;
-
-        mutator.mutateAssignment(candidate, scheduleSlots.size());
-
-        candidate.fitness = fitnessEvaluator.evaluate(candidate, problem, lessonInstances, scheduleSlots);
-
-        if (candidate.fitness.isBetterThan(child.fitness))
-        {
-            child = std::move(candidate);
-        }
-    }
-
-    return child;
-}
-
-bool GeneticOptimizer::shouldStop(const Chromosome& bestChromosome) const
-{
-    return settings.stopWhenPerfect
-        && bestChromosome.fitness.isFeasible()
-        && bestChromosome.fitness.softPenalty == 0.0;
+    lastReportedPercentage = percentage;
 }
 
 void GeneticOptimizer::evaluatePopulation(
@@ -211,7 +225,11 @@ void GeneticOptimizer::evaluatePopulation(
     {
         ChromosomeValidator::validate(chromosome, lessonInstances, scheduleSlots);
 
-        chromosome.fitness = fitnessEvaluator.evaluate(chromosome, problem, lessonInstances, scheduleSlots);
+        chromosome.fitness = fitnessEvaluator.evaluate(
+            chromosome,
+            problem,
+            lessonInstances,
+            scheduleSlots);
     }
 }
 
@@ -220,13 +238,18 @@ void GeneticOptimizer::sortPopulation(std::vector<Chromosome>& population)
     std::sort(population.begin(), population.end(), isBetter);
 }
 
-const Chromosome& GeneticOptimizer::selectByTournament(const std::vector<Chromosome>& population)
+const Chromosome& GeneticOptimizer::selectByTournament(
+    const std::vector<Chromosome>& population)
 {
-    std::uniform_int_distribution<std::size_t> distribution(0, population.size() - 1);
+    const int tournamentSize = settings.tournamentSize;
+
+    std::uniform_int_distribution<std::size_t> distribution(
+        0,
+        population.size() - 1);
 
     const Chromosome* winner = &population[distribution(randomEngine)];
 
-    for (int index = 1; index < settings.tournamentSize; ++index)
+    for (int index = 1; index < tournamentSize; ++index)
     {
         const Chromosome& competitor = population[distribution(randomEngine)];
 
@@ -239,7 +262,9 @@ const Chromosome& GeneticOptimizer::selectByTournament(const std::vector<Chromos
     return *winner;
 }
 
-bool GeneticOptimizer::isBetter(const Chromosome& first, const Chromosome& second)
+bool GeneticOptimizer::isBetter(
+    const Chromosome& first,
+    const Chromosome& second)
 {
     return first.fitness.isBetterThan(second.fitness);
 }

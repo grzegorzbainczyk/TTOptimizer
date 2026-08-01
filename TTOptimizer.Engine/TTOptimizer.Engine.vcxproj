@@ -153,6 +153,7 @@
     <ClInclude Include="include\Optimization\ChromosomeMutator.h" />
     <ClInclude Include="include\Optimization\GeneticOptimizer.h" />
     <ClInclude Include="include\Engine.h" />
+    <ClInclude Include="include\Optimization\OptimizationProgress.h" />
     <ClInclude Include="include\Preprocessing\AvailabilityValidator.h" />
     <ClInclude Include="include\Preprocessing\PreprocessingModels.h" />
     <ClInclude Include="include\Preprocessing\ReferenceIntegrityValidator.h" />

@@ -49,10 +49,10 @@ public:
                     "populationSize",
                     settings.populationSize);
 
-            settings.iterations =
+            settings.generations =
                 settingsJson.value(
-                    "iterations",
-                    settings.iterations);
+                    "generations",
+                    settings.generations);
 
             settings.eliteCount =
                 settingsJson.value(

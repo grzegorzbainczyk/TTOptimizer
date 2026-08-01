@@ -2,7 +2,7 @@ const OPTIMIZATION_SETTINGS_STORAGE_KEY = "classflow.optimizationSettings";
 
 const DEFAULT_OPTIMIZATION_SETTINGS = {
     populationSize: 100,
-    iterations: 10000,
+    generations: 100,
     eliteCount: 5,
     tournamentSize: 3,
     mutationAttempts: 5,
@@ -57,7 +57,7 @@ function loadSettings() {
 
 function populateForm(settings) {
     setInputValue("populationSize", settings.populationSize);
-    setInputValue("iterations", settings.iterations);
+    setInputValue("generations", settings.generations);
     setInputValue("eliteCount", settings.eliteCount);
     setInputValue("tournamentSize", settings.tournamentSize);
     setInputValue("mutationAttempts", settings.mutationAttempts);
@@ -98,7 +98,7 @@ function resetSettings() {
 function readSettingsFromForm() {
     return {
         populationSize: getIntegerValue("populationSize"),
-        iterations: getIntegerValue("iterations"),
+        generations: getIntegerValue("generations"),
         eliteCount: getIntegerValue("eliteCount"),
         tournamentSize: getIntegerValue("tournamentSize"),
         mutationAttempts: getIntegerValue("mutationAttempts"),
@@ -120,7 +120,7 @@ function readSettingsFromForm() {
 
 function validateSettings(settings) {
     if (settings.populationSize <= 0) return "Population size must be greater than zero.";
-    if (settings.iterations <= 0) return "Iterations must be greater than zero.";
+    if (settings.generations <= 0) return "generations must be greater than zero.";
     if (settings.eliteCount < 0 || settings.eliteCount >= settings.populationSize) return "Elite count must be non-negative and smaller than population size.";
     if (settings.tournamentSize <= 0 || settings.tournamentSize > settings.populationSize) return "Tournament size must be between 1 and population size.";
     if (settings.mutationAttempts < 0) return "Mutation attempts cannot be negative.";

@@ -1,11 +1,11 @@
-﻿const STORAGE_KEYS = {
+const STORAGE_KEYS = {
     lastOptimizationResult: "ttorganizer.lastOptimizationResult",
     optimizationSettings: "classflow.optimizationSettings"
 };
 
 const DEFAULT_OPTIMIZATION_SETTINGS = {
     populationSize: 100,
-    iterations: 10000,
+    generations: 100,
     eliteCount: 5,
     tournamentSize: 3,
     mutationAttempts: 5,
@@ -24,13 +24,108 @@ const DEFAULT_OPTIMIZATION_SETTINGS = {
     }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+let optimizationHubConnection = null;
+let currentOptimizationAbortController = null;
+
+document.addEventListener("DOMContentLoaded", async () => {
     setupNavigation();
     setupOptimization();
+    setupStopOptimization();
     setupClearResult();
     setupExportCsv();
     loadLastOptimizationResultFromStorage();
+    await initializeOptimizationHub();
 });
+
+
+async function initializeOptimizationHub() {
+    if (typeof signalR === "undefined") {
+        console.error(
+            "SignalR JavaScript client is not loaded."
+        );
+
+        return null;
+    }
+
+    optimizationHubConnection =
+        new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/optimization")
+            .withAutomaticReconnect()
+            .configureLogging(
+                signalR.LogLevel.Information
+            )
+            .build();
+
+    optimizationHubConnection.on(
+        "OptimizationProgress",
+        progress => {
+            updateOptimizationProgress(progress);
+        });
+
+    optimizationHubConnection.onreconnecting(
+        error => {
+            console.warn(
+                "SignalR connection is reconnecting.",
+                error
+            );
+        });
+
+    optimizationHubConnection.onreconnected(
+        connectionId => {
+            console.info(
+                "SignalR connection restored:",
+                connectionId
+            );
+        });
+
+    optimizationHubConnection.onclose(
+        error => {
+            console.error(
+                "SignalR connection closed.",
+                error
+            );
+        });
+
+    try {
+        await optimizationHubConnection.start();
+
+        console.info(
+            "SignalR connected:",
+            optimizationHubConnection.connectionId
+        );
+
+        return optimizationHubConnection;
+    } catch (error) {
+        console.error(
+            "Could not start SignalR connection.",
+            error
+        );
+
+        return null;
+    }
+}
+
+async function ensureOptimizationHubConnection() {
+    if (!optimizationHubConnection) {
+        return await initializeOptimizationHub();
+    }
+
+    if (optimizationHubConnection.state ===
+        signalR.HubConnectionState.Disconnected) {
+        try {
+            await optimizationHubConnection.start();
+        } catch (error) {
+            console.error(
+                "Could not reconnect to SignalR.",
+                error
+            );
+
+            return null;
+        }
+    }
+
+    return optimizationHubConnection;
+}
 
 function setupNavigation() {
     setupNavigationButton("teachersButton", "teachers.html");
@@ -67,6 +162,42 @@ function setupOptimization() {
     runOptimizationButton.addEventListener("click", runOptimization);
 }
 
+function setupStopOptimization() {
+    const stopButton = document.getElementById("stopOptimizationButton");
+
+    if (!stopButton) {
+        console.warn("stopOptimizationButton not found");
+        return;
+    }
+
+    stopButton.addEventListener("click", stopOptimization);
+}
+
+function stopOptimization() {
+    if (!currentOptimizationAbortController) {
+        return;
+    }
+
+    setText("statusText", "Stopping optimization...");
+    currentOptimizationAbortController.abort();
+}
+
+function setOptimizationRunningState(isRunning) {
+    const runButton = document.getElementById("runOptimizationButton");
+    const stopButton = document.getElementById("stopOptimizationButton");
+
+    if (runButton) {
+        runButton.disabled = isRunning;
+        runButton.textContent = isRunning
+            ? "Running..."
+            : "Run optimization";
+    }
+
+    if (stopButton) {
+        stopButton.disabled = !isRunning;
+    }
+}
+
 function setupClearResult() {
     const clearResultButton = document.getElementById("clearSavedResultButton");
 
@@ -91,12 +222,15 @@ function setupExportCsv() {
 
 async function runOptimization() {
     const statusText = document.getElementById("statusText");
-    const runButton = document.getElementById("runOptimizationButton");
+    const runOptimizationButton = document.getElementById("runOptimizationButton");
 
     try {
+
         clearOptimizationResultForNewRun();
+        showOptimizationProgress();
         setStatus("Running optimization...");
-        setRunningState(true);
+        setOptimizationRunningState(true);
+        currentOptimizationAbortController = new AbortController();
 
         let organizationId;
 
@@ -108,14 +242,34 @@ async function runOptimization() {
             return;
         }
 
-        const optimizationSettings = loadOptimizationSettings();
+        const hubConnection =
+            await ensureOptimizationHubConnection();
 
-        const response = await fetch(`/api/optimization/run?organizationId=${organizationId}`, {
+        if (!hubConnection?.connectionId) {
+            throw new Error(
+                "SignalR connection is not available."
+            );
+        }
+
+        const optimizationSettings =
+            loadOptimizationSettings();
+
+        const connectionId =
+            encodeURIComponent(
+                hubConnection.connectionId
+            );
+
+        const response = await fetch(
+            `/api/optimization/run` +
+            `?organizationId=${organizationId}` +
+            `&connectionId=${connectionId}`,
+            {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(optimizationSettings)
+            body: JSON.stringify(optimizationSettings),
+            signal: currentOptimizationAbortController.signal
         });
 
         if (!response.ok) {
@@ -133,12 +287,36 @@ async function runOptimization() {
         renderOptimizationResult(data);
         saveLastOptimizationResultToStorage(data);
         setStatus("Optimization finished.");
+
+
+        updateOptimizationProgress({
+            generation: optimizationSettings.generations,
+            totalGenerations: optimizationSettings.generations,
+            percentage: 100
+        });
+
+        hideOptimizationProgress();
+
+
     } catch (error) {
-        setStatus("Error while running optimization.");
-        console.error("Error while running optimization:", error);
-        alert("Error while running optimization. Check console for details.");
+        hideOptimizationProgress();
+
+        if (error?.name === "AbortError") {
+            setStatus("Optimization stopped.");
+            setResultMessage(
+                "warning",
+                "Optimization stopped",
+                "The optimization was stopped by the user."
+            );
+            console.info("Optimization request was aborted by the user.");
+        } else {
+            setStatus("Error while running optimization.");
+            console.error("Error while running optimization:", error);
+            alert("Error while running optimization. Check console for details.");
+        }
     } finally {
-        setRunningState(false);
+        currentOptimizationAbortController = null;
+        setOptimizationRunningState(false);
     }
 
     function setStatus(message) {
@@ -147,14 +325,6 @@ async function runOptimization() {
         }
     }
 
-    function setRunningState(isRunning) {
-        if (!runButton) {
-            return;
-        }
-
-        runButton.disabled = isRunning;
-        runButton.textContent = isRunning ? "Running..." : "Run optimization";
-    }
 }
 
 function loadOptimizationSettings() {
@@ -306,7 +476,7 @@ function getResultMessageIcon(type) {
         case "warning":
             return "⚠";
         default:
-            return "i";
+            return "ℹ️";
     }
 }
 
@@ -410,6 +580,72 @@ function hidePreprocessingIssues() {
 function setTimetableContentVisible(isVisible) {
     document.getElementById("timetableContent")?.classList.toggle("hidden", !isVisible);
 }
+
+
+function showOptimizationProgress() {
+    const panel =
+        document.getElementById(
+            "optimizationProgressPanel"
+        );
+
+    panel?.classList.remove("hidden");
+
+    updateOptimizationProgress({
+        generation: 0,
+        totalGenerations: 0,
+        percentage: 0
+    });
+}
+
+function hideOptimizationProgress() {
+    const panel =
+        document.getElementById(
+            "optimizationProgressPanel"
+        );
+
+    panel?.classList.add("hidden");
+}
+
+function updateOptimizationProgress(progress) {
+    const percentage =
+        Number(progress.percentage) || 0;
+
+    const generation =
+        Number(progress.generation) || 0;
+
+    const totalGenerations =
+        Number(progress.totalGenerations) || 0;
+
+    const progressBar =
+        document.getElementById(
+            "optimizationProgressBar"
+        );
+
+    const percentageText =
+        document.getElementById(
+            "optimizationProgressPercentage"
+        );
+
+    const generationText =
+        document.getElementById(
+            "optimizationGenerationText"
+        );
+
+    if (progressBar) {
+        progressBar.value = percentage;
+    }
+
+    if (percentageText) {
+        percentageText.textContent =
+            `${percentage}%`;
+    }
+
+    if (generationText) {
+        generationText.textContent =
+            `Generation: ${generation} / ${totalGenerations}`;
+    }
+}
+
 
 function renderScheduledLessonRows(scheduledLessons) {
     const timetableBody = document.getElementById("timetableBody");
