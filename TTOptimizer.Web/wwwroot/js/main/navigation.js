@@ -6,7 +6,8 @@ const NAVIGATION_TARGETS = {
     requirementsButton: "requirements.html",
     rulesButton: "rules.html",
     aboutProjectButton: "about.html",
-    optimizationSettingsButton: "optimization-settings.html"
+    optimizationSettingsButton: "optimization-settings.html",
+    optimizationInfoButton: "optimization-info.html"
 };
 
 export function setupDashboardNavigation() {

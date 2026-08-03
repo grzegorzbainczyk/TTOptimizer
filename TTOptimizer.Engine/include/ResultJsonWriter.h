@@ -17,7 +17,6 @@ struct OptimizationInfo
 	unsigned int randomSeed = 0;
 	int threadCount = 1;
 	long long durationMilliseconds = 0;
-	std::string message = "Feedback!!!";
 };
 
 class ResultJsonWriter
@@ -92,8 +91,8 @@ public:
 			["durationMilliseconds"] =
 			info.durationMilliseconds;
 
-		result["optimizationInfo"]["message"] =
-			info.message;
+		/*result["optimizationInfo"]["message"] =
+			info.message;*/
 
 		return result.dump(2);
 	}
