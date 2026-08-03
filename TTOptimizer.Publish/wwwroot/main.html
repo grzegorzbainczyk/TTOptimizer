@@ -1,8 +1,10 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8" />
-    <title>TTOrganizer - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassFlow - Dashboard</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -29,6 +31,14 @@
                             Built with ASP.NET Core, C++ and JavaScript
                         </p>
                     </div>
+
+                    <button id="optimizationSettingsButton"
+                            class="settings-button"
+                            type="button"
+                            title="Optimization settings">
+                        <span class="settings-button-icon">⚙️</span>
+                        <span>Settings</span>
+                    </button>
                 </div>
             </header>
 
@@ -36,12 +46,13 @@
 
                 <aside class="resource-sidebar app-card">
                     <h2>Resources</h2>
+
                     <p class="sidebar-subtitle">
                         Manage input data used by the optimizer.
                     </p>
 
                     <button id="teachersButton" class="resource-button">
-                        <span class="resource-button-icon">👩‍🏫</span>
+                        <span class="resource-button-icon">👤</span>
                         <span>
                             <strong>Teachers</strong>
                             <small>Manage staff</small>
@@ -93,37 +104,43 @@
 
                     <section class="app-card app-panel">
                         <h2>Optimization</h2>
+
                         <p>
                             Run the C++ optimization engine and display the decoded timetable result.
                         </p>
 
                         <div class="toolbar">
-                            <button id="runOptimizationButton" class="app-button app-button-primary-warm">
+                            <button id="runOptimizationButton"
+                                    class="app-button app-button-primary-warm">
                                 Run optimization
+                            </button>
+
+                            <button id="stopOptimizationButton"
+                                    class="app-button app-button-secondary"
+                                    type="button"
+                                    disabled>
+                                Stop
                             </button>
                         </div>
 
-                        <div class="optimization-depth">
-                            <label for="optimizationLevel">
-                                Optimization depth
-                            </label>
+                        <div id="optimizationProgressPanel"
+                             class="optimization-progress-panel hidden">
 
-                            <input id="optimizationLevel"
-                                   type="range"
-                                   min="1"
-                                   max="3"
-                                   step="1"
-                                   value="2">
+                            <div class="optimization-progress-header">
+                                <strong>Optimization in progress</strong>
 
-                            <div class="optimization-depth-labels">
-                                <span>Fast</span>
-                                <span>Balanced</span>
-                                <span>Thorough</span>
+                                <span id="optimizationProgressPercentage">
+                                    0%
+                                </span>
                             </div>
 
-                            <p id="optimizationLevelDescription"
-                               class="optimization-depth-description">
-                                Balanced search
+                            <progress id="optimizationProgressBar"
+                                      max="100"
+                                      value="0">
+                            </progress>
+
+                            <p id="optimizationGenerationText">
+                                Generation: 0 / 0
                             </p>
                         </div>
 
@@ -149,73 +166,96 @@
                             </div>
                         </div>
 
-                        <div class="summary-grid">
-                            <div class="summary-box">
-                                <span>Feedback</span>
-                                <strong id="feedback">-</strong>
-                            </div>
-                            <div class="summary-box">
-                                <span>Initial penalty</span>
-                                <strong id="initialPenalty">-</strong>
-                            </div>
+                        <div id="resultMessages" class="result-messages">
+                            <section id="resultMessagePanel"
+                                     class="result-message-panel result-message-neutral">
+                                <div class="result-message-icon" aria-hidden="true">ℹ️</div>
 
-                            <div class="summary-box">
-                                <span>Best penalty</span>
-                                <strong id="bestPenalty">-</strong>
-                            </div>
+                                <div class="result-message-content">
+                                    <span class="result-message-label">
+                                        Optimization result
+                                    </span>
 
-                            <div class="summary-box">
-                                <span>Lessons</span>
-                                <strong id="lessonsCount">-</strong>
-                            </div>
+                                    <h3 id="resultMessageTitle">
+                                        No optimization result yet
+                                    </h3>
+
+                                    <p id="resultMessageText">
+                                        Run the optimizer to generate a timetable.
+                                    </p>
+                                </div>
+                            </section>
+
+                            <section id="preprocessingDetails"
+                                     class="preprocessing-details hidden">
+                                <div class="preprocessing-details-header">
+                                    <div>
+                                        <span class="result-message-label">
+                                            Problem details
+                                        </span>
+
+                                        <h3>Input data requires attention</h3>
+                                    </div>
+
+                                    <span id="preprocessingIssueCount"
+                                          class="issue-count-badge">
+                                        0 problems
+                                    </span>
+                                </div>
+
+                                <ul id="preprocessingIssuesList"
+                                    class="preprocessing-issues-list">
+                                </ul>
+                            </section>
                         </div>
 
-                        <div class="filters-row">
-                            <label>
-                                Class:
-                                <select id="classFilter">
-                                    <option value="">All classes</option>
-                                </select>
-                            </label>
+                        <div id="timetableContent">
+                            <div class="filters-row">
+                                <label>
+                                    Class:
+                                    <select id="classFilter">
+                                        <option value="">All classes</option>
+                                    </select>
+                                </label>
 
-                            <label>
-                                Teacher:
-                                <select id="teacherFilter">
-                                    <option value="">All teachers</option>
-                                </select>
-                            </label>
+                                <label>
+                                    Teacher:
+                                    <select id="teacherFilter">
+                                        <option value="">All teachers</option>
+                                    </select>
+                                </label>
 
-                            <label>
-                                Room:
-                                <select id="roomFilter">
-                                    <option value="">All rooms</option>
-                                </select>
-                            </label>
+                                <label>
+                                    Room:
+                                    <select id="roomFilter">
+                                        <option value="">All rooms</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Slot</th>
+                                        <th>Lesson</th>
+                                        <th>Class</th>
+                                        <th>Subject</th>
+                                        <th>Teacher</th>
+                                        <th>Room</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="timetableBody">
+                                    <tr>
+                                        <td colspan="7">No timetable generated yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Day</th>
-                                    <th>Slot</th>
-                                    <th>Lesson</th>
-                                    <th>Class</th>
-                                    <th>Subject</th>
-                                    <th>Teacher</th>
-                                    <th>Room</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="timetableBody">
-                                <tr>
-                                    <td colspan="7">No timetable generated yet.</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </section>
 
                 </div>
-
             </div>
 
             <footer class="app-footer">
@@ -225,7 +265,8 @@
         </div>
     </main>
 
-    <script src="js/appContext.js"></script>
-    <script src="js/main.js"></script>
+    <script src="/js/appContext.js"></script>
+    <script src="/js/signalr/dist/browser/signalr.min.js"></script>
+    <script src="/js/main.js"></script>
 </body>
 </html>

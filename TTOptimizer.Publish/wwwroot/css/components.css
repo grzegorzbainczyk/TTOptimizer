@@ -791,3 +791,16 @@
         min-width: 800px;
     }
 }
+
+
+/* Optimization controls */
+.app-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(0.8);
+    box-shadow: none;
+}
+
+.app-button:disabled:hover {
+    transform: none;
+}
