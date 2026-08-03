@@ -1,11 +1,11 @@
-﻿/* =========================
+/* =========================
    1. Variables
 ========================= */
 :root {
     --color-bg-start: #dbeafe;
     --color-bg-middle: #bfdbfe;
     --color-bg-end: #e0f2fe;
-    --color-surface: rgba(255, 255, 255, 0.78);
+    --color-surface: rgba(255, 255, 255, 0.92);
     --color-surface-strong: rgba(255, 255, 255, 0.94);
     --color-surface-dark: rgba(30, 64, 175, 0.88);
     --color-primary: #2563eb;
@@ -19,14 +19,14 @@
     --color-text: #0f172a;
     --color-text-muted: #475569;
     --color-text-light: #f8fafc;
-    --color-border: rgba(59, 130, 246, 0.22);
-    --shadow-soft: 0 10px 26px rgba(37, 99, 235, 0.12);
-    --shadow-medium: 0 16px 40px rgba(37, 99, 235, 0.18);
-    --shadow-card-hover: 0 20px 48px rgba(37, 99, 235, 0.22);
+    --color-border: rgba(100, 116, 139, 0.22);
+    --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.08);
+    --shadow-medium: 0 18px 44px rgba(15, 23, 42, 0.13);
+    --shadow-card-hover: 0 16px 34px rgba(15, 23, 42, 0.13);
     --radius-sm: 8px;
-    --radius-md: 14px;
-    --radius-lg: 22px;
-    --radius-xl: 30px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
     --transition-fast: 0.18s ease;
     --transition-normal: 0.25s ease;
  
