@@ -239,9 +239,7 @@ function renderScheduledLessonRows(scheduledLessons) {
         row.dataset.roomValue = String(roomValue);
 
         appendCell(row, lesson.day ?? "");
-        appendCell(
-            row,
-            lesson.lessonNumber ?? lesson.slot ?? ""
+        appendCell(row, lesson.lessonNumber + 1 ?? lesson.slot ?? ""
         );
         appendCell(row, lesson.lessonInstanceId ?? "");
         appendCell(row, classValue);
