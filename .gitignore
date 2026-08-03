@@ -40,3 +40,5 @@ packages/
 # Environment files
 .env
 appsettings.Development.json
+
+TTOptimizer.Web/App_Data/OptimizationRuns/
