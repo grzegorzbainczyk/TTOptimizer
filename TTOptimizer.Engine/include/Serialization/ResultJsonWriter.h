@@ -7,7 +7,6 @@
 
 #include "Domain/TimetableModels.h"
 #include "Preprocessing/PreprocessingModels.h"
-#include "Utils/Utils.h"
 
 using json = nlohmann::json;
 
@@ -17,6 +16,40 @@ struct OptimizationInfo
 	unsigned int randomSeed = 0;
 	int threadCount = 1;
 	long long durationMilliseconds = 0;
+};
+
+class DayOfWeekConverter
+{
+public:
+	static std::string toString(DayOfWeek day)
+	{
+		switch (day)
+		{
+		case DayOfWeek::Monday:
+			return "Monday";
+
+		case DayOfWeek::Tuesday:
+			return "Tuesday";
+
+		case DayOfWeek::Wednesday:
+			return "Wednesday";
+
+		case DayOfWeek::Thursday:
+			return "Thursday";
+
+		case DayOfWeek::Friday:
+			return "Friday";
+
+		case DayOfWeek::Saturday:
+			return "Saturday";
+
+		case DayOfWeek::Sunday:
+			return "Sunday";
+
+		default:
+			return "Unknown";
+		}
+	}
 };
 
 class ResultJsonWriter
@@ -107,8 +140,8 @@ public:
 			lessonJson["roomId"] =
 				lesson.roomId;
 
-			lessonJson["day"] =
-				Utils::ToString(
+			lessonJson["day"] = 
+				DayOfWeekConverter::toString(
 					lesson.timeSlot.day);
 
 			lessonJson["lessonNumber"] =

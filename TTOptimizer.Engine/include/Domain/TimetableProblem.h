@@ -1,8 +1,7 @@
 #pragma once
 
 #include <vector>
-
-#include "TimeTableModels.h"
+#include "TimetableModels.h"
 
 struct TeacherUnavailability
 {

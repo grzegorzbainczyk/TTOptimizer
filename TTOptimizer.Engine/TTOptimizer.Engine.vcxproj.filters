@@ -28,126 +28,174 @@
     <Filter Include="Source Files\Generators">
       <UniqueIdentifier>{567ed871-6008-4dea-9c15-e7c84f9a3e3d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Utils">
-      <UniqueIdentifier>{56f0cf9e-8c56-4bcc-8b21-60d4d4adca3c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Optimization">
       <UniqueIdentifier>{15ff33ac-142b-44c7-9f24-dd72d9707674}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Domain">
+      <UniqueIdentifier>{c1f45d5a-d943-4ceb-841e-8230d0cdd523}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Evaluation">
+      <UniqueIdentifier>{9d84ff2c-2b7d-4e71-ad14-db16ef25cbf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Validation">
+      <UniqueIdentifier>{051ea45d-1a8e-41ef-bf7f-6cf2fe2bfca5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Evaluation\Rules">
+      <UniqueIdentifier>{3176370b-d87a-48b2-ab13-32fbf673e08d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Evaluation\Validation">
+      <UniqueIdentifier>{e069d905-1beb-44ac-896b-b68d1189a5e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Evaluation\Rules\Hard">
+      <UniqueIdentifier>{2af20e72-9099-481f-8685-fbfc5f90c17e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Evaluation\Rules\Soft">
+      <UniqueIdentifier>{60c2281d-43bc-46d2-8a2c-e1898dc20095}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Optimization">
+      <UniqueIdentifier>{eda9aff7-5669-47a4-872a-3ddf8dd3ff05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Preprocessing">
+      <UniqueIdentifier>{76236432-be78-488d-9261-07360f5309be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Serialization">
+      <UniqueIdentifier>{eb33a5c9-4f09-4a66-826e-4bc2346fa6ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine">
+      <UniqueIdentifier>{4b6ca19e-fa3d-42c9-8702-8a1674f6fc0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Generators">
+      <UniqueIdentifier>{0f499153-02b8-4198-801a-0f87bef03c98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Decoding">
+      <UniqueIdentifier>{3c9f9604-84b8-4ef3-ae04-257fcbffa465}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Evaluation\Rules">
+      <UniqueIdentifier>{a939bbfd-26a3-4b75-b5e4-ae218e133279}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Preprocessing">
+      <UniqueIdentifier>{b81e353b-85a5-4de1-b264-0d6f4189ff56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Evaluation\Rules\Soft">
+      <UniqueIdentifier>{47150d6e-0808-4140-b062-750530ca0961}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Evaluation\Rules\Hard">
+      <UniqueIdentifier>{c0365a9f-e384-498c-9504-19e856c44bfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{1ad8153a-5b4b-4741-b67c-95ffcaa648a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Utils\Utils.cpp">
-      <Filter>Source Files\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="src\Optimization\ChromosomeMutator.cpp">
       <Filter>Source Files\Optimization</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneticOptimizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="include\Preprocessing\TimetablePreprocessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="include\Evaluation\Rules\ConstraintRuleRegistry.cpp">
-      <Filter>Source Files\Evaluation</Filter>
-    </ClCompile>
-    <ClCompile Include="include\Evaluation\Rules\Soft\RoomSubjectCompatibilityRule.cpp">
-      <Filter>Source Files\Evaluation</Filter>
-    </ClCompile>
     <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp">
       <Filter>Source Files\Evaluation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Evaluation\Rules\ConstraintRuleRegistry.cpp">
+      <Filter>Source Files\Evaluation\Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Evaluation\Rules\Soft\RoomSubjectCompatibilityRule.cpp">
+      <Filter>Source Files\Evaluation\Rules\Soft</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Engine.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Optimization\GeneticOptimizer.cpp">
+      <Filter>Source Files\Optimization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Preprocessing\TimetablePreprocessor.cpp">
+      <Filter>Source Files\Preprocessing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\nlohmann\json.hpp">
       <Filter>External\nlohmann</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Domain\TimetableProblem.h">
+      <Filter>Header Files\Domain</Filter>
     </ClInclude>
-    <ClInclude Include="include\Generators\ChromosomeFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Generators\LessonInstanceGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Generators\ScheduleSlotGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Utils\Utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Evaluation\ChromosomeValidator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Domain\TimetableModels.h">
+      <Filter>Header Files\Domain</Filter>
     </ClInclude>
     <ClInclude Include="include\Evaluation\FitnessEvaluator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Optimization\ChromosomeMutator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ResultJsonWriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Domain\TimeTableModels.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Domain\TimetableProblem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\JsonReader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Optimization\GeneticOptimizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ChromosomeDecoder.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Evaluation</Filter>
     </ClInclude>
     <ClInclude Include="include\Evaluation\FitnessScore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Preprocessing\PreprocessingModels.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Preprocessing\StructuralProblemValidator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Preprocessing\ReferenceIntegrityValidator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Preprocessing\AvailabilityValidator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Preprocessing\TimetablePreprocessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Optimization\OptimizationProgress.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Evaluation</Filter>
     </ClInclude>
     <ClInclude Include="include\Evaluation\ConstraintViolation.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Evaluation</Filter>
     </ClInclude>
-    <ClInclude Include="include\Evaluation\Rules\ConstraintRuleContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Evaluation\Rules\ConstraintRuleRegistry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Evaluation\Rules\ConstraintRuleResult.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Evaluation\Rules\IConstraintRule.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Evaluation\Validation\ChromosomeValidator.h">
+      <Filter>Header Files\Evaluation\Validation</Filter>
     </ClInclude>
     <ClInclude Include="include\Evaluation\Rules\Soft\RoomSubjectCompatibilityRule.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Evaluation\Rules\Soft</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Optimization\GeneticOptimizer.h">
+      <Filter>Header Files\Optimization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Optimization\ChromosomeMutator.h">
+      <Filter>Header Files\Optimization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Optimization\OptimizationProgress.h">
+      <Filter>Header Files\Optimization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Preprocessing\PreprocessingModels.h">
+      <Filter>Header Files\Preprocessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Preprocessing\TimetablePreprocessor.h">
+      <Filter>Header Files\Preprocessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Preprocessing\StructuralProblemValidator.h">
+      <Filter>Header Files\Preprocessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Preprocessing\ReferenceIntegrityValidator.h">
+      <Filter>Header Files\Preprocessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Preprocessing\AvailabilityValidator.h">
+      <Filter>Header Files\Preprocessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultJsonWriter.h">
+      <Filter>Header Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Generators\LessonInstanceGenerator.h">
+      <Filter>Header Files\Generators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Generators\ScheduleSlotGenerator.h">
+      <Filter>Header Files\Generators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Generators\ChromosomeFactory.h">
+      <Filter>Header Files\Generators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ChromosomeDecoder.h">
+      <Filter>Header Files\Decoding</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Evaluation\Rules\ConstraintRuleContext.h">
+      <Filter>Header Files\Evaluation\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Evaluation\Rules\ConstraintRuleRegistry.h">
+      <Filter>Header Files\Evaluation\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Evaluation\Rules\ConstraintRuleResult.h">
+      <Filter>Header Files\Evaluation\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Evaluation\Rules\IConstraintRule.h">
+      <Filter>Header Files\Evaluation\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="include\JsonReader.h">
+      <Filter>Header Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\DayOfWeekConverter.h">
+      <Filter>Header Files\Serialization</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

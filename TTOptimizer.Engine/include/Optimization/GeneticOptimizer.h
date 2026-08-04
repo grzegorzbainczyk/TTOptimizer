@@ -4,7 +4,7 @@
 #include <random>
 #include <vector>
 
-#include "Domain/TimeTableModels.h"
+#include "Domain/TimetableModels.h"
 #include "Domain/TimetableProblem.h"
 #include "Evaluation/FitnessEvaluator.h"
 #include "Generators/ChromosomeFactory.h"

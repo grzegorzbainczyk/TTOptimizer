@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <utility>
 
-#include "Evaluation/ChromosomeValidator.h"
+#include "Evaluation/Validation/ChromosomeValidator.h"
 
 GeneticOptimizer::GeneticOptimizer(
     const OptimizationSettings& settings,

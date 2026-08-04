@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "Domain/TimeTableModels.h"
+#include "Domain/TimetableModels.h"
 
 enum class PreprocessingIssueSeverity
 {

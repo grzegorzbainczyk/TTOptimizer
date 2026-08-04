@@ -4,8 +4,8 @@
 #include <stdexcept>
 #include <vector>
 
-#include "Domain/TimeTableModels.h"
-#include "Domain/TimeTableProblem.h"
+#include "Domain/TimetableModels.h"
+#include "Domain/TimetableProblem.h"
 
 class ChromosomeDecoder
 {

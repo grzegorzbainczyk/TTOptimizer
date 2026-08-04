@@ -131,22 +131,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GeneticOptimizer.cpp" />
-    <ClCompile Include="include\Evaluation\Rules\ConstraintRuleRegistry.cpp" />
-    <ClCompile Include="include\Evaluation\Rules\Soft\RoomSubjectCompatibilityRule.cpp" />
-    <ClCompile Include="include\Preprocessing\TimetablePreprocessor.cpp" />
+    <ClCompile Include="src\Engine\Engine.cpp" />
     <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp" />
+    <ClCompile Include="src\Evaluation\Rules\ConstraintRuleRegistry.cpp" />
+    <ClCompile Include="src\Evaluation\Rules\Soft\RoomSubjectCompatibilityRule.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Optimization\ChromosomeMutator.cpp" />
-    <ClCompile Include="src\Engine.cpp" />
-    <ClCompile Include="src\Utils\Utils.cpp" />
+    <ClCompile Include="src\Optimization\GeneticOptimizer.cpp" />
+    <ClCompile Include="src\Preprocessing\TimetablePreprocessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\nlohmann\json.hpp" />
     <ClInclude Include="include\ChromosomeDecoder.h" />
-    <ClInclude Include="include\Domain\TimeTableModels.h" />
+    <ClInclude Include="include\Domain\TimetableModels.h" />
     <ClInclude Include="include\Domain\TimetableProblem.h" />
-    <ClInclude Include="include\Evaluation\ChromosomeValidator.h" />
     <ClInclude Include="include\Evaluation\ConstraintViolation.h" />
     <ClInclude Include="include\Evaluation\FitnessEvaluator.h" />
     <ClInclude Include="include\Evaluation\FitnessScore.h" />
@@ -155,6 +153,7 @@
     <ClInclude Include="include\Evaluation\Rules\ConstraintRuleResult.h" />
     <ClInclude Include="include\Evaluation\Rules\IConstraintRule.h" />
     <ClInclude Include="include\Evaluation\Rules\Soft\RoomSubjectCompatibilityRule.h" />
+    <ClInclude Include="include\Evaluation\Validation\ChromosomeValidator.h" />
     <ClInclude Include="include\Generators\ChromosomeFactory.h" />
     <ClInclude Include="include\Generators\LessonInstanceGenerator.h" />
     <ClInclude Include="include\Generators\ScheduleSlotGenerator.h" />
@@ -169,7 +168,7 @@
     <ClInclude Include="include\Preprocessing\TimetablePreprocessor.h" />
     <ClInclude Include="include\ResultJsonWriter.h" />
     <ClInclude Include="include\JsonReader.h" />
-    <ClInclude Include="include\Utils\Utils.h" />
+    <ClInclude Include="include\Utils\DayOfWeekConverter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

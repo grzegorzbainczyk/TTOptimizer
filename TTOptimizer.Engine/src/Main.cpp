@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "JsonReader.h"
-#include "Engine.h"
+#include "Serialization/JsonReader.h"
+#include "Engine/Engine.h"
 #include "Domain/TimetableProblem.h"
 
 #ifdef _DEBUG
