@@ -145,7 +145,7 @@ public class OptimizationInfo
     /// Gets or sets an informational message returned by the optimization engine.
     /// </summary>
     [JsonPropertyName("message")]
-    public required string Message { get; set; }
+    public string Message { get; set; } = string.Empty;
 }
 
 /// <summary>

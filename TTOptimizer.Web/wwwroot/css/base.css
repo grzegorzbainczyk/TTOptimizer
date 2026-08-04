@@ -13,7 +13,7 @@ body {
     background-position: center center;
     background-size: cover;
     background-attachment: fixed;
-    background-color: #dfeeff;
+    background-color: var(--color-page-fallback);
 }
 
 button,

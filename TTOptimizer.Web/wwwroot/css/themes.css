@@ -1,0 +1,250 @@
+/* =========================================================
+   ClassFlow themes
+
+   Default theme: cream.
+   Select another theme by setting:
+   <html data-theme="blue">
+   ========================================================= */
+
+:root,
+html[data-theme="cream"] {
+    color-scheme: light;
+
+    --color-bg-start: #dbeafe;
+    --color-bg-middle: #bfdbfe;
+    --color-bg-end: #e0f2fe;
+    --color-page-fallback: #dfeeff;
+
+    --color-surface: rgba(255, 250, 239, 0.94);
+    --color-surface-strong: rgba(255, 252, 244, 0.97);
+    --color-surface-elevated: rgba(255, 255, 255, 0.92);
+    --color-surface-soft: rgba(255, 255, 255, 0.82);
+    --color-surface-muted: rgba(248, 250, 252, 0.82);
+    --color-surface-dark: rgba(30, 64, 175, 0.88);
+
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-primary-accent: #3b82f6;
+    --color-primary-soft: rgba(37, 99, 235, 0.12);
+    --color-primary-softer: rgba(37, 99, 235, 0.06);
+    --color-primary-border: rgba(37, 99, 235, 0.22);
+    --color-primary-border-strong: rgba(37, 99, 235, 0.34);
+
+    --color-secondary: #0ea5e9;
+    --color-secondary-hover: #0284c7;
+
+    --color-text: #0f172a;
+    --color-text-muted: #475569;
+    --color-text-light: #f8fafc;
+    --color-heading-accent: #1e3a8a;
+
+    --color-border: rgba(190, 155, 96, 0.24);
+    --color-border-neutral: rgba(148, 163, 184, 0.35);
+
+    --color-header-start: rgba(29, 78, 216, 0.94);
+    --color-header-end: rgba(14, 165, 233, 0.86);
+
+    --color-panel-start: rgba(255, 253, 247, 0.98);
+    --color-panel-end: rgba(255, 249, 236, 0.96);
+    --color-sidebar-end: rgba(255, 246, 224, 0.96);
+
+    --color-tile-start: rgba(239, 246, 255, 0.96);
+    --color-tile-end: rgba(219, 234, 254, 0.88);
+    --color-tile-hover-start: rgba(219, 234, 254, 1);
+    --color-tile-hover-end: rgba(191, 219, 254, 0.94);
+
+    --color-input-background: rgba(255, 255, 255, 0.90);
+    --color-input-focus-background: #ffffff;
+
+    --color-warning: #f59e0b;
+    --color-danger: #dc2626;
+    --color-success: #16a34a;
+    --accent-warm: #f59e0b;
+    --accent-warm-hover: #d97706;
+    --accent-warm-soft: rgba(245, 158, 11, 0.14);
+    --success: #22c55e;
+    --success-soft: rgba(34, 197, 94, 0.14);
+    --danger: #ef4444;
+    --danger-soft: rgba(239, 68, 68, 0.14);
+
+    --shadow-primary: rgba(37, 99, 235, 0.28);
+    --shadow-soft: 0 10px 28px rgba(120, 88, 34, 0.09);
+    --shadow-medium: 0 18px 44px rgba(15, 23, 42, 0.13);
+    --shadow-card-hover: 0 16px 34px rgba(120, 88, 34, 0.14);
+}
+
+html[data-theme="beige"] {
+    --color-page-fallback: #e8ddcc;
+    --color-bg-start: #eadfcf;
+    --color-bg-middle: #d8c4a8;
+    --color-bg-end: #f2e9dc;
+
+    --color-surface: rgba(250, 245, 236, 0.95);
+    --color-surface-strong: rgba(255, 251, 244, 0.98);
+    --color-surface-elevated: rgba(255, 252, 246, 0.94);
+    --color-surface-soft: rgba(255, 250, 242, 0.86);
+    --color-surface-muted: rgba(248, 242, 233, 0.88);
+
+    --color-primary: #8a6546;
+    --color-primary-hover: #6f4f36;
+    --color-primary-accent: #b4875f;
+    --color-primary-soft: rgba(138, 101, 70, 0.14);
+    --color-primary-softer: rgba(138, 101, 70, 0.07);
+    --color-primary-border: rgba(138, 101, 70, 0.24);
+    --color-primary-border-strong: rgba(138, 101, 70, 0.38);
+    --color-secondary: #b08a62;
+    --color-secondary-hover: #8d6d4d;
+
+    --color-text: #302820;
+    --color-text-muted: #6f6257;
+    --color-heading-accent: #63462f;
+    --color-border: rgba(135, 100, 66, 0.25);
+
+    --color-header-start: rgba(111, 79, 54, 0.95);
+    --color-header-end: rgba(176, 138, 98, 0.90);
+
+    --color-panel-start: rgba(255, 252, 246, 0.98);
+    --color-panel-end: rgba(247, 238, 225, 0.97);
+    --color-sidebar-end: rgba(241, 229, 211, 0.97);
+
+    --color-tile-start: rgba(249, 241, 229, 0.97);
+    --color-tile-end: rgba(231, 214, 191, 0.92);
+    --color-tile-hover-start: rgba(241, 229, 211, 1);
+    --color-tile-hover-end: rgba(220, 197, 166, 0.96);
+
+    --shadow-primary: rgba(111, 79, 54, 0.25);
+    --shadow-soft: 0 10px 28px rgba(89, 67, 45, 0.10);
+    --shadow-card-hover: 0 16px 34px rgba(89, 67, 45, 0.16);
+}
+
+html[data-theme="blue"] {
+    --color-page-fallback: #dbeafe;
+    --color-bg-start: #dbeafe;
+    --color-bg-middle: #bfdbfe;
+    --color-bg-end: #e0f2fe;
+
+    --color-surface: rgba(245, 249, 255, 0.95);
+    --color-surface-strong: rgba(255, 255, 255, 0.98);
+    --color-surface-elevated: rgba(255, 255, 255, 0.94);
+    --color-surface-soft: rgba(248, 251, 255, 0.86);
+    --color-surface-muted: rgba(239, 246, 255, 0.88);
+
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-primary-accent: #60a5fa;
+    --color-primary-soft: rgba(37, 99, 235, 0.14);
+    --color-primary-softer: rgba(37, 99, 235, 0.07);
+    --color-primary-border: rgba(37, 99, 235, 0.24);
+    --color-primary-border-strong: rgba(37, 99, 235, 0.40);
+    --color-secondary: #0ea5e9;
+    --color-secondary-hover: #0284c7;
+
+    --color-text: #0f172a;
+    --color-text-muted: #475569;
+    --color-heading-accent: #1e3a8a;
+    --color-border: rgba(96, 165, 250, 0.28);
+
+    --color-header-start: rgba(29, 78, 216, 0.96);
+    --color-header-end: rgba(14, 165, 233, 0.90);
+
+    --color-panel-start: rgba(255, 255, 255, 0.98);
+    --color-panel-end: rgba(239, 246, 255, 0.97);
+    --color-sidebar-end: rgba(226, 238, 255, 0.97);
+
+    --color-tile-start: rgba(239, 246, 255, 0.98);
+    --color-tile-end: rgba(219, 234, 254, 0.92);
+    --color-tile-hover-start: rgba(219, 234, 254, 1);
+    --color-tile-hover-end: rgba(191, 219, 254, 0.98);
+
+    --shadow-primary: rgba(37, 99, 235, 0.30);
+    --shadow-soft: 0 10px 28px rgba(37, 99, 235, 0.10);
+    --shadow-card-hover: 0 16px 34px rgba(37, 99, 235, 0.18);
+}
+
+html[data-theme="green"] {
+    --color-page-fallback: #dff1e4;
+    --color-bg-start: #dcfce7;
+    --color-bg-middle: #bbf7d0;
+    --color-bg-end: #ecfdf5;
+
+    --color-surface: rgba(246, 252, 247, 0.95);
+    --color-surface-strong: rgba(252, 255, 252, 0.98);
+    --color-surface-elevated: rgba(255, 255, 255, 0.94);
+    --color-surface-soft: rgba(249, 255, 250, 0.86);
+    --color-surface-muted: rgba(240, 253, 244, 0.88);
+
+    --color-primary: #2f855a;
+    --color-primary-hover: #276749;
+    --color-primary-accent: #48bb78;
+    --color-primary-soft: rgba(47, 133, 90, 0.14);
+    --color-primary-softer: rgba(47, 133, 90, 0.07);
+    --color-primary-border: rgba(47, 133, 90, 0.24);
+    --color-primary-border-strong: rgba(47, 133, 90, 0.40);
+    --color-secondary: #38a169;
+    --color-secondary-hover: #2f855a;
+
+    --color-text: #17251d;
+    --color-text-muted: #52665a;
+    --color-heading-accent: #22543d;
+    --color-border: rgba(72, 187, 120, 0.27);
+
+    --color-header-start: rgba(39, 103, 73, 0.96);
+    --color-header-end: rgba(56, 161, 105, 0.90);
+
+    --color-panel-start: rgba(252, 255, 252, 0.98);
+    --color-panel-end: rgba(240, 253, 244, 0.97);
+    --color-sidebar-end: rgba(220, 252, 231, 0.97);
+
+    --color-tile-start: rgba(240, 253, 244, 0.98);
+    --color-tile-end: rgba(220, 252, 231, 0.92);
+    --color-tile-hover-start: rgba(220, 252, 231, 1);
+    --color-tile-hover-end: rgba(187, 247, 208, 0.98);
+
+    --shadow-primary: rgba(47, 133, 90, 0.28);
+    --shadow-soft: 0 10px 28px rgba(47, 133, 90, 0.10);
+    --shadow-card-hover: 0 16px 34px rgba(47, 133, 90, 0.18);
+}
+
+html[data-theme="emerald"] {
+    --color-page-fallback: #d8f3ee;
+    --color-bg-start: #ccfbf1;
+    --color-bg-middle: #99f6e4;
+    --color-bg-end: #ecfeff;
+
+    --color-surface: rgba(245, 253, 251, 0.95);
+    --color-surface-strong: rgba(250, 255, 254, 0.98);
+    --color-surface-elevated: rgba(255, 255, 255, 0.94);
+    --color-surface-soft: rgba(247, 255, 253, 0.86);
+    --color-surface-muted: rgba(236, 253, 245, 0.88);
+
+    --color-primary: #059669;
+    --color-primary-hover: #047857;
+    --color-primary-accent: #2dd4bf;
+    --color-primary-soft: rgba(5, 150, 105, 0.14);
+    --color-primary-softer: rgba(5, 150, 105, 0.07);
+    --color-primary-border: rgba(5, 150, 105, 0.24);
+    --color-primary-border-strong: rgba(5, 150, 105, 0.40);
+    --color-secondary: #0d9488;
+    --color-secondary-hover: #0f766e;
+
+    --color-text: #102a25;
+    --color-text-muted: #4c6761;
+    --color-heading-accent: #065f46;
+    --color-border: rgba(45, 212, 191, 0.28);
+
+    --color-header-start: rgba(4, 120, 87, 0.96);
+    --color-header-end: rgba(13, 148, 136, 0.90);
+
+    --color-panel-start: rgba(250, 255, 254, 0.98);
+    --color-panel-end: rgba(236, 253, 245, 0.97);
+    --color-sidebar-end: rgba(204, 251, 241, 0.97);
+
+    --color-tile-start: rgba(236, 253, 245, 0.98);
+    --color-tile-end: rgba(204, 251, 241, 0.92);
+    --color-tile-hover-start: rgba(204, 251, 241, 1);
+    --color-tile-hover-end: rgba(153, 246, 228, 0.98);
+
+    --shadow-primary: rgba(5, 150, 105, 0.28);
+    --shadow-soft: 0 10px 28px rgba(5, 150, 105, 0.10);
+    --shadow-card-hover: 0 16px 34px rgba(5, 150, 105, 0.18);
+}

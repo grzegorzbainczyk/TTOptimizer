@@ -19,7 +19,7 @@
     width: 100%;
     max-width: 570px;
     padding: 36px;
-    background: rgba(255, 255, 255, 0.88);
+    background: var(--color-surface-elevated);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-medium);
@@ -74,7 +74,7 @@
         width: 100%;
         box-sizing: border-box;
         padding: 12px 14px;
-        background: rgba(255, 255, 255, 0.82);
+        background: var(--color-surface-soft);
         border: 1px solid var(--color-border);
         border-radius: var(--radius-md);
         color: var(--color-text);
@@ -85,7 +85,7 @@
     }
 
         .form-group input:focus {
-            background-color: #ffffff;
+            background-color: var(--color-input-focus-background);
             border-color: var(--color-primary);
             box-shadow: 0 0 0 4px var(--color-primary-soft);
         }
@@ -134,7 +134,7 @@
 .auth-button-primary {
     background-color: #7fb3ff;
     border-color: #7fb3ff;
-    color: #ffffff;
+    color: var(--color-input-focus-background);
     box-shadow: 0 6px 16px rgba(80, 140, 220, 0.20);
 }
 

@@ -108,6 +108,39 @@
                         </div>
                     </section>
 
+
+                    <section class="settings-section">
+                        <h3>Appearance</h3>
+
+                        <div class="settings-grid">
+                            <label class="settings-field" for="themeSelect">
+                                <span>Color theme</span>
+
+                                <select id="themeSelect"
+                                        name="theme"
+                                        class="settings-select">
+                                    <option value="cream">Cream</option>
+                                    <option value="beige">Beige</option>
+                                    <option value="blue">Blue</option>
+                                    <option value="green">Green</option>
+                                    <option value="emerald">Emerald</option>
+                                </select>
+
+                                <small>
+                                    The selected theme is applied immediately
+                                    and stored in this browser.
+                                </small>
+                            </label>
+
+                            <div class="theme-preview"
+                                 aria-label="Theme preview">
+                                <span class="theme-preview-primary"></span>
+                                <span class="theme-preview-secondary"></span>
+                                <span class="theme-preview-surface"></span>
+                            </div>
+                        </div>
+                    </section>
+
                     <section class="settings-section">
                         <h3>Penalty settings</h3>
                         <div class="settings-grid settings-grid-penalties">
@@ -130,5 +163,6 @@
         </div>
     </main>
     <script src="js/optimization-settings.js"></script>
+    <script type="module" src="js/theme-settings.js"></script>
 </body>
 </html>
