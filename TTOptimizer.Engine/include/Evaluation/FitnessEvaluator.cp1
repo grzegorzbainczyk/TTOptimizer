@@ -351,6 +351,20 @@ FitnessScore FitnessEvaluator::evaluate(
             score.addHardViolation(
                 std::move(violation));
         }
+
+        /*
+         * Soft constraint:
+         * subject is not allowed or preferred
+         * in the selected room.
+         */
+        if (!ContainsSubject(
+            room.allowedSubjects,
+            requirement.subjectId))
+        {
+            score.addSoftPenalty(
+                ToPenalty(
+                    PenaltyLevel::Medium));
+        }
     }
 
     /*

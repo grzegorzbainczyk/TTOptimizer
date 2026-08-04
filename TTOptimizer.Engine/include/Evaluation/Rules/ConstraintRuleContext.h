@@ -1,0 +1,13 @@
+#pragma once
+
+#include <vector>
+
+#include "Domain/TimetableProblem.h"
+
+struct ConstraintRuleContext
+{
+    const Chromosome& chromosome;
+    const TimetableProblem& problem;
+    const std::vector<LessonInstance>& lessonInstances;
+    const std::vector<ScheduleSlot>& scheduleSlots;
+};

@@ -1,40 +1,11 @@
 #pragma once
 
-#include <string>
+#include <iterator>
 #include <utility>
 #include <vector>
 
-enum class ConstraintViolationType
-{
-    InvalidChromosome,
-    InvalidScheduleSlot,
-
-    TeacherUnavailable,
-    ClassGroupUnavailable,
-    RoomUnavailable,
-
-    TeacherConflict,
-    ClassGroupConflict,
-    RoomConflict
-};
-
-struct ConstraintViolation
-{
-    ConstraintViolationType type{
-        ConstraintViolationType::InvalidChromosome
-    };
-
-    int teacherId{};
-    int classGroupId{};
-    int roomId{};
-
-    int dayIndex{ -1 };
-    int slotIndex{ -1 };
-
-    int occurrenceCount{ 1 };
-
-    std::string message;
-};
+#include "Evaluation/ConstraintViolation.h"
+#include "Evaluation/Rules/ConstraintRuleResult.h"
 
 struct FitnessScore
 {
@@ -42,6 +13,7 @@ struct FitnessScore
     double softPenalty{};
 
     std::vector<ConstraintViolation> violations;
+    std::vector<ConstraintRuleResult> ruleResults;
 
     bool isFeasible() const
     {
@@ -87,5 +59,38 @@ struct FitnessScore
         {
             softPenalty += penalty;
         }
+    }
+
+    void addRuleResult(
+        ConstraintRuleResult result)
+    {
+        if (result.violationCount < 0)
+        {
+            result.violationCount = 0;
+        }
+
+        if (result.penalty < 0.0)
+        {
+            result.penalty = 0.0;
+        }
+
+        if (result.kind == ConstraintRuleKind::Hard)
+        {
+            hardViolationCount +=
+                result.violationCount;
+
+            violations.insert(
+                violations.end(),
+                std::make_move_iterator(
+                    result.violations.begin()),
+                std::make_move_iterator(
+                    result.violations.end()));
+        }
+        else
+        {
+            softPenalty += result.penalty;
+        }
+
+        ruleResults.push_back(std::move(result));
     }
 };

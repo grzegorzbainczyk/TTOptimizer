@@ -38,6 +38,46 @@ public:
 		result["bestPenalty"] =
 			score.softPenalty;
 
+
+		result["ruleResults"] =
+			json::array();
+
+		for (const ConstraintRuleResult& ruleResult :
+			score.ruleResults)
+		{
+			json ruleJson;
+
+			ruleJson["code"] =
+				ruleResult.code;
+
+			ruleJson["name"] =
+				ruleResult.name;
+
+			ruleJson["description"] =
+				ruleResult.description;
+
+			ruleJson["kind"] =
+				ruleKindToString(
+					ruleResult.kind);
+
+			ruleJson["category"] =
+				ruleCategoryToString(
+					ruleResult.category);
+
+			ruleJson["penaltyLevel"] =
+				penaltyLevelToString(
+					ruleResult.penaltyLevel);
+
+			ruleJson["violationCount"] =
+				ruleResult.violationCount;
+
+			ruleJson["penalty"] =
+				ruleResult.penalty;
+
+			result["ruleResults"].push_back(
+				std::move(ruleJson));
+		}
+
 		result["preprocessingIssues"] =
 			json::array();
 
@@ -115,6 +155,9 @@ public:
 		result["initialPenalty"] = 0.0;
 
 		result["scheduledLessons"] =
+			json::array();
+
+		result["ruleResults"] =
 			json::array();
 
 		result["preprocessingIssues"] =
@@ -199,10 +242,82 @@ public:
 		result["scheduledLessons"] =
 			json::array();
 
+		result["ruleResults"] =
+			json::array();
+
 		return result.dump(2);
 	}
 
 private:
+	static std::string ruleKindToString(
+		ConstraintRuleKind kind)
+	{
+		switch (kind)
+		{
+		case ConstraintRuleKind::Hard:
+			return "Hard";
+
+		case ConstraintRuleKind::Soft:
+			return "Soft";
+		}
+
+		return "Unknown";
+	}
+
+	static std::string ruleCategoryToString(
+		ConstraintRuleCategory category)
+	{
+		switch (category)
+		{
+		case ConstraintRuleCategory::Technical:
+			return "Technical";
+
+		case ConstraintRuleCategory::Teacher:
+			return "Teacher";
+
+		case ConstraintRuleCategory::ClassGroup:
+			return "ClassGroup";
+
+		case ConstraintRuleCategory::Room:
+			return "Room";
+
+		case ConstraintRuleCategory::Subject:
+			return "Subject";
+
+		case ConstraintRuleCategory::Lesson:
+			return "Lesson";
+
+		case ConstraintRuleCategory::Global:
+			return "Global";
+		}
+
+		return "Unknown";
+	}
+
+	static std::string penaltyLevelToString(
+		ConstraintPenaltyLevel level)
+	{
+		switch (level)
+		{
+		case ConstraintPenaltyLevel::None:
+			return "None";
+
+		case ConstraintPenaltyLevel::Low:
+			return "Low";
+
+		case ConstraintPenaltyLevel::Medium:
+			return "Medium";
+
+		case ConstraintPenaltyLevel::High:
+			return "High";
+
+		case ConstraintPenaltyLevel::Hard:
+			return "Hard";
+		}
+
+		return "Unknown";
+	}
+
 	static std::string severityToString(
 		PreprocessingIssueSeverity severity)
 	{
