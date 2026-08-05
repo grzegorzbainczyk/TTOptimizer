@@ -1,16 +1,19 @@
 /* =========================================================
    Shared design tokens
-   Theme colors are defined in themes.css.
    ========================================================= */
 
 :root {
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 18px;
-    --radius-xl: 24px;
+--radius-sm: 6px;
+    --radius-md: 9px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
 
-    --transition-fast: 0.18s ease;
-    --transition-normal: 0.25s ease;
+    --border-thin: 1px;
+    --border-strong: 2px;
+    --border-emphasis: 3px;
+
+    --transition-fast: 0.16s ease;
+    --transition-normal: 0.24s ease;
 
     --space-sm: 8px;
     --space-md: 12px;

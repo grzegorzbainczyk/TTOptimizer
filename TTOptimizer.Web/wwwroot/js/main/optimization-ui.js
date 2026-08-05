@@ -9,9 +9,16 @@ export function setOptimizationRunningState(isRunning) {
 
     if (runButton) {
         runButton.disabled = isRunning;
-        runButton.textContent = isRunning
-            ? "Running..."
-            : "Run optimization";
+
+        const runButtonLabel = runButton.querySelector(
+            ".optimization-run-label"
+        );
+
+        if (runButtonLabel) {
+            runButtonLabel.textContent = isRunning
+                ? "Running..."
+                : "Run optimization";
+        }
     }
 
     if (stopButton) {

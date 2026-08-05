@@ -1,26 +1,23 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap");
-
 /* =========================================================
    Application shell
    ========================================================= */
 
 .app-shell {
-    min-height: 100vh;
+min-height: 100vh;
     padding: 24px;
 }
 
 .app-container {
-    width: min(1500px, calc(100vw - 48px));
+width: min(1500px, calc(100vw - 48px));
     margin: 0 auto;
 }
-
 
 /* =========================================================
    Header
    ========================================================= */
 
 .app-header {
-    margin-bottom: 22px;
+margin-bottom: 22px;
     padding: 26px 30px;
     border-radius: var(--radius-xl);
     background: linear-gradient(135deg, var(--color-header-start), var(--color-header-end));
@@ -31,37 +28,37 @@
 }
 
 .app-hero {
-    display: flex;
+display: flex;
     align-items: center;
     justify-content: flex-start;
     min-height: 132px;
 }
 
 .hero-title-row {
-    width: 100%;
+width: 100%;
     display: flex;
     align-items: center;
     gap: 22px;
 }
 
 .app-logo {
-    flex: 0 0 auto;
+flex: 0 0 auto;
     width: 92px;
     height: 92px;
     object-fit: contain;
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.96);
+    background: var(--color-surface-elevated);
     padding: 8px;
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.20);
 }
 
 .hero-content {
-    max-width: 760px;
+max-width: 760px;
     flex: 1 1 auto;
 }
 
 .hero-badge {
-    display: inline-flex;
+display: inline-flex;
     align-items: center;
     margin-bottom: 10px;
     padding: 6px 13px;
@@ -74,8 +71,8 @@
 }
 
 .app-header h1 {
-    margin: 0 0 8px;
-    font-family: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+margin: 0 0 8px;
+    font-family: var(--font-body);
     font-size: clamp(2.15rem, 4vw, 2.65rem);
     line-height: 1;
     font-weight: 800;
@@ -83,7 +80,7 @@
 }
 
 .hero-subtitle {
-    margin: 0;
+margin: 0;
     max-width: 720px;
     color: rgba(248, 250, 252, 0.94);
     font-size: 1.05rem;
@@ -92,158 +89,138 @@
 }
 
 .hero-tech {
-    margin-top: 4px;
+margin-top: 4px;
     color: rgba(248, 250, 252, 0.72);
     font-size: 0.86rem;
     line-height: 1.45;
 }
 
 .app-header p {
-    margin: 0;
+margin: 0;
 }
 
-    .app-header p + p {
-        margin-top: 4px;
-    }
-
+.app-header p + p {
+margin-top: 4px;
+}
 
 /* =========================================================
    Main dashboard layout
    ========================================================= */
 
 .dashboard-layout {
-    display: grid;
+display: grid;
     grid-template-columns: 250px minmax(0, 1fr);
     gap: 20px;
     align-items: stretch;
 }
 
 .dashboard-content {
-    min-width: 0;
+min-width: 0;
     display: flex;
     flex-direction: column;
 }
-
 
 /* =========================================================
    Resource sidebar
    ========================================================= */
 
 .resource-sidebar {
-    padding: 20px;
+padding: 20px;
     align-self: stretch;
     min-height: 100%;
 }
 
-    .resource-sidebar h2 {
-        margin: 0 0 8px;
+.resource-sidebar h2 {
+margin: 0 0 8px;
         color: var(--color-text);
-        font-family: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+        font-family: var(--font-body);
         font-weight: 800;
-    }
+}
 
 .sidebar-subtitle {
-    margin: 0 0 18px;
+margin: 0 0 18px;
     color: var(--color-text-muted);
     line-height: 1.4;
 }
-
 
 /* =========================================================
    Panels
    ========================================================= */
 
 .app-panel {
-    padding: 24px;
+padding: 24px;
     margin-bottom: 20px;
 }
 
-    .app-panel:last-child {
-        margin-bottom: 0;
-    }
+.app-panel:last-child {
+margin-bottom: 0;
+}
 
-    .app-panel h2 {
-        margin-top: 0;
+.app-panel h2 {
+margin-top: 0;
         margin-bottom: 10px;
         color: var(--color-text);
-        font-family: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+        font-family: var(--font-body);
         font-weight: 800;
-    }
+}
 
-    .app-panel p {
-        color: var(--color-text-muted);
-    }
-
+.app-panel p {
+color: var(--color-text-muted);
+}
 
 /* =========================================================
    Section header row
    ========================================================= */
 
 .section-header-row {
-    display: flex;
+display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
     margin-bottom: 18px;
 }
 
-    .section-header-row h2 {
-        margin: 0;
-    }
+.section-header-row h2 {
+margin: 0;
+}
 
 .section-actions {
-    display: flex;
+display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 10px;
     flex-wrap: wrap;
 }
 
-    .section-actions .app-button {
-        white-space: nowrap;
-    }
-
+.section-actions .app-button {
+white-space: nowrap;
+}
 
 /* =========================================================
    Toolbar
    ========================================================= */
 
 .toolbar {
-    display: flex;
+display: flex;
     flex-wrap: wrap;
     gap: 10px;
     margin: 20px 0 16px;
 }
-
 
 /* =========================================================
    Footer
    ========================================================= */
 
 .app-footer {
-    margin-top: 24px;
+margin-top: 24px;
     padding: 16px;
     text-align: center;
     color: rgba(15, 23, 42, 0.58);
 }
 
-
 /* =========================================================
    Optional sections
    ========================================================= */
-
-.app-section {
-    margin-top: 24px;
-}
-
-.app-section-title {
-    margin: 0 0 16px;
-    color: var(--color-text);
-    font-family: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
-    font-size: 1.35rem;
-    font-weight: 800;
-}
-
 
 /* =========================================================
    Responsive
@@ -319,4 +296,63 @@
     .section-actions {
         justify-content: flex-start;
     }
+}
+
+/* =========================================================
+   Classic Ink layout refinements
+   ========================================================= */
+
+.app-header {
+color: var(--color-text);
+    background: linear-gradient(180deg, var(--color-header-start), var(--color-header-end));
+    border: var(--border-emphasis) solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 5px 0 rgba(16, 42, 67, 0.13);
+    backdrop-filter: none;
+}
+
+.app-header::after {
+content: "";
+    display: block;
+    position: absolute;
+    inset: auto 0 -13px;
+    height: 9px;
+    background: var(--color-primary);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+.app-header {
+position: relative;
+}
+
+.app-logo {
+border: var(--border-strong) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-elevated);
+    box-shadow: var(--shadow-medium);
+}
+
+.hero-badge {
+background: var(--color-secondary-soft);
+    color: var(--color-text);
+    border: 1px solid rgba(182, 138, 50, 0.42);
+}
+
+.app-header h1 {
+color: var(--color-primary);
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+color: var(--color-text);
+}
+
+.hero-tech {
+color: var(--color-text-muted);
+}
+
+.resource-sidebar,
+.app-panel {
+border-radius: var(--radius-lg);
 }

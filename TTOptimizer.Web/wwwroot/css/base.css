@@ -1,32 +1,51 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap");
 
-* {
-    box-sizing: border-box;
+*,
+*::before,
+*::after {
+box-sizing: border-box;
 }
 
-html,
-body {
-    margin: 0;
-    min-height: 100vh;
-    background-image: url("../images/backgrounds/school_bkg.png");
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    background-attachment: fixed;
+html {
+min-height: 100%;
     background-color: var(--color-page-fallback);
+}
+
+body {
+min-height: 100vh;
+    margin: 0;
+    color: var(--color-text);
+    font-family: var(--font-body);
+    background:
+        linear-gradient(var(--color-page-overlay), var(--color-page-overlay)),
+        url("../images/backgrounds/school_bkg.png") center / cover fixed no-repeat;
+}
+
+h1,
+h2,
+h3,
+h4 {
+color: var(--color-heading-accent);
+    font-family: var(--font-heading);
 }
 
 button,
 input,
-select {
-    font: inherit;
+select,
+textarea {
+font: inherit;
 }
 
 button {
-    cursor: pointer;
+cursor: pointer;
 }
 
 a {
-    color: inherit;
+color: inherit;
     text-decoration: none;
+}
+
+::selection {
+background: var(--color-secondary-soft);
+    color: var(--color-text);
 }
