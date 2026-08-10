@@ -1,0 +1,378 @@
+{
+  "daysPerWeek": 5,
+  "slotsPerDay": 8,
+  "teachers": [
+    {
+      "id": 388,
+      "name": "Anna Kowalska"
+    },
+    {
+      "id": 389,
+      "name": "Jan Nowak"
+    },
+    {
+      "id": 390,
+      "name": "Piotr Zieli\u0144ski"
+    },
+    {
+      "id": 391,
+      "name": "Magdalena Koz\u0142owska"
+    }
+  ],
+  "classes": [
+    {
+      "id": 256,
+      "name": "1A"
+    },
+    {
+      "id": 257,
+      "name": "1B"
+    },
+    {
+      "id": 258,
+      "name": "1C"
+    },
+    {
+      "id": 259,
+      "name": "2A"
+    }
+  ],
+  "subjects": [
+    {
+      "id": 371,
+      "name": "Mathematics"
+    },
+    {
+      "id": 372,
+      "name": "Polish"
+    },
+    {
+      "id": 373,
+      "name": "English"
+    },
+    {
+      "id": 374,
+      "name": "Biology"
+    },
+    {
+      "id": 375,
+      "name": "History"
+    }
+  ],
+  "rooms": [
+    {
+      "id": 275,
+      "name": "101",
+      "capacity": 0
+    },
+    {
+      "id": 276,
+      "name": "102",
+      "capacity": 0
+    },
+    {
+      "id": 277,
+      "name": "8",
+      "capacity": 0
+    },
+    {
+      "id": 278,
+      "name": "6",
+      "capacity": 0
+    },
+    {
+      "id": 279,
+      "name": "2",
+      "capacity": 0
+    }
+  ],
+  "lessonRequirements": [
+    {
+      "id": 1159,
+      "teacherId": 388,
+      "classGroupId": 256,
+      "subjectId": 371,
+      "lessonsPerWeek": 4
+    },
+    {
+      "id": 1160,
+      "teacherId": 389,
+      "classGroupId": 256,
+      "subjectId": 372,
+      "lessonsPerWeek": 3
+    },
+    {
+      "id": 1161,
+      "teacherId": 390,
+      "classGroupId": 256,
+      "subjectId": 373,
+      "lessonsPerWeek": 2
+    },
+    {
+      "id": 1162,
+      "teacherId": 388,
+      "classGroupId": 257,
+      "subjectId": 371,
+      "lessonsPerWeek": 4
+    },
+    {
+      "id": 1163,
+      "teacherId": 389,
+      "classGroupId": 257,
+      "subjectId": 372,
+      "lessonsPerWeek": 3
+    },
+    {
+      "id": 1164,
+      "teacherId": 390,
+      "classGroupId": 257,
+      "subjectId": 373,
+      "lessonsPerWeek": 2
+    },
+    {
+      "id": 1165,
+      "teacherId": 391,
+      "classGroupId": 257,
+      "subjectId": 371,
+      "lessonsPerWeek": 4
+    },
+    {
+      "id": 1166,
+      "teacherId": 391,
+      "classGroupId": 258,
+      "subjectId": 375,
+      "lessonsPerWeek": 2
+    },
+    {
+      "id": 1167,
+      "teacherId": 388,
+      "classGroupId": 259,
+      "subjectId": 371,
+      "lessonsPerWeek": 1
+    }
+  ],
+  "teacherUnavailabilities": [
+    {
+      "teacherId": 388,
+      "dayIndex": 0,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 0,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 0,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 0,
+      "slotIndex": 6
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 0,
+      "slotIndex": 7
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 1,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 2,
+      "slotIndex": 0
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 2,
+      "slotIndex": 2
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 2,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 2,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 2,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 4,
+      "slotIndex": 0
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 4,
+      "slotIndex": 1
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 4,
+      "slotIndex": 2
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 4,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 4,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 4,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 4,
+      "slotIndex": 6
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 4,
+      "slotIndex": 7
+    },
+    {
+      "teacherId": 390,
+      "dayIndex": 0,
+      "slotIndex": 7
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 0,
+      "slotIndex": 0
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 0,
+      "slotIndex": 1
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 0,
+      "slotIndex": 2
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 0,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 0,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 0,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 0,
+      "slotIndex": 6
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 0,
+      "slotIndex": 7
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 1,
+      "slotIndex": 0
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 1,
+      "slotIndex": 1
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 1,
+      "slotIndex": 2
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 1,
+      "slotIndex": 3
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 1,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 1,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 1,
+      "slotIndex": 6
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 1,
+      "slotIndex": 7
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 4,
+      "slotIndex": 4
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 4,
+      "slotIndex": 5
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 4,
+      "slotIndex": 6
+    },
+    {
+      "teacherId": 391,
+      "dayIndex": 4,
+      "slotIndex": 7
+    }
+  ],
+  "classGroupUnavailabilities": [],
+  "roomUnavailabilities": [],
+  "optimizationSettings": {
+    "populationSize": 10,
+    "generations": 100,
+    "eliteCount": 5,
+    "tournamentSize": 3,
+    "mutationAttempts": 5,
+    "mutationProbability": 1,
+    "randomSeed": 12345,
+    "threadCount": 1,
+    "stopWhenPerfect": true,
+    "stagnationGenerationLimit": 0,
+    "enableProgressLogging": true,
+    "progressLogInterval": 100,
+    "penalties": {
+      "low": 10,
+      "medium": 100,
+      "high": 1000,
+      "hard": 1000000
+    }
+  }
+}

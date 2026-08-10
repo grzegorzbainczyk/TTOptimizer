@@ -102,8 +102,10 @@
 
                 <div class="dashboard-content">
 
-                    <section class="app-card app-panel">
-                        <h2>Optimization</h2>
+                    <section class="app-card app-panel optimization-panel">
+                        <div class="optimization-heading">
+                            <h2>Optimization</h2>
+                        </div>
 
                         <p>
                             Run the C++ optimization engine and display the decoded timetable result.
@@ -111,8 +113,9 @@
 
                         <div class="toolbar">
                             <button id="runOptimizationButton"
-                                    class="app-button app-button-primary-warm">
-                                Run optimization
+                                    class="app-button optimization-run-button">
+                                <span class="optimization-run-icon" aria-hidden="true"></span>
+                                <span class="optimization-run-label">Run optimization</span>
                             </button>
 
                             <button id="stopOptimizationButton"
@@ -120,6 +123,12 @@
                                     type="button"
                                     disabled>
                                 Stop
+                            </button>
+
+                            <button id="optimizationInfoButton"
+                                    class="app-button app-button-secondary"
+                                    type="button">
+                                Info
                             </button>
                         </div>
 
@@ -169,9 +178,7 @@
                         <div id="resultMessages" class="result-messages">
                             <section id="resultMessagePanel"
                                      class="result-message-panel result-message-neutral">
-                                <div class="result-message-icon" aria-hidden="true">ℹ️</div>
-
-                                <div class="result-message-content">
+<div class="result-message-content">
                                     <span class="result-message-label">
                                         Optimization result
                                     </span>
@@ -267,6 +274,6 @@
 
     <script src="/js/appContext.js"></script>
     <script src="/js/signalr/dist/browser/signalr.min.js"></script>
-    <script src="/js/main.js"></script>
+    <script type="module" src="/js/main.js"></script>
 </body>
 </html>

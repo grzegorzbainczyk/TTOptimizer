@@ -1,106 +1,91 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ClassFlow - Resource Availability</title>
-
-    <link rel="stylesheet"
-          href="css/style.css" />
+    <link rel="stylesheet" href="css/style.css" />
 </head>
-
-<body>
-    <div class="page-container">
-        <header class="app-header">
-            <div>
-                <h1 id="availabilityPageTitle">
-                    Resource availability
-                </h1>
-
-                <p id="availabilityResourceName"
-                   class="page-subtitle">
-                    Loading resource...
-                </p>
-            </div>
-
-            <nav class="header-actions">
-                <button id="backButton"
-                        class="secondary-button"
-                        type="button">
-                    Back
-                </button>
-
-                <button id="refreshAvailabilityButton"
-                        class="secondary-button"
-                        type="button">
-                    Refresh
-                </button>
-            </nav>
-        </header>
-
-        <main class="content-card">
-            <div class="section-header">
+<body class="availability-page">
+    <main class="app-shell">
+        <div class="app-container">
+            <header class="app-header">
                 <div>
-                    <h2>Weekly availability</h2>
-
-                    <p class="page-subtitle">
-                        Click a cell to switch between available
-                        and unavailable.
+                    <div class="hero-badge">Resource configuration</div>
+                    <h1 id="availabilityPageTitle">Resource availability</h1>
+                    <p id="availabilityResourceName" class="hero-subtitle">
+                        Loading resource...
                     </p>
                 </div>
-            </div>
 
-            <div class="form-actions">
-                <button id="markAllAvailableButton"
-                        class="secondary-button"
-                        type="button">
-                    Mark all available
-                </button>
+                <nav class="header-actions" aria-label="Availability page actions">
+                    <button id="backButton"
+                            class="app-button app-button-secondary"
+                            type="button">
+                        Back
+                    </button>
 
-                <button id="markAllUnavailableButton"
-                        class="secondary-button"
-                        type="button">
-                    Mark all unavailable
-                </button>
-            </div>
+                    <button id="refreshAvailabilityButton"
+                            class="app-button app-button-secondary"
+                            type="button">
+                        Refresh
+                    </button>
+                </nav>
+            </header>
 
-            <div class="table-wrapper">
-                <table id="availabilityTable"
-                       class="data-table">
+            <section class="app-card app-panel availability-card">
+                <div class="availability-intro">
+                    <h2>Weekly availability</h2>
+                    <p>
+                        Click a cell to switch between available and unavailable.
+                    </p>
+                </div>
 
-                    <thead>
-                        <tr>
-                            <th>Lesson</th>
-                            <th>Monday</th>
-                            <th>Tuesday</th>
-                            <th>Wednesday</th>
-                            <th>Thursday</th>
-                            <th>Friday</th>
-                        </tr>
-                    </thead>
+                <div class="availability-toolbar">
+                    <button id="markAllAvailableButton"
+                            class="app-button app-button-secondary"
+                            type="button">
+                        Mark all available
+                    </button>
 
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
+                    <button id="markAllUnavailableButton"
+                            class="app-button app-button-secondary"
+                            type="button">
+                        Mark all unavailable
+                    </button>
+                </div>
 
-            <div class="form-actions">
-                <button id="saveAvailabilityButton"
-                        class="main-action-button"
-                        type="button">
-                    Save availability
-                </button>
-            </div>
+                <div class="availability-table-wrapper">
+                    <table id="availabilityTable"
+                           class="data-table availability-table">
+                        <thead>
+                            <tr>
+                                <th>Lesson</th>
+                                <th>Monday</th>
+                                <th>Tuesday</th>
+                                <th>Wednesday</th>
+                                <th>Thursday</th>
+                                <th>Friday</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
 
-            <p id="availabilityMessage"
-               class="form-message"
-               aria-live="polite">
-            </p>
-        </main>
-    </div>
+                <div class="availability-save-actions">
+                    <button id="saveAvailabilityButton"
+                            class="app-button app-button-primary"
+                            type="button">
+                        Save availability
+                    </button>
+                </div>
+
+                <p id="availabilityMessage"
+                   class="availability-message"
+                   aria-live="polite"></p>
+            </section>
+        </div>
+    </main>
 
     <script src="js/appContext.js"></script>
     <script src="js/availability.js"></script>
