@@ -1,10 +1,19 @@
-﻿const daysCount = 5;
+const daysCount = 5;
 const slotsPerDay = 8;
 
 let resourceType = null;
 let resourceId = null;
 
-const unavailableSlots = new Set();
+// Available is the default state and is therefore not stored in the API/database.
+// The map contains only Preferred, NotPreferred or Unavailable entries.
+const timeSlotPreferences = new Map();
+
+const preferenceCycle = [
+    "Available",
+    "Preferred",
+    "NotPreferred",
+    "Unavailable"
+];
 
 document.addEventListener("DOMContentLoaded", async () => {
     const backButton =
@@ -34,12 +43,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     refreshAvailabilityButton?.addEventListener(
         "click",
-        loadAvailability
+        loadTimeSlotPreferences
     );
 
     saveAvailabilityButton?.addEventListener(
         "click",
-        saveAvailability
+        saveTimeSlotPreferences
     );
 
     markAllAvailableButton?.addEventListener(
@@ -58,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     buildAvailabilityTable();
 
-    await loadAvailability();
+    await loadTimeSlotPreferences();
 });
 
 function readResourceParameters() {
@@ -74,7 +83,8 @@ function readResourceParameters() {
     const supportedResourceTypes = [
         "teacher",
         "class",
-        "room"
+        "room",
+        "subject"
     ];
 
     if (
@@ -144,7 +154,7 @@ function buildAvailabilityTable() {
             cell.tabIndex = 0;
 
             cell.addEventListener("click", () => {
-                toggleAvailabilityCell(
+                cyclePreference(
                     dayIndex,
                     slotIndex
                 );
@@ -159,7 +169,7 @@ function buildAvailabilityTable() {
                     ) {
                         event.preventDefault();
 
-                        toggleAvailabilityCell(
+                        cyclePreference(
                             dayIndex,
                             slotIndex
                         );
@@ -176,7 +186,7 @@ function buildAvailabilityTable() {
     renderAvailabilityTable();
 }
 
-async function loadAvailability() {
+async function loadTimeSlotPreferences() {
     clearAvailabilityMessage();
 
     try {
@@ -185,7 +195,7 @@ async function loadAvailability() {
                 .requireOrganizationId();
 
         const endpoint =
-            getAvailabilityEndpoint(
+            getTimeSlotPreferencesEndpoint(
                 organizationId
             );
 
@@ -199,31 +209,35 @@ async function loadAvailability() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not load availability. ` +
+                    `Could not load time slot preferences. ` +
                     `Status: ${response.status}`
                 )
             );
         }
 
-        unavailableSlots.clear();
+        timeSlotPreferences.clear();
 
-        const slots =
-            Array.isArray(data?.unavailableSlots)
-                ? data.unavailableSlots
+        const preferences =
+            Array.isArray(data?.timeSlotPreferences)
+                ? data.timeSlotPreferences
                 : [];
 
-        slots.forEach(slot => {
+        preferences.forEach(preference => {
             if (
                 isValidSlot(
-                    slot.dayIndex,
-                    slot.slotIndex
+                    preference.dayIndex,
+                    preference.slotIndex
+                ) &&
+                isStoredPreferenceType(
+                    preference.preferenceType
                 )
             ) {
-                unavailableSlots.add(
+                timeSlotPreferences.set(
                     createSlotKey(
-                        slot.dayIndex,
-                        slot.slotIndex
-                    )
+                        preference.dayIndex,
+                        preference.slotIndex
+                    ),
+                    preference.preferenceType
                 );
             }
         });
@@ -235,25 +249,33 @@ async function loadAvailability() {
         renderAvailabilityTable();
     } catch (error) {
         console.error(
-            "Error loading availability:",
+            "Error loading time slot preferences:",
             error
         );
 
         showAvailabilityMessage(
             error instanceof Error
                 ? error.message
-                : "Could not load availability.",
+                : "Could not load time slot preferences.",
             true
         );
     }
 }
 
-async function saveAvailability() {
+async function saveTimeSlotPreferences() {
     clearAvailabilityMessage();
 
-    const unavailableSlotsRequest =
-        Array.from(unavailableSlots)
-            .map(parseSlotKey)
+    const timeSlotPreferencesRequest =
+        Array.from(timeSlotPreferences.entries())
+            .map(([key, preferenceType]) => {
+                const slot = parseSlotKey(key);
+
+                return {
+                    dayIndex: slot.dayIndex,
+                    slotIndex: slot.slotIndex,
+                    preferenceType
+                };
+            })
             .sort((left, right) => {
                 if (
                     left.dayIndex !==
@@ -277,7 +299,7 @@ async function saveAvailability() {
                 .requireOrganizationId();
 
         const endpoint =
-            getAvailabilityEndpoint(
+            getTimeSlotPreferencesEndpoint(
                 organizationId
             );
 
@@ -291,8 +313,8 @@ async function saveAvailability() {
                 },
 
                 body: JSON.stringify({
-                    unavailableSlots:
-                        unavailableSlotsRequest
+                    timeSlotPreferences:
+                        timeSlotPreferencesRequest
                 })
             });
 
@@ -303,7 +325,7 @@ async function saveAvailability() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not save availability. ` +
+                    `Could not save time slot preferences. ` +
                     `Status: ${response.status}`
                 )
             );
@@ -311,25 +333,25 @@ async function saveAvailability() {
 
         showAvailabilityMessage(
             data?.message ??
-            "Availability was saved.",
+            "Time slot preferences were saved.",
             false
         );
     } catch (error) {
         console.error(
-            "Error saving availability:",
+            "Error saving time slot preferences:",
             error
         );
 
         showAvailabilityMessage(
             error instanceof Error
                 ? error.message
-                : "Could not save availability.",
+                : "Could not save time slot preferences.",
             true
         );
     }
 }
 
-function getAvailabilityEndpoint(
+function getTimeSlotPreferencesEndpoint(
     organizationId
 ) {
     let resourcePath;
@@ -347,6 +369,10 @@ function getAvailabilityEndpoint(
             resourcePath = "rooms";
             break;
 
+        case "subject":
+            resourcePath = "subjects";
+            break;
+
         default:
             throw new Error(
                 `Unsupported resource type: ${resourceType}`
@@ -356,7 +382,7 @@ function getAvailabilityEndpoint(
     return (
         `/api/${resourcePath}/${encodeURIComponent(
             resourceId
-        )}/availability?organizationId=${encodeURIComponent(
+        )}/time-slot-preferences?organizationId=${encodeURIComponent(
             organizationId
         )}`
     );
@@ -376,7 +402,8 @@ function updatePageHeader(resourceName) {
     const resourceLabels = {
         teacher: "Teacher",
         class: "Class",
-        room: "Room"
+        room: "Room",
+        subject: "Subject"
     };
 
     const resourceLabel =
@@ -385,7 +412,7 @@ function updatePageHeader(resourceName) {
 
     if (pageTitle) {
         pageTitle.textContent =
-            `${resourceLabel} availability`;
+            `${resourceLabel} time slot preferences`;
     }
 
     if (resourceNameElement) {
@@ -395,7 +422,7 @@ function updatePageHeader(resourceName) {
     }
 }
 
-function toggleAvailabilityCell(
+function cyclePreference(
     dayIndex,
     slotIndex
 ) {
@@ -405,22 +432,57 @@ function toggleAvailabilityCell(
             slotIndex
         );
 
-    if (unavailableSlots.has(key)) {
-        unavailableSlots.delete(key);
-    } else {
-        unavailableSlots.add(key);
-    }
+    const currentPreference =
+        getPreferenceForSlot(key);
+
+    const currentIndex =
+        preferenceCycle.indexOf(
+            currentPreference
+        );
+
+    const nextPreference =
+        preferenceCycle[
+            (currentIndex + 1) %
+            preferenceCycle.length
+        ];
+
+    setPreferenceForSlot(
+        key,
+        nextPreference
+    );
 
     renderAvailabilityTable();
 }
 
+function getPreferenceForSlot(key) {
+    return (
+        timeSlotPreferences.get(key) ??
+        "Available"
+    );
+}
+
+function setPreferenceForSlot(
+    key,
+    preferenceType
+) {
+    if (preferenceType === "Available") {
+        timeSlotPreferences.delete(key);
+        return;
+    }
+
+    timeSlotPreferences.set(
+        key,
+        preferenceType
+    );
+}
+
 function markAllAvailable() {
-    unavailableSlots.clear();
+    timeSlotPreferences.clear();
     renderAvailabilityTable();
 }
 
 function markAllUnavailable() {
-    unavailableSlots.clear();
+    timeSlotPreferences.clear();
 
     for (
         let dayIndex = 0;
@@ -432,11 +494,12 @@ function markAllUnavailable() {
             slotIndex < slotsPerDay;
             slotIndex++
         ) {
-            unavailableSlots.add(
+            timeSlotPreferences.set(
                 createSlotKey(
                     dayIndex,
                     slotIndex
-                )
+                ),
+                "Unavailable"
             );
         }
     }
@@ -457,36 +520,58 @@ function renderAvailabilityTable() {
         const slotIndex =
             Number(cell.dataset.slotIndex);
 
-        const isUnavailable =
-            unavailableSlots.has(
+        const preference =
+            getPreferenceForSlot(
                 createSlotKey(
                     dayIndex,
                     slotIndex
                 )
             );
 
-        cell.classList.toggle(
-            "unavailable",
-            isUnavailable
-        );
-
-        cell.classList.toggle(
+        cell.classList.remove(
+            "preferred",
             "available",
-            !isUnavailable
+            "not-preferred",
+            "unavailable"
         );
 
-        cell.textContent =
-            isUnavailable
-                ? "Unavailable"
-                : "Available";
+        switch (preference) {
+            case "Preferred":
+                cell.classList.add("preferred");
+                cell.textContent = "Preferred";
+                break;
+
+            case "NotPreferred":
+                cell.classList.add("not-preferred");
+                cell.textContent = "Not preferred";
+                break;
+
+            case "Unavailable":
+                cell.classList.add("unavailable");
+                cell.textContent = "Unavailable";
+                break;
+
+            default:
+                cell.classList.add("available");
+                cell.textContent = "Available";
+                break;
+        }
 
         cell.setAttribute(
             "aria-label",
-            isUnavailable
-                ? "Unavailable"
-                : "Available"
+            preference === "NotPreferred"
+                ? "Not preferred"
+                : preference
         );
     });
+}
+
+function isStoredPreferenceType(value) {
+    return (
+        value === "Preferred" ||
+        value === "NotPreferred" ||
+        value === "Unavailable"
+    );
 }
 
 function createSlotKey(
@@ -528,7 +613,8 @@ function goBack() {
     const backPages = {
         teacher: "teachers.html",
         class: "classes.html",
-        room: "rooms.html"
+        room: "rooms.html",
+        subject: "subjects.html"
     };
 
     window.location.href =

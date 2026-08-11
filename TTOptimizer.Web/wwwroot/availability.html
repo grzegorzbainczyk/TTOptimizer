@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClassFlow - Resource Availability</title>
+    <title>ClassFlow - Time Slot Preferences</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="availability-page">
@@ -12,13 +12,13 @@
             <header class="app-header">
                 <div>
                     <div class="hero-badge">Resource configuration</div>
-                    <h1 id="availabilityPageTitle">Resource availability</h1>
+                    <h1 id="availabilityPageTitle">Time slot preferences</h1>
                     <p id="availabilityResourceName" class="hero-subtitle">
                         Loading resource...
                     </p>
                 </div>
 
-                <nav class="header-actions" aria-label="Availability page actions">
+                <nav class="header-actions" aria-label="Time slot preferences page actions">
                     <button id="backButton"
                             class="app-button app-button-secondary"
                             type="button">
@@ -35,9 +35,10 @@
 
             <section class="app-card app-panel availability-card">
                 <div class="availability-intro">
-                    <h2>Weekly availability</h2>
+                    <h2>Weekly time slot preferences</h2>
                     <p>
-                        Click a cell to switch between available and unavailable.
+                        Click a cell to cycle through:
+                        Preferred, Available, Not preferred and Unavailable.
                     </p>
                 </div>
 
@@ -53,6 +54,13 @@
                             type="button">
                         Mark all unavailable
                     </button>
+                </div>
+
+                <div class="availability-legend" aria-label="Time slot preference legend">
+                    <span class="availability-legend-item preferred">Preferred</span>
+                    <span class="availability-legend-item available">Available</span>
+                    <span class="availability-legend-item not-preferred">Not preferred</span>
+                    <span class="availability-legend-item unavailable">Unavailable</span>
                 </div>
 
                 <div class="availability-table-wrapper">
@@ -76,7 +84,7 @@
                     <button id="saveAvailabilityButton"
                             class="app-button app-button-primary"
                             type="button">
-                        Save availability
+                        Save preferences
                     </button>
                 </div>
 

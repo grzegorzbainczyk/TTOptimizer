@@ -59,3 +59,83 @@
 .table-actions-column {
     width: 140px;
 }
+
+/* Time slot preference states */
+
+.availability-cell {
+    cursor: pointer;
+    text-align: center;
+    font-weight: 600;
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .availability-cell.available {
+        background-color: #e4f3e8;
+        color: #166534;
+    }
+
+    .availability-cell.preferred {
+        background-color: #79d68a;
+        color: #102a18;
+        font-weight: 700;
+    }
+
+    .availability-cell.not-preferred {
+        background-color: #ffd39a;
+        color: #6b3f00;
+        font-weight: 700;
+    }
+
+    .availability-cell.unavailable {
+        background-color: #f2aaaa;
+        color: #7a1f1f;
+        font-weight: 700;
+    }
+
+    .availability-cell:hover {
+        filter: brightness(0.97);
+    }
+
+    .availability-cell:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: -3px;
+    }
+
+/* Legend */
+
+.availability-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.availability-legend-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+    .availability-legend-item.available {
+        background-color: #e4f3e8;
+        color: #166534;
+    }
+
+    .availability-legend-item.preferred {
+        background-color: #79d68a;
+        color: #102a18;
+    }
+
+    .availability-legend-item.not-preferred {
+        background-color: #ffd39a;
+        color: #6b3f00;
+    }
+
+    .availability-legend-item.unavailable {
+        background-color: #f2aaaa;
+        color: #7a1f1f;
+    }
