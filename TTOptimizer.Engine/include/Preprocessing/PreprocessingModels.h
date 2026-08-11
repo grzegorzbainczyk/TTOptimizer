@@ -16,7 +16,7 @@ enum class PreprocessingIssueCode
     InvalidDaysPerWeek,
     InvalidSlotsPerDay,
     InvalidWeeklyCount,
-    InvalidUnavailability,
+    InvalidTimeSlotPreference,
 
     MissingTeachers,
     MissingClassGroups,
@@ -31,6 +31,7 @@ enum class PreprocessingIssueCode
 
     TeacherInsufficientAvailability,
     ClassGroupInsufficientAvailability,
+    SubjectInsufficientAvailability,
     InsufficientRoomAvailability
 };
 

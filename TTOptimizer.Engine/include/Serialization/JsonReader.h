@@ -48,21 +48,7 @@ public:
         readRooms(root, problem);
         readLessonRequirements(root, problem);
 
-        const bool hasNewPreferences =
-            root.contains("teacherTimeSlotPreferences")
-            || root.contains("classGroupTimeSlotPreferences")
-            || root.contains("roomTimeSlotPreferences")
-            || root.contains("subjectTimeSlotPreferences");
-
-        if (hasNewPreferences)
-        {
-            readTimeSlotPreferences(root, problem);
-        }
-        else
-        {
-            // Backward compatibility for older saved/debug input files.
-            readLegacyUnavailabilities(root, problem);
-        }
+        readTimeSlotPreferences(root, problem);
 
         return problem;
     }
@@ -247,16 +233,6 @@ private:
                     item.value("preferenceType", ""));
 
                 problem.teacherTimeSlotPreferences.push_back(preference);
-
-                if (preference.preferenceType ==
-                    TimeSlotPreferenceType::Unavailable)
-                {
-                    problem.teacherUnavailabilities.push_back({
-                        preference.teacherId,
-                        preference.dayIndex,
-                        preference.slotIndex
-                    });
-                }
             }
         }
 
@@ -273,16 +249,6 @@ private:
                     item.value("preferenceType", ""));
 
                 problem.classGroupTimeSlotPreferences.push_back(preference);
-
-                if (preference.preferenceType ==
-                    TimeSlotPreferenceType::Unavailable)
-                {
-                    problem.classGroupUnavailabilities.push_back({
-                        preference.classGroupId,
-                        preference.dayIndex,
-                        preference.slotIndex
-                    });
-                }
             }
         }
 
@@ -299,16 +265,6 @@ private:
                     item.value("preferenceType", ""));
 
                 problem.roomTimeSlotPreferences.push_back(preference);
-
-                if (preference.preferenceType ==
-                    TimeSlotPreferenceType::Unavailable)
-                {
-                    problem.roomUnavailabilities.push_back({
-                        preference.roomId,
-                        preference.dayIndex,
-                        preference.slotIndex
-                    });
-                }
             }
         }
 
@@ -329,68 +285,4 @@ private:
         }
     }
 
-    static void readLegacyUnavailabilities(
-        const json& root,
-        TimetableProblem& problem)
-    {
-        if (root.contains("teacherUnavailabilities")
-            && root["teacherUnavailabilities"].is_array())
-        {
-            for (const auto& item : root["teacherUnavailabilities"])
-            {
-                TeacherUnavailability unavailability;
-                unavailability.teacherId = item.value("teacherId", 0);
-                unavailability.dayIndex = item.value("dayIndex", 0);
-                unavailability.slotIndex = item.value("slotIndex", 0);
-                problem.teacherUnavailabilities.push_back(unavailability);
-
-                problem.teacherTimeSlotPreferences.push_back({
-                    unavailability.teacherId,
-                    unavailability.dayIndex,
-                    unavailability.slotIndex,
-                    TimeSlotPreferenceType::Unavailable
-                });
-            }
-        }
-
-        if (root.contains("classGroupUnavailabilities")
-            && root["classGroupUnavailabilities"].is_array())
-        {
-            for (const auto& item : root["classGroupUnavailabilities"])
-            {
-                ClassGroupUnavailability unavailability;
-                unavailability.classGroupId = item.value("classGroupId", 0);
-                unavailability.dayIndex = item.value("dayIndex", 0);
-                unavailability.slotIndex = item.value("slotIndex", 0);
-                problem.classGroupUnavailabilities.push_back(unavailability);
-
-                problem.classGroupTimeSlotPreferences.push_back({
-                    unavailability.classGroupId,
-                    unavailability.dayIndex,
-                    unavailability.slotIndex,
-                    TimeSlotPreferenceType::Unavailable
-                });
-            }
-        }
-
-        if (root.contains("roomUnavailabilities")
-            && root["roomUnavailabilities"].is_array())
-        {
-            for (const auto& item : root["roomUnavailabilities"])
-            {
-                RoomUnavailability unavailability;
-                unavailability.roomId = item.value("roomId", 0);
-                unavailability.dayIndex = item.value("dayIndex", 0);
-                unavailability.slotIndex = item.value("slotIndex", 0);
-                problem.roomUnavailabilities.push_back(unavailability);
-
-                problem.roomTimeSlotPreferences.push_back({
-                    unavailability.roomId,
-                    unavailability.dayIndex,
-                    unavailability.slotIndex,
-                    TimeSlotPreferenceType::Unavailable
-                });
-            }
-        }
-    }
 };

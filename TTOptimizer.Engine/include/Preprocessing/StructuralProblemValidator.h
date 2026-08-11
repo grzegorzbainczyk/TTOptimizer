@@ -14,29 +14,13 @@ public:
     {
         std::vector<PreprocessingIssue> issues;
 
-        validateDimensions(
-            problem,
-            issues);
-
-        validateRequiredCollections(
-            problem,
-            issues);
-
-        validateLessonRequirements(
-            problem,
-            issues);
-
-        validateTeacherUnavailabilities(
-            problem,
-            issues);
-
-        validateClassGroupUnavailabilities(
-            problem,
-            issues);
-
-        validateRoomUnavailabilities(
-            problem,
-            issues);
+        validateDimensions(problem, issues);
+        validateRequiredCollections(problem, issues);
+        validateLessonRequirements(problem, issues);
+        validateTeacherTimeSlotPreferences(problem, issues);
+        validateClassGroupTimeSlotPreferences(problem, issues);
+        validateRoomTimeSlotPreferences(problem, issues);
+        validateSubjectTimeSlotPreferences(problem, issues);
 
         return issues;
     }
@@ -57,8 +41,7 @@ private:
             issue.message =
                 "Days per week must be between 1 and 7.";
 
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
 
         if (problem.slotsPerDay <= 0)
@@ -71,8 +54,7 @@ private:
             issue.message =
                 "Slots per day must be greater than zero.";
 
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
     }
 
@@ -83,72 +65,52 @@ private:
         if (problem.teachers.empty())
         {
             PreprocessingIssue issue;
-
             issue.code =
                 PreprocessingIssueCode::MissingTeachers;
-
             issue.message =
                 "No teachers are defined.";
-
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
 
         if (problem.classGroups.empty())
         {
             PreprocessingIssue issue;
-
             issue.code =
                 PreprocessingIssueCode::MissingClassGroups;
-
             issue.message =
                 "No class groups are defined.";
-
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
 
         if (problem.subjects.empty())
         {
             PreprocessingIssue issue;
-
             issue.code =
                 PreprocessingIssueCode::MissingSubjects;
-
             issue.message =
                 "No subjects are defined.";
-
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
 
         if (problem.rooms.empty())
         {
             PreprocessingIssue issue;
-
             issue.code =
                 PreprocessingIssueCode::MissingRooms;
-
             issue.message =
                 "No rooms are defined.";
-
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
 
         if (problem.lessonRequirements.empty())
         {
             PreprocessingIssue issue;
-
             issue.code =
                 PreprocessingIssueCode::
                 MissingLessonRequirements;
-
             issue.message =
                 "No lesson requirements are defined.";
-
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
     }
 
@@ -188,22 +150,21 @@ private:
                     + " must have a weekly count "
                     "greater than zero.";
 
-                issues.push_back(
-                    std::move(issue));
+                issues.push_back(std::move(issue));
             }
         }
     }
 
-    static void validateTeacherUnavailabilities(
+    static void validateTeacherTimeSlotPreferences(
         const TimetableProblem& problem,
         std::vector<PreprocessingIssue>& issues)
     {
-        for (const TeacherUnavailability& unavailability :
-            problem.teacherUnavailabilities)
+        for (const TeacherTimeSlotPreference& preference :
+            problem.teacherTimeSlotPreferences)
         {
             if (isTimeIndexValid(
-                unavailability.dayIndex,
-                unavailability.slotIndex,
+                preference.dayIndex,
+                preference.slotIndex,
                 problem))
             {
                 continue;
@@ -213,36 +174,30 @@ private:
 
             issue.code =
                 PreprocessingIssueCode::
-                InvalidUnavailability;
+                InvalidTimeSlotPreference;
 
-            issue.teacherId =
-                unavailability.teacherId;
-
-            issue.dayIndex =
-                unavailability.dayIndex;
-
-            issue.slotIndex =
-                unavailability.slotIndex;
+            issue.teacherId = preference.teacherId;
+            issue.dayIndex = preference.dayIndex;
+            issue.slotIndex = preference.slotIndex;
 
             issue.message =
-                "Teacher unavailability contains "
+                "Teacher time slot preference contains "
                 "an invalid day or slot index.";
 
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
     }
 
-    static void validateClassGroupUnavailabilities(
+    static void validateClassGroupTimeSlotPreferences(
         const TimetableProblem& problem,
         std::vector<PreprocessingIssue>& issues)
     {
-        for (const ClassGroupUnavailability& unavailability :
-            problem.classGroupUnavailabilities)
+        for (const ClassGroupTimeSlotPreference& preference :
+            problem.classGroupTimeSlotPreferences)
         {
             if (isTimeIndexValid(
-                unavailability.dayIndex,
-                unavailability.slotIndex,
+                preference.dayIndex,
+                preference.slotIndex,
                 problem))
             {
                 continue;
@@ -252,36 +207,30 @@ private:
 
             issue.code =
                 PreprocessingIssueCode::
-                InvalidUnavailability;
+                InvalidTimeSlotPreference;
 
-            issue.classGroupId =
-                unavailability.classGroupId;
-
-            issue.dayIndex =
-                unavailability.dayIndex;
-
-            issue.slotIndex =
-                unavailability.slotIndex;
+            issue.classGroupId = preference.classGroupId;
+            issue.dayIndex = preference.dayIndex;
+            issue.slotIndex = preference.slotIndex;
 
             issue.message =
-                "Class group unavailability contains "
+                "Class group time slot preference contains "
                 "an invalid day or slot index.";
 
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
     }
 
-    static void validateRoomUnavailabilities(
+    static void validateRoomTimeSlotPreferences(
         const TimetableProblem& problem,
         std::vector<PreprocessingIssue>& issues)
     {
-        for (const RoomUnavailability& unavailability :
-            problem.roomUnavailabilities)
+        for (const RoomTimeSlotPreference& preference :
+            problem.roomTimeSlotPreferences)
         {
             if (isTimeIndexValid(
-                unavailability.dayIndex,
-                unavailability.slotIndex,
+                preference.dayIndex,
+                preference.slotIndex,
                 problem))
             {
                 continue;
@@ -291,23 +240,50 @@ private:
 
             issue.code =
                 PreprocessingIssueCode::
-                InvalidUnavailability;
+                InvalidTimeSlotPreference;
 
-            issue.roomId =
-                unavailability.roomId;
-
-            issue.dayIndex =
-                unavailability.dayIndex;
-
-            issue.slotIndex =
-                unavailability.slotIndex;
+            issue.roomId = preference.roomId;
+            issue.dayIndex = preference.dayIndex;
+            issue.slotIndex = preference.slotIndex;
 
             issue.message =
-                "Room unavailability contains "
+                "Room time slot preference contains "
                 "an invalid day or slot index.";
 
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
+        }
+    }
+
+    static void validateSubjectTimeSlotPreferences(
+        const TimetableProblem& problem,
+        std::vector<PreprocessingIssue>& issues)
+    {
+        for (const SubjectTimeSlotPreference& preference :
+            problem.subjectTimeSlotPreferences)
+        {
+            if (isTimeIndexValid(
+                preference.dayIndex,
+                preference.slotIndex,
+                problem))
+            {
+                continue;
+            }
+
+            PreprocessingIssue issue;
+
+            issue.code =
+                PreprocessingIssueCode::
+                InvalidTimeSlotPreference;
+
+            issue.subjectId = preference.subjectId;
+            issue.dayIndex = preference.dayIndex;
+            issue.slotIndex = preference.slotIndex;
+
+            issue.message =
+                "Subject time slot preference contains "
+                "an invalid day or slot index.";
+
+            issues.push_back(std::move(issue));
         }
     }
 

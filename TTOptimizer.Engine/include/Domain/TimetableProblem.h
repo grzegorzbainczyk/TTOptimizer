@@ -16,7 +16,9 @@ struct TeacherTimeSlotPreference
     TeacherId teacherId{};
     int dayIndex{};
     int slotIndex{};
-    TimeSlotPreferenceType preferenceType{ TimeSlotPreferenceType::Available };
+    TimeSlotPreferenceType preferenceType{
+        TimeSlotPreferenceType::Available
+    };
 };
 
 struct ClassGroupTimeSlotPreference
@@ -24,7 +26,9 @@ struct ClassGroupTimeSlotPreference
     ClassGroupId classGroupId{};
     int dayIndex{};
     int slotIndex{};
-    TimeSlotPreferenceType preferenceType{ TimeSlotPreferenceType::Available };
+    TimeSlotPreferenceType preferenceType{
+        TimeSlotPreferenceType::Available
+    };
 };
 
 struct RoomTimeSlotPreference
@@ -32,7 +36,9 @@ struct RoomTimeSlotPreference
     RoomId roomId{};
     int dayIndex{};
     int slotIndex{};
-    TimeSlotPreferenceType preferenceType{ TimeSlotPreferenceType::Available };
+    TimeSlotPreferenceType preferenceType{
+        TimeSlotPreferenceType::Available
+    };
 };
 
 struct SubjectTimeSlotPreference
@@ -40,33 +46,9 @@ struct SubjectTimeSlotPreference
     SubjectId subjectId{};
     int dayIndex{};
     int slotIndex{};
-    TimeSlotPreferenceType preferenceType{ TimeSlotPreferenceType::Available };
-};
-
-/*
- * Legacy hard-unavailability views are kept temporarily because the current
- * preprocessing validators still consume them. JsonReader derives these
- * collections automatically from TimeSlotPreferenceType::Unavailable.
- */
-struct TeacherUnavailability
-{
-    TeacherId teacherId{};
-    int dayIndex{};
-    int slotIndex{};
-};
-
-struct ClassGroupUnavailability
-{
-    ClassGroupId classGroupId{};
-    int dayIndex{};
-    int slotIndex{};
-};
-
-struct RoomUnavailability
-{
-    RoomId roomId{};
-    int dayIndex{};
-    int slotIndex{};
+    TimeSlotPreferenceType preferenceType{
+        TimeSlotPreferenceType::Available
+    };
 };
 
 struct TimetableProblem
@@ -77,14 +59,17 @@ struct TimetableProblem
     std::vector<Room> rooms;
     std::vector<LessonRequirement> lessonRequirements;
 
-    std::vector<TeacherTimeSlotPreference> teacherTimeSlotPreferences;
-    std::vector<ClassGroupTimeSlotPreference> classGroupTimeSlotPreferences;
-    std::vector<RoomTimeSlotPreference> roomTimeSlotPreferences;
-    std::vector<SubjectTimeSlotPreference> subjectTimeSlotPreferences;
+    std::vector<TeacherTimeSlotPreference>
+        teacherTimeSlotPreferences;
 
-    std::vector<TeacherUnavailability> teacherUnavailabilities;
-    std::vector<ClassGroupUnavailability> classGroupUnavailabilities;
-    std::vector<RoomUnavailability> roomUnavailabilities;
+    std::vector<ClassGroupTimeSlotPreference>
+        classGroupTimeSlotPreferences;
+
+    std::vector<RoomTimeSlotPreference>
+        roomTimeSlotPreferences;
+
+    std::vector<SubjectTimeSlotPreference>
+        subjectTimeSlotPreferences;
 
     int daysPerWeek = 5;
     int slotsPerDay = 8;

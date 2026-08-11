@@ -16,21 +16,11 @@ public:
     {
         std::vector<PreprocessingIssue> issues;
 
-        validateLessonRequirements(
-            problem,
-            issues);
-
-        validateTeacherUnavailabilities(
-            problem,
-            issues);
-
-        validateClassGroupUnavailabilities(
-            problem,
-            issues);
-
-        validateRoomUnavailabilities(
-            problem,
-            issues);
+        validateLessonRequirements(problem, issues);
+        validateTeacherTimeSlotPreferences(problem, issues);
+        validateClassGroupTimeSlotPreferences(problem, issues);
+        validateRoomTimeSlotPreferences(problem, issues);
+        validateSubjectTimeSlotPreferences(problem, issues);
 
         return issues;
     }
@@ -52,17 +42,10 @@ private:
                 issue.code =
                     PreprocessingIssueCode::TeacherNotFound;
 
-                issue.requirementId =
-                    requirement.id;
-
-                issue.teacherId =
-                    requirement.teacherId;
-
-                issue.classGroupId =
-                    requirement.classGroupId;
-
-                issue.subjectId =
-                    requirement.subjectId;
+                issue.requirementId = requirement.id;
+                issue.teacherId = requirement.teacherId;
+                issue.classGroupId = requirement.classGroupId;
+                issue.subjectId = requirement.subjectId;
 
                 issue.message =
                     "Lesson requirement "
@@ -71,8 +54,7 @@ private:
                     + std::to_string(requirement.teacherId)
                     + ", but this teacher does not exist.";
 
-                issues.push_back(
-                    std::move(issue));
+                issues.push_back(std::move(issue));
             }
 
             if (!classGroupExists(
@@ -85,17 +67,10 @@ private:
                     PreprocessingIssueCode::
                     ClassGroupNotFound;
 
-                issue.requirementId =
-                    requirement.id;
-
-                issue.teacherId =
-                    requirement.teacherId;
-
-                issue.classGroupId =
-                    requirement.classGroupId;
-
-                issue.subjectId =
-                    requirement.subjectId;
+                issue.requirementId = requirement.id;
+                issue.teacherId = requirement.teacherId;
+                issue.classGroupId = requirement.classGroupId;
+                issue.subjectId = requirement.subjectId;
 
                 issue.message =
                     "Lesson requirement "
@@ -104,8 +79,7 @@ private:
                     + std::to_string(requirement.classGroupId)
                     + ", but this class group does not exist.";
 
-                issues.push_back(
-                    std::move(issue));
+                issues.push_back(std::move(issue));
             }
 
             if (!subjectExists(
@@ -117,17 +91,10 @@ private:
                 issue.code =
                     PreprocessingIssueCode::SubjectNotFound;
 
-                issue.requirementId =
-                    requirement.id;
-
-                issue.teacherId =
-                    requirement.teacherId;
-
-                issue.classGroupId =
-                    requirement.classGroupId;
-
-                issue.subjectId =
-                    requirement.subjectId;
+                issue.requirementId = requirement.id;
+                issue.teacherId = requirement.teacherId;
+                issue.classGroupId = requirement.classGroupId;
+                issue.subjectId = requirement.subjectId;
 
                 issue.message =
                     "Lesson requirement "
@@ -136,22 +103,19 @@ private:
                     + std::to_string(requirement.subjectId)
                     + ", but this subject does not exist.";
 
-                issues.push_back(
-                    std::move(issue));
+                issues.push_back(std::move(issue));
             }
         }
     }
 
-    static void validateTeacherUnavailabilities(
+    static void validateTeacherTimeSlotPreferences(
         const TimetableProblem& problem,
         std::vector<PreprocessingIssue>& issues)
     {
-        for (const TeacherUnavailability& unavailability :
-            problem.teacherUnavailabilities)
+        for (const TeacherTimeSlotPreference& preference :
+            problem.teacherTimeSlotPreferences)
         {
-            if (teacherExists(
-                problem,
-                unavailability.teacherId))
+            if (teacherExists(problem, preference.teacherId))
             {
                 continue;
             }
@@ -161,35 +125,29 @@ private:
             issue.code =
                 PreprocessingIssueCode::TeacherNotFound;
 
-            issue.teacherId =
-                unavailability.teacherId;
-
-            issue.dayIndex =
-                unavailability.dayIndex;
-
-            issue.slotIndex =
-                unavailability.slotIndex;
+            issue.teacherId = preference.teacherId;
+            issue.dayIndex = preference.dayIndex;
+            issue.slotIndex = preference.slotIndex;
 
             issue.message =
-                "Teacher unavailability references teacher "
-                + std::to_string(unavailability.teacherId)
+                "Teacher time slot preference references teacher "
+                + std::to_string(preference.teacherId)
                 + ", but this teacher does not exist.";
 
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
     }
 
-    static void validateClassGroupUnavailabilities(
+    static void validateClassGroupTimeSlotPreferences(
         const TimetableProblem& problem,
         std::vector<PreprocessingIssue>& issues)
     {
-        for (const ClassGroupUnavailability& unavailability :
-            problem.classGroupUnavailabilities)
+        for (const ClassGroupTimeSlotPreference& preference :
+            problem.classGroupTimeSlotPreferences)
         {
             if (classGroupExists(
                 problem,
-                unavailability.classGroupId))
+                preference.classGroupId))
             {
                 continue;
             }
@@ -200,36 +158,27 @@ private:
                 PreprocessingIssueCode::
                 ClassGroupNotFound;
 
-            issue.classGroupId =
-                unavailability.classGroupId;
-
-            issue.dayIndex =
-                unavailability.dayIndex;
-
-            issue.slotIndex =
-                unavailability.slotIndex;
+            issue.classGroupId = preference.classGroupId;
+            issue.dayIndex = preference.dayIndex;
+            issue.slotIndex = preference.slotIndex;
 
             issue.message =
-                "Class group unavailability references class group "
-                + std::to_string(
-                    unavailability.classGroupId)
+                "Class group time slot preference references class group "
+                + std::to_string(preference.classGroupId)
                 + ", but this class group does not exist.";
 
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
     }
 
-    static void validateRoomUnavailabilities(
+    static void validateRoomTimeSlotPreferences(
         const TimetableProblem& problem,
         std::vector<PreprocessingIssue>& issues)
     {
-        for (const RoomUnavailability& unavailability :
-            problem.roomUnavailabilities)
+        for (const RoomTimeSlotPreference& preference :
+            problem.roomTimeSlotPreferences)
         {
-            if (roomExists(
-                problem,
-                unavailability.roomId))
+            if (roomExists(problem, preference.roomId))
             {
                 continue;
             }
@@ -239,22 +188,46 @@ private:
             issue.code =
                 PreprocessingIssueCode::RoomNotFound;
 
-            issue.roomId =
-                unavailability.roomId;
-
-            issue.dayIndex =
-                unavailability.dayIndex;
-
-            issue.slotIndex =
-                unavailability.slotIndex;
+            issue.roomId = preference.roomId;
+            issue.dayIndex = preference.dayIndex;
+            issue.slotIndex = preference.slotIndex;
 
             issue.message =
-                "Room unavailability references room "
-                + std::to_string(unavailability.roomId)
+                "Room time slot preference references room "
+                + std::to_string(preference.roomId)
                 + ", but this room does not exist.";
 
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
+        }
+    }
+
+    static void validateSubjectTimeSlotPreferences(
+        const TimetableProblem& problem,
+        std::vector<PreprocessingIssue>& issues)
+    {
+        for (const SubjectTimeSlotPreference& preference :
+            problem.subjectTimeSlotPreferences)
+        {
+            if (subjectExists(problem, preference.subjectId))
+            {
+                continue;
+            }
+
+            PreprocessingIssue issue;
+
+            issue.code =
+                PreprocessingIssueCode::SubjectNotFound;
+
+            issue.subjectId = preference.subjectId;
+            issue.dayIndex = preference.dayIndex;
+            issue.slotIndex = preference.slotIndex;
+
+            issue.message =
+                "Subject time slot preference references subject "
+                + std::to_string(preference.subjectId)
+                + ", but this subject does not exist.";
+
+            issues.push_back(std::move(issue));
         }
     }
 
@@ -278,8 +251,7 @@ private:
         return std::any_of(
             problem.classGroups.begin(),
             problem.classGroups.end(),
-            [classGroupId](
-                const ClassGroup& classGroup)
+            [classGroupId](const ClassGroup& classGroup)
             {
                 return classGroup.id == classGroupId;
             });

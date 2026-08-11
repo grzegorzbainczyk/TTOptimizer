@@ -380,8 +380,8 @@ private:
 		case PreprocessingIssueCode::InvalidWeeklyCount:
 			return "InvalidWeeklyCount";
 
-		case PreprocessingIssueCode::InvalidUnavailability:
-			return "InvalidUnavailability";
+		case PreprocessingIssueCode::InvalidTimeSlotPreference:
+			return "InvalidTimeSlotPreference";
 
 		case PreprocessingIssueCode::MissingTeachers:
 			return "MissingTeachers";
@@ -415,6 +415,9 @@ private:
 
 		case PreprocessingIssueCode::ClassGroupInsufficientAvailability:
 			return "ClassGroupInsufficientAvailability";
+
+		case PreprocessingIssueCode::SubjectInsufficientAvailability:
+			return "SubjectInsufficientAvailability";
 
 		case PreprocessingIssueCode::InsufficientRoomAvailability:
 			return "InsufficientRoomAvailability";

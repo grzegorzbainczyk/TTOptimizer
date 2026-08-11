@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <set>
 #include <string>
 #include <utility>
@@ -17,13 +16,6 @@ public:
     {
         std::vector<PreprocessingIssue> issues;
 
-        /*
-         * Availability calculations make sense only
-         * for valid timetable dimensions.
-         *
-         * StructuralProblemValidator reports the actual
-         * dimension errors.
-         */
         if (problem.daysPerWeek <= 0 ||
             problem.daysPerWeek > 7 ||
             problem.slotsPerDay <= 0)
@@ -31,24 +23,23 @@ public:
             return issues;
         }
 
-        validateTeacherAvailability(
-            problem,
-            issues);
-
-        validateClassGroupAvailability(
-            problem,
-            issues);
-
-        validateTotalRoomAvailability(
-            problem,
-            issues);
+        validateTeacherAvailability(problem, issues);
+        validateClassGroupAvailability(problem, issues);
+        validateSubjectAvailability(problem, issues);
+        validateTotalRoomAvailability(problem, issues);
 
         return issues;
     }
 
 private:
-    using TimePeriod =
-        std::pair<int, int>;
+    using TimePeriod = std::pair<int, int>;
+
+    static bool isUnavailable(
+        TimeSlotPreferenceType preferenceType)
+    {
+        return preferenceType ==
+            TimeSlotPreferenceType::Unavailable;
+    }
 
     static void validateTeacherAvailability(
         const TimetableProblem& problem,
@@ -85,22 +76,14 @@ private:
             }
 
             PreprocessingIssue issue;
-
             issue.severity =
                 PreprocessingIssueSeverity::Error;
-
             issue.code =
                 PreprocessingIssueCode::
                 TeacherInsufficientAvailability;
-
-            issue.teacherId =
-                teacher.id;
-
-            issue.requiredCount =
-                requiredLessonCount;
-
-            issue.availableCount =
-                availableTimePeriodCount;
+            issue.teacherId = teacher.id;
+            issue.requiredCount = requiredLessonCount;
+            issue.availableCount = availableTimePeriodCount;
 
             issue.message =
                 "Teacher "
@@ -113,8 +96,7 @@ private:
                 + std::to_string(availableTimePeriodCount)
                 + " available time periods.";
 
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
         }
     }
 
@@ -154,22 +136,14 @@ private:
             }
 
             PreprocessingIssue issue;
-
             issue.severity =
                 PreprocessingIssueSeverity::Error;
-
             issue.code =
                 PreprocessingIssueCode::
                 ClassGroupInsufficientAvailability;
-
-            issue.classGroupId =
-                classGroup.id;
-
-            issue.requiredCount =
-                requiredLessonCount;
-
-            issue.availableCount =
-                availableTimePeriodCount;
+            issue.classGroupId = classGroup.id;
+            issue.requiredCount = requiredLessonCount;
+            issue.availableCount = availableTimePeriodCount;
 
             issue.message =
                 "Class group "
@@ -182,8 +156,66 @@ private:
                 + std::to_string(availableTimePeriodCount)
                 + " available time periods.";
 
-            issues.push_back(
-                std::move(issue));
+            issues.push_back(std::move(issue));
+        }
+    }
+
+    static void validateSubjectAvailability(
+        const TimetableProblem& problem,
+        std::vector<PreprocessingIssue>& issues)
+    {
+        const int totalTimePeriodCount =
+            getTotalTimePeriodCount(problem);
+
+        for (const Subject& subject : problem.subjects)
+        {
+            const int requiredLessonCount =
+                getRequiredLessonCountForSubject(
+                    problem,
+                    subject.id);
+
+            if (requiredLessonCount == 0)
+            {
+                continue;
+            }
+
+            const int unavailableTimePeriodCount =
+                getSubjectUnavailableTimePeriodCount(
+                    problem,
+                    subject.id);
+
+            const int availableTimePeriodCount =
+                totalTimePeriodCount -
+                unavailableTimePeriodCount;
+
+            if (requiredLessonCount <=
+                availableTimePeriodCount)
+            {
+                continue;
+            }
+
+            PreprocessingIssue issue;
+            issue.severity =
+                PreprocessingIssueSeverity::Error;
+            issue.code =
+                PreprocessingIssueCode::
+                SubjectInsufficientAvailability;
+            issue.subjectId = subject.id;
+            issue.requiredCount = requiredLessonCount;
+            issue.availableCount = availableTimePeriodCount;
+
+            issue.message =
+                "Subject "
+                + subject.name
+                + " (ID "
+                + std::to_string(subject.id)
+                + ") requires "
+                + std::to_string(requiredLessonCount)
+                + " weekly lessons, but has only "
+                + std::to_string(availableTimePeriodCount)
+                + " available time periods.";
+
+            issues.push_back(std::move(issue));
         }
     }
 
@@ -223,19 +255,13 @@ private:
         }
 
         PreprocessingIssue issue;
-
         issue.severity =
             PreprocessingIssueSeverity::Error;
-
         issue.code =
             PreprocessingIssueCode::
-            InsufficientRoomAvailability;
-
-        issue.requiredCount =
-            requiredLessonCount;
-
-        issue.availableCount =
-            availableRoomSlotCount;
+                InsufficientRoomAvailability;
+        issue.requiredCount = requiredLessonCount;
+        issue.availableCount = availableRoomSlotCount;
 
         issue.message =
             "The timetable requires "
@@ -244,8 +270,7 @@ private:
             + std::to_string(availableRoomSlotCount)
             + " room schedule slots are available.";
 
-        issues.push_back(
-            std::move(issue));
+        issues.push_back(std::move(issue));
     }
 
     static int getTotalTimePeriodCount(
@@ -263,12 +288,6 @@ private:
         for (const LessonRequirement& requirement :
             problem.lessonRequirements)
         {
-            /*
-             * Invalid weekly counts are handled by
-             * StructuralProblemValidator.
-             *
-             * Negative values must not reduce the total.
-             */
             if (requirement.weeklyCount > 0)
             {
                 requiredLessonCount +=
@@ -320,31 +339,52 @@ private:
         return requiredLessonCount;
     }
 
+    static int getRequiredLessonCountForSubject(
+        const TimetableProblem& problem,
+        SubjectId subjectId)
+    {
+        int requiredLessonCount = 0;
+
+        for (const LessonRequirement& requirement :
+            problem.lessonRequirements)
+        {
+            if (requirement.subjectId == subjectId &&
+                requirement.weeklyCount > 0)
+            {
+                requiredLessonCount +=
+                    requirement.weeklyCount;
+            }
+        }
+
+        return requiredLessonCount;
+    }
+
     static int getTeacherUnavailableTimePeriodCount(
         const TimetableProblem& problem,
         TeacherId teacherId)
     {
         std::set<TimePeriod> unavailableTimePeriods;
 
-        for (const TeacherUnavailability& unavailability :
-            problem.teacherUnavailabilities)
+        for (const TeacherTimeSlotPreference& preference :
+            problem.teacherTimeSlotPreferences)
         {
-            if (unavailability.teacherId != teacherId)
+            if (preference.teacherId != teacherId ||
+                !isUnavailable(preference.preferenceType))
             {
                 continue;
             }
 
             if (!isTimePeriodValid(
                 problem,
-                unavailability.dayIndex,
-                unavailability.slotIndex))
+                preference.dayIndex,
+                preference.slotIndex))
             {
                 continue;
             }
 
             unavailableTimePeriods.emplace(
-                unavailability.dayIndex,
-                unavailability.slotIndex);
+                preference.dayIndex,
+                preference.slotIndex);
         }
 
         return static_cast<int>(
@@ -357,26 +397,26 @@ private:
     {
         std::set<TimePeriod> unavailableTimePeriods;
 
-        for (const ClassGroupUnavailability& unavailability :
-            problem.classGroupUnavailabilities)
+        for (const ClassGroupTimeSlotPreference& preference :
+            problem.classGroupTimeSlotPreferences)
         {
-            if (unavailability.classGroupId !=
-                classGroupId)
+            if (preference.classGroupId != classGroupId ||
+                !isUnavailable(preference.preferenceType))
             {
                 continue;
             }
 
             if (!isTimePeriodValid(
                 problem,
-                unavailability.dayIndex,
-                unavailability.slotIndex))
+                preference.dayIndex,
+                preference.slotIndex))
             {
                 continue;
             }
 
             unavailableTimePeriods.emplace(
-                unavailability.dayIndex,
-                unavailability.slotIndex);
+                preference.dayIndex,
+                preference.slotIndex);
         }
 
         return static_cast<int>(
@@ -389,25 +429,58 @@ private:
     {
         std::set<TimePeriod> unavailableTimePeriods;
 
-        for (const RoomUnavailability& unavailability :
-            problem.roomUnavailabilities)
+        for (const RoomTimeSlotPreference& preference :
+            problem.roomTimeSlotPreferences)
         {
-            if (unavailability.roomId != roomId)
+            if (preference.roomId != roomId ||
+                !isUnavailable(preference.preferenceType))
             {
                 continue;
             }
 
             if (!isTimePeriodValid(
                 problem,
-                unavailability.dayIndex,
-                unavailability.slotIndex))
+                preference.dayIndex,
+                preference.slotIndex))
             {
                 continue;
             }
 
             unavailableTimePeriods.emplace(
-                unavailability.dayIndex,
-                unavailability.slotIndex);
+                preference.dayIndex,
+                preference.slotIndex);
+        }
+
+        return static_cast<int>(
+            unavailableTimePeriods.size());
+    }
+
+    static int getSubjectUnavailableTimePeriodCount(
+        const TimetableProblem& problem,
+        SubjectId subjectId)
+    {
+        std::set<TimePeriod> unavailableTimePeriods;
+
+        for (const SubjectTimeSlotPreference& preference :
+            problem.subjectTimeSlotPreferences)
+        {
+            if (preference.subjectId != subjectId ||
+                !isUnavailable(preference.preferenceType))
+            {
+                continue;
+            }
+
+            if (!isTimePeriodValid(
+                problem,
+                preference.dayIndex,
+                preference.slotIndex))
+            {
+                continue;
+            }
+
+            unavailableTimePeriods.emplace(
+                preference.dayIndex,
+                preference.slotIndex);
         }
 
         return static_cast<int>(
