@@ -30,6 +30,9 @@ namespace TTOptimizer.Web.Data
         public DbSet<RoomTimeSlotPreference> RoomTimeSlotPreferences { get; set; }
         public DbSet<SubjectTimeSlotPreference> SubjectTimeSlotPreferences { get; set; }
 
+        public DbSet<OrganizationSchedulingPreferences> OrganizationSchedulingPreferences { get; set; }
+        public DbSet<TeacherSchedulingPreferences> TeacherSchedulingPreferences { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -213,6 +216,31 @@ namespace TTOptimizer.Web.Data
                 entity.HasOne(x => x.Organization)
                     .WithMany()
                     .HasForeignKey(x => x.OrganizationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<OrganizationSchedulingPreferences>(entity =>
+            {
+                entity.HasIndex(item => item.OrganizationId)
+                    .IsUnique();
+
+                entity.HasOne(item => item.Organization)
+                    .WithMany()
+                    .HasForeignKey(item => item.OrganizationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(item => item.TeacherMinimizeGaps)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Medium);
+            });
+
+            modelBuilder.Entity<TeacherSchedulingPreferences>(entity =>
+            {
+                entity.HasIndex(item => item.TeacherId)
+                    .IsUnique();
+
+                entity.HasOne(item => item.Teacher)
+                    .WithMany()
+                    .HasForeignKey(item => item.TeacherId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

@@ -1,4 +1,4 @@
-﻿document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const backToMainButton =
         document.getElementById("backToMainButton");
 
@@ -175,6 +175,22 @@ function renderTeachers(teachers) {
             window.location.href = url;
         });
 
+        const preferencesButton =
+            document.createElement("button");
+
+        preferencesButton.type = "button";
+        preferencesButton.className = "small-button teacher-action-button teacher-preferences-button";
+        preferencesButton.textContent = "Preferences";
+
+        preferencesButton.addEventListener("click", () => {
+            const url =
+                "teacher-preferences.html" +
+                `?teacherId=${encodeURIComponent(teacher.id)}` +
+                `&teacherName=${encodeURIComponent(teacher.name ?? "")}`;
+
+            window.location.href = url;
+        });
+
         const deleteButton =
             document.createElement("button");
 
@@ -194,6 +210,7 @@ function renderTeachers(teachers) {
         actionsContainer.append(
             editButton,
             availabilityButton,
+            preferencesButton,
             deleteButton
         );
 

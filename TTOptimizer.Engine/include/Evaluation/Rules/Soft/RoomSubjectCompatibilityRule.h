@@ -2,12 +2,13 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <utility>
 #include "Evaluation/Rules/IConstraintRule.h"
 
 class RoomSubjectCompatibilityRule final : public IConstraintRule
 {
 public:
-	ConstraintRuleResult evaluate(
+	std::vector<ConstraintRuleResult> evaluate(
 		const ConstraintRuleContext& context) const override
 	{
 		ConstraintRuleResult result;
@@ -68,7 +69,7 @@ public:
 			static_cast<double>(result.violationCount) *
 			context.problem.optimizationSettings.penalties.medium;
 
-		return result;
+		return { std::move(result) };
 	}
 
 private:

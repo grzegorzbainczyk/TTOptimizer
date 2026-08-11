@@ -14,7 +14,9 @@ enum class ConstraintViolationType
 
     TeacherConflict,
     ClassGroupConflict,
-    RoomConflict
+    RoomConflict,
+
+    TeacherGap
 };
 
 struct ConstraintViolation

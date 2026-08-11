@@ -535,6 +535,9 @@ public class CppOptimizerService
             SubjectTimeSlotPreferences =
                 problem.SubjectTimeSlotPreferences,
 
+            TeacherSchedulingPreferences =
+                problem.TeacherSchedulingPreferences,
+
             OptimizationSettings =
                 problem.OptimizationSettings
         };

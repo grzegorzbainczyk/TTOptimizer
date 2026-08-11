@@ -64,6 +64,13 @@ public class SubjectTimeSlotPreferenceInput
     public TimeSlotPreferenceType PreferenceType { get; set; }
 }
 
+public class TeacherSchedulingPreferenceInput
+{
+    public int TeacherId { get; set; }
+
+    public SchedulingPreferenceLevel MinimizeGaps { get; set; }
+}
+
 public class TimetableProblem
 {
     public List<Teacher> Teachers { get; set; } = new();
@@ -80,6 +87,8 @@ public class TimetableProblem
     public List<ClassGroupTimeSlotPreferenceInput> ClassGroupTimeSlotPreferences { get; set; } = new();
     public List<RoomTimeSlotPreferenceInput> RoomTimeSlotPreferences { get; set; } = new();
     public List<SubjectTimeSlotPreferenceInput> SubjectTimeSlotPreferences { get; set; } = new();
+
+    public List<TeacherSchedulingPreferenceInput> TeacherSchedulingPreferences { get; set; } = new();
 
     public int DaysPerWeek { get; set; } = 5;
 

@@ -11,6 +11,15 @@ enum class TimeSlotPreferenceType
     Unavailable
 };
 
+enum class SchedulingPreferenceLevel
+{
+    Disabled,
+    Low,
+    Medium,
+    High,
+    Hard
+};
+
 struct TeacherTimeSlotPreference
 {
     TeacherId teacherId{};
@@ -51,6 +60,15 @@ struct SubjectTimeSlotPreference
     };
 };
 
+struct TeacherSchedulingPreference
+{
+    TeacherId teacherId{};
+
+    SchedulingPreferenceLevel minimizeGaps{
+        SchedulingPreferenceLevel::Medium
+    };
+};
+
 struct TimetableProblem
 {
     std::vector<Teacher> teachers;
@@ -70,6 +88,9 @@ struct TimetableProblem
 
     std::vector<SubjectTimeSlotPreference>
         subjectTimeSlotPreferences;
+
+    std::vector<TeacherSchedulingPreference>
+        teacherSchedulingPreferences;
 
     int daysPerWeek = 5;
     int slotsPerDay = 8;

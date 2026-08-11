@@ -74,6 +74,12 @@ public class OptimizerInputDto
     public List<SubjectTimeSlotPreferenceInput> SubjectTimeSlotPreferences { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the effective scheduling preferences for teachers.
+    /// Values already include organization defaults and teacher overrides.
+    /// </summary>
+    public List<TeacherSchedulingPreferenceInput> TeacherSchedulingPreferences { get; set; } = new();
+
+    /// <summary>
     /// Gets or sets the configuration used by the optimization algorithm,
     /// such as iteration limits, random seed, and thread count.
     /// </summary>

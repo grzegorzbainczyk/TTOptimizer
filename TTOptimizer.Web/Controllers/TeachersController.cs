@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 using TTOptimizer.Web.Models.DTO.Teachers;
+using TTOptimizer.Web.Models.DTO.SchedulingPreferences;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -483,6 +484,174 @@ public class TeachersController : ControllerBase
             timeSlotPreferences = normalizedPreferences
                 .OrderBy(slot => slot.DayIndex)
                 .ThenBy(slot => slot.SlotIndex)
+        });
+    }
+
+    // Scheduling preferences endpoint for a specific teacher
+
+    [HttpGet("{id:int}/scheduling-preferences")]
+    public async Task<IActionResult> GetSchedulingPreferences(
+        int id,
+        [FromQuery] int organizationId)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        var teacher = await _dbContext.Teachers
+            .AsNoTracking()
+            .Where(t =>
+                t.Id == id &&
+                t.OrganizationId == organizationId)
+            .Select(t => new
+            {
+                t.Id,
+                t.Name
+            })
+            .FirstOrDefaultAsync();
+
+        if (teacher == null)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Teacher was not found."
+            });
+        }
+
+        var organizationPreferences =
+            await _dbContext.OrganizationSchedulingPreferences
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.OrganizationId == organizationId);
+
+        var defaultMinimizeGaps =
+            organizationPreferences?.TeacherMinimizeGaps
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var teacherPreferences =
+            await _dbContext.TeacherSchedulingPreferences
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.TeacherId == id);
+
+        var overrideValue =
+            teacherPreferences?.MinimizeGaps;
+
+        var dto = new TeacherSchedulingPreferencesDto
+        {
+            TeacherId = teacher.Id,
+            TeacherName = teacher.Name,
+            MinimizeGaps = overrideValue,
+            DefaultMinimizeGaps = defaultMinimizeGaps,
+            EffectiveMinimizeGaps =
+                overrideValue ?? defaultMinimizeGaps
+        };
+
+        return Ok(new
+        {
+            success = true,
+            preferences = dto
+        });
+    }
+
+    [HttpPut("{id:int}/scheduling-preferences")]
+    public async Task<IActionResult> UpdateSchedulingPreferences(
+        int id,
+        [FromQuery] int organizationId,
+        [FromBody] UpdateTeacherSchedulingPreferencesRequest request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        var teacher = await _dbContext.Teachers
+            .Where(t =>
+                t.Id == id &&
+                t.OrganizationId == organizationId)
+            .Select(t => new
+            {
+                t.Id,
+                t.Name
+            })
+            .FirstOrDefaultAsync();
+
+        if (teacher == null)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Teacher was not found."
+            });
+        }
+
+        if (request.MinimizeGaps.HasValue &&
+            !Enum.IsDefined(request.MinimizeGaps.Value))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Minimize gaps preference level is invalid."
+            });
+        }
+
+        var preferences =
+            await _dbContext.TeacherSchedulingPreferences
+                .FirstOrDefaultAsync(item =>
+                    item.TeacherId == id);
+
+        if (preferences == null)
+        {
+            preferences = new TeacherSchedulingPreferences
+            {
+                TeacherId = id
+            };
+
+            _dbContext.TeacherSchedulingPreferences.Add(
+                preferences);
+        }
+
+        preferences.MinimizeGaps =
+            request.MinimizeGaps;
+
+        await _dbContext.SaveChangesAsync();
+
+        var organizationPreferences =
+            await _dbContext.OrganizationSchedulingPreferences
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.OrganizationId == organizationId);
+
+        var defaultMinimizeGaps =
+            organizationPreferences?.TeacherMinimizeGaps
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var dto = new TeacherSchedulingPreferencesDto
+        {
+            TeacherId = teacher.Id,
+            TeacherName = teacher.Name,
+            MinimizeGaps = preferences.MinimizeGaps,
+            DefaultMinimizeGaps = defaultMinimizeGaps,
+            EffectiveMinimizeGaps =
+                preferences.MinimizeGaps
+                ?? defaultMinimizeGaps
+        };
+
+        return Ok(new
+        {
+            success = true,
+            message = "Teacher scheduling preferences were updated.",
+            preferences = dto
         });
     }
 

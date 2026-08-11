@@ -49,6 +49,7 @@ public:
         readLessonRequirements(root, problem);
 
         readTimeSlotPreferences(root, problem);
+        readTeacherSchedulingPreferences(root, problem);
 
         return problem;
     }
@@ -74,6 +75,38 @@ private:
 
         throw std::runtime_error(
             "Unknown time slot preference type: " + value);
+    }
+
+    static SchedulingPreferenceLevel parseSchedulingPreferenceLevel(
+        const std::string& value)
+    {
+        if (value == "Disabled")
+        {
+            return SchedulingPreferenceLevel::Disabled;
+        }
+
+        if (value == "Low")
+        {
+            return SchedulingPreferenceLevel::Low;
+        }
+
+        if (value == "Medium")
+        {
+            return SchedulingPreferenceLevel::Medium;
+        }
+
+        if (value == "High")
+        {
+            return SchedulingPreferenceLevel::High;
+        }
+
+        if (value == "Hard")
+        {
+            return SchedulingPreferenceLevel::Hard;
+        }
+
+        throw std::runtime_error(
+            "Unknown scheduling preference level: " + value);
     }
 
     static void readOptimizationSettings(
@@ -284,5 +317,34 @@ private:
             }
         }
     }
+
+
+    static void readTeacherSchedulingPreferences(
+        const json& root,
+        TimetableProblem& problem)
+    {
+        if (!root.contains("teacherSchedulingPreferences")
+            || !root["teacherSchedulingPreferences"].is_array())
+        {
+            return;
+        }
+
+        for (const auto& item :
+            root["teacherSchedulingPreferences"])
+        {
+            TeacherSchedulingPreference preference;
+
+            preference.teacherId =
+                item.value("teacherId", 0);
+
+            preference.minimizeGaps =
+                parseSchedulingPreferenceLevel(
+                    item.value("minimizeGaps", "Medium"));
+
+            problem.teacherSchedulingPreferences.push_back(
+                preference);
+        }
+    }
+
 
 };

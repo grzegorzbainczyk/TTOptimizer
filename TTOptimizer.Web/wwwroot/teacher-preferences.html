@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>ClassFlow - Teacher scheduling preferences</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="teachers-page">
+    <div class="page-container">
+        <header class="app-header teachers-header">
+            <div class="teachers-header-content">
+                <div>
+                    <span class="teachers-page-label">Teacher scheduling</span>
+
+                    <h1 id="teacherPreferencesTitle">
+                        Scheduling preferences
+                    </h1>
+
+                    <p class="page-subtitle">
+                        Configure optimization preferences for this teacher.
+                    </p>
+                </div>
+
+                <nav class="header-actions">
+                    <button id="backToTeachersButton"
+                            class="secondary-button"
+                            type="button">
+                        Back
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <main class="content-card teachers-card">
+            <div class="section-header teachers-section-header">
+                <div>
+                    <h2>Teacher preferences</h2>
+
+                    <p class="teachers-section-description">
+                        Teacher-specific values can override the organization defaults.
+                    </p>
+                </div>
+            </div>
+
+            <section class="resource-form-section teachers-form-section">
+                <input id="teacherId" type="hidden" />
+
+                <div class="form-grid teachers-form-grid">
+                    <div class="form-field">
+                        <label for="minimizeGapsImportance">
+                            Minimize gaps
+                        </label>
+
+                        <select id="minimizeGapsImportance">
+                            <option value="default">
+                                Default (Medium)
+                            </option>
+                            <option value="disabled">
+                                Disabled
+                            </option>
+                            <option value="low">
+                                Low
+                            </option>
+                            <option value="medium">
+                                Medium
+                            </option>
+                            <option value="high">
+                                High
+                            </option>
+                            <option value="hard">
+                                Hard
+                            </option>
+                        </select>
+
+                        <small>
+                            Prefer schedules with fewer gaps between this teacher's lessons.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-actions teachers-form-actions">
+                    <button id="saveTeacherPreferencesButton"
+                            class="main-action-button"
+                            type="button">
+                        Save
+                    </button>
+
+                    <button id="resetTeacherPreferencesButton"
+                            class="secondary-button"
+                            type="button">
+                        Use default
+                    </button>
+                </div>
+
+                <p id="teacherPreferencesMessage"
+                   class="form-message"
+                   aria-live="polite">
+                </p>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/appContext.js"></script>
+    <script src="js/teacher-preferences.js"></script>
+</body>
+</html>

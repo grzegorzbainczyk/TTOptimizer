@@ -112,6 +112,43 @@ public class TimetableProblemBuilderService
                 })
                 .ToListAsync();
 
+        var organizationSchedulingPreferences =
+            await _context.OrganizationSchedulingPreferences
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.OrganizationId == organizationId);
+
+        var defaultTeacherMinimizeGaps =
+            organizationSchedulingPreferences?.TeacherMinimizeGaps
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var teacherPreferenceOverrides =
+            await _context.TeacherSchedulingPreferences
+                .AsNoTracking()
+                .Where(item =>
+                    item.Teacher.OrganizationId == organizationId)
+                .ToDictionaryAsync(
+                    item => item.TeacherId,
+                    item => item.MinimizeGaps);
+
+        var teacherSchedulingPreferences =
+            teachers
+                .Select(teacher =>
+                {
+                    teacherPreferenceOverrides.TryGetValue(
+                        teacher.Id,
+                        out var overrideValue);
+
+                    return new TeacherSchedulingPreferenceInput
+                    {
+                        TeacherId = teacher.Id,
+                        MinimizeGaps =
+                            overrideValue
+                            ?? defaultTeacherMinimizeGaps
+                    };
+                })
+                .ToList();
+
         ValidationResult validate = ValidateData(
             teachers,
             classGroups,
@@ -136,6 +173,8 @@ public class TimetableProblemBuilderService
             ClassGroupTimeSlotPreferences = classGroupTimeSlotPreferences,
             RoomTimeSlotPreferences = roomTimeSlotPreferences,
             SubjectTimeSlotPreferences = subjectTimeSlotPreferences,
+
+            TeacherSchedulingPreferences = teacherSchedulingPreferences,
 
             DaysPerWeek = 5,
             SlotsPerDay = 8,

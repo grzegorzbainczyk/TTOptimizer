@@ -534,8 +534,14 @@ FitnessScore FitnessEvaluator::evaluate(
 
     for (const auto& rule : ruleRegistry_.rules())
     {
-        score.addRuleResult(
-            rule->evaluate(context));
+        auto ruleResults =
+            rule->evaluate(context);
+
+        for (auto& ruleResult : ruleResults)
+        {
+            score.addRuleResult(
+                std::move(ruleResult));
+        }
     }
 
     return score;
