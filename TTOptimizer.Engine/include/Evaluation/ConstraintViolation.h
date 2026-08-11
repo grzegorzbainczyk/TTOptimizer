@@ -10,6 +10,7 @@ enum class ConstraintViolationType
     TeacherUnavailable,
     ClassGroupUnavailable,
     RoomUnavailable,
+    SubjectUnavailable,
 
     TeacherConflict,
     ClassGroupConflict,
@@ -25,6 +26,7 @@ struct ConstraintViolation
     int teacherId{};
     int classGroupId{};
     int roomId{};
+    int subjectId{};
 
     int dayIndex{ -1 };
     int slotIndex{ -1 };

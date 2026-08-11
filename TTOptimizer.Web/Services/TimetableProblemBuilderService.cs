@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models;
 using TTOptimizer.Web.Models.Domain;
@@ -15,7 +15,9 @@ public class TimetableProblemBuilderService
         _context = context;
     }
 
-    public async Task<TimetableProblemBuildResult> BuildAsync(int organizationId, OptimizationSettings optimizationSettings)
+    public async Task<TimetableProblemBuildResult> BuildAsync(
+        int organizationId,
+        OptimizationSettings optimizationSettings)
     {
         var teachers = await _context.Teachers
             .Where(t => t.OrganizationId == organizationId)
@@ -42,58 +44,80 @@ public class TimetableProblemBuilderService
             .OrderBy(lr => lr.Id)
             .ToListAsync();
 
-        var teacherUnavailabilities =
-    await _context.TeacherTimeSlotPreferences
-        .AsNoTracking()
-        .Where(item =>
-            item.PreferenceType == TimeSlotPreferenceType.Unavailable &&
-            item.Teacher.OrganizationId == organizationId)
-        .OrderBy(item => item.TeacherId)
-        .ThenBy(item => item.DayIndex)
-        .ThenBy(item => item.SlotIndex)
-        .Select(item => new TeacherUnavailabilityInput
-        {
-            TeacherId = item.TeacherId,
-            DayIndex = item.DayIndex,
-            SlotIndex = item.SlotIndex
-        })
-        .ToListAsync();
+        var teacherTimeSlotPreferences =
+            await _context.TeacherTimeSlotPreferences
+                .AsNoTracking()
+                .Where(item =>
+                    item.Teacher.OrganizationId == organizationId)
+                .OrderBy(item => item.TeacherId)
+                .ThenBy(item => item.DayIndex)
+                .ThenBy(item => item.SlotIndex)
+                .Select(item => new TeacherTimeSlotPreferenceInput
+                {
+                    TeacherId = item.TeacherId,
+                    DayIndex = item.DayIndex,
+                    SlotIndex = item.SlotIndex,
+                    PreferenceType = item.PreferenceType
+                })
+                .ToListAsync();
 
-        var classGroupUnavailabilities =
+        var classGroupTimeSlotPreferences =
             await _context.ClassGroupTimeSlotPreferences
                 .AsNoTracking()
                 .Where(item =>
-                    item.PreferenceType == TimeSlotPreferenceType.Unavailable &&
                     item.ClassGroup.OrganizationId == organizationId)
                 .OrderBy(item => item.ClassGroupId)
                 .ThenBy(item => item.DayIndex)
                 .ThenBy(item => item.SlotIndex)
-                .Select(item => new ClassGroupUnavailabilityInput
+                .Select(item => new ClassGroupTimeSlotPreferenceInput
                 {
                     ClassGroupId = item.ClassGroupId,
                     DayIndex = item.DayIndex,
-                    SlotIndex = item.SlotIndex
+                    SlotIndex = item.SlotIndex,
+                    PreferenceType = item.PreferenceType
                 })
                 .ToListAsync();
 
-        var roomUnavailabilities =
+        var roomTimeSlotPreferences =
             await _context.RoomTimeSlotPreferences
                 .AsNoTracking()
                 .Where(item =>
-                    item.PreferenceType == TimeSlotPreferenceType.Unavailable &&
                     item.Room.OrganizationId == organizationId)
                 .OrderBy(item => item.RoomId)
                 .ThenBy(item => item.DayIndex)
                 .ThenBy(item => item.SlotIndex)
-                .Select(item => new RoomUnavailabilityInput
+                .Select(item => new RoomTimeSlotPreferenceInput
                 {
                     RoomId = item.RoomId,
                     DayIndex = item.DayIndex,
-                    SlotIndex = item.SlotIndex
+                    SlotIndex = item.SlotIndex,
+                    PreferenceType = item.PreferenceType
                 })
                 .ToListAsync();
 
-        ValidationResult validate = ValidateData(teachers,classGroups,subjects,rooms,lessonRequirements);
+        var subjectTimeSlotPreferences =
+            await _context.SubjectTimeSlotPreferences
+                .AsNoTracking()
+                .Where(item =>
+                    item.Subject.OrganizationId == organizationId)
+                .OrderBy(item => item.SubjectId)
+                .ThenBy(item => item.DayIndex)
+                .ThenBy(item => item.SlotIndex)
+                .Select(item => new SubjectTimeSlotPreferenceInput
+                {
+                    SubjectId = item.SubjectId,
+                    DayIndex = item.DayIndex,
+                    SlotIndex = item.SlotIndex,
+                    PreferenceType = item.PreferenceType
+                })
+                .ToListAsync();
+
+        ValidationResult validate = ValidateData(
+            teachers,
+            classGroups,
+            subjects,
+            rooms,
+            lessonRequirements);
 
         if (!validate.Success)
         {
@@ -108,14 +132,10 @@ public class TimetableProblemBuilderService
             Rooms = rooms,
             LessonRequirements = lessonRequirements,
 
-            TeacherUnavailabilities =
-         teacherUnavailabilities,
-
-            ClassGroupUnavailabilities =
-         classGroupUnavailabilities,
-
-            RoomUnavailabilities =
-         roomUnavailabilities,
+            TeacherTimeSlotPreferences = teacherTimeSlotPreferences,
+            ClassGroupTimeSlotPreferences = classGroupTimeSlotPreferences,
+            RoomTimeSlotPreferences = roomTimeSlotPreferences,
+            SubjectTimeSlotPreferences = subjectTimeSlotPreferences,
 
             DaysPerWeek = 5,
             SlotsPerDay = 8,
@@ -126,11 +146,11 @@ public class TimetableProblemBuilderService
     }
 
     private static ValidationResult ValidateData(
-    List<Teacher> teachers,
-    List<ClassGroup> classes,
-    List<Subject> subjects,
-    List<Room> rooms,
-    List<LessonRequirement> requirements)
+        List<Teacher> teachers,
+        List<ClassGroup> classes,
+        List<Subject> subjects,
+        List<Room> rooms,
+        List<LessonRequirement> requirements)
     {
         if (!teachers.Any())
         {

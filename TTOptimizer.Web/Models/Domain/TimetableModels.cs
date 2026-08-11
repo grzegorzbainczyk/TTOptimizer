@@ -1,4 +1,4 @@
-﻿using TTOptimizer.Web.Models.Optimization;
+using TTOptimizer.Web.Models.Optimization;
 
 namespace TTOptimizer.Web.Models.Domain;
 
@@ -32,6 +32,38 @@ public class ScheduleSlot
     public TimeSlot TimeSlot { get; set; } = new();
 }
 
+public class TeacherTimeSlotPreferenceInput
+{
+    public int TeacherId { get; set; }
+    public int DayIndex { get; set; }
+    public int SlotIndex { get; set; }
+    public TimeSlotPreferenceType PreferenceType { get; set; }
+}
+
+public class ClassGroupTimeSlotPreferenceInput
+{
+    public int ClassGroupId { get; set; }
+    public int DayIndex { get; set; }
+    public int SlotIndex { get; set; }
+    public TimeSlotPreferenceType PreferenceType { get; set; }
+}
+
+public class RoomTimeSlotPreferenceInput
+{
+    public int RoomId { get; set; }
+    public int DayIndex { get; set; }
+    public int SlotIndex { get; set; }
+    public TimeSlotPreferenceType PreferenceType { get; set; }
+}
+
+public class SubjectTimeSlotPreferenceInput
+{
+    public int SubjectId { get; set; }
+    public int DayIndex { get; set; }
+    public int SlotIndex { get; set; }
+    public TimeSlotPreferenceType PreferenceType { get; set; }
+}
+
 public class TimetableProblem
 {
     public List<Teacher> Teachers { get; set; } = new();
@@ -44,9 +76,10 @@ public class TimetableProblem
 
     public List<LessonRequirement> LessonRequirements { get; set; } = new();
 
-    public List<TeacherUnavailabilityInput> TeacherUnavailabilities { get; set; } = new();
-    public List<ClassGroupUnavailabilityInput> ClassGroupUnavailabilities { get; set; } = new();
-    public List<RoomUnavailabilityInput> RoomUnavailabilities { get; set; } = new();
+    public List<TeacherTimeSlotPreferenceInput> TeacherTimeSlotPreferences { get; set; } = new();
+    public List<ClassGroupTimeSlotPreferenceInput> ClassGroupTimeSlotPreferences { get; set; } = new();
+    public List<RoomTimeSlotPreferenceInput> RoomTimeSlotPreferences { get; set; } = new();
+    public List<SubjectTimeSlotPreferenceInput> SubjectTimeSlotPreferences { get; set; } = new();
 
     public int DaysPerWeek { get; set; } = 5;
 

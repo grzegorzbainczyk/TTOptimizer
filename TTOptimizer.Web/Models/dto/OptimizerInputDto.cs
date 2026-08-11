@@ -1,4 +1,5 @@
-﻿using TTOptimizer.Web.Models.Optimization;
+using TTOptimizer.Web.Models.Domain;
+using TTOptimizer.Web.Models.Optimization;
 
 namespace TTOptimizer.Web.Models.DTO;
 
@@ -8,7 +9,7 @@ namespace TTOptimizer.Web.Models.DTO;
 /// </summary>
 /// <remarks>
 /// The object contains the timetable dimensions, available domain resources,
-/// lesson requirements, unavailability constraints, and optimization settings.
+/// lesson requirements, time slot preferences, and optimization settings.
 /// </remarks>
 public class OptimizerInputDto
 {
@@ -49,22 +50,28 @@ public class OptimizerInputDto
     public List<OptimizerLessonRequirementDto> LessonRequirements { get; set; } = new();
 
     /// <summary>
-    /// Gets or sets the collection of time slots during which teachers
-    /// are unavailable to conduct lessons.
+    /// Gets or sets non-default time slot preferences for teachers.
+    /// Missing slots are treated as Available by the optimization engine.
     /// </summary>
-    public List<TeacherUnavailabilityInput> TeacherUnavailabilities { get; set; } = new();
+    public List<TeacherTimeSlotPreferenceInput> TeacherTimeSlotPreferences { get; set; } = new();
 
     /// <summary>
-    /// Gets or sets the collection of time slots during which class groups
-    /// are unavailable to attend lessons.
+    /// Gets or sets non-default time slot preferences for class groups.
+    /// Missing slots are treated as Available by the optimization engine.
     /// </summary>
-    public List<ClassGroupUnavailabilityInput> ClassGroupUnavailabilities { get; set; } = new();
+    public List<ClassGroupTimeSlotPreferenceInput> ClassGroupTimeSlotPreferences { get; set; } = new();
 
     /// <summary>
-    /// Gets or sets the collection of time slots during which rooms
-    /// are unavailable for scheduled lessons.
+    /// Gets or sets non-default time slot preferences for rooms.
+    /// Missing slots are treated as Available by the optimization engine.
     /// </summary>
-    public List<RoomUnavailabilityInput> RoomUnavailabilities { get; set; } = new();
+    public List<RoomTimeSlotPreferenceInput> RoomTimeSlotPreferences { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets non-default time slot preferences for subjects.
+    /// Missing slots are treated as Available by the optimization engine.
+    /// </summary>
+    public List<SubjectTimeSlotPreferenceInput> SubjectTimeSlotPreferences { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the configuration used by the optimization algorithm,

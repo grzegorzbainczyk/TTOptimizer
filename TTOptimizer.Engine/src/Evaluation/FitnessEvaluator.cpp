@@ -131,6 +131,57 @@ namespace
     }
 
 
+    template <typename Preference, typename ResourceId>
+    TimeSlotPreferenceType FindTimeSlotPreference(
+        const std::vector<Preference>& preferences,
+        ResourceId resourceId,
+        int dayIndex,
+        int slotIndex,
+        ResourceId Preference::* idMember)
+    {
+        const auto iterator = std::find_if(
+            preferences.begin(),
+            preferences.end(),
+            [resourceId, dayIndex, slotIndex, idMember](
+                const Preference& preference)
+            {
+                return preference.*idMember == resourceId
+                    && preference.dayIndex == dayIndex
+                    && preference.slotIndex == slotIndex;
+            });
+
+        if (iterator == preferences.end())
+        {
+            return TimeSlotPreferenceType::Available;
+        }
+
+        return iterator->preferenceType;
+    }
+
+    void AddTimeSlotPreferencePenalty(
+        FitnessScore& score,
+        TimeSlotPreferenceType preferenceType)
+    {
+        switch (preferenceType)
+        {
+        case TimeSlotPreferenceType::Preferred:
+            return;
+
+        case TimeSlotPreferenceType::Available:
+            score.addSoftPenalty(1.0);
+            return;
+
+        case TimeSlotPreferenceType::NotPreferred:
+            score.addSoftPenalty(10.0);
+            return;
+
+        case TimeSlotPreferenceType::Unavailable:
+            // Hard violations are reported separately.
+            return;
+        }
+    }
+
+
     ConstraintViolation CreateViolation(
         ConstraintViolationType type,
         std::string message)
@@ -253,6 +304,43 @@ FitnessScore FitnessEvaluator::evaluate(
         teacherTimeUsage[teacherTimeKey]++;
         classGroupTimeUsage[classGroupTimeKey]++;
 
+        const TimeSlotPreferenceType teacherPreference =
+            FindTimeSlotPreference(
+                problem.teacherTimeSlotPreferences,
+                requirement.teacherId,
+                dayIndex,
+                slotIndex,
+                &TeacherTimeSlotPreference::teacherId);
+
+        const TimeSlotPreferenceType classGroupPreference =
+            FindTimeSlotPreference(
+                problem.classGroupTimeSlotPreferences,
+                requirement.classGroupId,
+                dayIndex,
+                slotIndex,
+                &ClassGroupTimeSlotPreference::classGroupId);
+
+        const TimeSlotPreferenceType roomPreference =
+            FindTimeSlotPreference(
+                problem.roomTimeSlotPreferences,
+                scheduleSlot.roomId,
+                dayIndex,
+                slotIndex,
+                &RoomTimeSlotPreference::roomId);
+
+        const TimeSlotPreferenceType subjectPreference =
+            FindTimeSlotPreference(
+                problem.subjectTimeSlotPreferences,
+                requirement.subjectId,
+                dayIndex,
+                slotIndex,
+                &SubjectTimeSlotPreference::subjectId);
+
+        AddTimeSlotPreferencePenalty(score, teacherPreference);
+        AddTimeSlotPreferencePenalty(score, classGroupPreference);
+        AddTimeSlotPreferencePenalty(score, roomPreference);
+        AddTimeSlotPreferencePenalty(score, subjectPreference);
+
         // Hard constraint: teacher is unavailable.
         if (IsTeacherUnavailable(
             problem,
@@ -341,6 +429,39 @@ FitnessScore FitnessEvaluator::evaluate(
 
             violation.roomId =
                 scheduleSlot.roomId;
+
+            violation.dayIndex =
+                dayIndex;
+
+            violation.slotIndex =
+                slotIndex;
+
+            score.addHardViolation(
+                std::move(violation));
+        }
+
+        // Hard constraint: subject is unavailable.
+        if (subjectPreference ==
+            TimeSlotPreferenceType::Unavailable)
+        {
+            ConstraintViolation violation =
+                CreateViolation(
+                    ConstraintViolationType::
+                    SubjectUnavailable,
+                    "Subject is unavailable at the "
+                    "assigned time.");
+
+            violation.teacherId =
+                requirement.teacherId;
+
+            violation.classGroupId =
+                requirement.classGroupId;
+
+            violation.roomId =
+                scheduleSlot.roomId;
+
+            violation.subjectId =
+                requirement.subjectId;
 
             violation.dayIndex =
                 dayIndex;

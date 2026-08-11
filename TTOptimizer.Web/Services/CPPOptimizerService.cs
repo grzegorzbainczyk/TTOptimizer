@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
@@ -523,14 +523,17 @@ public class CppOptimizerService
                         })
                     .ToList(),
 
-            TeacherUnavailabilities =
-                problem.TeacherUnavailabilities,
+            TeacherTimeSlotPreferences =
+                problem.TeacherTimeSlotPreferences,
 
-            ClassGroupUnavailabilities =
-                problem.ClassGroupUnavailabilities,
+            ClassGroupTimeSlotPreferences =
+                problem.ClassGroupTimeSlotPreferences,
 
-            RoomUnavailabilities =
-                problem.RoomUnavailabilities,
+            RoomTimeSlotPreferences =
+                problem.RoomTimeSlotPreferences,
+
+            SubjectTimeSlotPreferences =
+                problem.SubjectTimeSlotPreferences,
 
             OptimizationSettings =
                 problem.OptimizationSettings
