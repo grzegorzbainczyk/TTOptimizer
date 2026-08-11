@@ -11,7 +11,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddScoped<DemoDataSeeder>();
 builder.Services.AddScoped<CppOptimizerService>();
-builder.Services.AddScoped<TimetableProblemBuilder>();
+builder.Services.AddScoped<TimetableProblemBuilderService>();
 builder.Services.AddScoped<ScheduleSlotGeneratorService>();
 builder.Services.AddScoped<LessonInstanceGeneratorService>();
 builder.Services.AddScoped<TimetableDecoderService>();

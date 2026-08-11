@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.ClassGroups;
-using TTOptimizer.Web.Models.DTO.ResourceAvailability;
+using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -257,10 +257,11 @@ public class ClassesController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:int}/availability")]
-    public async Task<IActionResult> GetAvailability(
-    int id,
-    [FromQuery] int organizationId)
+
+    [HttpGet("{id:int}/time-slot-preferences")]
+    public async Task<IActionResult> GetTimeSlotPreferences(
+        int id,
+        [FromQuery] int organizationId)
     {
         if (organizationId <= 0)
         {
@@ -290,35 +291,34 @@ public class ClassesController : ControllerBase
             });
         }
 
-        var unavailableSlots =
-            await _db.ClassGroupUnavailabilities
+        var timeSlotPreferences =
+            await _db.ClassGroupTimeSlotPreferences
                 .AsNoTracking()
-                .Where(item =>
-                    item.ClassGroupId == id)
+                .Where(item => item.ClassGroupId == id)
                 .OrderBy(item => item.DayIndex)
                 .ThenBy(item => item.SlotIndex)
-                .Select(item => new AvailabilitySlotDTO
+                .Select(item => new TimeSlotPreferenceDTO
                 {
                     DayIndex = item.DayIndex,
-                    SlotIndex = item.SlotIndex
+                    SlotIndex = item.SlotIndex,
+                    PreferenceType = item.PreferenceType
                 })
                 .ToListAsync();
 
         return Ok(new
         {
-            success = true,
             resourceType = "class",
             resourceId = classGroup.Id,
             resourceName = classGroup.Name,
-            unavailableSlots
+            timeSlotPreferences
         });
     }
 
-    [HttpPut("{id:int}/availability")]
-    public async Task<IActionResult> UpdateAvailability(
-    int id,
-    [FromQuery] int organizationId,
-    [FromBody] UpdateAvailabilityRequest request)
+    [HttpPut("{id:int}/time-slot-preferences")]
+    public async Task<IActionResult> UpdateTimeSlotPreferences(
+        int id,
+        [FromQuery] int organizationId,
+        [FromBody] UpdateTimeSlotPreferencesRequest request)
     {
         if (organizationId <= 0)
         {
@@ -328,12 +328,12 @@ public class ClassesController : ControllerBase
             });
         }
 
-        var classExists =
+        var resourceExists =
             await _db.ClassGroups.AnyAsync(item =>
                 item.Id == id &&
                 item.OrganizationId == organizationId);
 
-        if (!classExists)
+        if (!resourceExists)
         {
             return NotFound(new
             {
@@ -341,33 +341,33 @@ public class ClassesController : ControllerBase
             });
         }
 
-        if (request.UnavailableSlots == null)
+        if (request.TimeSlotPreferences == null)
         {
             return BadRequest(new
             {
-                message =
-                    "Unavailable slots collection is required."
+                message = "Time slot preferences collection is required."
             });
         }
 
-        var invalidSlot = request.UnavailableSlots
+        var invalidSlot = request.TimeSlotPreferences
             .FirstOrDefault(slot =>
                 slot.DayIndex < 0 ||
                 slot.DayIndex > 4 ||
                 slot.SlotIndex < 0 ||
-                slot.SlotIndex > 7);
+                slot.SlotIndex > 7 ||
+                !Enum.IsDefined(slot.PreferenceType));
 
         if (invalidSlot != null)
         {
             return BadRequest(new
             {
                 message =
-                    "Day index must be between 0 and 4, " +
-                    "and slot index between 0 and 7."
+                    "Day index must be between 0 and 4, slot index between 0 and 7, " +
+                    "and preference type must be valid."
             });
         }
 
-        var normalizedSlots = request.UnavailableSlots
+        var normalizedPreferences = request.TimeSlotPreferences
             .GroupBy(slot => new
             {
                 slot.DayIndex,
@@ -379,37 +379,32 @@ public class ClassesController : ControllerBase
         await using var transaction =
             await _db.Database.BeginTransactionAsync();
 
-        var existingSlots =
-            await _db.ClassGroupUnavailabilities
-                .Where(item =>
-                    item.ClassGroupId == id)
+        var existingPreferences =
+            await _db.ClassGroupTimeSlotPreferences
+                .Where(item => item.ClassGroupId == id)
                 .ToListAsync();
 
-        _db.ClassGroupUnavailabilities.RemoveRange(
-            existingSlots
-        );
+        _db.ClassGroupTimeSlotPreferences.RemoveRange(existingPreferences);
 
-        var newSlots = normalizedSlots
-            .Select(slot => new ClassGroupUnavailability
+        var newPreferences = normalizedPreferences
+            .Select(slot => new ClassGroupTimeSlotPreference
             {
                 ClassGroupId = id,
                 DayIndex = slot.DayIndex,
-                SlotIndex = slot.SlotIndex
+                SlotIndex = slot.SlotIndex,
+                PreferenceType = slot.PreferenceType
             })
             .ToList();
 
-        _db.ClassGroupUnavailabilities.AddRange(
-            newSlots
-        );
+        _db.ClassGroupTimeSlotPreferences.AddRange(newPreferences);
 
         await _db.SaveChangesAsync();
         await transaction.CommitAsync();
 
         return Ok(new
         {
-            success = true,
-            message = "Class availability was updated.",
-            unavailableSlots = normalizedSlots
+            message = "Class time slot preferences were updated.",
+            timeSlotPreferences = normalizedPreferences
                 .OrderBy(slot => slot.DayIndex)
                 .ThenBy(slot => slot.SlotIndex)
         });

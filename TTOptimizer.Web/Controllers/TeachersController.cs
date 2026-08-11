@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
-using TTOptimizer.Web.Models.DTO.ResourceAvailability;
+using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 using TTOptimizer.Web.Models.DTO.Teachers;
 
 namespace TTOptimizer.Web.Controllers;
@@ -321,12 +321,13 @@ public class TeachersController : ControllerBase
     }
 
 
-    // Availability endpoint for a specific teacher
 
-    [HttpGet("{id:int}/availability")]
-    public async Task<IActionResult> GetAvailability(
-    int id,
-    [FromQuery] int organizationId)
+    // Time slot preferences endpoint for a specific teacher
+
+    [HttpGet("{id:int}/time-slot-preferences")]
+    public async Task<IActionResult> GetTimeSlotPreferences(
+        int id,
+        [FromQuery] int organizationId)
     {
         if (organizationId <= 0)
         {
@@ -358,17 +359,17 @@ public class TeachersController : ControllerBase
             });
         }
 
-        var unavailableSlots =
-            await _dbContext.TeacherUnavailabilities
+        var timeSlotPreferences =
+            await _dbContext.TeacherTimeSlotPreferences
                 .AsNoTracking()
-                .Where(item =>
-                    item.TeacherId == id)
+                .Where(item => item.TeacherId == id)
                 .OrderBy(item => item.DayIndex)
                 .ThenBy(item => item.SlotIndex)
-                .Select(item => new AvailabilitySlotDTO
+                .Select(item => new TimeSlotPreferenceDTO
                 {
                     DayIndex = item.DayIndex,
-                    SlotIndex = item.SlotIndex
+                    SlotIndex = item.SlotIndex,
+                    PreferenceType = item.PreferenceType
                 })
                 .ToListAsync();
 
@@ -378,15 +379,15 @@ public class TeachersController : ControllerBase
             resourceType = "teacher",
             resourceId = teacher.Id,
             resourceName = teacher.Name,
-            unavailableSlots
+            timeSlotPreferences
         });
     }
 
-    [HttpPut("{id:int}/availability")]
-    public async Task<IActionResult> UpdateAvailability(
-    int id,
-    [FromQuery] int organizationId,
-    [FromBody] UpdateAvailabilityRequest request)
+    [HttpPut("{id:int}/time-slot-preferences")]
+    public async Task<IActionResult> UpdateTimeSlotPreferences(
+        int id,
+        [FromQuery] int organizationId,
+        [FromBody] UpdateTimeSlotPreferencesRequest request)
     {
         if (organizationId <= 0)
         {
@@ -411,21 +412,22 @@ public class TeachersController : ControllerBase
             });
         }
 
-        if (request.UnavailableSlots == null)
+        if (request.TimeSlotPreferences == null)
         {
             return BadRequest(new
             {
                 success = false,
-                message = "Unavailable slots collection is required."
+                message = "Time slot preferences collection is required."
             });
         }
 
-        var invalidSlot = request.UnavailableSlots
+        var invalidSlot = request.TimeSlotPreferences
             .FirstOrDefault(slot =>
                 slot.DayIndex < 0 ||
                 slot.DayIndex > 4 ||
                 slot.SlotIndex < 0 ||
-                slot.SlotIndex > 7);
+                slot.SlotIndex > 7 ||
+                !Enum.IsDefined(slot.PreferenceType));
 
         if (invalidSlot != null)
         {
@@ -433,12 +435,12 @@ public class TeachersController : ControllerBase
             {
                 success = false,
                 message =
-                    "Day index must be between 0 and 4, " +
-                    "and slot index between 0 and 7."
+                    "Day index must be between 0 and 4, slot index between 0 and 7, " +
+                    "and preference type must be valid."
             });
         }
 
-        var normalizedSlots = request.UnavailableSlots
+        var normalizedPreferences = request.TimeSlotPreferences
             .GroupBy(slot => new
             {
                 slot.DayIndex,
@@ -450,28 +452,26 @@ public class TeachersController : ControllerBase
         await using var transaction =
             await _dbContext.Database.BeginTransactionAsync();
 
-        var existingSlots =
-            await _dbContext.TeacherUnavailabilities
-                .Where(item =>
-                    item.TeacherId == id)
+        var existingPreferences =
+            await _dbContext.TeacherTimeSlotPreferences
+                .Where(item => item.TeacherId == id)
                 .ToListAsync();
 
-        _dbContext.TeacherUnavailabilities.RemoveRange(
-            existingSlots
-        );
+        _dbContext.TeacherTimeSlotPreferences.RemoveRange(
+            existingPreferences);
 
-        var newSlots = normalizedSlots
-            .Select(slot => new TeacherUnavailability
+        var newPreferences = normalizedPreferences
+            .Select(slot => new TeacherTimeSlotPreference
             {
                 TeacherId = id,
                 DayIndex = slot.DayIndex,
-                SlotIndex = slot.SlotIndex
+                SlotIndex = slot.SlotIndex,
+                PreferenceType = slot.PreferenceType
             })
             .ToList();
 
-        _dbContext.TeacherUnavailabilities.AddRange(
-            newSlots
-        );
+        _dbContext.TeacherTimeSlotPreferences.AddRange(
+            newPreferences);
 
         await _dbContext.SaveChangesAsync();
         await transaction.CommitAsync();
@@ -479,10 +479,11 @@ public class TeachersController : ControllerBase
         return Ok(new
         {
             success = true,
-            message = "Teacher availability was updated.",
-            unavailableSlots = normalizedSlots
+            message = "Teacher time slot preferences were updated.",
+            timeSlotPreferences = normalizedPreferences
                 .OrderBy(slot => slot.DayIndex)
                 .ThenBy(slot => slot.SlotIndex)
         });
     }
+
 }

@@ -15,13 +15,13 @@ public class OptimizationController : ControllerBase
 {
     private readonly AppDbContext _dbContext;
     private readonly CppOptimizerService _cppOptimizerService;
-    private readonly TimetableProblemBuilder _timetableProblemBuilder;
+    private readonly TimetableProblemBuilderService _timetableProblemBuilder;
     private readonly IHubContext<OptimizationHub> _optimizationHub;
 
     public OptimizationController(
         AppDbContext dbContext,
         CppOptimizerService cppOptimizerService,
-        TimetableProblemBuilder timetableProblemBuilder,
+        TimetableProblemBuilderService timetableProblemBuilder,
         IHubContext<OptimizationHub> optimizationHub)
     {
         _dbContext = dbContext;

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
-using TTOptimizer.Web.Models.DTO.ResourceAvailability;
+using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 using TTOptimizer.Web.Models.DTO.Rooms;
 
 namespace TTOptimizer.Web.Controllers;
@@ -262,10 +262,11 @@ public class RoomsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:int}/availability")]
-    public async Task<IActionResult> GetAvailability(
-    int id,
-    [FromQuery] int organizationId)
+
+    [HttpGet("{id:int}/time-slot-preferences")]
+    public async Task<IActionResult> GetTimeSlotPreferences(
+        int id,
+        [FromQuery] int organizationId)
     {
         if (organizationId <= 0)
         {
@@ -295,35 +296,34 @@ public class RoomsController : ControllerBase
             });
         }
 
-        var unavailableSlots =
-            await _db.RoomUnavailabilities
+        var timeSlotPreferences =
+            await _db.RoomTimeSlotPreferences
                 .AsNoTracking()
                 .Where(item => item.RoomId == id)
                 .OrderBy(item => item.DayIndex)
                 .ThenBy(item => item.SlotIndex)
-                .Select(item => new AvailabilitySlotDTO
+                .Select(item => new TimeSlotPreferenceDTO
                 {
                     DayIndex = item.DayIndex,
-                    SlotIndex = item.SlotIndex
+                    SlotIndex = item.SlotIndex,
+                    PreferenceType = item.PreferenceType
                 })
                 .ToListAsync();
 
         return Ok(new
         {
-            success = true,
             resourceType = "room",
             resourceId = room.Id,
             resourceName = room.Name,
-            unavailableSlots
+            timeSlotPreferences
         });
     }
 
-
-    [HttpPut("{id:int}/availability")]
-    public async Task<IActionResult> UpdateAvailability(
-    int id,
-    [FromQuery] int organizationId,
-    [FromBody] UpdateAvailabilityRequest request)
+    [HttpPut("{id:int}/time-slot-preferences")]
+    public async Task<IActionResult> UpdateTimeSlotPreferences(
+        int id,
+        [FromQuery] int organizationId,
+        [FromBody] UpdateTimeSlotPreferencesRequest request)
     {
         if (organizationId <= 0)
         {
@@ -333,12 +333,12 @@ public class RoomsController : ControllerBase
             });
         }
 
-        var roomExists =
+        var resourceExists =
             await _db.Rooms.AnyAsync(item =>
                 item.Id == id &&
                 item.OrganizationId == organizationId);
 
-        if (!roomExists)
+        if (!resourceExists)
         {
             return NotFound(new
             {
@@ -346,33 +346,33 @@ public class RoomsController : ControllerBase
             });
         }
 
-        if (request.UnavailableSlots == null)
+        if (request.TimeSlotPreferences == null)
         {
             return BadRequest(new
             {
-                message =
-                    "Unavailable slots collection is required."
+                message = "Time slot preferences collection is required."
             });
         }
 
-        var invalidSlot = request.UnavailableSlots
+        var invalidSlot = request.TimeSlotPreferences
             .FirstOrDefault(slot =>
                 slot.DayIndex < 0 ||
                 slot.DayIndex > 4 ||
                 slot.SlotIndex < 0 ||
-                slot.SlotIndex > 7);
+                slot.SlotIndex > 7 ||
+                !Enum.IsDefined(slot.PreferenceType));
 
         if (invalidSlot != null)
         {
             return BadRequest(new
             {
                 message =
-                    "Day index must be between 0 and 4, " +
-                    "and slot index between 0 and 7."
+                    "Day index must be between 0 and 4, slot index between 0 and 7, " +
+                    "and preference type must be valid."
             });
         }
 
-        var normalizedSlots = request.UnavailableSlots
+        var normalizedPreferences = request.TimeSlotPreferences
             .GroupBy(slot => new
             {
                 slot.DayIndex,
@@ -384,36 +384,32 @@ public class RoomsController : ControllerBase
         await using var transaction =
             await _db.Database.BeginTransactionAsync();
 
-        var existingSlots =
-            await _db.RoomUnavailabilities
+        var existingPreferences =
+            await _db.RoomTimeSlotPreferences
                 .Where(item => item.RoomId == id)
                 .ToListAsync();
 
-        _db.RoomUnavailabilities.RemoveRange(
-            existingSlots
-        );
+        _db.RoomTimeSlotPreferences.RemoveRange(existingPreferences);
 
-        var newSlots = normalizedSlots
-            .Select(slot => new RoomUnavailability
+        var newPreferences = normalizedPreferences
+            .Select(slot => new RoomTimeSlotPreference
             {
                 RoomId = id,
                 DayIndex = slot.DayIndex,
-                SlotIndex = slot.SlotIndex
+                SlotIndex = slot.SlotIndex,
+                PreferenceType = slot.PreferenceType
             })
             .ToList();
 
-        _db.RoomUnavailabilities.AddRange(
-            newSlots
-        );
+        _db.RoomTimeSlotPreferences.AddRange(newPreferences);
 
         await _db.SaveChangesAsync();
         await transaction.CommitAsync();
 
         return Ok(new
         {
-            success = true,
-            message = "Room availability was updated.",
-            unavailableSlots = normalizedSlots
+            message = "Room time slot preferences were updated.",
+            timeSlotPreferences = normalizedPreferences
                 .OrderBy(slot => slot.DayIndex)
                 .ThenBy(slot => slot.SlotIndex)
         });

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Models.Domain;
 
 namespace TTOptimizer.Web.Data
@@ -25,9 +25,10 @@ namespace TTOptimizer.Web.Data
         public DbSet<ScheduledLesson> ScheduledLessons => Set<ScheduledLesson>();
         public DbSet<ScheduleConstraint> ScheduleConstraints { get; set; }
 
-        public DbSet<TeacherUnavailability> TeacherUnavailabilities { get; set; }
-        public DbSet<ClassGroupUnavailability> ClassGroupUnavailabilities { get; set; }
-        public DbSet<RoomUnavailability> RoomUnavailabilities { get; set; }
+        public DbSet<TeacherTimeSlotPreference> TeacherTimeSlotPreferences { get; set; }
+        public DbSet<ClassGroupTimeSlotPreference> ClassGroupTimeSlotPreferences { get; set; }
+        public DbSet<RoomTimeSlotPreference> RoomTimeSlotPreferences { get; set; }
+        public DbSet<SubjectTimeSlotPreference> SubjectTimeSlotPreferences { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -215,61 +216,93 @@ namespace TTOptimizer.Web.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<TeacherUnavailability>(entity =>
+            modelBuilder.Entity<TeacherTimeSlotPreference>(entity =>
             {
-                entity.HasIndex(item => new
-                {
-                    item.TeacherId,
-                    item.DayIndex,
-                    item.SlotIndex
-                })
-                .IsUnique();
+                entity.HasIndex(item => new { item.TeacherId, item.DayIndex, item.SlotIndex })
+                    .IsUnique();
 
                 entity.HasOne(item => item.Teacher)
                     .WithMany()
                     .HasForeignKey(item => item.TeacherId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                entity.ToTable(table =>
+                {
+                    table.HasCheckConstraint(
+                        "CK_TeacherTimeSlotPreference_DayIndex",
+                        "\"DayIndex\" >= 0 AND \"DayIndex\" <= 4");
+
+                    table.HasCheckConstraint(
+                        "CK_TeacherTimeSlotPreference_SlotIndex",
+                        "\"SlotIndex\" >= 0 AND \"SlotIndex\" <= 7");
+                });
             });
 
-            modelBuilder.Entity<ClassGroupUnavailability>(entity =>
+            modelBuilder.Entity<ClassGroupTimeSlotPreference>(entity =>
             {
-                entity.HasIndex(item => new
-                {
-                    item.ClassGroupId,
-                    item.DayIndex,
-                    item.SlotIndex
-                })
-                .IsUnique();
+                entity.HasIndex(item => new { item.ClassGroupId, item.DayIndex, item.SlotIndex })
+                    .IsUnique();
 
                 entity.HasOne(item => item.ClassGroup)
                     .WithMany()
                     .HasForeignKey(item => item.ClassGroupId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                entity.ToTable(table =>
+                {
+                    table.HasCheckConstraint(
+                        "CK_ClassGroupTimeSlotPreference_DayIndex",
+                        "\"DayIndex\" >= 0 AND \"DayIndex\" <= 4");
+
+                    table.HasCheckConstraint(
+                        "CK_ClassGroupTimeSlotPreference_SlotIndex",
+                        "\"SlotIndex\" >= 0 AND \"SlotIndex\" <= 7");
+                });
             });
 
-            modelBuilder.Entity<RoomUnavailability>(entity =>
+            modelBuilder.Entity<RoomTimeSlotPreference>(entity =>
             {
-                entity.HasIndex(item => new
-                {
-                    item.RoomId,
-                    item.DayIndex,
-                    item.SlotIndex
-                })
-                .IsUnique();
+                entity.HasIndex(item => new { item.RoomId, item.DayIndex, item.SlotIndex })
+                    .IsUnique();
 
                 entity.HasOne(item => item.Room)
                     .WithMany()
                     .HasForeignKey(item => item.RoomId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                entity.ToTable(table =>
+                {
+                    table.HasCheckConstraint(
+                        "CK_RoomTimeSlotPreference_DayIndex",
+                        "\"DayIndex\" >= 0 AND \"DayIndex\" <= 4");
+
+                    table.HasCheckConstraint(
+                        "CK_RoomTimeSlotPreference_SlotIndex",
+                        "\"SlotIndex\" >= 0 AND \"SlotIndex\" <= 7");
+                });
             });
 
-            modelBuilder.Entity<TeacherUnavailability>()
-            .ToTable(table =>
-            table.HasCheckConstraint(
-                "CK_TeacherUnavailability_DayIndex",
-                "\"DayIndex\" >= 0 AND \"DayIndex\" <= 4"
-        )
-    );
+            modelBuilder.Entity<SubjectTimeSlotPreference>(entity =>
+            {
+                entity.HasIndex(item => new { item.SubjectId, item.DayIndex, item.SlotIndex })
+                    .IsUnique();
+
+                entity.HasOne(item => item.Subject)
+                    .WithMany()
+                    .HasForeignKey(item => item.SubjectId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.ToTable(table =>
+                {
+                    table.HasCheckConstraint(
+                        "CK_SubjectTimeSlotPreference_DayIndex",
+                        "\"DayIndex\" >= 0 AND \"DayIndex\" <= 4");
+
+                    table.HasCheckConstraint(
+                        "CK_SubjectTimeSlotPreference_SlotIndex",
+                        "\"SlotIndex\" >= 0 AND \"SlotIndex\" <= 7");
+                });
+            });
         }
     }
 }

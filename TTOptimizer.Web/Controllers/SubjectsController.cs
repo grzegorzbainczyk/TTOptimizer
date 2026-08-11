@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.Subjects;
+using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -224,6 +225,159 @@ public class SubjectsController : ControllerBase
         );
 
         return Ok(result);
+    }
+
+
+    [HttpGet("{id:int}/time-slot-preferences")]
+    public async Task<IActionResult> GetTimeSlotPreferences(
+        int id,
+        [FromQuery] int organizationId)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                message = "Organization ID is required."
+            });
+        }
+
+        var subject = await _db.Subjects
+            .AsNoTracking()
+            .Where(item =>
+                item.Id == id &&
+                item.OrganizationId == organizationId)
+            .Select(item => new
+            {
+                item.Id,
+                item.Name
+            })
+            .FirstOrDefaultAsync();
+
+        if (subject == null)
+        {
+            return NotFound(new
+            {
+                message = "Subject not found."
+            });
+        }
+
+        var timeSlotPreferences =
+            await _db.SubjectTimeSlotPreferences
+                .AsNoTracking()
+                .Where(item => item.SubjectId == id)
+                .OrderBy(item => item.DayIndex)
+                .ThenBy(item => item.SlotIndex)
+                .Select(item => new TimeSlotPreferenceDTO
+                {
+                    DayIndex = item.DayIndex,
+                    SlotIndex = item.SlotIndex,
+                    PreferenceType = item.PreferenceType
+                })
+                .ToListAsync();
+
+        return Ok(new
+        {
+            resourceType = "subject",
+            resourceId = subject.Id,
+            resourceName = subject.Name,
+            timeSlotPreferences
+        });
+    }
+
+    [HttpPut("{id:int}/time-slot-preferences")]
+    public async Task<IActionResult> UpdateTimeSlotPreferences(
+        int id,
+        [FromQuery] int organizationId,
+        [FromBody] UpdateTimeSlotPreferencesRequest request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                message = "Organization ID is required."
+            });
+        }
+
+        var resourceExists =
+            await _db.Subjects.AnyAsync(item =>
+                item.Id == id &&
+                item.OrganizationId == organizationId);
+
+        if (!resourceExists)
+        {
+            return NotFound(new
+            {
+                message = "Subject not found."
+            });
+        }
+
+        if (request.TimeSlotPreferences == null)
+        {
+            return BadRequest(new
+            {
+                message = "Time slot preferences collection is required."
+            });
+        }
+
+        var invalidSlot = request.TimeSlotPreferences
+            .FirstOrDefault(slot =>
+                slot.DayIndex < 0 ||
+                slot.DayIndex > 4 ||
+                slot.SlotIndex < 0 ||
+                slot.SlotIndex > 7 ||
+                !Enum.IsDefined(slot.PreferenceType));
+
+        if (invalidSlot != null)
+        {
+            return BadRequest(new
+            {
+                message =
+                    "Day index must be between 0 and 4, slot index between 0 and 7, " +
+                    "and preference type must be valid."
+            });
+        }
+
+        var normalizedPreferences = request.TimeSlotPreferences
+            .GroupBy(slot => new
+            {
+                slot.DayIndex,
+                slot.SlotIndex
+            })
+            .Select(group => group.First())
+            .ToList();
+
+        await using var transaction =
+            await _db.Database.BeginTransactionAsync();
+
+        var existingPreferences =
+            await _db.SubjectTimeSlotPreferences
+                .Where(item => item.SubjectId == id)
+                .ToListAsync();
+
+        _db.SubjectTimeSlotPreferences.RemoveRange(existingPreferences);
+
+        var newPreferences = normalizedPreferences
+            .Select(slot => new SubjectTimeSlotPreference
+            {
+                SubjectId = id,
+                DayIndex = slot.DayIndex,
+                SlotIndex = slot.SlotIndex,
+                PreferenceType = slot.PreferenceType
+            })
+            .ToList();
+
+        _db.SubjectTimeSlotPreferences.AddRange(newPreferences);
+
+        await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
+
+        return Ok(new
+        {
+            message = "Subject time slot preferences were updated.",
+            timeSlotPreferences = normalizedPreferences
+                .OrderBy(slot => slot.DayIndex)
+                .ThenBy(slot => slot.SlotIndex)
+        });
     }
 
     [HttpDelete("{id:int}")]

@@ -6,11 +6,11 @@ using TTOptimizer.Web.Models.Optimization;
 
 namespace TTOptimizer.Web.Services;
 
-public class TimetableProblemBuilder
+public class TimetableProblemBuilderService
 {
     private readonly AppDbContext _context;
 
-    public TimetableProblemBuilder(AppDbContext context)
+    public TimetableProblemBuilderService(AppDbContext context)
     {
         _context = context;
     }
@@ -43,9 +43,10 @@ public class TimetableProblemBuilder
             .ToListAsync();
 
         var teacherUnavailabilities =
-    await _context.TeacherUnavailabilities
+    await _context.TeacherTimeSlotPreferences
         .AsNoTracking()
         .Where(item =>
+            item.PreferenceType == TimeSlotPreferenceType.Unavailable &&
             item.Teacher.OrganizationId == organizationId)
         .OrderBy(item => item.TeacherId)
         .ThenBy(item => item.DayIndex)
@@ -59,9 +60,10 @@ public class TimetableProblemBuilder
         .ToListAsync();
 
         var classGroupUnavailabilities =
-            await _context.ClassGroupUnavailabilities
+            await _context.ClassGroupTimeSlotPreferences
                 .AsNoTracking()
                 .Where(item =>
+                    item.PreferenceType == TimeSlotPreferenceType.Unavailable &&
                     item.ClassGroup.OrganizationId == organizationId)
                 .OrderBy(item => item.ClassGroupId)
                 .ThenBy(item => item.DayIndex)
@@ -75,9 +77,10 @@ public class TimetableProblemBuilder
                 .ToListAsync();
 
         var roomUnavailabilities =
-            await _context.RoomUnavailabilities
+            await _context.RoomTimeSlotPreferences
                 .AsNoTracking()
                 .Where(item =>
+                    item.PreferenceType == TimeSlotPreferenceType.Unavailable &&
                     item.Room.OrganizationId == organizationId)
                 .OrderBy(item => item.RoomId)
                 .ThenBy(item => item.DayIndex)
