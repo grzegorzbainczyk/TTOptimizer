@@ -141,6 +141,46 @@
                         </div>
                     </section>
 
+
+                    <section class="settings-section">
+                        <h3>AI connection test</h3>
+
+                        <div class="settings-grid">
+                            <label class="settings-field" for="aiTestPrompt">
+                                <span>Test prompt</span>
+                                <textarea id="aiTestPrompt"
+                                          rows="3"
+                                          placeholder="Example: Say hello from ClassFlow."></textarea>
+                                <small>
+                                    Sends a simple prompt to the configured LLM service.
+                                    Nothing is saved to the database.
+                                </small>
+                            </label>
+
+                            <label class="settings-field" for="aiTestResponse">
+                                <span>AI response</span>
+                                <textarea id="aiTestResponse"
+                                          rows="5"
+                                          readonly
+                                          placeholder="The response from the LLM will appear here."></textarea>
+                            </label>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button id="testAIButton"
+                                    class="app-button app-button-secondary"
+                                    type="button">
+                                Test AI
+                            </button>
+                        </div>
+
+                        <p id="aiTestStatus"
+                           class="settings-status"
+                           role="status"
+                           aria-live="polite">
+                        </p>
+                    </section>
+
                     <section class="settings-section">
                         <h3>Penalty settings</h3>
                         <div class="settings-grid settings-grid-penalties">

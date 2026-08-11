@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("optimizationSettingsForm")?.addEventListener("submit", saveSettings);
     document.getElementById("resetSettingsButton")?.addEventListener("click", resetSettings);
     document.getElementById("backToMainButton")?.addEventListener("click", () => window.location.href = "main.html");
+    document.getElementById("testAIButton")?.addEventListener("click", testAIConnection);
 
     populateForm(loadSettings());
 });
@@ -153,6 +154,61 @@ function getNumberValue(elementId) {
 
 function getCheckboxValue(elementId) {
     return Boolean(document.getElementById(elementId)?.checked);
+}
+
+
+async function testAIConnection() {
+    const promptElement = document.getElementById("aiTestPrompt");
+    const responseElement = document.getElementById("aiTestResponse");
+
+    if (!promptElement || !responseElement) {
+        return;
+    }
+
+    const prompt = promptElement.value.trim();
+
+    if (!prompt) {
+        showAIStatus("Enter a test prompt first.", true);
+        return;
+    }
+
+    responseElement.value = "";
+    showAIStatus("Testing AI connection...");
+
+    try {
+        const response = await fetch("/api/ai/test", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("accessToken")
+            },
+            body: JSON.stringify({
+                prompt: prompt
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            responseElement.value = data.response ?? "";
+            showAIStatus(data.message ?? "AI connection test failed.", true);
+            return;
+        }
+
+        responseElement.value = data.response ?? "";
+        showAIStatus("AI connection works.");
+    } catch (error) {
+        console.error("AI connection test failed.", error);
+        showAIStatus("Could not connect to the AI endpoint.", true);
+    }
+}
+
+function showAIStatus(message, isError = false) {
+    const status = document.getElementById("aiTestStatus");
+    if (!status) return;
+
+    status.textContent = message;
+    status.classList.toggle("settings-status-error", isError);
 }
 
 function showStatus(message, isError = false) {

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Hubs;
 using TTOptimizer.Web.Services;
+using TTOptimizer.Web.Services.AI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddScoped<TimetableProblemBuilder>();
 builder.Services.AddScoped<ScheduleSlotGeneratorService>();
 builder.Services.AddScoped<LessonInstanceGeneratorService>();
 builder.Services.AddScoped<TimetableDecoderService>();
+builder.Services.AddScoped<ILLMService, LLMService>();
+builder.Services.AddScoped<ILLMRuleInterpreterService, LLMRuleInterpreterService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
