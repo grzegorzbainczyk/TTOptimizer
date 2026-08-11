@@ -22,12 +22,6 @@
     <Filter Include="Source Files\Evaluation">
       <UniqueIdentifier>{708d1d8f-5370-4d44-ac1d-c9b24aff59bf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Domain">
-      <UniqueIdentifier>{61a7b125-798d-42ed-b8ea-73a4c3b335a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Generators">
-      <UniqueIdentifier>{567ed871-6008-4dea-9c15-e7c84f9a3e3d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Optimization">
       <UniqueIdentifier>{15ff33ac-142b-44c7-9f24-dd72d9707674}</UniqueIdentifier>
     </Filter>
@@ -36,9 +30,6 @@
     </Filter>
     <Filter Include="Header Files\Evaluation">
       <UniqueIdentifier>{9d84ff2c-2b7d-4e71-ad14-db16ef25cbf6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Validation">
-      <UniqueIdentifier>{051ea45d-1a8e-41ef-bf7f-6cf2fe2bfca5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Evaluation\Rules">
       <UniqueIdentifier>{3176370b-d87a-48b2-ab13-32fbf673e08d}</UniqueIdentifier>
@@ -70,46 +61,19 @@
     <Filter Include="Header Files\Decoding">
       <UniqueIdentifier>{3c9f9604-84b8-4ef3-ae04-257fcbffa465}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Evaluation\Rules">
-      <UniqueIdentifier>{a939bbfd-26a3-4b75-b5e4-ae218e133279}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Preprocessing">
-      <UniqueIdentifier>{b81e353b-85a5-4de1-b264-0d6f4189ff56}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Evaluation\Rules\Soft">
-      <UniqueIdentifier>{47150d6e-0808-4140-b062-750530ca0961}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Evaluation\Rules\Hard">
-      <UniqueIdentifier>{c0365a9f-e384-498c-9504-19e856c44bfb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine">
-      <UniqueIdentifier>{1ad8153a-5b4b-4741-b67c-95ffcaa648a9}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Optimization\ChromosomeMutator.cpp">
-      <Filter>Source Files\Optimization</Filter>
-    </ClCompile>
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp">
       <Filter>Source Files\Evaluation</Filter>
     </ClCompile>
-    <ClCompile Include="src\Evaluation\Rules\ConstraintRuleRegistry.cpp">
-      <Filter>Source Files\Evaluation\Rules</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Evaluation\Rules\Soft\RoomSubjectCompatibilityRule.cpp">
-      <Filter>Source Files\Evaluation\Rules\Soft</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Engine.cpp">
-      <Filter>Source Files\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="src\Optimization\GeneticOptimizer.cpp">
       <Filter>Source Files\Optimization</Filter>
     </ClCompile>
-    <ClCompile Include="src\Preprocessing\TimetablePreprocessor.cpp">
-      <Filter>Source Files\Preprocessing</Filter>
+    <ClCompile Include="src\Engine\Engine.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
