@@ -50,7 +50,21 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
                     { "type", "progress" },
                     { "generation", progress.generation },
                     { "totalGenerations", progress.totalGenerations },
-                    { "percentage", progress.percentage }
+                    { "percentage", progress.percentage },
+                    { "bestFoundAtGeneration", progress.bestFoundAtGeneration },
+                    {
+                        "best",
+                        {
+                            {
+                                "hardViolationCount",
+                                progress.best.hardViolationCount
+                            },
+                            {
+                                "softPenalty",
+                                progress.best.softPenalty
+                            }
+                        }
+                    }
                 };
 
                 std::cout << message.dump() << '\n' << std::flush;

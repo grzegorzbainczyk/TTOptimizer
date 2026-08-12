@@ -109,7 +109,15 @@ Chromosome GeneticOptimizer::optimize(
         << bestChromosome.fitness.softPenalty
         << '\n';
 
-    int lastReportedPercentage = 0;
+    int bestFoundAtGeneration = 0;
+    int lastReportedPercentage = -1;
+
+    reportProgress(
+        0,
+        generations,
+        bestFoundAtGeneration,
+        bestChromosome,
+        lastReportedPercentage);
 
     for (int generation = 1; generation <= generations; ++generation)
     {
@@ -158,6 +166,7 @@ Chromosome GeneticOptimizer::optimize(
         if (population.front().fitness.isBetterThan(bestChromosome.fitness))
         {
             bestChromosome = population.front();
+            bestFoundAtGeneration = generation;
 
             std::cerr << "Generation: "
                 << generation
@@ -168,7 +177,12 @@ Chromosome GeneticOptimizer::optimize(
                 << '\n';
         }
 
-        reportProgress(generation, generations, lastReportedPercentage);
+        reportProgress(
+            generation,
+            generations,
+            bestFoundAtGeneration,
+            bestChromosome,
+            lastReportedPercentage);
 
         if (settings.stopWhenPerfect
             && bestChromosome.fitness.isFeasible()
@@ -191,6 +205,8 @@ Chromosome GeneticOptimizer::optimize(
 void GeneticOptimizer::reportProgress(
     int generation,
     int totalGenerations,
+    int bestFoundAtGeneration,
+    const Chromosome& bestChromosome,
     int& lastReportedPercentage) const
 {
     if (!progressCallback)
@@ -198,7 +214,8 @@ void GeneticOptimizer::reportProgress(
         return;
     }
 
-    const int percentage = generation * 100 / totalGenerations;
+    const int percentage =
+        generation * 100 / totalGenerations;
 
     if (percentage == lastReportedPercentage)
     {
@@ -209,6 +226,14 @@ void GeneticOptimizer::reportProgress(
     progress.generation = generation;
     progress.totalGenerations = totalGenerations;
     progress.percentage = percentage;
+    progress.bestFoundAtGeneration =
+        bestFoundAtGeneration;
+
+    progress.best.hardViolationCount =
+        bestChromosome.fitness.hardViolationCount;
+
+    progress.best.softPenalty =
+        bestChromosome.fitness.softPenalty;
 
     progressCallback(progress);
 

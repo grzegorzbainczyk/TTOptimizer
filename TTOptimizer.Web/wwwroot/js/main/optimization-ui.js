@@ -162,6 +162,8 @@ export function showOptimizationProgress() {
         .getElementById("optimizationProgressPanel")
         ?.classList.remove("hidden");
 
+    resetOptimizationProgressMetrics();
+
     updateOptimizationProgress({
         generation: 0,
         totalGenerations: 0,
@@ -205,6 +207,132 @@ export function updateOptimizationProgress(progress) {
         generationText.textContent =
             `Generation: ${generation} / ${totalGenerations}`;
     }
+
+    if (progress.best) {
+        updateBestOptimizationMetrics(progress);
+    }
+}
+
+function updateBestOptimizationMetrics(progress) {
+    const hardViolationCount =
+        Number(progress.best.hardViolationCount);
+
+    const softPenalty =
+        Number(progress.best.softPenalty);
+
+    const bestFoundAtGeneration =
+        Number(progress.bestFoundAtGeneration) || 0;
+
+    const hardValue = document.getElementById(
+        "optimizationHardViolationCount"
+    );
+
+    const softValue = document.getElementById(
+        "optimizationSoftPenalty"
+    );
+
+    const bestFoundText = document.getElementById(
+        "optimizationBestFoundText"
+    );
+
+    const feasibilityText = document.getElementById(
+        "optimizationFeasibilityText"
+    );
+
+    const hardMetric = document.getElementById(
+        "optimizationHardMetric"
+    );
+
+    if (hardValue && Number.isFinite(hardViolationCount)) {
+        hardValue.textContent =
+            String(hardViolationCount);
+    }
+
+    if (softValue && Number.isFinite(softPenalty)) {
+        softValue.textContent =
+            formatPenalty(softPenalty);
+    }
+
+    if (bestFoundText) {
+        bestFoundText.textContent =
+            bestFoundAtGeneration > 0
+                ? `Best found: generation ${bestFoundAtGeneration}`
+                : "Best found: initial population";
+    }
+
+    if (
+        feasibilityText &&
+        hardMetric &&
+        Number.isFinite(hardViolationCount)
+    ) {
+        hardMetric.classList.remove(
+            "optimization-metric-neutral",
+            "optimization-metric-warning",
+            "optimization-metric-success"
+        );
+
+        if (hardViolationCount === 0) {
+            hardMetric.classList.add(
+                "optimization-metric-success"
+            );
+
+            feasibilityText.textContent =
+                "Feasible solution found";
+        } else {
+            hardMetric.classList.add(
+                "optimization-metric-warning"
+            );
+
+            feasibilityText.textContent =
+                "No feasible solution yet";
+        }
+    }
+}
+
+function resetOptimizationProgressMetrics() {
+    setText(
+        "optimizationBestFoundText",
+        "Best found: initial population"
+    );
+
+    setText(
+        "optimizationHardViolationCount",
+        "-"
+    );
+
+    setText(
+        "optimizationSoftPenalty",
+        "-"
+    );
+
+    setText(
+        "optimizationFeasibilityText",
+        "Waiting for first evaluation"
+    );
+
+    const hardMetric = document.getElementById(
+        "optimizationHardMetric"
+    );
+
+    if (hardMetric) {
+        hardMetric.classList.remove(
+            "optimization-metric-warning",
+            "optimization-metric-success"
+        );
+
+        hardMetric.classList.add(
+            "optimization-metric-neutral"
+        );
+    }
+}
+
+function formatPenalty(value) {
+    return new Intl.NumberFormat(
+        undefined,
+        {
+            maximumFractionDigits: 2
+        }
+    ).format(value);
 }
 
 export function setText(elementId, value) {

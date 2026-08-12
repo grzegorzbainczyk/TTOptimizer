@@ -35,6 +35,8 @@ private:
     void reportProgress(
         int generation,
         int totalGenerations,
+        int bestFoundAtGeneration,
+        const Chromosome& bestChromosome,
         int& lastReportedPercentage) const;
 
     void evaluatePopulation(

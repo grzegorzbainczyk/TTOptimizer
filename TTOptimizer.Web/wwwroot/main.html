@@ -156,9 +156,48 @@
                                       value="0">
                             </progress>
 
-                            <p id="optimizationGenerationText">
-                                Generation: 0 / 0
-                            </p>
+                            <div class="optimization-progress-details">
+                                <div class="optimization-progress-meta">
+                                    <span id="optimizationGenerationText">
+                                        Generation: 0 / 0
+                                    </span>
+
+                                    <span id="optimizationBestFoundText">
+                                        Best found: initial population
+                                    </span>
+                                </div>
+
+                                <div class="optimization-metrics">
+                                    <div id="optimizationHardMetric"
+                                         class="optimization-metric optimization-metric-neutral">
+                                        <span class="optimization-metric-label">
+                                            Hard violations
+                                        </span>
+
+                                        <strong id="optimizationHardViolationCount">
+                                            -
+                                        </strong>
+
+                                        <small id="optimizationFeasibilityText">
+                                            Waiting for first evaluation
+                                        </small>
+                                    </div>
+
+                                    <div class="optimization-metric optimization-metric-soft">
+                                        <span class="optimization-metric-label">
+                                            Soft penalty
+                                        </span>
+
+                                        <strong id="optimizationSoftPenalty">
+                                            -
+                                        </strong>
+
+                                        <small>
+                                            Best value found so far
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <p id="statusText">Ready.</p>
