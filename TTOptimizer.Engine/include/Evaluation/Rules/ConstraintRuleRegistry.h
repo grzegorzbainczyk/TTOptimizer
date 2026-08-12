@@ -13,6 +13,10 @@
 #include "Soft/ClassGroupAvoidSingleLessonDayRule.h"
 #include "Soft/ClassGroupMaxConsecutiveLessonsRule.h"
 #include "Soft/ClassGroupMaxLessonsPerDayRule.h"
+#include "Soft/SubjectSpreadAcrossDaysRule.h"
+#include "Soft/SubjectMaxOccurrencesPerDayRule.h"
+#include "Soft/SubjectPreferDoubleLessonsRule.h"
+#include "Soft/SubjectAvoidDoubleLessonsRule.h"
 
 class ConstraintRuleRegistry
 {
@@ -45,6 +49,18 @@ public:
 
         rules_.push_back(
             std::make_unique<ClassGroupMaxLessonsPerDayRule>());
+
+        rules_.push_back(
+            std::make_unique<SubjectSpreadAcrossDaysRule>());
+
+        rules_.push_back(
+            std::make_unique<SubjectMaxOccurrencesPerDayRule>());
+
+        rules_.push_back(
+            std::make_unique<SubjectPreferDoubleLessonsRule>());
+
+        rules_.push_back(
+            std::make_unique<SubjectAvoidDoubleLessonsRule>());
     }
 
     const std::vector<std::unique_ptr<IConstraintRule>>&

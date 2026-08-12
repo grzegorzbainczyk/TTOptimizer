@@ -1515,3 +1515,25 @@ border: var(--border-thin) solid var(--color-border-neutral);
 .scheduling-defaults-group .section-header-row {
     margin-bottom: 16px;
 }
+
+
+/* =========================================================
+   Subject scheduling preferences
+   ========================================================= */
+
+.subject-preferences-button {
+    color: #7c3aed;
+    border-color: #ddd6fe;
+    background: #f5f3ff;
+}
+
+.subject-preferences-button:hover {
+    background: #ede9fe;
+}
+
+.subject-preferences-note {
+    margin: 14px 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.84rem;
+    font-weight: 650;
+}

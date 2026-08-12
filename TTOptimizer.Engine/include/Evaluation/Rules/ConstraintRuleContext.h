@@ -5,6 +5,7 @@
 #include "Domain/TimetableProblem.h"
 #include "Evaluation/Rules/TeacherScheduleStats.h"
 #include "Evaluation/Rules/ClassGroupScheduleStats.h"
+#include "Evaluation/Rules/SubjectScheduleStats.h"
 
 struct ConstraintRuleContext
 {
@@ -14,4 +15,5 @@ struct ConstraintRuleContext
     const std::vector<ScheduleSlot>& scheduleSlots;
     const TeacherScheduleStats& teacherScheduleStats;
     const ClassGroupScheduleStats& classGroupScheduleStats;
+    const SubjectScheduleStats& subjectScheduleStats;
 };

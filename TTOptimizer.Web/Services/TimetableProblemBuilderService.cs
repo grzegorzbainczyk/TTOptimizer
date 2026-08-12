@@ -166,6 +166,26 @@ public class TimetableProblemBuilderService
             organizationSchedulingPreferences?.ClassGroupMaxLessonsPerDayLimit
             ?? 8;
 
+        var defaultSubjectSpreadAcrossDays =
+            organizationSchedulingPreferences?.SubjectSpreadAcrossDays
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultSubjectMaxOccurrencesPerDay =
+            organizationSchedulingPreferences?.SubjectMaxOccurrencesPerDay
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultSubjectMaxOccurrencesPerDayLimit =
+            organizationSchedulingPreferences?.SubjectMaxOccurrencesPerDayLimit
+            ?? 1;
+
+        var defaultSubjectPreferDoubleLessons =
+            organizationSchedulingPreferences?.SubjectPreferDoubleLessons
+            ?? SchedulingPreferenceLevel.Disabled;
+
+        var defaultSubjectAvoidDoubleLessons =
+            organizationSchedulingPreferences?.SubjectAvoidDoubleLessons
+            ?? SchedulingPreferenceLevel.Disabled;
+
         var teacherPreferenceOverrides =
             await _context.TeacherSchedulingPreferences
                 .AsNoTracking()
@@ -260,6 +280,49 @@ public class TimetableProblemBuilderService
                 })
                 .ToList();
 
+        var subjectPreferenceOverrides =
+            await _context.SubjectSchedulingPreferences
+                .AsNoTracking()
+                .Where(item =>
+                    item.Subject.OrganizationId == organizationId)
+                .ToDictionaryAsync(
+                    item => item.SubjectId);
+
+        var subjectSchedulingPreferences =
+            subjects
+                .Select(subject =>
+                {
+                    subjectPreferenceOverrides.TryGetValue(
+                        subject.Id,
+                        out var overrideValue);
+
+                    return new SubjectSchedulingPreferenceInput
+                    {
+                        SubjectId = subject.Id,
+
+                        SpreadAcrossDays =
+                            overrideValue?.SpreadAcrossDays
+                            ?? defaultSubjectSpreadAcrossDays,
+
+                        MaxOccurrencesPerDay =
+                            overrideValue?.MaxOccurrencesPerDay
+                            ?? defaultSubjectMaxOccurrencesPerDay,
+
+                        MaxOccurrencesPerDayLimit =
+                            overrideValue?.MaxOccurrencesPerDayLimit
+                            ?? defaultSubjectMaxOccurrencesPerDayLimit,
+
+                        PreferDoubleLessons =
+                            overrideValue?.PreferDoubleLessons
+                            ?? defaultSubjectPreferDoubleLessons,
+
+                        AvoidDoubleLessons =
+                            overrideValue?.AvoidDoubleLessons
+                            ?? defaultSubjectAvoidDoubleLessons
+                    };
+                })
+                .ToList();
+
         ValidationResult validate = ValidateData(
             teachers,
             classGroups,
@@ -287,6 +350,7 @@ public class TimetableProblemBuilderService
 
             TeacherSchedulingPreferences = teacherSchedulingPreferences,
             ClassGroupSchedulingPreferences = classGroupSchedulingPreferences,
+            SubjectSchedulingPreferences = subjectSchedulingPreferences,
 
             DaysPerWeek = 5,
             SlotsPerDay = 8,

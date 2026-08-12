@@ -29,7 +29,11 @@ function initializeLevelSelects() {
         "classGroupMinimizeGaps",
         "classGroupAvoidSingleLessonDay",
         "classGroupMaxConsecutiveLessons",
-        "classGroupMaxLessonsPerDay"
+        "classGroupMaxLessonsPerDay",
+        "subjectSpreadAcrossDays",
+        "subjectMaxOccurrencesPerDay",
+        "subjectPreferDoubleLessons",
+        "subjectAvoidDoubleLessons"
     ]) {
         const select = document.getElementById(id);
         if (!select) continue;
@@ -103,6 +107,21 @@ async function loadOrganizationPreferences() {
         setValue("classGroupMaxLessonsPerDayLimit",
             preferences.classGroupMaxLessonsPerDayLimit ?? 8);
 
+        setValue("subjectSpreadAcrossDays",
+            preferences.subjectSpreadAcrossDays ?? "Medium");
+
+        setValue("subjectMaxOccurrencesPerDay",
+            preferences.subjectMaxOccurrencesPerDay ?? "Medium");
+
+        setValue("subjectMaxOccurrencesPerDayLimit",
+            preferences.subjectMaxOccurrencesPerDayLimit ?? 1);
+
+        setValue("subjectPreferDoubleLessons",
+            preferences.subjectPreferDoubleLessons ?? "Disabled");
+
+        setValue("subjectAvoidDoubleLessons",
+            preferences.subjectAvoidDoubleLessons ?? "Disabled");
+
         const organizationName =
             document.getElementById("organizationName");
 
@@ -161,7 +180,18 @@ async function saveOrganizationPreferences() {
             classGroupMaxLessonsPerDay:
                 getValue("classGroupMaxLessonsPerDay"),
             classGroupMaxLessonsPerDayLimit:
-                getInteger("classGroupMaxLessonsPerDayLimit")
+                getInteger("classGroupMaxLessonsPerDayLimit"),
+
+            subjectSpreadAcrossDays:
+                getValue("subjectSpreadAcrossDays"),
+            subjectMaxOccurrencesPerDay:
+                getValue("subjectMaxOccurrencesPerDay"),
+            subjectMaxOccurrencesPerDayLimit:
+                getInteger("subjectMaxOccurrencesPerDayLimit"),
+            subjectPreferDoubleLessons:
+                getValue("subjectPreferDoubleLessons"),
+            subjectAvoidDoubleLessons:
+                getValue("subjectAvoidDoubleLessons")
         };
 
         validateLimit(
@@ -183,6 +213,19 @@ async function saveOrganizationPreferences() {
             payload.classGroupMaxLessonsPerDayLimit,
             "Class max lessons per day"
         );
+
+        validateLimit(
+            payload.subjectMaxOccurrencesPerDayLimit,
+            "Subject max occurrences per day"
+        );
+
+        if (payload.subjectPreferDoubleLessons !== "Disabled" &&
+            payload.subjectAvoidDoubleLessons !== "Disabled")
+        {
+            throw new Error(
+                "Prefer double lessons and avoid double lessons cannot both be enabled."
+            );
+        }
 
         if (saveButton) saveButton.disabled = true;
 

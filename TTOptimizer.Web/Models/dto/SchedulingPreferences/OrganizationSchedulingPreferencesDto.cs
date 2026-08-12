@@ -21,6 +21,12 @@ public class OrganizationSchedulingPreferencesDto
     public int ClassGroupMaxConsecutiveLessonsLimit { get; set; }
     public SchedulingPreferenceLevel ClassGroupMaxLessonsPerDay { get; set; }
     public int ClassGroupMaxLessonsPerDayLimit { get; set; }
+
+    public SchedulingPreferenceLevel SubjectSpreadAcrossDays { get; set; }
+    public SchedulingPreferenceLevel SubjectMaxOccurrencesPerDay { get; set; }
+    public int SubjectMaxOccurrencesPerDayLimit { get; set; }
+    public SchedulingPreferenceLevel SubjectPreferDoubleLessons { get; set; }
+    public SchedulingPreferenceLevel SubjectAvoidDoubleLessons { get; set; }
 }
 
 public class UpdateOrganizationSchedulingPreferencesRequest
@@ -38,4 +44,10 @@ public class UpdateOrganizationSchedulingPreferencesRequest
     public int ClassGroupMaxConsecutiveLessonsLimit { get; set; }
     public SchedulingPreferenceLevel ClassGroupMaxLessonsPerDay { get; set; }
     public int ClassGroupMaxLessonsPerDayLimit { get; set; }
+
+    public SchedulingPreferenceLevel SubjectSpreadAcrossDays { get; set; }
+    public SchedulingPreferenceLevel SubjectMaxOccurrencesPerDay { get; set; }
+    public int SubjectMaxOccurrencesPerDayLimit { get; set; }
+    public SchedulingPreferenceLevel SubjectPreferDoubleLessons { get; set; }
+    public SchedulingPreferenceLevel SubjectAvoidDoubleLessons { get; set; }
 }

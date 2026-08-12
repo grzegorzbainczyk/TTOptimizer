@@ -33,6 +33,7 @@ namespace TTOptimizer.Web.Data
         public DbSet<OrganizationSchedulingPreferences> OrganizationSchedulingPreferences { get; set; }
         public DbSet<TeacherSchedulingPreferences> TeacherSchedulingPreferences { get; set; }
         public DbSet<ClassGroupSchedulingPreferences> ClassGroupSchedulingPreferences { get; set; }
+        public DbSet<SubjectSchedulingPreferences> SubjectSchedulingPreferences { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -266,6 +267,21 @@ namespace TTOptimizer.Web.Data
                 entity.Property(item => item.ClassGroupMaxLessonsPerDayLimit)
                     .HasDefaultValue(8);
 
+                entity.Property(item => item.SubjectSpreadAcrossDays)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Medium);
+
+                entity.Property(item => item.SubjectMaxOccurrencesPerDay)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Medium);
+
+                entity.Property(item => item.SubjectMaxOccurrencesPerDayLimit)
+                    .HasDefaultValue(1);
+
+                entity.Property(item => item.SubjectPreferDoubleLessons)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Disabled);
+
+                entity.Property(item => item.SubjectAvoidDoubleLessons)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Disabled);
+
                 entity.ToTable(table =>
                 {
                     table.HasCheckConstraint(
@@ -283,6 +299,10 @@ namespace TTOptimizer.Web.Data
                     table.HasCheckConstraint(
                         "CK_OrganizationSchedulingPreferences_ClassGroupMaxLessonsPerDayLimit",
                         "\"ClassGroupMaxLessonsPerDayLimit\" >= 1 AND \"ClassGroupMaxLessonsPerDayLimit\" <= 8");
+
+                    table.HasCheckConstraint(
+                        "CK_OrganizationSchedulingPreferences_SubjectMaxOccurrencesPerDayLimit",
+                        "\"SubjectMaxOccurrencesPerDayLimit\" >= 1 AND \"SubjectMaxOccurrencesPerDayLimit\" <= 8");
                 });
             });
 
@@ -327,6 +347,24 @@ namespace TTOptimizer.Web.Data
                     table.HasCheckConstraint(
                         "CK_ClassGroupSchedulingPreferences_MaxLessonsPerDayLimit",
                         "\"MaxLessonsPerDayLimit\" IS NULL OR (\"MaxLessonsPerDayLimit\" >= 1 AND \"MaxLessonsPerDayLimit\" <= 8)");
+                });
+            });
+
+            modelBuilder.Entity<SubjectSchedulingPreferences>(entity =>
+            {
+                entity.HasIndex(item => item.SubjectId)
+                    .IsUnique();
+
+                entity.HasOne(item => item.Subject)
+                    .WithMany()
+                    .HasForeignKey(item => item.SubjectId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.ToTable(table =>
+                {
+                    table.HasCheckConstraint(
+                        "CK_SubjectSchedulingPreferences_MaxOccurrencesPerDayLimit",
+                        "\"MaxOccurrencesPerDayLimit\" IS NULL OR (\"MaxOccurrencesPerDayLimit\" >= 1 AND \"MaxOccurrencesPerDayLimit\" <= 8)");
                 });
             });
 

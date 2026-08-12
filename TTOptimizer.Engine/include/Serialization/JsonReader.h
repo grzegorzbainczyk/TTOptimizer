@@ -51,6 +51,7 @@ public:
         readTimeSlotPreferences(root, problem);
         readTeacherSchedulingPreferences(root, problem);
         readClassGroupSchedulingPreferences(root, problem);
+        readSubjectSchedulingPreferences(root, problem);
 
         return problem;
     }
@@ -427,6 +428,60 @@ private:
                     8);
 
             problem.classGroupSchedulingPreferences.push_back(
+                preference);
+        }
+    }
+
+
+
+    static void readSubjectSchedulingPreferences(
+        const json& root,
+        TimetableProblem& problem)
+    {
+        if (!root.contains("subjectSchedulingPreferences")
+            || !root["subjectSchedulingPreferences"].is_array())
+        {
+            return;
+        }
+
+        for (const auto& item :
+            root["subjectSchedulingPreferences"])
+        {
+            SubjectSchedulingPreference preference;
+
+            preference.subjectId =
+                item.value("subjectId", 0);
+
+            preference.spreadAcrossDays =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "spreadAcrossDays",
+                        "Medium"));
+
+            preference.maxOccurrencesPerDay =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "maxOccurrencesPerDay",
+                        "Medium"));
+
+            preference.maxOccurrencesPerDayLimit =
+                item.value(
+                    "maxOccurrencesPerDayLimit",
+                    1);
+
+            preference.preferDoubleLessons =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "preferDoubleLessons",
+                        "Disabled"));
+
+            preference.avoidDoubleLessons =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "avoidDoubleLessons",
+                        "Disabled"));
+
+            problem.subjectSchedulingPreferences.push_back(
                 preference);
         }
     }

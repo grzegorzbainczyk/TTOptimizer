@@ -14,6 +14,7 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
     private const int DefaultMaxLessonsPerDayLimit = 6;
     private const int DefaultClassGroupMaxConsecutiveLessonsLimit = 6;
     private const int DefaultClassGroupMaxLessonsPerDayLimit = 8;
+    private const int DefaultSubjectMaxOccurrencesPerDayLimit = 1;
 
     private readonly AppDbContext _dbContext;
 
@@ -92,7 +93,11 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
             !IsValidLevel(request.ClassGroupMinimizeGaps) ||
             !IsValidLevel(request.ClassGroupAvoidSingleLessonDay) ||
             !IsValidLevel(request.ClassGroupMaxConsecutiveLessons) ||
-            !IsValidLevel(request.ClassGroupMaxLessonsPerDay))
+            !IsValidLevel(request.ClassGroupMaxLessonsPerDay) ||
+            !IsValidLevel(request.SubjectSpreadAcrossDays) ||
+            !IsValidLevel(request.SubjectMaxOccurrencesPerDay) ||
+            !IsValidLevel(request.SubjectPreferDoubleLessons) ||
+            !IsValidLevel(request.SubjectAvoidDoubleLessons))
         {
             return BadRequest(new
             {
@@ -104,12 +109,23 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
         if (!IsValidLimit(request.TeacherMaxConsecutiveLessonsLimit) ||
             !IsValidLimit(request.TeacherMaxLessonsPerDayLimit) ||
             !IsValidLimit(request.ClassGroupMaxConsecutiveLessonsLimit) ||
-            !IsValidLimit(request.ClassGroupMaxLessonsPerDayLimit))
+            !IsValidLimit(request.ClassGroupMaxLessonsPerDayLimit) ||
+            !IsValidLimit(request.SubjectMaxOccurrencesPerDayLimit))
         {
             return BadRequest(new
             {
                 success = false,
                 message = "Lesson limits must be between 1 and 8."
+            });
+        }
+
+        if (IsEnabled(request.SubjectPreferDoubleLessons) &&
+            IsEnabled(request.SubjectAvoidDoubleLessons))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Prefer double lessons and avoid double lessons cannot both be enabled for subjects."
             });
         }
 
@@ -183,6 +199,21 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
         preferences.ClassGroupMaxLessonsPerDayLimit =
             request.ClassGroupMaxLessonsPerDayLimit;
 
+        preferences.SubjectSpreadAcrossDays =
+            request.SubjectSpreadAcrossDays;
+
+        preferences.SubjectMaxOccurrencesPerDay =
+            request.SubjectMaxOccurrencesPerDay;
+
+        preferences.SubjectMaxOccurrencesPerDayLimit =
+            request.SubjectMaxOccurrencesPerDayLimit;
+
+        preferences.SubjectPreferDoubleLessons =
+            request.SubjectPreferDoubleLessons;
+
+        preferences.SubjectAvoidDoubleLessons =
+            request.SubjectAvoidDoubleLessons;
+
         await _dbContext.SaveChangesAsync();
 
         return Ok(new
@@ -252,7 +283,27 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
 
             ClassGroupMaxLessonsPerDayLimit =
                 preferences?.ClassGroupMaxLessonsPerDayLimit
-                ?? DefaultClassGroupMaxLessonsPerDayLimit
+                ?? DefaultClassGroupMaxLessonsPerDayLimit,
+
+            SubjectSpreadAcrossDays =
+                preferences?.SubjectSpreadAcrossDays
+                ?? SchedulingPreferenceLevel.Medium,
+
+            SubjectMaxOccurrencesPerDay =
+                preferences?.SubjectMaxOccurrencesPerDay
+                ?? SchedulingPreferenceLevel.Medium,
+
+            SubjectMaxOccurrencesPerDayLimit =
+                preferences?.SubjectMaxOccurrencesPerDayLimit
+                ?? DefaultSubjectMaxOccurrencesPerDayLimit,
+
+            SubjectPreferDoubleLessons =
+                preferences?.SubjectPreferDoubleLessons
+                ?? SchedulingPreferenceLevel.Disabled,
+
+            SubjectAvoidDoubleLessons =
+                preferences?.SubjectAvoidDoubleLessons
+                ?? SchedulingPreferenceLevel.Disabled
         };
     }
 
@@ -265,5 +316,10 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
     private static bool IsValidLimit(int value)
     {
         return value is >= 1 and <= 8;
+    }
+
+    private static bool IsEnabled(SchedulingPreferenceLevel value)
+    {
+        return value != SchedulingPreferenceLevel.Disabled;
     }
 }

@@ -39,5 +39,20 @@ public class OrganizationSchedulingPreferences
 
     public int ClassGroupMaxLessonsPerDayLimit { get; set; } = 8;
 
+
+    public SchedulingPreferenceLevel SubjectSpreadAcrossDays { get; set; }
+        = SchedulingPreferenceLevel.Medium;
+
+    public SchedulingPreferenceLevel SubjectMaxOccurrencesPerDay { get; set; }
+        = SchedulingPreferenceLevel.Medium;
+
+    public int SubjectMaxOccurrencesPerDayLimit { get; set; } = 1;
+
+    public SchedulingPreferenceLevel SubjectPreferDoubleLessons { get; set; }
+        = SchedulingPreferenceLevel.Disabled;
+
+    public SchedulingPreferenceLevel SubjectAvoidDoubleLessons { get; set; }
+        = SchedulingPreferenceLevel.Disabled;
+
     public Organization Organization { get; set; } = null!;
 }

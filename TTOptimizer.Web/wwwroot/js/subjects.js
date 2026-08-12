@@ -156,6 +156,44 @@ function renderSubjects(subjects) {
             }
         );
 
+
+        const availabilityButton =
+            document.createElement("button");
+
+        availabilityButton.type = "button";
+        availabilityButton.className =
+            "small-button teacher-action-button teacher-availability-button";
+        availabilityButton.textContent = "Availability";
+
+        availabilityButton.addEventListener("click", () => {
+            const url =
+                "availability.html" +
+                "?resourceType=subject" +
+                `&resourceId=${encodeURIComponent(
+                    subject.id
+                )}`;
+
+            window.location.href = url;
+        });
+
+        const preferencesButton =
+            document.createElement("button");
+
+        preferencesButton.type = "button";
+        preferencesButton.className =
+            "small-button teacher-action-button subject-preferences-button";
+        preferencesButton.textContent = "Preferences";
+
+        preferencesButton.addEventListener("click", () => {
+            const url =
+                "subject-preferences.html" +
+                `?subjectId=${encodeURIComponent(
+                    subject.id
+                )}`;
+
+            window.location.href = url;
+        });
+
         const deleteButton =
             document.createElement("button");
 
@@ -179,6 +217,8 @@ function renderSubjects(subjects) {
 
         actionsContainer.append(
             editButton,
+            availabilityButton,
+            preferencesButton,
             deleteButton
         );
 

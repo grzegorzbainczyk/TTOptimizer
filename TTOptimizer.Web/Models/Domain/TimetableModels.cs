@@ -99,6 +99,22 @@ public class ClassGroupSchedulingPreferenceInput
     public int MaxLessonsPerDayLimit { get; set; }
 }
 
+
+public class SubjectSchedulingPreferenceInput
+{
+    public int SubjectId { get; set; }
+
+    public SchedulingPreferenceLevel SpreadAcrossDays { get; set; }
+
+    public SchedulingPreferenceLevel MaxOccurrencesPerDay { get; set; }
+
+    public int MaxOccurrencesPerDayLimit { get; set; }
+
+    public SchedulingPreferenceLevel PreferDoubleLessons { get; set; }
+
+    public SchedulingPreferenceLevel AvoidDoubleLessons { get; set; }
+}
+
 public class TimetableProblem
 {
     public List<Teacher> Teachers { get; set; } = new();
@@ -118,6 +134,7 @@ public class TimetableProblem
 
     public List<TeacherSchedulingPreferenceInput> TeacherSchedulingPreferences { get; set; } = new();
     public List<ClassGroupSchedulingPreferenceInput> ClassGroupSchedulingPreferences { get; set; } = new();
+    public List<SubjectSchedulingPreferenceInput> SubjectSchedulingPreferences { get; set; } = new();
 
     public int DaysPerWeek { get; set; } = 5;
 

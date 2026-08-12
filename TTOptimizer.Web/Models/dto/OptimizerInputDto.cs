@@ -86,6 +86,12 @@ public class OptimizerInputDto
     public List<ClassGroupSchedulingPreferenceInput> ClassGroupSchedulingPreferences { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the effective scheduling preferences for subjects.
+    /// Values already include organization defaults and subject overrides.
+    /// </summary>
+    public List<SubjectSchedulingPreferenceInput> SubjectSchedulingPreferences { get; set; } = new();
+
+    /// <summary>
     /// Gets or sets the configuration used by the optimization algorithm,
     /// such as iteration limits, random seed, and thread count.
     /// </summary>

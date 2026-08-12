@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.Subjects;
 using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
+using TTOptimizer.Web.Models.DTO.SchedulingPreferences;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -378,6 +379,288 @@ public class SubjectsController : ControllerBase
                 .OrderBy(slot => slot.DayIndex)
                 .ThenBy(slot => slot.SlotIndex)
         });
+    }
+
+
+    [HttpGet("{id:int}/scheduling-preferences")]
+    public async Task<IActionResult> GetSchedulingPreferences(
+        int id,
+        [FromQuery] int organizationId)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        var subject = await _db.Subjects
+            .AsNoTracking()
+            .Where(item =>
+                item.Id == id &&
+                item.OrganizationId == organizationId)
+            .Select(item => new
+            {
+                item.Id,
+                item.Name
+            })
+            .FirstOrDefaultAsync();
+
+        if (subject == null)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Subject was not found."
+            });
+        }
+
+        var organizationDefaults =
+            await _db.OrganizationSchedulingPreferences
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.OrganizationId == organizationId);
+
+        var subjectPreferences =
+            await _db.SubjectSchedulingPreferences
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.SubjectId == id);
+
+        return Ok(new
+        {
+            success = true,
+            preferences = CreateSubjectSchedulingPreferencesDto(
+                subject.Id,
+                subject.Name,
+                organizationDefaults,
+                subjectPreferences)
+        });
+    }
+
+    [HttpPut("{id:int}/scheduling-preferences")]
+    public async Task<IActionResult> UpdateSchedulingPreferences(
+        int id,
+        [FromQuery] int organizationId,
+        [FromBody] UpdateSubjectSchedulingPreferencesRequest request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        if (!IsValidOptionalLevel(request.SpreadAcrossDays) ||
+            !IsValidOptionalLevel(request.MaxOccurrencesPerDay) ||
+            !IsValidOptionalLevel(request.PreferDoubleLessons) ||
+            !IsValidOptionalLevel(request.AvoidDoubleLessons))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "One or more scheduling preference levels are invalid."
+            });
+        }
+
+        if (!IsValidOptionalLimit(request.MaxOccurrencesPerDayLimit))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Maximum subject occurrences per day must be between 1 and 8 or left empty to use the organization default."
+            });
+        }
+
+        var subject = await _db.Subjects
+            .Where(item =>
+                item.Id == id &&
+                item.OrganizationId == organizationId)
+            .Select(item => new
+            {
+                item.Id,
+                item.Name
+            })
+            .FirstOrDefaultAsync();
+
+        if (subject == null)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Subject was not found."
+            });
+        }
+
+        var organizationDefaults =
+            await _db.OrganizationSchedulingPreferences
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.OrganizationId == organizationId);
+
+        var defaultPreferDouble =
+            organizationDefaults?.SubjectPreferDoubleLessons
+            ?? SchedulingPreferenceLevel.Disabled;
+
+        var defaultAvoidDouble =
+            organizationDefaults?.SubjectAvoidDoubleLessons
+            ?? SchedulingPreferenceLevel.Disabled;
+
+        var effectivePreferDouble =
+            request.PreferDoubleLessons
+            ?? defaultPreferDouble;
+
+        var effectiveAvoidDouble =
+            request.AvoidDoubleLessons
+            ?? defaultAvoidDouble;
+
+        if (IsEnabled(effectivePreferDouble) &&
+            IsEnabled(effectiveAvoidDouble))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Prefer double lessons and avoid double lessons cannot both be enabled for the same subject."
+            });
+        }
+
+        var preferences =
+            await _db.SubjectSchedulingPreferences
+                .FirstOrDefaultAsync(item =>
+                    item.SubjectId == id);
+
+        if (preferences == null)
+        {
+            preferences = new SubjectSchedulingPreferences
+            {
+                SubjectId = id
+            };
+
+            _db.SubjectSchedulingPreferences.Add(preferences);
+        }
+
+        preferences.SpreadAcrossDays =
+            request.SpreadAcrossDays;
+
+        preferences.MaxOccurrencesPerDay =
+            request.MaxOccurrencesPerDay;
+
+        preferences.MaxOccurrencesPerDayLimit =
+            request.MaxOccurrencesPerDayLimit;
+
+        preferences.PreferDoubleLessons =
+            request.PreferDoubleLessons;
+
+        preferences.AvoidDoubleLessons =
+            request.AvoidDoubleLessons;
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            success = true,
+            message = "Subject scheduling preferences were saved.",
+            preferences = CreateSubjectSchedulingPreferencesDto(
+                subject.Id,
+                subject.Name,
+                organizationDefaults,
+                preferences)
+        });
+    }
+
+    private static SubjectSchedulingPreferencesDto
+        CreateSubjectSchedulingPreferencesDto(
+            int subjectId,
+            string subjectName,
+            OrganizationSchedulingPreferences? defaults,
+            SubjectSchedulingPreferences? preferences)
+    {
+        var defaultSpreadAcrossDays =
+            defaults?.SubjectSpreadAcrossDays
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultMaxOccurrencesPerDay =
+            defaults?.SubjectMaxOccurrencesPerDay
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultMaxOccurrencesPerDayLimit =
+            defaults?.SubjectMaxOccurrencesPerDayLimit
+            ?? 1;
+
+        var defaultPreferDoubleLessons =
+            defaults?.SubjectPreferDoubleLessons
+            ?? SchedulingPreferenceLevel.Disabled;
+
+        var defaultAvoidDoubleLessons =
+            defaults?.SubjectAvoidDoubleLessons
+            ?? SchedulingPreferenceLevel.Disabled;
+
+        return new SubjectSchedulingPreferencesDto
+        {
+            SubjectId = subjectId,
+            SubjectName = subjectName,
+
+            SpreadAcrossDays =
+                preferences?.SpreadAcrossDays,
+            DefaultSpreadAcrossDays =
+                defaultSpreadAcrossDays,
+            EffectiveSpreadAcrossDays =
+                preferences?.SpreadAcrossDays
+                ?? defaultSpreadAcrossDays,
+
+            MaxOccurrencesPerDay =
+                preferences?.MaxOccurrencesPerDay,
+            DefaultMaxOccurrencesPerDay =
+                defaultMaxOccurrencesPerDay,
+            EffectiveMaxOccurrencesPerDay =
+                preferences?.MaxOccurrencesPerDay
+                ?? defaultMaxOccurrencesPerDay,
+
+            MaxOccurrencesPerDayLimit =
+                preferences?.MaxOccurrencesPerDayLimit,
+            DefaultMaxOccurrencesPerDayLimit =
+                defaultMaxOccurrencesPerDayLimit,
+            EffectiveMaxOccurrencesPerDayLimit =
+                preferences?.MaxOccurrencesPerDayLimit
+                ?? defaultMaxOccurrencesPerDayLimit,
+
+            PreferDoubleLessons =
+                preferences?.PreferDoubleLessons,
+            DefaultPreferDoubleLessons =
+                defaultPreferDoubleLessons,
+            EffectivePreferDoubleLessons =
+                preferences?.PreferDoubleLessons
+                ?? defaultPreferDoubleLessons,
+
+            AvoidDoubleLessons =
+                preferences?.AvoidDoubleLessons,
+            DefaultAvoidDoubleLessons =
+                defaultAvoidDoubleLessons,
+            EffectiveAvoidDoubleLessons =
+                preferences?.AvoidDoubleLessons
+                ?? defaultAvoidDoubleLessons
+        };
+    }
+
+    private static bool IsValidOptionalLevel(
+        SchedulingPreferenceLevel? value)
+    {
+        return value == null || Enum.IsDefined(value.Value);
+    }
+
+    private static bool IsValidOptionalLimit(int? value)
+    {
+        return value == null || value is >= 1 and <= 8;
+    }
+
+    private static bool IsEnabled(
+        SchedulingPreferenceLevel value)
+    {
+        return value != SchedulingPreferenceLevel.Disabled;
     }
 
     [HttpDelete("{id:int}")]
