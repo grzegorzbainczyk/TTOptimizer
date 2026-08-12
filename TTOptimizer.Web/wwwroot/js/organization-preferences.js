@@ -1,23 +1,45 @@
+const preferenceLevels = [
+    "Disabled",
+    "Low",
+    "Medium",
+    "High",
+    "Hard"
+];
+
 document.addEventListener("DOMContentLoaded", async () => {
-    const backButton =
-        document.getElementById("backToMainButton");
+    initializeLevelSelects();
 
-    const saveButton =
-        document.getElementById(
-            "saveOrganizationPreferencesButton"
-        );
+    document.getElementById("backToMainButton")
+        ?.addEventListener("click", () => {
+            window.location.href = "main.html";
+        });
 
-    backButton?.addEventListener("click", () => {
-        window.location.href = "main.html";
-    });
-
-    saveButton?.addEventListener(
-        "click",
-        saveOrganizationPreferences
-    );
+    document.getElementById("saveOrganizationPreferencesButton")
+        ?.addEventListener("click", saveOrganizationPreferences);
 
     await loadOrganizationPreferences();
 });
+
+function initializeLevelSelects() {
+    for (const id of [
+        "teacherMinimizeGaps",
+        "teacherAvoidSingleLessonDay",
+        "teacherMaxConsecutiveLessons",
+        "teacherMaxLessonsPerDay"
+    ]) {
+        const select = document.getElementById(id);
+        if (!select) continue;
+
+        select.innerHTML = "";
+
+        for (const level of preferenceLevels) {
+            const option = document.createElement("option");
+            option.value = level;
+            option.textContent = level;
+            select.appendChild(option);
+        }
+    }
+}
 
 async function loadOrganizationPreferences() {
     try {
@@ -27,10 +49,7 @@ async function loadOrganizationPreferences() {
         showStatus("Loading scheduling defaults...");
 
         const response = await fetch(
-            `/api/organization-scheduling-preferences` +
-            `?organizationId=${encodeURIComponent(
-                organizationId
-            )}`
+            `/api/organization-scheduling-preferences?organizationId=${encodeURIComponent(organizationId)}`
         );
 
         const data = await readJsonResponse(response);
@@ -44,10 +63,23 @@ async function loadOrganizationPreferences() {
 
         const preferences = data.preferences;
 
-        document.getElementById(
-            "teacherMinimizeGaps"
-        ).value =
-            preferences.teacherMinimizeGaps ?? "Medium";
+        setValue("teacherMinimizeGaps",
+            preferences.teacherMinimizeGaps ?? "Medium");
+
+        setValue("teacherAvoidSingleLessonDay",
+            preferences.teacherAvoidSingleLessonDay ?? "Low");
+
+        setValue("teacherMaxConsecutiveLessons",
+            preferences.teacherMaxConsecutiveLessons ?? "Medium");
+
+        setValue("teacherMaxConsecutiveLessonsLimit",
+            preferences.teacherMaxConsecutiveLessonsLimit ?? 4);
+
+        setValue("teacherMaxLessonsPerDay",
+            preferences.teacherMaxLessonsPerDay ?? "Medium");
+
+        setValue("teacherMaxLessonsPerDayLimit",
+            preferences.teacherMaxLessonsPerDayLimit ?? 6);
 
         const organizationName =
             document.getElementById("organizationName");
@@ -76,38 +108,49 @@ async function loadOrganizationPreferences() {
 
 async function saveOrganizationPreferences() {
     const saveButton =
-        document.getElementById(
-            "saveOrganizationPreferencesButton"
-        );
+        document.getElementById("saveOrganizationPreferencesButton");
 
     try {
         const organizationId =
             window.appContext.requireOrganizationId();
 
-        const teacherMinimizeGaps =
-            document.getElementById(
-                "teacherMinimizeGaps"
-            ).value;
+        const payload = {
+            teacherMinimizeGaps:
+                getValue("teacherMinimizeGaps"),
+            teacherAvoidSingleLessonDay:
+                getValue("teacherAvoidSingleLessonDay"),
+            teacherMaxConsecutiveLessons:
+                getValue("teacherMaxConsecutiveLessons"),
+            teacherMaxConsecutiveLessonsLimit:
+                getInteger("teacherMaxConsecutiveLessonsLimit"),
+            teacherMaxLessonsPerDay:
+                getValue("teacherMaxLessonsPerDay"),
+            teacherMaxLessonsPerDayLimit:
+                getInteger("teacherMaxLessonsPerDayLimit")
+        };
 
-        if (saveButton) {
-            saveButton.disabled = true;
-        }
+        validateLimit(
+            payload.teacherMaxConsecutiveLessonsLimit,
+            "Max consecutive lessons"
+        );
+
+        validateLimit(
+            payload.teacherMaxLessonsPerDayLimit,
+            "Max lessons per day"
+        );
+
+        if (saveButton) saveButton.disabled = true;
 
         showStatus("Saving scheduling defaults...");
 
         const response = await fetch(
-            `/api/organization-scheduling-preferences` +
-            `?organizationId=${encodeURIComponent(
-                organizationId
-            )}`,
+            `/api/organization-scheduling-preferences?organizationId=${encodeURIComponent(organizationId)}`,
             {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    teacherMinimizeGaps
-                })
+                body: JSON.stringify(payload)
             }
         );
 
@@ -137,43 +180,53 @@ async function saveOrganizationPreferences() {
             true
         );
     } finally {
-        if (saveButton) {
-            saveButton.disabled = false;
-        }
+        if (saveButton) saveButton.disabled = false;
+    }
+}
+
+function setValue(id, value) {
+    const element = document.getElementById(id);
+    if (element) element.value = value;
+}
+
+function getValue(id) {
+    return document.getElementById(id)?.value ?? "";
+}
+
+function getInteger(id) {
+    return Number.parseInt(
+        document.getElementById(id)?.value ?? "",
+        10
+    );
+}
+
+function validateLimit(value, label) {
+    if (!Number.isInteger(value) || value < 1 || value > 8) {
+        throw new Error(`${label} limit must be between 1 and 8.`);
     }
 }
 
 async function readJsonResponse(response) {
     const text = await response.text();
 
-    if (!text) {
-        return null;
-    }
+    if (!text) return null;
 
     try {
         return JSON.parse(text);
     } catch {
         return {
             success: false,
-            message:
-                `Server returned invalid JSON. Status: ${response.status}`
+            message: `Server returned invalid JSON. Status: ${response.status}`
         };
     }
 }
 
 function showStatus(message, isError = false) {
     const status =
-        document.getElementById(
-            "organizationPreferencesStatus"
-        );
+        document.getElementById("organizationPreferencesStatus");
 
-    if (!status) {
-        return;
-    }
+    if (!status) return;
 
     status.textContent = message;
-    status.classList.toggle(
-        "settings-status-error",
-        isError
-    );
+    status.classList.toggle("settings-status-error", isError);
 }

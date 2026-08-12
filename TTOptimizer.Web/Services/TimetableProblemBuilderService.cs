@@ -122,14 +122,33 @@ public class TimetableProblemBuilderService
             organizationSchedulingPreferences?.TeacherMinimizeGaps
             ?? SchedulingPreferenceLevel.Medium;
 
+        var defaultTeacherAvoidSingleLessonDay =
+            organizationSchedulingPreferences?.TeacherAvoidSingleLessonDay
+            ?? SchedulingPreferenceLevel.Low;
+
+        var defaultTeacherMaxConsecutiveLessons =
+            organizationSchedulingPreferences?.TeacherMaxConsecutiveLessons
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultTeacherMaxConsecutiveLessonsLimit =
+            organizationSchedulingPreferences?.TeacherMaxConsecutiveLessonsLimit
+            ?? 4;
+
+        var defaultTeacherMaxLessonsPerDay =
+            organizationSchedulingPreferences?.TeacherMaxLessonsPerDay
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultTeacherMaxLessonsPerDayLimit =
+            organizationSchedulingPreferences?.TeacherMaxLessonsPerDayLimit
+            ?? 6;
+
         var teacherPreferenceOverrides =
             await _context.TeacherSchedulingPreferences
                 .AsNoTracking()
                 .Where(item =>
                     item.Teacher.OrganizationId == organizationId)
                 .ToDictionaryAsync(
-                    item => item.TeacherId,
-                    item => item.MinimizeGaps);
+                    item => item.TeacherId);
 
         var teacherSchedulingPreferences =
             teachers
@@ -142,9 +161,30 @@ public class TimetableProblemBuilderService
                     return new TeacherSchedulingPreferenceInput
                     {
                         TeacherId = teacher.Id,
+
                         MinimizeGaps =
-                            overrideValue
-                            ?? defaultTeacherMinimizeGaps
+                            overrideValue?.MinimizeGaps
+                            ?? defaultTeacherMinimizeGaps,
+
+                        AvoidSingleLessonDay =
+                            overrideValue?.AvoidSingleLessonDay
+                            ?? defaultTeacherAvoidSingleLessonDay,
+
+                        MaxConsecutiveLessons =
+                            overrideValue?.MaxConsecutiveLessons
+                            ?? defaultTeacherMaxConsecutiveLessons,
+
+                        MaxConsecutiveLessonsLimit =
+                            overrideValue?.MaxConsecutiveLessonsLimit
+                            ?? defaultTeacherMaxConsecutiveLessonsLimit,
+
+                        MaxLessonsPerDay =
+                            overrideValue?.MaxLessonsPerDay
+                            ?? defaultTeacherMaxLessonsPerDay,
+
+                        MaxLessonsPerDayLimit =
+                            overrideValue?.MaxLessonsPerDayLimit
+                            ?? defaultTeacherMaxLessonsPerDayLimit
                     };
                 })
                 .ToList();

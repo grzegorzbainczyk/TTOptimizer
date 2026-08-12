@@ -6,7 +6,7 @@
 #include "Evaluation/Rules/IConstraintRule.h"
 #include "Evaluation/Rules/TeacherSchedulingRuleSupport.h"
 
-class TeacherMinimizeGapsRule final : public IConstraintRule
+class TeacherAvoidSingleLessonDayRule final : public IConstraintRule
 {
 public:
     std::vector<ConstraintRuleResult> evaluate(
@@ -18,39 +18,39 @@ public:
             TeacherSchedulingRuleSupport::createResult(
                 ConstraintRuleKind::Soft,
                 ConstraintPenaltyLevel::Low,
-                "TeacherMinimizeGaps.Low",
-                "Minimize teacher gaps (Low)",
-                "Counts empty lesson slots between a teacher's first and last lesson of the day.");
+                "TeacherAvoidSingleLessonDay.Low",
+                "Avoid teacher single-lesson day (Low)",
+                "Counts teacher days containing exactly one occupied lesson slot.");
 
         auto mediumResult =
             TeacherSchedulingRuleSupport::createResult(
                 ConstraintRuleKind::Soft,
                 ConstraintPenaltyLevel::Medium,
-                "TeacherMinimizeGaps.Medium",
-                "Minimize teacher gaps (Medium)",
-                "Counts empty lesson slots between a teacher's first and last lesson of the day.");
+                "TeacherAvoidSingleLessonDay.Medium",
+                "Avoid teacher single-lesson day (Medium)",
+                "Counts teacher days containing exactly one occupied lesson slot.");
 
         auto highResult =
             TeacherSchedulingRuleSupport::createResult(
                 ConstraintRuleKind::Soft,
                 ConstraintPenaltyLevel::High,
-                "TeacherMinimizeGaps.High",
-                "Minimize teacher gaps (High)",
-                "Counts empty lesson slots between a teacher's first and last lesson of the day.");
+                "TeacherAvoidSingleLessonDay.High",
+                "Avoid teacher single-lesson day (High)",
+                "Counts teacher days containing exactly one occupied lesson slot.");
 
         auto hardResult =
             TeacherSchedulingRuleSupport::createResult(
                 ConstraintRuleKind::Hard,
                 ConstraintPenaltyLevel::Hard,
-                "TeacherMinimizeGaps.Hard",
-                "Minimize teacher gaps (Hard)",
-                "Counts empty lesson slots between a teacher's first and last lesson of the day.");
+                "TeacherAvoidSingleLessonDay.Hard",
+                "Avoid teacher single-lesson day (Hard)",
+                "Counts teacher days containing exactly one occupied lesson slot.");
 
         for (const TeacherSchedulingPreference& preference :
             context.problem.teacherSchedulingPreferences)
         {
             const SchedulingPreferenceLevel level =
-                preference.minimizeGaps;
+                preference.avoidSingleLessonDay;
 
             if (level ==
                 SchedulingPreferenceLevel::Disabled)
@@ -78,7 +78,7 @@ public:
                             dayIndex)];
 
                 const int violationCount =
-                    (stats.lessonCount <= 1 ? 0 : (stats.lastSlot - stats.firstSlot + 1 - stats.lessonCount));
+                    (stats.lessonCount == 1 ? 1 : 0);
 
                 if (violationCount <= 0)
                 {
@@ -122,7 +122,7 @@ public:
                 {
                     ConstraintViolation violation;
                     violation.type =
-                        ConstraintViolationType::TeacherGap;
+                        ConstraintViolationType::TeacherSingleLessonDay;
                     violation.teacherId =
                         preference.teacherId;
                     violation.dayIndex =
@@ -130,7 +130,7 @@ public:
                     violation.occurrenceCount =
                         violationCount;
                     violation.message =
-                        "Teacher has gaps between lessons.";
+                        "Teacher has a day with only one lesson.";
 
                     target->violations.push_back(
                         std::move(violation));

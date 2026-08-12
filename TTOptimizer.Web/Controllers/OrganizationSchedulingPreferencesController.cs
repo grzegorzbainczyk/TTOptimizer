@@ -10,6 +10,9 @@ namespace TTOptimizer.Web.Controllers;
 [Route("api/organization-scheduling-preferences")]
 public class OrganizationSchedulingPreferencesController : ControllerBase
 {
+    private const int DefaultMaxConsecutiveLessonsLimit = 4;
+    private const int DefaultMaxLessonsPerDayLimit = 6;
+
     private readonly AppDbContext _dbContext;
 
     public OrganizationSchedulingPreferencesController(
@@ -56,19 +59,13 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
                 .FirstOrDefaultAsync(item =>
                     item.OrganizationId == organizationId);
 
-        var teacherMinimizeGaps =
-            preferences?.TeacherMinimizeGaps
-            ?? SchedulingPreferenceLevel.Medium;
-
         return Ok(new
         {
             success = true,
-            preferences = new OrganizationSchedulingPreferencesDto
-            {
-                OrganizationId = organization.Id,
-                OrganizationName = organization.Name,
-                TeacherMinimizeGaps = teacherMinimizeGaps
-            }
+            preferences = CreateDto(
+                organization.Id,
+                organization.Name,
+                preferences)
         });
     }
 
@@ -86,12 +83,25 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
             });
         }
 
-        if (!Enum.IsDefined(request.TeacherMinimizeGaps))
+        if (!IsValidLevel(request.TeacherMinimizeGaps) ||
+            !IsValidLevel(request.TeacherAvoidSingleLessonDay) ||
+            !IsValidLevel(request.TeacherMaxConsecutiveLessons) ||
+            !IsValidLevel(request.TeacherMaxLessonsPerDay))
         {
             return BadRequest(new
             {
                 success = false,
-                message = "Teacher minimize gaps value is invalid."
+                message = "One or more scheduling preference levels are invalid."
+            });
+        }
+
+        if (!IsValidLimit(request.TeacherMaxConsecutiveLessonsLimit) ||
+            !IsValidLimit(request.TeacherMaxLessonsPerDayLimit))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Lesson limits must be between 1 and 8."
             });
         }
 
@@ -122,18 +132,30 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
         {
             preferences = new OrganizationSchedulingPreferences
             {
-                OrganizationId = organizationId,
-                TeacherMinimizeGaps = request.TeacherMinimizeGaps
+                OrganizationId = organizationId
             };
 
             _dbContext.OrganizationSchedulingPreferences.Add(
                 preferences);
         }
-        else
-        {
-            preferences.TeacherMinimizeGaps =
-                request.TeacherMinimizeGaps;
-        }
+
+        preferences.TeacherMinimizeGaps =
+            request.TeacherMinimizeGaps;
+
+        preferences.TeacherAvoidSingleLessonDay =
+            request.TeacherAvoidSingleLessonDay;
+
+        preferences.TeacherMaxConsecutiveLessons =
+            request.TeacherMaxConsecutiveLessons;
+
+        preferences.TeacherMaxConsecutiveLessonsLimit =
+            request.TeacherMaxConsecutiveLessonsLimit;
+
+        preferences.TeacherMaxLessonsPerDay =
+            request.TeacherMaxLessonsPerDay;
+
+        preferences.TeacherMaxLessonsPerDayLimit =
+            request.TeacherMaxLessonsPerDayLimit;
 
         await _dbContext.SaveChangesAsync();
 
@@ -141,13 +163,57 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
         {
             success = true,
             message = "Organization scheduling defaults were saved.",
-            preferences = new OrganizationSchedulingPreferencesDto
-            {
-                OrganizationId = organization.Id,
-                OrganizationName = organization.Name,
-                TeacherMinimizeGaps =
-                    preferences.TeacherMinimizeGaps
-            }
+            preferences = CreateDto(
+                organization.Id,
+                organization.Name,
+                preferences)
         });
+    }
+
+    private static OrganizationSchedulingPreferencesDto CreateDto(
+        int organizationId,
+        string organizationName,
+        OrganizationSchedulingPreferences? preferences)
+    {
+        return new OrganizationSchedulingPreferencesDto
+        {
+            OrganizationId = organizationId,
+            OrganizationName = organizationName,
+
+            TeacherMinimizeGaps =
+                preferences?.TeacherMinimizeGaps
+                ?? SchedulingPreferenceLevel.Medium,
+
+            TeacherAvoidSingleLessonDay =
+                preferences?.TeacherAvoidSingleLessonDay
+                ?? SchedulingPreferenceLevel.Low,
+
+            TeacherMaxConsecutiveLessons =
+                preferences?.TeacherMaxConsecutiveLessons
+                ?? SchedulingPreferenceLevel.Medium,
+
+            TeacherMaxConsecutiveLessonsLimit =
+                preferences?.TeacherMaxConsecutiveLessonsLimit
+                ?? DefaultMaxConsecutiveLessonsLimit,
+
+            TeacherMaxLessonsPerDay =
+                preferences?.TeacherMaxLessonsPerDay
+                ?? SchedulingPreferenceLevel.Medium,
+
+            TeacherMaxLessonsPerDayLimit =
+                preferences?.TeacherMaxLessonsPerDayLimit
+                ?? DefaultMaxLessonsPerDayLimit
+        };
+    }
+
+    private static bool IsValidLevel(
+        SchedulingPreferenceLevel value)
+    {
+        return Enum.IsDefined(value);
+    }
+
+    private static bool IsValidLimit(int value)
+    {
+        return value is >= 1 and <= 8;
     }
 }

@@ -1,12 +1,13 @@
 #pragma once
 
+#include <algorithm>
 #include <utility>
 #include <vector>
 
 #include "Evaluation/Rules/IConstraintRule.h"
 #include "Evaluation/Rules/TeacherSchedulingRuleSupport.h"
 
-class TeacherMinimizeGapsRule final : public IConstraintRule
+class TeacherMaxConsecutiveLessonsRule final : public IConstraintRule
 {
 public:
     std::vector<ConstraintRuleResult> evaluate(
@@ -18,39 +19,39 @@ public:
             TeacherSchedulingRuleSupport::createResult(
                 ConstraintRuleKind::Soft,
                 ConstraintPenaltyLevel::Low,
-                "TeacherMinimizeGaps.Low",
-                "Minimize teacher gaps (Low)",
-                "Counts empty lesson slots between a teacher's first and last lesson of the day.");
+                "TeacherMaxConsecutiveLessons.Low",
+                "Teacher maximum consecutive lessons (Low)",
+                "Counts lessons exceeding the configured maximum consecutive lesson limit.");
 
         auto mediumResult =
             TeacherSchedulingRuleSupport::createResult(
                 ConstraintRuleKind::Soft,
                 ConstraintPenaltyLevel::Medium,
-                "TeacherMinimizeGaps.Medium",
-                "Minimize teacher gaps (Medium)",
-                "Counts empty lesson slots between a teacher's first and last lesson of the day.");
+                "TeacherMaxConsecutiveLessons.Medium",
+                "Teacher maximum consecutive lessons (Medium)",
+                "Counts lessons exceeding the configured maximum consecutive lesson limit.");
 
         auto highResult =
             TeacherSchedulingRuleSupport::createResult(
                 ConstraintRuleKind::Soft,
                 ConstraintPenaltyLevel::High,
-                "TeacherMinimizeGaps.High",
-                "Minimize teacher gaps (High)",
-                "Counts empty lesson slots between a teacher's first and last lesson of the day.");
+                "TeacherMaxConsecutiveLessons.High",
+                "Teacher maximum consecutive lessons (High)",
+                "Counts lessons exceeding the configured maximum consecutive lesson limit.");
 
         auto hardResult =
             TeacherSchedulingRuleSupport::createResult(
                 ConstraintRuleKind::Hard,
                 ConstraintPenaltyLevel::Hard,
-                "TeacherMinimizeGaps.Hard",
-                "Minimize teacher gaps (Hard)",
-                "Counts empty lesson slots between a teacher's first and last lesson of the day.");
+                "TeacherMaxConsecutiveLessons.Hard",
+                "Teacher maximum consecutive lessons (Hard)",
+                "Counts lessons exceeding the configured maximum consecutive lesson limit.");
 
         for (const TeacherSchedulingPreference& preference :
             context.problem.teacherSchedulingPreferences)
         {
             const SchedulingPreferenceLevel level =
-                preference.minimizeGaps;
+                preference.maxConsecutiveLessons;
 
             if (level ==
                 SchedulingPreferenceLevel::Disabled)
@@ -78,7 +79,7 @@ public:
                             dayIndex)];
 
                 const int violationCount =
-                    (stats.lessonCount <= 1 ? 0 : (stats.lastSlot - stats.firstSlot + 1 - stats.lessonCount));
+                    std::max(0, stats.maxConsecutiveLessons - preference.maxConsecutiveLessonsLimit);
 
                 if (violationCount <= 0)
                 {
@@ -122,7 +123,7 @@ public:
                 {
                     ConstraintViolation violation;
                     violation.type =
-                        ConstraintViolationType::TeacherGap;
+                        ConstraintViolationType::TeacherMaxConsecutiveLessons;
                     violation.teacherId =
                         preference.teacherId;
                     violation.dayIndex =
@@ -130,7 +131,7 @@ public:
                     violation.occurrenceCount =
                         violationCount;
                     violation.message =
-                        "Teacher has gaps between lessons.";
+                        "Teacher exceeds the maximum consecutive lesson limit.";
 
                     target->violations.push_back(
                         std::move(violation));

@@ -69,6 +69,16 @@ public class TeacherSchedulingPreferenceInput
     public int TeacherId { get; set; }
 
     public SchedulingPreferenceLevel MinimizeGaps { get; set; }
+
+    public SchedulingPreferenceLevel AvoidSingleLessonDay { get; set; }
+
+    public SchedulingPreferenceLevel MaxConsecutiveLessons { get; set; }
+
+    public int MaxConsecutiveLessonsLimit { get; set; }
+
+    public SchedulingPreferenceLevel MaxLessonsPerDay { get; set; }
+
+    public int MaxLessonsPerDayLimit { get; set; }
 }
 
 public class TimetableProblem

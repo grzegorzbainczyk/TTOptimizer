@@ -67,6 +67,22 @@ struct TeacherSchedulingPreference
     SchedulingPreferenceLevel minimizeGaps{
         SchedulingPreferenceLevel::Medium
     };
+
+    SchedulingPreferenceLevel avoidSingleLessonDay{
+        SchedulingPreferenceLevel::Low
+    };
+
+    SchedulingPreferenceLevel maxConsecutiveLessons{
+        SchedulingPreferenceLevel::Medium
+    };
+
+    int maxConsecutiveLessonsLimit{ 4 };
+
+    SchedulingPreferenceLevel maxLessonsPerDay{
+        SchedulingPreferenceLevel::Medium
+    };
+
+    int maxLessonsPerDayLimit{ 6 };
 };
 
 struct TimetableProblem

@@ -341,6 +341,34 @@ private:
                 parseSchedulingPreferenceLevel(
                     item.value("minimizeGaps", "Medium"));
 
+            preference.avoidSingleLessonDay =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "avoidSingleLessonDay",
+                        "Low"));
+
+            preference.maxConsecutiveLessons =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "maxConsecutiveLessons",
+                        "Medium"));
+
+            preference.maxConsecutiveLessonsLimit =
+                item.value(
+                    "maxConsecutiveLessonsLimit",
+                    4);
+
+            preference.maxLessonsPerDay =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "maxLessonsPerDay",
+                        "Medium"));
+
+            preference.maxLessonsPerDayLimit =
+                item.value(
+                    "maxLessonsPerDayLimit",
+                    6);
+
             problem.teacherSchedulingPreferences.push_back(
                 preference);
         }

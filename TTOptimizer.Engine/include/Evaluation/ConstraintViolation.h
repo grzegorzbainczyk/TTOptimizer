@@ -16,7 +16,10 @@ enum class ConstraintViolationType
     ClassGroupConflict,
     RoomConflict,
 
-    TeacherGap
+    TeacherGap,
+    TeacherSingleLessonDay,
+    TeacherMaxConsecutiveLessons,
+    TeacherMaxLessonsPerDay
 };
 
 struct ConstraintViolation

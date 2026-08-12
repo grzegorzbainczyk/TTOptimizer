@@ -10,7 +10,6 @@
 <body>
     <main class="app-shell">
         <div class="app-container">
-
             <header class="app-header app-hero">
                 <div class="hero-title-row">
                     <img src="images/logos/logo.png"
@@ -18,18 +17,12 @@
                          class="app-logo" />
 
                     <div class="hero-content">
-                        <div class="hero-badge">
-                            Organization scheduling
-                        </div>
-
+                        <div class="hero-badge">Organization scheduling</div>
                         <h1>Scheduling defaults</h1>
-
                         <p class="hero-subtitle">
-                            Configure default scheduling preferences used by resources in this organization.
+                            Configure default scheduling preferences inherited by teachers.
                         </p>
-
-                        <p id="organizationName"
-                           class="hero-tech">
+                        <p id="organizationName" class="hero-tech">
                             Loading organization...
                         </p>
                     </div>
@@ -47,30 +40,51 @@
                     <div>
                         <h2>Teacher scheduling defaults</h2>
                         <p>
-                            Teachers using Default inherit these values.
                             Individual teacher overrides remain unchanged.
+                            Teachers set to Default inherit the values below.
                         </p>
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-field">
-                        <label for="teacherMinimizeGaps">
-                            Minimize gaps
-                        </label>
+                        <label for="teacherMinimizeGaps">Minimize gaps</label>
+                        <select id="teacherMinimizeGaps"></select>
+                        <small>Prefer fewer empty slots between the first and last lesson of a day.</small>
+                    </div>
 
-                        <select id="teacherMinimizeGaps">
-                            <option value="Disabled">Disabled</option>
-                            <option value="Low">Low</option>
-                            <option value="Medium">Medium</option>
-                            <option value="High">High</option>
-                            <option value="Hard">Hard</option>
-                        </select>
+                    <div class="form-field">
+                        <label for="teacherAvoidSingleLessonDay">Avoid single-lesson day</label>
+                        <select id="teacherAvoidSingleLessonDay"></select>
+                        <small>Discourage days on which a teacher comes to school for only one lesson.</small>
+                    </div>
 
-                        <small>
-                            Controls how strongly ClassFlow prefers teacher schedules
-                            without empty lesson slots between lessons.
-                        </small>
+                    <div class="form-field">
+                        <label for="teacherMaxConsecutiveLessons">Max consecutive lessons - importance</label>
+                        <select id="teacherMaxConsecutiveLessons"></select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="teacherMaxConsecutiveLessonsLimit">Max consecutive lessons - limit</label>
+                        <input id="teacherMaxConsecutiveLessonsLimit"
+                               type="number"
+                               min="1"
+                               max="8"
+                               step="1" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="teacherMaxLessonsPerDay">Max lessons per day - importance</label>
+                        <select id="teacherMaxLessonsPerDay"></select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="teacherMaxLessonsPerDayLimit">Max lessons per day - limit</label>
+                        <input id="teacherMaxLessonsPerDayLimit"
+                               type="number"
+                               min="1"
+                               max="8"
+                               step="1" />
                     </div>
                 </div>
 
@@ -85,14 +99,12 @@
                 <p id="organizationPreferencesStatus"
                    class="form-message"
                    role="status"
-                   aria-live="polite">
-                </p>
+                   aria-live="polite"></p>
             </section>
 
             <footer class="app-footer">
                 Created by Grzegorz Bainczyk
             </footer>
-
         </div>
     </main>
 

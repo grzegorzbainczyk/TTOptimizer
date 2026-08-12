@@ -7,6 +7,7 @@
 
 #include "Evaluation/FitnessEvaluator.h"
 #include "Evaluation/Rules/ConstraintRuleContext.h"
+#include "Evaluation/Rules/TeacherScheduleStatsBuilder.h"
 
 namespace
 {
@@ -525,11 +526,19 @@ FitnessScore FitnessEvaluator::evaluate(
     }
 
 
+    const TeacherScheduleStats teacherScheduleStats =
+        TeacherScheduleStatsBuilder::build(
+            chromosome,
+            problem,
+            lessonInstances,
+            scheduleSlots);
+
     const ConstraintRuleContext context{
         chromosome,
         problem,
         lessonInstances,
-        scheduleSlots
+        scheduleSlots,
+        teacherScheduleStats
     };
 
     for (const auto& rule : ruleRegistry_.rules())

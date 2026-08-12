@@ -530,33 +530,20 @@ public class TeachersController : ControllerBase
                 .FirstOrDefaultAsync(item =>
                     item.OrganizationId == organizationId);
 
-        var defaultMinimizeGaps =
-            organizationPreferences?.TeacherMinimizeGaps
-            ?? SchedulingPreferenceLevel.Medium;
-
         var teacherPreferences =
             await _dbContext.TeacherSchedulingPreferences
                 .AsNoTracking()
                 .FirstOrDefaultAsync(item =>
                     item.TeacherId == id);
 
-        var overrideValue =
-            teacherPreferences?.MinimizeGaps;
-
-        var dto = new TeacherSchedulingPreferencesDto
-        {
-            TeacherId = teacher.Id,
-            TeacherName = teacher.Name,
-            MinimizeGaps = overrideValue,
-            DefaultMinimizeGaps = defaultMinimizeGaps,
-            EffectiveMinimizeGaps =
-                overrideValue ?? defaultMinimizeGaps
-        };
-
         return Ok(new
         {
             success = true,
-            preferences = dto
+            preferences = CreateTeacherSchedulingPreferencesDto(
+                teacher.Id,
+                teacher.Name,
+                organizationPreferences,
+                teacherPreferences)
         });
     }
 
@@ -595,13 +582,25 @@ public class TeachersController : ControllerBase
             });
         }
 
-        if (request.MinimizeGaps.HasValue &&
-            !Enum.IsDefined(request.MinimizeGaps.Value))
+        if (!IsValidOptionalLevel(request.MinimizeGaps) ||
+            !IsValidOptionalLevel(request.AvoidSingleLessonDay) ||
+            !IsValidOptionalLevel(request.MaxConsecutiveLessons) ||
+            !IsValidOptionalLevel(request.MaxLessonsPerDay))
         {
             return BadRequest(new
             {
                 success = false,
-                message = "Minimize gaps preference level is invalid."
+                message = "One or more scheduling preference levels are invalid."
+            });
+        }
+
+        if (!IsValidOptionalLimit(request.MaxConsecutiveLessonsLimit) ||
+            !IsValidOptionalLimit(request.MaxLessonsPerDayLimit))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Lesson limits must be between 1 and 8, or null to use the organization default."
             });
         }
 
@@ -624,6 +623,21 @@ public class TeachersController : ControllerBase
         preferences.MinimizeGaps =
             request.MinimizeGaps;
 
+        preferences.AvoidSingleLessonDay =
+            request.AvoidSingleLessonDay;
+
+        preferences.MaxConsecutiveLessons =
+            request.MaxConsecutiveLessons;
+
+        preferences.MaxConsecutiveLessonsLimit =
+            request.MaxConsecutiveLessonsLimit;
+
+        preferences.MaxLessonsPerDay =
+            request.MaxLessonsPerDay;
+
+        preferences.MaxLessonsPerDayLimit =
+            request.MaxLessonsPerDayLimit;
+
         await _dbContext.SaveChangesAsync();
 
         var organizationPreferences =
@@ -632,27 +646,115 @@ public class TeachersController : ControllerBase
                 .FirstOrDefaultAsync(item =>
                     item.OrganizationId == organizationId);
 
-        var defaultMinimizeGaps =
-            organizationPreferences?.TeacherMinimizeGaps
-            ?? SchedulingPreferenceLevel.Medium;
-
-        var dto = new TeacherSchedulingPreferencesDto
-        {
-            TeacherId = teacher.Id,
-            TeacherName = teacher.Name,
-            MinimizeGaps = preferences.MinimizeGaps,
-            DefaultMinimizeGaps = defaultMinimizeGaps,
-            EffectiveMinimizeGaps =
-                preferences.MinimizeGaps
-                ?? defaultMinimizeGaps
-        };
-
         return Ok(new
         {
             success = true,
             message = "Teacher scheduling preferences were updated.",
-            preferences = dto
+            preferences = CreateTeacherSchedulingPreferencesDto(
+                teacher.Id,
+                teacher.Name,
+                organizationPreferences,
+                preferences)
         });
     }
 
+    private static TeacherSchedulingPreferencesDto
+        CreateTeacherSchedulingPreferencesDto(
+            int teacherId,
+            string teacherName,
+            OrganizationSchedulingPreferences? organizationPreferences,
+            TeacherSchedulingPreferences? teacherPreferences)
+    {
+        var defaultMinimizeGaps =
+            organizationPreferences?.TeacherMinimizeGaps
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultAvoidSingleLessonDay =
+            organizationPreferences?.TeacherAvoidSingleLessonDay
+            ?? SchedulingPreferenceLevel.Low;
+
+        var defaultMaxConsecutiveLessons =
+            organizationPreferences?.TeacherMaxConsecutiveLessons
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultMaxConsecutiveLessonsLimit =
+            organizationPreferences?.TeacherMaxConsecutiveLessonsLimit
+            ?? 4;
+
+        var defaultMaxLessonsPerDay =
+            organizationPreferences?.TeacherMaxLessonsPerDay
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultMaxLessonsPerDayLimit =
+            organizationPreferences?.TeacherMaxLessonsPerDayLimit
+            ?? 6;
+
+        return new TeacherSchedulingPreferencesDto
+        {
+            TeacherId = teacherId,
+            TeacherName = teacherName,
+
+            MinimizeGaps =
+                teacherPreferences?.MinimizeGaps,
+            DefaultMinimizeGaps =
+                defaultMinimizeGaps,
+            EffectiveMinimizeGaps =
+                teacherPreferences?.MinimizeGaps
+                ?? defaultMinimizeGaps,
+
+            AvoidSingleLessonDay =
+                teacherPreferences?.AvoidSingleLessonDay,
+            DefaultAvoidSingleLessonDay =
+                defaultAvoidSingleLessonDay,
+            EffectiveAvoidSingleLessonDay =
+                teacherPreferences?.AvoidSingleLessonDay
+                ?? defaultAvoidSingleLessonDay,
+
+            MaxConsecutiveLessons =
+                teacherPreferences?.MaxConsecutiveLessons,
+            DefaultMaxConsecutiveLessons =
+                defaultMaxConsecutiveLessons,
+            EffectiveMaxConsecutiveLessons =
+                teacherPreferences?.MaxConsecutiveLessons
+                ?? defaultMaxConsecutiveLessons,
+
+            MaxConsecutiveLessonsLimit =
+                teacherPreferences?.MaxConsecutiveLessonsLimit,
+            DefaultMaxConsecutiveLessonsLimit =
+                defaultMaxConsecutiveLessonsLimit,
+            EffectiveMaxConsecutiveLessonsLimit =
+                teacherPreferences?.MaxConsecutiveLessonsLimit
+                ?? defaultMaxConsecutiveLessonsLimit,
+
+            MaxLessonsPerDay =
+                teacherPreferences?.MaxLessonsPerDay,
+            DefaultMaxLessonsPerDay =
+                defaultMaxLessonsPerDay,
+            EffectiveMaxLessonsPerDay =
+                teacherPreferences?.MaxLessonsPerDay
+                ?? defaultMaxLessonsPerDay,
+
+            MaxLessonsPerDayLimit =
+                teacherPreferences?.MaxLessonsPerDayLimit,
+            DefaultMaxLessonsPerDayLimit =
+                defaultMaxLessonsPerDayLimit,
+            EffectiveMaxLessonsPerDayLimit =
+                teacherPreferences?.MaxLessonsPerDayLimit
+                ?? defaultMaxLessonsPerDayLimit
+        };
+    }
+
+    private static bool IsValidOptionalLevel(
+        SchedulingPreferenceLevel? value)
+    {
+        return !value.HasValue ||
+            Enum.IsDefined(value.Value);
+    }
+
+    private static bool IsValidOptionalLimit(
+        int? value)
+    {
+        return !value.HasValue ||
+            value.Value is >= 1 and <= 8;
+    }
 }

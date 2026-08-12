@@ -1,36 +1,91 @@
+const preferenceLevels = [
+    "Disabled",
+    "Low",
+    "Medium",
+    "High",
+    "Hard"
+];
+
+const levelFields = [
+    {
+        id: "minimizeGapsImportance",
+        override: "minimizeGaps",
+        defaultValue: "defaultMinimizeGaps",
+        effective: "effectiveMinimizeGaps"
+    },
+    {
+        id: "avoidSingleLessonDayImportance",
+        override: "avoidSingleLessonDay",
+        defaultValue: "defaultAvoidSingleLessonDay",
+        effective: "effectiveAvoidSingleLessonDay"
+    },
+    {
+        id: "maxConsecutiveLessonsImportance",
+        override: "maxConsecutiveLessons",
+        defaultValue: "defaultMaxConsecutiveLessons",
+        effective: "effectiveMaxConsecutiveLessons"
+    },
+    {
+        id: "maxLessonsPerDayImportance",
+        override: "maxLessonsPerDay",
+        defaultValue: "defaultMaxLessonsPerDay",
+        effective: "effectiveMaxLessonsPerDay"
+    }
+];
+
 document.addEventListener("DOMContentLoaded", async () => {
-    const backToTeachersButton =
-        document.getElementById("backToTeachersButton");
+    initializeLevelSelects();
 
-    const saveTeacherPreferencesButton =
-        document.getElementById("saveTeacherPreferencesButton");
+    document.getElementById("backToTeachersButton")
+        ?.addEventListener("click", () => {
+            window.location.href = "teachers.html";
+        });
 
-    const resetTeacherPreferencesButton =
-        document.getElementById("resetTeacherPreferencesButton");
+    document.getElementById("saveTeacherPreferencesButton")
+        ?.addEventListener(
+            "click",
+            saveTeacherSchedulingPreferences
+        );
 
-    backToTeachersButton?.addEventListener("click", () => {
-        window.location.href = "teachers.html";
-    });
+    document.getElementById("resetTeacherPreferencesButton")
+        ?.addEventListener("click", async () => {
+            for (const field of levelFields) {
+                document.getElementById(field.id).value =
+                    "default";
+            }
 
-    saveTeacherPreferencesButton?.addEventListener(
-        "click",
-        saveTeacherSchedulingPreferences
-    );
+            document.getElementById(
+                "maxConsecutiveLessonsLimit"
+            ).value = "";
 
-    resetTeacherPreferencesButton?.addEventListener(
-        "click",
-        async () => {
-            const select =
-                document.getElementById("minimizeGapsImportance");
-
-            select.value = "default";
+            document.getElementById(
+                "maxLessonsPerDayLimit"
+            ).value = "";
 
             await saveTeacherSchedulingPreferences();
-        }
-    );
+        });
 
     await initializeTeacherPreferencesPage();
 });
+
+function initializeLevelSelects() {
+    for (const field of levelFields) {
+        const select = document.getElementById(field.id);
+
+        const defaultOption =
+            document.createElement("option");
+        defaultOption.value = "default";
+        defaultOption.textContent = "Default";
+        select.appendChild(defaultOption);
+
+        for (const level of preferenceLevels) {
+            const option = document.createElement("option");
+            option.value = level;
+            option.textContent = level;
+            select.appendChild(option);
+        }
+    }
+}
 
 async function initializeTeacherPreferencesPage() {
     const parameters =
@@ -43,22 +98,17 @@ async function initializeTeacherPreferencesPage() {
         parameters.get("teacherName");
 
     if (!teacherId) {
-        showTeacherPreferencesMessage(
-            "Teacher id is missing.",
-            true
-        );
-
+        showMessage("Teacher id is missing.", true);
         return;
     }
 
     document.getElementById("teacherId").value =
         teacherId;
 
-    const title =
-        document.getElementById("teacherPreferencesTitle");
-
     if (teacherName) {
-        title.textContent =
+        document.getElementById(
+            "teacherPreferencesTitle"
+        ).textContent =
             `${teacherName} - scheduling preferences`;
     }
 
@@ -66,7 +116,7 @@ async function initializeTeacherPreferencesPage() {
 }
 
 async function loadTeacherSchedulingPreferences() {
-    clearTeacherPreferencesMessage();
+    clearMessage();
 
     const teacherId =
         document.getElementById("teacherId").value;
@@ -76,58 +126,59 @@ async function loadTeacherSchedulingPreferences() {
             window.appContext.requireOrganizationId();
 
         const response = await fetch(
-            `/api/teachers/${encodeURIComponent(
-                teacherId
-            )}/scheduling-preferences?organizationId=${encodeURIComponent(
-                organizationId
-            )}`
+            `/api/teachers/${encodeURIComponent(teacherId)}/scheduling-preferences?organizationId=${encodeURIComponent(organizationId)}`
         );
 
         const data = await readJsonResponse(response);
 
-        if (!response.ok) {
+        if (!response.ok || !data?.success) {
             throw new Error(
                 data?.message ??
                 `Could not load scheduling preferences. Status: ${response.status}`
             );
         }
 
-        const preferences = data?.preferences;
+        const p = data.preferences;
 
-        if (!preferences) {
-            throw new Error(
-                "Scheduling preferences response is missing."
+        document.getElementById(
+            "teacherPreferencesTitle"
+        ).textContent =
+            `${p.teacherName} - scheduling preferences`;
+
+        for (const field of levelFields) {
+            updateDefaultOption(
+                field.id,
+                p[field.defaultValue]
             );
+
+            document.getElementById(field.id).value =
+                p[field.override] == null
+                    ? "default"
+                    : p[field.override];
         }
 
-        const title =
-            document.getElementById("teacherPreferencesTitle");
-
-        title.textContent =
-            `${preferences.teacherName} - scheduling preferences`;
-
-        const select =
-            document.getElementById("minimizeGapsImportance");
-
-        updateDefaultOption(
-            preferences.defaultMinimizeGaps
+        setLimit(
+            "maxConsecutiveLessonsLimit",
+            "maxConsecutiveLessonsLimitHint",
+            p.maxConsecutiveLessonsLimit,
+            p.defaultMaxConsecutiveLessonsLimit
         );
 
-        select.value =
-            preferences.minimizeGaps == null
-                ? "default"
-                : preferences.minimizeGaps.toLowerCase();
-
-        showEffectiveValue(
-            preferences.effectiveMinimizeGaps
+        setLimit(
+            "maxLessonsPerDayLimit",
+            "maxLessonsPerDayLimitHint",
+            p.maxLessonsPerDayLimit,
+            p.defaultMaxLessonsPerDayLimit
         );
+
+        showEffectiveSummary(p);
     } catch (error) {
         console.error(
             "Error loading teacher scheduling preferences:",
             error
         );
 
-        showTeacherPreferencesMessage(
+        showMessage(
             error instanceof Error
                 ? error.message
                 : "Could not load scheduling preferences.",
@@ -137,68 +188,86 @@ async function loadTeacherSchedulingPreferences() {
 }
 
 async function saveTeacherSchedulingPreferences() {
-    clearTeacherPreferencesMessage();
+    clearMessage();
 
     const teacherId =
         document.getElementById("teacherId").value;
 
-    const select =
-        document.getElementById("minimizeGapsImportance");
+    const payload = {
+        minimizeGaps:
+            readLevel("minimizeGapsImportance"),
 
-    const minimizeGaps =
-        select.value === "default"
-            ? null
-            : toPreferenceLevel(select.value);
+        avoidSingleLessonDay:
+            readLevel("avoidSingleLessonDayImportance"),
+
+        maxConsecutiveLessons:
+            readLevel("maxConsecutiveLessonsImportance"),
+
+        maxConsecutiveLessonsLimit:
+            readOptionalLimit("maxConsecutiveLessonsLimit"),
+
+        maxLessonsPerDay:
+            readLevel("maxLessonsPerDayImportance"),
+
+        maxLessonsPerDayLimit:
+            readOptionalLimit("maxLessonsPerDayLimit")
+    };
 
     try {
         const organizationId =
             window.appContext.requireOrganizationId();
 
         const response = await fetch(
-            `/api/teachers/${encodeURIComponent(
-                teacherId
-            )}/scheduling-preferences?organizationId=${encodeURIComponent(
-                organizationId
-            )}`,
+            `/api/teachers/${encodeURIComponent(teacherId)}/scheduling-preferences?organizationId=${encodeURIComponent(organizationId)}`,
             {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    minimizeGaps
-                })
+                body: JSON.stringify(payload)
             }
         );
 
         const data = await readJsonResponse(response);
 
-        if (!response.ok) {
+        if (!response.ok || !data?.success) {
             throw new Error(
                 data?.message ??
                 `Could not save scheduling preferences. Status: ${response.status}`
             );
         }
 
-        updateDefaultOption(
-            data.preferences.defaultMinimizeGaps
+        const p = data.preferences;
+
+        for (const field of levelFields) {
+            updateDefaultOption(
+                field.id,
+                p[field.defaultValue]
+            );
+        }
+
+        setLimit(
+            "maxConsecutiveLessonsLimit",
+            "maxConsecutiveLessonsLimitHint",
+            p.maxConsecutiveLessonsLimit,
+            p.defaultMaxConsecutiveLessonsLimit
         );
 
-        showEffectiveValue(
-            data.preferences.effectiveMinimizeGaps
+        setLimit(
+            "maxLessonsPerDayLimit",
+            "maxLessonsPerDayLimitHint",
+            p.maxLessonsPerDayLimit,
+            p.defaultMaxLessonsPerDayLimit
         );
 
-        showTeacherPreferencesMessage(
-            "Scheduling preferences saved.",
-            false
-        );
+        showEffectiveSummary(p, true);
     } catch (error) {
         console.error(
             "Error saving teacher scheduling preferences:",
             error
         );
 
-        showTeacherPreferencesMessage(
+        showMessage(
             error instanceof Error
                 ? error.message
                 : "Could not save scheduling preferences.",
@@ -207,87 +276,117 @@ async function saveTeacherSchedulingPreferences() {
     }
 }
 
-function updateDefaultOption(defaultValue) {
-    const select =
-        document.getElementById("minimizeGapsImportance");
+function readLevel(id) {
+    const value =
+        document.getElementById(id).value;
 
-    const defaultOption =
-        select.querySelector('option[value="default"]');
+    return value === "default"
+        ? null
+        : value;
+}
 
-    if (defaultOption) {
-        defaultOption.textContent =
+function readOptionalLimit(id) {
+    const raw =
+        document.getElementById(id).value.trim();
+
+    if (!raw) {
+        return null;
+    }
+
+    const value = Number.parseInt(raw, 10);
+
+    if (!Number.isInteger(value) ||
+        value < 1 ||
+        value > 8) {
+        throw new Error(
+            "Lesson limits must be between 1 and 8."
+        );
+    }
+
+    return value;
+}
+
+function updateDefaultOption(selectId, defaultValue) {
+    const option =
+        document.getElementById(selectId)
+            ?.querySelector('option[value="default"]');
+
+    if (option) {
+        option.textContent =
             `Default (${defaultValue})`;
     }
 }
 
-function showEffectiveValue(effectiveValue) {
-    const messageElement =
-        document.getElementById("teacherPreferencesMessage");
+function setLimit(
+    inputId,
+    hintId,
+    overrideValue,
+    defaultValue
+) {
+    const input = document.getElementById(inputId);
+    const hint = document.getElementById(hintId);
 
-    if (!messageElement) {
-        return;
+    input.value =
+        overrideValue == null
+            ? ""
+            : overrideValue;
+
+    input.placeholder =
+        `Default (${defaultValue})`;
+
+    if (hint) {
+        hint.textContent =
+            overrideValue == null
+                ? `Using organization default: ${defaultValue}`
+                : `Teacher override: ${overrideValue}`;
     }
+}
 
-    messageElement.textContent =
-        `Effective value: ${effectiveValue}`;
+function showEffectiveSummary(p, saved = false) {
+    const prefix =
+        saved
+            ? "Saved. "
+            : "";
 
-    messageElement.classList.remove(
-        "error-message"
+    showMessage(
+        `${prefix}Effective values: ` +
+        `gaps ${p.effectiveMinimizeGaps}; ` +
+        `single-lesson day ${p.effectiveAvoidSingleLessonDay}; ` +
+        `consecutive ${p.effectiveMaxConsecutiveLessons} / limit ${p.effectiveMaxConsecutiveLessonsLimit}; ` +
+        `daily ${p.effectiveMaxLessonsPerDay} / limit ${p.effectiveMaxLessonsPerDayLimit}.`,
+        false
     );
 }
 
-function toPreferenceLevel(value) {
-    const mapping = {
-        disabled: "Disabled",
-        low: "Low",
-        medium: "Medium",
-        high: "High",
-        hard: "Hard"
-    };
+function showMessage(message, isError) {
+    const element =
+        document.getElementById(
+            "teacherPreferencesMessage"
+        );
 
-    return mapping[value] ?? null;
-}
+    if (!element) return;
 
-function showTeacherPreferencesMessage(message, isError) {
-    const messageElement =
-        document.getElementById("teacherPreferencesMessage");
-
-    if (!messageElement) {
-        return;
-    }
-
-    messageElement.textContent = message;
-    messageElement.classList.toggle(
+    element.textContent = message;
+    element.classList.toggle(
         "error-message",
         isError
     );
 }
 
-function clearTeacherPreferencesMessage() {
-    const messageElement =
-        document.getElementById("teacherPreferencesMessage");
-
-    if (!messageElement) {
-        return;
-    }
-
-    messageElement.textContent = "";
-    messageElement.classList.remove(
-        "error-message"
-    );
+function clearMessage() {
+    showMessage("", false);
 }
 
 async function readJsonResponse(response) {
     const text = await response.text();
 
-    if (!text) {
-        return null;
-    }
+    if (!text) return null;
 
     try {
         return JSON.parse(text);
     } catch {
         return {
+            success: false,
             message: text
         };
     }

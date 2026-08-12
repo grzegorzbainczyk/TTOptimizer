@@ -231,6 +231,32 @@ namespace TTOptimizer.Web.Data
 
                 entity.Property(item => item.TeacherMinimizeGaps)
                     .HasDefaultValue(SchedulingPreferenceLevel.Medium);
+
+                entity.Property(item => item.TeacherAvoidSingleLessonDay)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Low);
+
+                entity.Property(item => item.TeacherMaxConsecutiveLessons)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Medium);
+
+                entity.Property(item => item.TeacherMaxConsecutiveLessonsLimit)
+                    .HasDefaultValue(4);
+
+                entity.Property(item => item.TeacherMaxLessonsPerDay)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Medium);
+
+                entity.Property(item => item.TeacherMaxLessonsPerDayLimit)
+                    .HasDefaultValue(6);
+
+                entity.ToTable(table =>
+                {
+                    table.HasCheckConstraint(
+                        "CK_OrganizationSchedulingPreferences_MaxConsecutiveLessonsLimit",
+                        "\"TeacherMaxConsecutiveLessonsLimit\" >= 1 AND \"TeacherMaxConsecutiveLessonsLimit\" <= 8");
+
+                    table.HasCheckConstraint(
+                        "CK_OrganizationSchedulingPreferences_MaxLessonsPerDayLimit",
+                        "\"TeacherMaxLessonsPerDayLimit\" >= 1 AND \"TeacherMaxLessonsPerDayLimit\" <= 8");
+                });
             });
 
             modelBuilder.Entity<TeacherSchedulingPreferences>(entity =>
@@ -242,6 +268,17 @@ namespace TTOptimizer.Web.Data
                     .WithMany()
                     .HasForeignKey(item => item.TeacherId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                entity.ToTable(table =>
+                {
+                    table.HasCheckConstraint(
+                        "CK_TeacherSchedulingPreferences_MaxConsecutiveLessonsLimit",
+                        "\"MaxConsecutiveLessonsLimit\" IS NULL OR (\"MaxConsecutiveLessonsLimit\" >= 1 AND \"MaxConsecutiveLessonsLimit\" <= 8)");
+
+                    table.HasCheckConstraint(
+                        "CK_TeacherSchedulingPreferences_MaxLessonsPerDayLimit",
+                        "\"MaxLessonsPerDayLimit\" IS NULL OR (\"MaxLessonsPerDayLimit\" >= 1 AND \"MaxLessonsPerDayLimit\" <= 8)");
+                });
             });
 
             modelBuilder.Entity<TeacherTimeSlotPreference>(entity =>
