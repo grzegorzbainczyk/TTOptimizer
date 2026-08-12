@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassFlow - Scheduling defaults</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <main class="app-shell">
+        <div class="app-container">
+
+            <header class="app-header app-hero">
+                <div class="hero-title-row">
+                    <img src="images/logos/logo.png"
+                         alt="ClassFlow logo"
+                         class="app-logo" />
+
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            Organization scheduling
+                        </div>
+
+                        <h1>Scheduling defaults</h1>
+
+                        <p class="hero-subtitle">
+                            Configure default scheduling preferences used by resources in this organization.
+                        </p>
+
+                        <p id="organizationName"
+                           class="hero-tech">
+                            Loading organization...
+                        </p>
+                    </div>
+
+                    <button id="backToMainButton"
+                            class="settings-button"
+                            type="button">
+                        Back to dashboard
+                    </button>
+                </div>
+            </header>
+
+            <section class="app-card app-panel">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Teacher scheduling defaults</h2>
+                        <p>
+                            Teachers using Default inherit these values.
+                            Individual teacher overrides remain unchanged.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="teacherMinimizeGaps">
+                            Minimize gaps
+                        </label>
+
+                        <select id="teacherMinimizeGaps">
+                            <option value="Disabled">Disabled</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+
+                        <small>
+                            Controls how strongly ClassFlow prefers teacher schedules
+                            without empty lesson slots between lessons.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="saveOrganizationPreferencesButton"
+                            class="primary-button"
+                            type="button">
+                        Save
+                    </button>
+                </div>
+
+                <p id="organizationPreferencesStatus"
+                   class="form-message"
+                   role="status"
+                   aria-live="polite">
+                </p>
+            </section>
+
+            <footer class="app-footer">
+                Created by Grzegorz Bainczyk
+            </footer>
+
+        </div>
+    </main>
+
+    <script src="/js/appContext.js"></script>
+    <script src="/js/organization-preferences.js"></script>
+</body>
+</html>
