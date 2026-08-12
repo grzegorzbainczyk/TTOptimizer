@@ -80,6 +80,12 @@ public class OptimizerInputDto
     public List<TeacherSchedulingPreferenceInput> TeacherSchedulingPreferences { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the effective scheduling preferences for class groups.
+    /// Values already include organization defaults and class-group overrides.
+    /// </summary>
+    public List<ClassGroupSchedulingPreferenceInput> ClassGroupSchedulingPreferences { get; set; } = new();
+
+    /// <summary>
     /// Gets or sets the configuration used by the optimization algorithm,
     /// such as iteration limits, random seed, and thread count.
     /// </summary>

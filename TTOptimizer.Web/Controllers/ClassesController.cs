@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.ClassGroups;
 using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
+using TTOptimizer.Web.Models.DTO.SchedulingPreferences;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -408,6 +409,259 @@ public class ClassesController : ControllerBase
                 .OrderBy(slot => slot.DayIndex)
                 .ThenBy(slot => slot.SlotIndex)
         });
+    }
+
+
+    [HttpGet("{id:int}/scheduling-preferences")]
+    public async Task<IActionResult> GetSchedulingPreferences(
+        int id,
+        [FromQuery] int organizationId)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        var classGroup = await _db.ClassGroups
+            .AsNoTracking()
+            .Where(item =>
+                item.Id == id &&
+                item.OrganizationId == organizationId)
+            .Select(item => new
+            {
+                item.Id,
+                item.Name
+            })
+            .FirstOrDefaultAsync();
+
+        if (classGroup == null)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Class was not found."
+            });
+        }
+
+        var organizationDefaults =
+            await _db.OrganizationSchedulingPreferences
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.OrganizationId == organizationId);
+
+        var classGroupPreferences =
+            await _db.ClassGroupSchedulingPreferences
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.ClassGroupId == id);
+
+        return Ok(new
+        {
+            success = true,
+            preferences = CreateClassGroupSchedulingPreferencesDto(
+                classGroup.Id,
+                classGroup.Name,
+                organizationDefaults,
+                classGroupPreferences)
+        });
+    }
+
+    [HttpPut("{id:int}/scheduling-preferences")]
+    public async Task<IActionResult> UpdateSchedulingPreferences(
+        int id,
+        [FromQuery] int organizationId,
+        [FromBody] UpdateClassGroupSchedulingPreferencesRequest request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        if (!IsValidOptionalLevel(request.MinimizeGaps) ||
+            !IsValidOptionalLevel(request.AvoidSingleLessonDay) ||
+            !IsValidOptionalLevel(request.MaxConsecutiveLessons) ||
+            !IsValidOptionalLevel(request.MaxLessonsPerDay))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "One or more scheduling preference levels are invalid."
+            });
+        }
+
+        if (!IsValidOptionalLimit(request.MaxConsecutiveLessonsLimit) ||
+            !IsValidOptionalLimit(request.MaxLessonsPerDayLimit))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Lesson limits must be between 1 and 8 or left empty to use the organization default."
+            });
+        }
+
+        var classGroup = await _db.ClassGroups
+            .Where(item =>
+                item.Id == id &&
+                item.OrganizationId == organizationId)
+            .Select(item => new
+            {
+                item.Id,
+                item.Name
+            })
+            .FirstOrDefaultAsync();
+
+        if (classGroup == null)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Class was not found."
+            });
+        }
+
+        var preferences =
+            await _db.ClassGroupSchedulingPreferences
+                .FirstOrDefaultAsync(item =>
+                    item.ClassGroupId == id);
+
+        if (preferences == null)
+        {
+            preferences = new ClassGroupSchedulingPreferences
+            {
+                ClassGroupId = id
+            };
+
+            _db.ClassGroupSchedulingPreferences.Add(preferences);
+        }
+
+        preferences.MinimizeGaps = request.MinimizeGaps;
+        preferences.AvoidSingleLessonDay = request.AvoidSingleLessonDay;
+        preferences.MaxConsecutiveLessons = request.MaxConsecutiveLessons;
+        preferences.MaxConsecutiveLessonsLimit = request.MaxConsecutiveLessonsLimit;
+        preferences.MaxLessonsPerDay = request.MaxLessonsPerDay;
+        preferences.MaxLessonsPerDayLimit = request.MaxLessonsPerDayLimit;
+
+        await _db.SaveChangesAsync();
+
+        var organizationDefaults =
+            await _db.OrganizationSchedulingPreferences
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item =>
+                    item.OrganizationId == organizationId);
+
+        return Ok(new
+        {
+            success = true,
+            message = "Class scheduling preferences were saved.",
+            preferences = CreateClassGroupSchedulingPreferencesDto(
+                classGroup.Id,
+                classGroup.Name,
+                organizationDefaults,
+                preferences)
+        });
+    }
+
+    private static ClassGroupSchedulingPreferencesDto
+        CreateClassGroupSchedulingPreferencesDto(
+            int classGroupId,
+            string classGroupName,
+            OrganizationSchedulingPreferences? defaults,
+            ClassGroupSchedulingPreferences? preferences)
+    {
+        var defaultMinimizeGaps =
+            defaults?.ClassGroupMinimizeGaps
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultAvoidSingleLessonDay =
+            defaults?.ClassGroupAvoidSingleLessonDay
+            ?? SchedulingPreferenceLevel.Disabled;
+
+        var defaultMaxConsecutiveLessons =
+            defaults?.ClassGroupMaxConsecutiveLessons
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultMaxConsecutiveLessonsLimit =
+            defaults?.ClassGroupMaxConsecutiveLessonsLimit
+            ?? 6;
+
+        var defaultMaxLessonsPerDay =
+            defaults?.ClassGroupMaxLessonsPerDay
+            ?? SchedulingPreferenceLevel.High;
+
+        var defaultMaxLessonsPerDayLimit =
+            defaults?.ClassGroupMaxLessonsPerDayLimit
+            ?? 8;
+
+        return new ClassGroupSchedulingPreferencesDto
+        {
+            ClassGroupId = classGroupId,
+            ClassGroupName = classGroupName,
+
+            MinimizeGaps = preferences?.MinimizeGaps,
+            DefaultMinimizeGaps = defaultMinimizeGaps,
+            EffectiveMinimizeGaps =
+                preferences?.MinimizeGaps
+                ?? defaultMinimizeGaps,
+
+            AvoidSingleLessonDay =
+                preferences?.AvoidSingleLessonDay,
+            DefaultAvoidSingleLessonDay =
+                defaultAvoidSingleLessonDay,
+            EffectiveAvoidSingleLessonDay =
+                preferences?.AvoidSingleLessonDay
+                ?? defaultAvoidSingleLessonDay,
+
+            MaxConsecutiveLessons =
+                preferences?.MaxConsecutiveLessons,
+            DefaultMaxConsecutiveLessons =
+                defaultMaxConsecutiveLessons,
+            EffectiveMaxConsecutiveLessons =
+                preferences?.MaxConsecutiveLessons
+                ?? defaultMaxConsecutiveLessons,
+
+            MaxConsecutiveLessonsLimit =
+                preferences?.MaxConsecutiveLessonsLimit,
+            DefaultMaxConsecutiveLessonsLimit =
+                defaultMaxConsecutiveLessonsLimit,
+            EffectiveMaxConsecutiveLessonsLimit =
+                preferences?.MaxConsecutiveLessonsLimit
+                ?? defaultMaxConsecutiveLessonsLimit,
+
+            MaxLessonsPerDay =
+                preferences?.MaxLessonsPerDay,
+            DefaultMaxLessonsPerDay =
+                defaultMaxLessonsPerDay,
+            EffectiveMaxLessonsPerDay =
+                preferences?.MaxLessonsPerDay
+                ?? defaultMaxLessonsPerDay,
+
+            MaxLessonsPerDayLimit =
+                preferences?.MaxLessonsPerDayLimit,
+            DefaultMaxLessonsPerDayLimit =
+                defaultMaxLessonsPerDayLimit,
+            EffectiveMaxLessonsPerDayLimit =
+                preferences?.MaxLessonsPerDayLimit
+                ?? defaultMaxLessonsPerDayLimit
+        };
+    }
+
+    private static bool IsValidOptionalLevel(
+        SchedulingPreferenceLevel? value)
+    {
+        return value == null || Enum.IsDefined(value.Value);
+    }
+
+    private static bool IsValidOptionalLimit(int? value)
+    {
+        return value == null || value is >= 1 and <= 8;
     }
 
     [HttpDelete("{id:int}")]

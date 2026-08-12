@@ -19,7 +19,12 @@ enum class ConstraintViolationType
     TeacherGap,
     TeacherSingleLessonDay,
     TeacherMaxConsecutiveLessons,
-    TeacherMaxLessonsPerDay
+    TeacherMaxLessonsPerDay,
+
+    ClassGroupGap,
+    ClassGroupSingleLessonDay,
+    ClassGroupMaxConsecutiveLessons,
+    ClassGroupMaxLessonsPerDay
 };
 
 struct ConstraintViolation

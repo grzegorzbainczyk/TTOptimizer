@@ -538,6 +538,9 @@ public class CppOptimizerService
             TeacherSchedulingPreferences =
                 problem.TeacherSchedulingPreferences,
 
+            ClassGroupSchedulingPreferences =
+                problem.ClassGroupSchedulingPreferences,
+
             OptimizationSettings =
                 problem.OptimizationSettings
         };

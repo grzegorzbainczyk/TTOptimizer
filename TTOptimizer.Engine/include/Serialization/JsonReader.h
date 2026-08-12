@@ -50,6 +50,7 @@ public:
 
         readTimeSlotPreferences(root, problem);
         readTeacherSchedulingPreferences(root, problem);
+        readClassGroupSchedulingPreferences(root, problem);
 
         return problem;
     }
@@ -373,6 +374,63 @@ private:
                 preference);
         }
     }
+
+
+    static void readClassGroupSchedulingPreferences(
+        const json& root,
+        TimetableProblem& problem)
+    {
+        if (!root.contains("classGroupSchedulingPreferences")
+            || !root["classGroupSchedulingPreferences"].is_array())
+        {
+            return;
+        }
+
+        for (const auto& item :
+            root["classGroupSchedulingPreferences"])
+        {
+            ClassGroupSchedulingPreference preference;
+
+            preference.classGroupId =
+                item.value("classGroupId", 0);
+
+            preference.minimizeGaps =
+                parseSchedulingPreferenceLevel(
+                    item.value("minimizeGaps", "Medium"));
+
+            preference.avoidSingleLessonDay =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "avoidSingleLessonDay",
+                        "Disabled"));
+
+            preference.maxConsecutiveLessons =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "maxConsecutiveLessons",
+                        "Medium"));
+
+            preference.maxConsecutiveLessonsLimit =
+                item.value(
+                    "maxConsecutiveLessonsLimit",
+                    6);
+
+            preference.maxLessonsPerDay =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "maxLessonsPerDay",
+                        "High"));
+
+            preference.maxLessonsPerDayLimit =
+                item.value(
+                    "maxLessonsPerDayLimit",
+                    8);
+
+            problem.classGroupSchedulingPreferences.push_back(
+                preference);
+        }
+    }
+
 
 
 };

@@ -12,6 +12,8 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
 {
     private const int DefaultMaxConsecutiveLessonsLimit = 4;
     private const int DefaultMaxLessonsPerDayLimit = 6;
+    private const int DefaultClassGroupMaxConsecutiveLessonsLimit = 6;
+    private const int DefaultClassGroupMaxLessonsPerDayLimit = 8;
 
     private readonly AppDbContext _dbContext;
 
@@ -86,7 +88,11 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
         if (!IsValidLevel(request.TeacherMinimizeGaps) ||
             !IsValidLevel(request.TeacherAvoidSingleLessonDay) ||
             !IsValidLevel(request.TeacherMaxConsecutiveLessons) ||
-            !IsValidLevel(request.TeacherMaxLessonsPerDay))
+            !IsValidLevel(request.TeacherMaxLessonsPerDay) ||
+            !IsValidLevel(request.ClassGroupMinimizeGaps) ||
+            !IsValidLevel(request.ClassGroupAvoidSingleLessonDay) ||
+            !IsValidLevel(request.ClassGroupMaxConsecutiveLessons) ||
+            !IsValidLevel(request.ClassGroupMaxLessonsPerDay))
         {
             return BadRequest(new
             {
@@ -96,7 +102,9 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
         }
 
         if (!IsValidLimit(request.TeacherMaxConsecutiveLessonsLimit) ||
-            !IsValidLimit(request.TeacherMaxLessonsPerDayLimit))
+            !IsValidLimit(request.TeacherMaxLessonsPerDayLimit) ||
+            !IsValidLimit(request.ClassGroupMaxConsecutiveLessonsLimit) ||
+            !IsValidLimit(request.ClassGroupMaxLessonsPerDayLimit))
         {
             return BadRequest(new
             {
@@ -157,6 +165,24 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
         preferences.TeacherMaxLessonsPerDayLimit =
             request.TeacherMaxLessonsPerDayLimit;
 
+        preferences.ClassGroupMinimizeGaps =
+            request.ClassGroupMinimizeGaps;
+
+        preferences.ClassGroupAvoidSingleLessonDay =
+            request.ClassGroupAvoidSingleLessonDay;
+
+        preferences.ClassGroupMaxConsecutiveLessons =
+            request.ClassGroupMaxConsecutiveLessons;
+
+        preferences.ClassGroupMaxConsecutiveLessonsLimit =
+            request.ClassGroupMaxConsecutiveLessonsLimit;
+
+        preferences.ClassGroupMaxLessonsPerDay =
+            request.ClassGroupMaxLessonsPerDay;
+
+        preferences.ClassGroupMaxLessonsPerDayLimit =
+            request.ClassGroupMaxLessonsPerDayLimit;
+
         await _dbContext.SaveChangesAsync();
 
         return Ok(new
@@ -202,7 +228,31 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
 
             TeacherMaxLessonsPerDayLimit =
                 preferences?.TeacherMaxLessonsPerDayLimit
-                ?? DefaultMaxLessonsPerDayLimit
+                ?? DefaultMaxLessonsPerDayLimit,
+
+            ClassGroupMinimizeGaps =
+                preferences?.ClassGroupMinimizeGaps
+                ?? SchedulingPreferenceLevel.Medium,
+
+            ClassGroupAvoidSingleLessonDay =
+                preferences?.ClassGroupAvoidSingleLessonDay
+                ?? SchedulingPreferenceLevel.Disabled,
+
+            ClassGroupMaxConsecutiveLessons =
+                preferences?.ClassGroupMaxConsecutiveLessons
+                ?? SchedulingPreferenceLevel.Medium,
+
+            ClassGroupMaxConsecutiveLessonsLimit =
+                preferences?.ClassGroupMaxConsecutiveLessonsLimit
+                ?? DefaultClassGroupMaxConsecutiveLessonsLimit,
+
+            ClassGroupMaxLessonsPerDay =
+                preferences?.ClassGroupMaxLessonsPerDay
+                ?? SchedulingPreferenceLevel.High,
+
+            ClassGroupMaxLessonsPerDayLimit =
+                preferences?.ClassGroupMaxLessonsPerDayLimit
+                ?? DefaultClassGroupMaxLessonsPerDayLimit
         };
     }
 

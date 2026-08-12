@@ -85,6 +85,32 @@ struct TeacherSchedulingPreference
     int maxLessonsPerDayLimit{ 6 };
 };
 
+
+struct ClassGroupSchedulingPreference
+{
+    ClassGroupId classGroupId{};
+
+    SchedulingPreferenceLevel minimizeGaps{
+        SchedulingPreferenceLevel::Medium
+    };
+
+    SchedulingPreferenceLevel avoidSingleLessonDay{
+        SchedulingPreferenceLevel::Disabled
+    };
+
+    SchedulingPreferenceLevel maxConsecutiveLessons{
+        SchedulingPreferenceLevel::Medium
+    };
+
+    int maxConsecutiveLessonsLimit{ 6 };
+
+    SchedulingPreferenceLevel maxLessonsPerDay{
+        SchedulingPreferenceLevel::High
+    };
+
+    int maxLessonsPerDayLimit{ 8 };
+};
+
 struct TimetableProblem
 {
     std::vector<Teacher> teachers;
@@ -107,6 +133,9 @@ struct TimetableProblem
 
     std::vector<TeacherSchedulingPreference>
         teacherSchedulingPreferences;
+
+    std::vector<ClassGroupSchedulingPreference>
+        classGroupSchedulingPreferences;
 
     int daysPerWeek = 5;
     int slotsPerDay = 8;

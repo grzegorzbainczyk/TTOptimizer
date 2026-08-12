@@ -25,7 +25,11 @@ function initializeLevelSelects() {
         "teacherMinimizeGaps",
         "teacherAvoidSingleLessonDay",
         "teacherMaxConsecutiveLessons",
-        "teacherMaxLessonsPerDay"
+        "teacherMaxLessonsPerDay",
+        "classGroupMinimizeGaps",
+        "classGroupAvoidSingleLessonDay",
+        "classGroupMaxConsecutiveLessons",
+        "classGroupMaxLessonsPerDay"
     ]) {
         const select = document.getElementById(id);
         if (!select) continue;
@@ -81,6 +85,24 @@ async function loadOrganizationPreferences() {
         setValue("teacherMaxLessonsPerDayLimit",
             preferences.teacherMaxLessonsPerDayLimit ?? 6);
 
+        setValue("classGroupMinimizeGaps",
+            preferences.classGroupMinimizeGaps ?? "Medium");
+
+        setValue("classGroupAvoidSingleLessonDay",
+            preferences.classGroupAvoidSingleLessonDay ?? "Disabled");
+
+        setValue("classGroupMaxConsecutiveLessons",
+            preferences.classGroupMaxConsecutiveLessons ?? "Medium");
+
+        setValue("classGroupMaxConsecutiveLessonsLimit",
+            preferences.classGroupMaxConsecutiveLessonsLimit ?? 6);
+
+        setValue("classGroupMaxLessonsPerDay",
+            preferences.classGroupMaxLessonsPerDay ?? "High");
+
+        setValue("classGroupMaxLessonsPerDayLimit",
+            preferences.classGroupMaxLessonsPerDayLimit ?? 8);
+
         const organizationName =
             document.getElementById("organizationName");
 
@@ -126,7 +148,20 @@ async function saveOrganizationPreferences() {
             teacherMaxLessonsPerDay:
                 getValue("teacherMaxLessonsPerDay"),
             teacherMaxLessonsPerDayLimit:
-                getInteger("teacherMaxLessonsPerDayLimit")
+                getInteger("teacherMaxLessonsPerDayLimit"),
+
+            classGroupMinimizeGaps:
+                getValue("classGroupMinimizeGaps"),
+            classGroupAvoidSingleLessonDay:
+                getValue("classGroupAvoidSingleLessonDay"),
+            classGroupMaxConsecutiveLessons:
+                getValue("classGroupMaxConsecutiveLessons"),
+            classGroupMaxConsecutiveLessonsLimit:
+                getInteger("classGroupMaxConsecutiveLessonsLimit"),
+            classGroupMaxLessonsPerDay:
+                getValue("classGroupMaxLessonsPerDay"),
+            classGroupMaxLessonsPerDayLimit:
+                getInteger("classGroupMaxLessonsPerDayLimit")
         };
 
         validateLimit(
@@ -136,7 +171,17 @@ async function saveOrganizationPreferences() {
 
         validateLimit(
             payload.teacherMaxLessonsPerDayLimit,
-            "Max lessons per day"
+            "Teacher max lessons per day"
+        );
+
+        validateLimit(
+            payload.classGroupMaxConsecutiveLessonsLimit,
+            "Class max consecutive lessons"
+        );
+
+        validateLimit(
+            payload.classGroupMaxLessonsPerDayLimit,
+            "Class max lessons per day"
         );
 
         if (saveButton) saveButton.disabled = true;

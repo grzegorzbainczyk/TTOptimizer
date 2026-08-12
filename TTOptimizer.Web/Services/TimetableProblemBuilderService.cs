@@ -142,6 +142,30 @@ public class TimetableProblemBuilderService
             organizationSchedulingPreferences?.TeacherMaxLessonsPerDayLimit
             ?? 6;
 
+        var defaultClassGroupMinimizeGaps =
+            organizationSchedulingPreferences?.ClassGroupMinimizeGaps
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultClassGroupAvoidSingleLessonDay =
+            organizationSchedulingPreferences?.ClassGroupAvoidSingleLessonDay
+            ?? SchedulingPreferenceLevel.Disabled;
+
+        var defaultClassGroupMaxConsecutiveLessons =
+            organizationSchedulingPreferences?.ClassGroupMaxConsecutiveLessons
+            ?? SchedulingPreferenceLevel.Medium;
+
+        var defaultClassGroupMaxConsecutiveLessonsLimit =
+            organizationSchedulingPreferences?.ClassGroupMaxConsecutiveLessonsLimit
+            ?? 6;
+
+        var defaultClassGroupMaxLessonsPerDay =
+            organizationSchedulingPreferences?.ClassGroupMaxLessonsPerDay
+            ?? SchedulingPreferenceLevel.High;
+
+        var defaultClassGroupMaxLessonsPerDayLimit =
+            organizationSchedulingPreferences?.ClassGroupMaxLessonsPerDayLimit
+            ?? 8;
+
         var teacherPreferenceOverrides =
             await _context.TeacherSchedulingPreferences
                 .AsNoTracking()
@@ -189,6 +213,53 @@ public class TimetableProblemBuilderService
                 })
                 .ToList();
 
+        var classGroupPreferenceOverrides =
+            await _context.ClassGroupSchedulingPreferences
+                .AsNoTracking()
+                .Where(item =>
+                    item.ClassGroup.OrganizationId == organizationId)
+                .ToDictionaryAsync(
+                    item => item.ClassGroupId);
+
+        var classGroupSchedulingPreferences =
+            classGroups
+                .Select(classGroup =>
+                {
+                    classGroupPreferenceOverrides.TryGetValue(
+                        classGroup.Id,
+                        out var overrideValue);
+
+                    return new ClassGroupSchedulingPreferenceInput
+                    {
+                        ClassGroupId = classGroup.Id,
+
+                        MinimizeGaps =
+                            overrideValue?.MinimizeGaps
+                            ?? defaultClassGroupMinimizeGaps,
+
+                        AvoidSingleLessonDay =
+                            overrideValue?.AvoidSingleLessonDay
+                            ?? defaultClassGroupAvoidSingleLessonDay,
+
+                        MaxConsecutiveLessons =
+                            overrideValue?.MaxConsecutiveLessons
+                            ?? defaultClassGroupMaxConsecutiveLessons,
+
+                        MaxConsecutiveLessonsLimit =
+                            overrideValue?.MaxConsecutiveLessonsLimit
+                            ?? defaultClassGroupMaxConsecutiveLessonsLimit,
+
+                        MaxLessonsPerDay =
+                            overrideValue?.MaxLessonsPerDay
+                            ?? defaultClassGroupMaxLessonsPerDay,
+
+                        MaxLessonsPerDayLimit =
+                            overrideValue?.MaxLessonsPerDayLimit
+                            ?? defaultClassGroupMaxLessonsPerDayLimit
+                    };
+                })
+                .ToList();
+
         ValidationResult validate = ValidateData(
             teachers,
             classGroups,
@@ -215,6 +286,7 @@ public class TimetableProblemBuilderService
             SubjectTimeSlotPreferences = subjectTimeSlotPreferences,
 
             TeacherSchedulingPreferences = teacherSchedulingPreferences,
+            ClassGroupSchedulingPreferences = classGroupSchedulingPreferences,
 
             DaysPerWeek = 5,
             SlotsPerDay = 8,

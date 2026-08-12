@@ -20,7 +20,7 @@
                         <div class="hero-badge">Organization scheduling</div>
                         <h1>Scheduling defaults</h1>
                         <p class="hero-subtitle">
-                            Configure default scheduling preferences inherited by teachers.
+                            Configure default scheduling preferences inherited by teachers and classes.
                         </p>
                         <p id="organizationName" class="hero-tech">
                             Loading organization...
@@ -87,6 +87,61 @@
                                step="1" />
                     </div>
                 </div>
+
+
+            <section class="scheduling-defaults-group">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Class scheduling defaults</h2>
+                        <p>
+                            Individual class overrides remain unchanged.
+                            Classes set to Default inherit the values below.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="classGroupMinimizeGaps">Minimize gaps</label>
+                        <select id="classGroupMinimizeGaps"></select>
+                        <small>Prefer fewer empty slots between the first and last lesson of a class day.</small>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="classGroupAvoidSingleLessonDay">Avoid single-lesson day</label>
+                        <select id="classGroupAvoidSingleLessonDay"></select>
+                        <small>Discourage class days containing exactly one lesson.</small>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="classGroupMaxConsecutiveLessons">Max consecutive lessons - importance</label>
+                        <select id="classGroupMaxConsecutiveLessons"></select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="classGroupMaxConsecutiveLessonsLimit">Max consecutive lessons - limit</label>
+                        <input id="classGroupMaxConsecutiveLessonsLimit"
+                               type="number"
+                               min="1"
+                               max="8"
+                               step="1" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="classGroupMaxLessonsPerDay">Max lessons per day - importance</label>
+                        <select id="classGroupMaxLessonsPerDay"></select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="classGroupMaxLessonsPerDayLimit">Max lessons per day - limit</label>
+                        <input id="classGroupMaxLessonsPerDayLimit"
+                               type="number"
+                               min="1"
+                               max="8"
+                               step="1" />
+                    </div>
+                </div>
+            </section>
 
                 <div class="form-actions">
                     <button id="saveOrganizationPreferencesButton"

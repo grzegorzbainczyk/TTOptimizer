@@ -261,6 +261,25 @@ function renderClasses(classes) {
             window.location.href = url;
         });
 
+
+        const preferencesButton =
+            document.createElement("button");
+
+        preferencesButton.type = "button";
+        preferencesButton.className =
+            "small-button teacher-action-button class-preferences-button";
+        preferencesButton.textContent = "Preferences";
+
+        preferencesButton.addEventListener("click", () => {
+            const url =
+                "class-preferences.html" +
+                `?classGroupId=${encodeURIComponent(
+                    classGroup.id
+                )}`;
+
+            window.location.href = url;
+        });
+
         const deleteButton =
             document.createElement("button");
 
@@ -285,6 +304,7 @@ function renderClasses(classes) {
         actionsContainer.append(
             editButton,
             availabilityButton,
+            preferencesButton,
             deleteButton
         );
 

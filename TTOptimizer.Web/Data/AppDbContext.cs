@@ -32,6 +32,7 @@ namespace TTOptimizer.Web.Data
 
         public DbSet<OrganizationSchedulingPreferences> OrganizationSchedulingPreferences { get; set; }
         public DbSet<TeacherSchedulingPreferences> TeacherSchedulingPreferences { get; set; }
+        public DbSet<ClassGroupSchedulingPreferences> ClassGroupSchedulingPreferences { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -247,6 +248,24 @@ namespace TTOptimizer.Web.Data
                 entity.Property(item => item.TeacherMaxLessonsPerDayLimit)
                     .HasDefaultValue(6);
 
+                entity.Property(item => item.ClassGroupMinimizeGaps)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Medium);
+
+                entity.Property(item => item.ClassGroupAvoidSingleLessonDay)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Disabled);
+
+                entity.Property(item => item.ClassGroupMaxConsecutiveLessons)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Medium);
+
+                entity.Property(item => item.ClassGroupMaxConsecutiveLessonsLimit)
+                    .HasDefaultValue(6);
+
+                entity.Property(item => item.ClassGroupMaxLessonsPerDay)
+                    .HasDefaultValue(SchedulingPreferenceLevel.High);
+
+                entity.Property(item => item.ClassGroupMaxLessonsPerDayLimit)
+                    .HasDefaultValue(8);
+
                 entity.ToTable(table =>
                 {
                     table.HasCheckConstraint(
@@ -256,6 +275,14 @@ namespace TTOptimizer.Web.Data
                     table.HasCheckConstraint(
                         "CK_OrganizationSchedulingPreferences_MaxLessonsPerDayLimit",
                         "\"TeacherMaxLessonsPerDayLimit\" >= 1 AND \"TeacherMaxLessonsPerDayLimit\" <= 8");
+
+                    table.HasCheckConstraint(
+                        "CK_OrganizationSchedulingPreferences_ClassGroupMaxConsecutiveLessonsLimit",
+                        "\"ClassGroupMaxConsecutiveLessonsLimit\" >= 1 AND \"ClassGroupMaxConsecutiveLessonsLimit\" <= 8");
+
+                    table.HasCheckConstraint(
+                        "CK_OrganizationSchedulingPreferences_ClassGroupMaxLessonsPerDayLimit",
+                        "\"ClassGroupMaxLessonsPerDayLimit\" >= 1 AND \"ClassGroupMaxLessonsPerDayLimit\" <= 8");
                 });
             });
 
@@ -277,6 +304,28 @@ namespace TTOptimizer.Web.Data
 
                     table.HasCheckConstraint(
                         "CK_TeacherSchedulingPreferences_MaxLessonsPerDayLimit",
+                        "\"MaxLessonsPerDayLimit\" IS NULL OR (\"MaxLessonsPerDayLimit\" >= 1 AND \"MaxLessonsPerDayLimit\" <= 8)");
+                });
+            });
+
+            modelBuilder.Entity<ClassGroupSchedulingPreferences>(entity =>
+            {
+                entity.HasIndex(item => item.ClassGroupId)
+                    .IsUnique();
+
+                entity.HasOne(item => item.ClassGroup)
+                    .WithMany()
+                    .HasForeignKey(item => item.ClassGroupId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.ToTable(table =>
+                {
+                    table.HasCheckConstraint(
+                        "CK_ClassGroupSchedulingPreferences_MaxConsecutiveLessonsLimit",
+                        "\"MaxConsecutiveLessonsLimit\" IS NULL OR (\"MaxConsecutiveLessonsLimit\" >= 1 AND \"MaxConsecutiveLessonsLimit\" <= 8)");
+
+                    table.HasCheckConstraint(
+                        "CK_ClassGroupSchedulingPreferences_MaxLessonsPerDayLimit",
                         "\"MaxLessonsPerDayLimit\" IS NULL OR (\"MaxLessonsPerDayLimit\" >= 1 AND \"MaxLessonsPerDayLimit\" <= 8)");
                 });
             });

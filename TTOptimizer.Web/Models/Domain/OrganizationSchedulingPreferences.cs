@@ -22,5 +22,22 @@ public class OrganizationSchedulingPreferences
 
     public int TeacherMaxLessonsPerDayLimit { get; set; } = 6;
 
+
+    public SchedulingPreferenceLevel ClassGroupMinimizeGaps { get; set; }
+        = SchedulingPreferenceLevel.Medium;
+
+    public SchedulingPreferenceLevel ClassGroupAvoidSingleLessonDay { get; set; }
+        = SchedulingPreferenceLevel.Disabled;
+
+    public SchedulingPreferenceLevel ClassGroupMaxConsecutiveLessons { get; set; }
+        = SchedulingPreferenceLevel.Medium;
+
+    public int ClassGroupMaxConsecutiveLessonsLimit { get; set; } = 6;
+
+    public SchedulingPreferenceLevel ClassGroupMaxLessonsPerDay { get; set; }
+        = SchedulingPreferenceLevel.High;
+
+    public int ClassGroupMaxLessonsPerDayLimit { get; set; } = 8;
+
     public Organization Organization { get; set; } = null!;
 }
