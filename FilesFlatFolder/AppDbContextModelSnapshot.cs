@@ -76,13 +76,16 @@ namespace TTOptimizer.Web.Migrations
                     b.Property<int?>("AppUserId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ClassGroupId")
+                    b.Property<int?>("ClassGroupId")
                         .HasColumnType("integer");
 
                     b.Property<int>("HoursPerWeek")
                         .HasColumnType("integer");
 
                     b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("StudentGroupId")
                         .HasColumnType("integer");
 
                     b.Property<int>("SubjectId")
@@ -98,6 +101,8 @@ namespace TTOptimizer.Web.Migrations
                     b.HasIndex("ClassGroupId");
 
                     b.HasIndex("OrganizationId");
+
+                    b.HasIndex("StudentGroupId");
 
                     b.HasIndex("SubjectId");
 
@@ -390,6 +395,14 @@ namespace TTOptimizer.Web.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("DirectorName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -621,6 +634,89 @@ namespace TTOptimizer.Web.Migrations
                     b.ToTable("ScheduleConstraints");
                 });
 
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ClassGroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DivisionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassGroupId")
+                        .IsUnique()
+                        .HasFilter("\"Type\" = 0");
+
+                    b.HasIndex("DivisionId");
+
+                    b.HasIndex("OrganizationId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("StudentGroups");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroupDivision", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassGroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("ClassGroupId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("StudentGroupDivisions");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroupMember", b =>
+                {
+                    b.Property<int>("StudentGroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MemberGroupId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("StudentGroupId", "MemberGroupId");
+
+                    b.HasIndex("MemberGroupId");
+
+                    b.ToTable("StudentGroupMembers");
+                });
+
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.SubjectSchedulingPreferences", b =>
                 {
                     b.Property<int>("Id")
@@ -848,14 +944,18 @@ namespace TTOptimizer.Web.Migrations
                     b.HasOne("ClassGroup", "ClassGroup")
                         .WithMany()
                         .HasForeignKey("ClassGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TTOptimizer.Web.Models.Domain.Organization", "Organization")
                         .WithMany("LessonRequirements")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("TTOptimizer.Web.Models.Domain.StudentGroup", "StudentGroup")
+                        .WithMany()
+                        .HasForeignKey("StudentGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Subject", "Subject")
                         .WithMany()
@@ -872,6 +972,8 @@ namespace TTOptimizer.Web.Migrations
                     b.Navigation("ClassGroup");
 
                     b.Navigation("Organization");
+
+                    b.Navigation("StudentGroup");
 
                     b.Navigation("Subject");
 
@@ -1054,6 +1156,69 @@ namespace TTOptimizer.Web.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroup", b =>
+                {
+                    b.HasOne("ClassGroup", "ClassGroup")
+                        .WithMany("StudentGroups")
+                        .HasForeignKey("ClassGroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TTOptimizer.Web.Models.Domain.StudentGroupDivision", "Division")
+                        .WithMany("StudentGroups")
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TTOptimizer.Web.Models.Domain.Organization", "Organization")
+                        .WithMany("StudentGroups")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassGroup");
+
+                    b.Navigation("Division");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroupDivision", b =>
+                {
+                    b.HasOne("ClassGroup", "ClassGroup")
+                        .WithMany()
+                        .HasForeignKey("ClassGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TTOptimizer.Web.Models.Domain.Organization", "Organization")
+                        .WithMany("StudentGroupDivisions")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassGroup");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroupMember", b =>
+                {
+                    b.HasOne("TTOptimizer.Web.Models.Domain.StudentGroup", "MemberGroup")
+                        .WithMany("MemberOf")
+                        .HasForeignKey("MemberGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TTOptimizer.Web.Models.Domain.StudentGroup", "StudentGroup")
+                        .WithMany("Members")
+                        .HasForeignKey("StudentGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MemberGroup");
+
+                    b.Navigation("StudentGroup");
+                });
+
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.SubjectSchedulingPreferences", b =>
                 {
                     b.HasOne("Subject", "Subject")
@@ -1113,6 +1278,11 @@ namespace TTOptimizer.Web.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("ClassGroup", b =>
+                {
+                    b.Navigation("StudentGroups");
+                });
+
             modelBuilder.Entity("OptimizationRun", b =>
                 {
                     b.Navigation("ScheduledLessons");
@@ -1147,9 +1317,25 @@ namespace TTOptimizer.Web.Migrations
 
                     b.Navigation("Rooms");
 
+                    b.Navigation("StudentGroupDivisions");
+
+                    b.Navigation("StudentGroups");
+
                     b.Navigation("Subjects");
 
                     b.Navigation("Teachers");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroup", b =>
+                {
+                    b.Navigation("MemberOf");
+
+                    b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroupDivision", b =>
+                {
+                    b.Navigation("StudentGroups");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Models.Domain;
 
 namespace TTOptimizer.Web.Data;
@@ -117,6 +117,10 @@ public class DemoDataSeeder
             .Where(x => x.OrganizationId == organizationId)
             .ToListAsync();
 
+        var buildings = await _context.Buildings
+            .Where(x => x.OrganizationId == organizationId)
+            .ToListAsync();
+
         var subjects = await _context.Subjects
             .Where(x => x.OrganizationId == organizationId)
             .ToListAsync();
@@ -135,6 +139,7 @@ public class DemoDataSeeder
 
         _context.ClassGroups.RemoveRange(classGroups);
         _context.Rooms.RemoveRange(rooms);
+        _context.Buildings.RemoveRange(buildings);
         _context.Subjects.RemoveRange(subjects);
         _context.Teachers.RemoveRange(teachers);
 
@@ -171,15 +176,23 @@ public class DemoDataSeeder
             OrganizationId = organizationId
         };
 
+        var mainBuilding = new Building
+        {
+            Name = "Main Building",
+            OrganizationId = organizationId
+        };
+
         var room101 = new Room
         {
             Name = "101",
+            Building = mainBuilding,
             OrganizationId = organizationId
         };
 
         var room102 = new Room
         {
             Name = "102",
+            Building = mainBuilding,
             OrganizationId = organizationId
         };
 
@@ -224,6 +237,8 @@ public class DemoDataSeeder
             jan,
             piotr
         );
+
+        _context.Buildings.Add(mainBuilding);
 
         _context.Rooms.AddRange(
             room101,
@@ -347,6 +362,18 @@ public class DemoDataSeeder
                 "Physical Education"
             });
 
+        var mainBuilding = new Building
+        {
+            Name = "Main Building",
+            OrganizationId = organizationId
+        };
+
+        var sportsBuilding = new Building
+        {
+            Name = "Sports Building",
+            OrganizationId = organizationId
+        };
+
         var rooms = CreateRooms(
             organizationId,
             new[]
@@ -363,6 +390,13 @@ public class DemoDataSeeder
                 "Gym"
             });
 
+        foreach (var room in rooms.Values)
+        {
+            room.Building = room.Name == "Gym"
+                ? sportsBuilding
+                : mainBuilding;
+        }
+
         ConfigureHardDemoRooms(rooms, subjects);
 
         ConfigureHardDemoClassGroups(
@@ -372,6 +406,11 @@ public class DemoDataSeeder
         );
 
         _context.Teachers.AddRange(teachers.Values);
+        _context.Buildings.AddRange(
+            mainBuilding,
+            sportsBuilding
+        );
+
         _context.Rooms.AddRange(rooms.Values);
         _context.ClassGroups.AddRange(classGroups.Values);
         _context.Subjects.AddRange(subjects.Values);

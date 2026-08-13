@@ -8,6 +8,7 @@
 
 using TeacherId = int;
 using ClassGroupId = int;
+using StudentGroupId = int;
 using SubjectId = int;
 using RoomId = int;
 using LessonRequirementId = int;
@@ -138,6 +139,29 @@ struct ClassGroup
     int maxLessonsPerDay{};
 };
 
+
+enum class StudentGroupType
+{
+    WholeClass,
+    Subgroup,
+    Combined,
+    Individual
+};
+
+struct StudentGroup
+{
+    StudentGroupId id{};
+    std::string name;
+    StudentGroupType type{ StudentGroupType::WholeClass };
+    std::vector<ClassGroupId> classGroupIds;
+};
+
+struct StudentGroupConflict
+{
+    StudentGroupId firstStudentGroupId{};
+    StudentGroupId secondStudentGroupId{};
+};
+
 struct Room
 {
     RoomId id{};
@@ -150,6 +174,7 @@ struct LessonRequirement
 {
     LessonRequirementId id{};
     ClassGroupId classGroupId{};
+    StudentGroupId studentGroupId{};
     SubjectId subjectId{};
     TeacherId teacherId{};
     int weeklyCount{};
@@ -192,6 +217,7 @@ struct ScheduledLesson
     LessonRequirementId requirementId{};
 
     ClassGroupId classGroupId{};
+    StudentGroupId studentGroupId{};
     SubjectId subjectId{};
     TeacherId teacherId{};
     RoomId roomId{};

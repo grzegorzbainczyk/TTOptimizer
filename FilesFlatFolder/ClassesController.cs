@@ -117,6 +117,14 @@ public class ClassesController : ControllerBase
 
         _db.ClassGroups.Add(classGroup);
 
+        _db.StudentGroups.Add(new StudentGroup
+        {
+            OrganizationId = organizationId,
+            Name = normalizedName,
+            Type = StudentGroupType.WholeClass,
+            ClassGroup = classGroup
+        });
+
         try
         {
             await _db.SaveChangesAsync();

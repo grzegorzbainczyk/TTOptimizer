@@ -21,6 +21,10 @@ namespace TTOptimizer.Web.Data
 
         public DbSet<LessonRequirement> LessonRequirements => Set<LessonRequirement>();
 
+        public DbSet<StudentGroup> StudentGroups => Set<StudentGroup>();
+        public DbSet<StudentGroupDivision> StudentGroupDivisions => Set<StudentGroupDivision>();
+        public DbSet<StudentGroupMember> StudentGroupMembers => Set<StudentGroupMember>();
+
         public DbSet<OptimizationRun> OptimizationRuns => Set<OptimizationRun>();
         public DbSet<ScheduledLesson> ScheduledLessons => Set<ScheduledLesson>();
         public DbSet<ScheduleConstraint> ScheduleConstraints { get; set; }
@@ -66,10 +70,18 @@ namespace TTOptimizer.Web.Data
                 .HasIndex(x => x.UserName)
                 .IsUnique();
 
-            modelBuilder.Entity<Organization>()
-                .Property(x => x.Name)
-                .IsRequired()
-                .HasMaxLength(200);
+            modelBuilder.Entity<Organization>(entity =>
+            {
+                entity.Property(x => x.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(x => x.Address)
+                    .HasMaxLength(500);
+
+                entity.Property(x => x.DirectorName)
+                    .HasMaxLength(200);
+            });
 
             modelBuilder.Entity<AppUserOrganization>()
                 .Property(x => x.Role)
@@ -175,9 +187,89 @@ namespace TTOptimizer.Web.Data
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            modelBuilder.Entity<LessonRequirement>()
-                .Property(x => x.HoursPerWeek)
-                .IsRequired();
+            modelBuilder.Entity<StudentGroupDivision>(entity =>
+            {
+                entity.Property(item => item.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.HasIndex(item => new { item.ClassGroupId, item.Name })
+                    .IsUnique();
+
+                entity.HasOne(item => item.Organization)
+                    .WithMany(item => item.StudentGroupDivisions)
+                    .HasForeignKey(item => item.OrganizationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(item => item.ClassGroup)
+                    .WithMany()
+                    .HasForeignKey(item => item.ClassGroupId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<StudentGroup>(entity =>
+            {
+                entity.Property(item => item.Name)
+                    .IsRequired()
+                    .HasMaxLength(150);
+
+                entity.HasIndex(item => new { item.OrganizationId, item.Name })
+                    .IsUnique();
+
+                entity.HasIndex(item => item.ClassGroupId)
+                    .IsUnique()
+                    .HasFilter("\"Type\" = 0");
+
+                entity.HasOne(item => item.Organization)
+                    .WithMany(item => item.StudentGroups)
+                    .HasForeignKey(item => item.OrganizationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(item => item.ClassGroup)
+                    .WithMany(item => item.StudentGroups)
+                    .HasForeignKey(item => item.ClassGroupId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(item => item.Division)
+                    .WithMany(item => item.StudentGroups)
+                    .HasForeignKey(item => item.DivisionId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<StudentGroupMember>(entity =>
+            {
+                entity.HasKey(item => new
+                {
+                    item.StudentGroupId,
+                    item.MemberGroupId
+                });
+
+                entity.HasOne(item => item.StudentGroup)
+                    .WithMany(item => item.Members)
+                    .HasForeignKey(item => item.StudentGroupId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(item => item.MemberGroup)
+                    .WithMany(item => item.MemberOf)
+                    .HasForeignKey(item => item.MemberGroupId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<LessonRequirement>(entity =>
+            {
+                entity.Property(item => item.HoursPerWeek)
+                    .IsRequired();
+
+                entity.HasOne(item => item.StudentGroup)
+                    .WithMany()
+                    .HasForeignKey(item => item.StudentGroupId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(item => item.ClassGroup)
+                    .WithMany()
+                    .HasForeignKey(item => item.ClassGroupId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
             modelBuilder.Entity<OptimizationRun>()
                 .Property(x => x.CreatedAtUtc)

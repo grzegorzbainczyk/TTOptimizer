@@ -1561,3 +1561,64 @@ border: var(--border-thin) solid var(--color-border-neutral);
 .student-group-combined-card { grid-column:1 / -1; }
 #studentGroupsMessage { margin:18px 28px 0; }
 @media (max-width:1000px){.student-group-actions-grid{grid-template-columns:1fr}.student-groups-tree{grid-template-columns:1fr}}
+
+
+/* =========================================================
+   School information
+   ========================================================= */
+
+.hero-organization-name {
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.88rem;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+}
+
+.school-card {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.school-form-section {
+    padding: 24px;
+}
+
+.school-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.school-form-grid .form-field-full-width {
+    grid-column: 1 / -1;
+}
+
+.school-form-grid input,
+.school-form-grid textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.school-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.school-help-text {
+    margin: 8px 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+    .school-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .school-form-grid .form-field-full-width {
+        grid-column: auto;
+    }
+}

@@ -141,6 +141,8 @@ struct TimetableProblem
     std::vector<ClassGroup> classGroups;
     std::vector<Subject> subjects;
     std::vector<Room> rooms;
+    std::vector<StudentGroup> studentGroups;
+    std::vector<StudentGroupConflict> studentGroupConflicts;
     std::vector<LessonRequirement> lessonRequirements;
 
     std::vector<TeacherTimeSlotPreference>

@@ -12,8 +12,8 @@ using TTOptimizer.Web.Data;
 namespace TTOptimizer.Web.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260811210612_AddTeacherSchedulingPreferences")]
-    partial class AddTeacherSchedulingPreferences
+    [Migration("20260813125132_AddSchoolInformation")]
+    partial class AddSchoolInformation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,13 +79,16 @@ namespace TTOptimizer.Web.Migrations
                     b.Property<int?>("AppUserId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ClassGroupId")
+                    b.Property<int?>("ClassGroupId")
                         .HasColumnType("integer");
 
                     b.Property<int>("HoursPerWeek")
                         .HasColumnType("integer");
 
                     b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("StudentGroupId")
                         .HasColumnType("integer");
 
                     b.Property<int>("SubjectId")
@@ -101,6 +104,8 @@ namespace TTOptimizer.Web.Migrations
                     b.HasIndex("ClassGroupId");
 
                     b.HasIndex("OrganizationId");
+
+                    b.HasIndex("StudentGroupId");
 
                     b.HasIndex("SubjectId");
 
@@ -310,6 +315,48 @@ namespace TTOptimizer.Web.Migrations
                     b.ToTable("AppUserOrganizations");
                 });
 
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.ClassGroupSchedulingPreferences", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AvoidSingleLessonDay")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ClassGroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MaxConsecutiveLessons")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MaxConsecutiveLessonsLimit")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MaxLessonsPerDay")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MaxLessonsPerDayLimit")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MinimizeGaps")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassGroupId")
+                        .IsUnique();
+
+                    b.ToTable("ClassGroupSchedulingPreferences", t =>
+                        {
+                            t.HasCheckConstraint("CK_ClassGroupSchedulingPreferences_MaxConsecutiveLessonsLimit", "\"MaxConsecutiveLessonsLimit\" IS NULL OR (\"MaxConsecutiveLessonsLimit\" >= 1 AND \"MaxConsecutiveLessonsLimit\" <= 8)");
+
+                            t.HasCheckConstraint("CK_ClassGroupSchedulingPreferences_MaxLessonsPerDayLimit", "\"MaxLessonsPerDayLimit\" IS NULL OR (\"MaxLessonsPerDayLimit\" >= 1 AND \"MaxLessonsPerDayLimit\" <= 8)");
+                        });
+                });
+
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.ClassGroupTimeSlotPreference", b =>
                 {
                     b.Property<int>("Id")
@@ -351,6 +398,14 @@ namespace TTOptimizer.Web.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("DirectorName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -369,8 +424,88 @@ namespace TTOptimizer.Web.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("ClassGroupAvoidSingleLessonDay")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("ClassGroupMaxConsecutiveLessons")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
+                    b.Property<int>("ClassGroupMaxConsecutiveLessonsLimit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(6);
+
+                    b.Property<int>("ClassGroupMaxLessonsPerDay")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(3);
+
+                    b.Property<int>("ClassGroupMaxLessonsPerDayLimit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(8);
+
+                    b.Property<int>("ClassGroupMinimizeGaps")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
                     b.Property<int>("OrganizationId")
                         .HasColumnType("integer");
+
+                    b.Property<int>("SubjectAvoidDoubleLessons")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("SubjectMaxOccurrencesPerDay")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
+                    b.Property<int>("SubjectMaxOccurrencesPerDayLimit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("SubjectPreferDoubleLessons")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("SubjectSpreadAcrossDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
+                    b.Property<int>("TeacherAvoidSingleLessonDay")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("TeacherMaxConsecutiveLessons")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
+                    b.Property<int>("TeacherMaxConsecutiveLessonsLimit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(4);
+
+                    b.Property<int>("TeacherMaxLessonsPerDay")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
+                    b.Property<int>("TeacherMaxLessonsPerDayLimit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(6);
 
                     b.Property<int>("TeacherMinimizeGaps")
                         .ValueGeneratedOnAdd()
@@ -382,7 +517,18 @@ namespace TTOptimizer.Web.Migrations
                     b.HasIndex("OrganizationId")
                         .IsUnique();
 
-                    b.ToTable("OrganizationSchedulingPreferences");
+                    b.ToTable("OrganizationSchedulingPreferences", t =>
+                        {
+                            t.HasCheckConstraint("CK_OrganizationSchedulingPreferences_ClassGroupMaxConsecutiveLessonsLimit", "\"ClassGroupMaxConsecutiveLessonsLimit\" >= 1 AND \"ClassGroupMaxConsecutiveLessonsLimit\" <= 8");
+
+                            t.HasCheckConstraint("CK_OrganizationSchedulingPreferences_ClassGroupMaxLessonsPerDayLimit", "\"ClassGroupMaxLessonsPerDayLimit\" >= 1 AND \"ClassGroupMaxLessonsPerDayLimit\" <= 8");
+
+                            t.HasCheckConstraint("CK_OrganizationSchedulingPreferences_MaxConsecutiveLessonsLimit", "\"TeacherMaxConsecutiveLessonsLimit\" >= 1 AND \"TeacherMaxConsecutiveLessonsLimit\" <= 8");
+
+                            t.HasCheckConstraint("CK_OrganizationSchedulingPreferences_MaxLessonsPerDayLimit", "\"TeacherMaxLessonsPerDayLimit\" >= 1 AND \"TeacherMaxLessonsPerDayLimit\" <= 8");
+
+                            t.HasCheckConstraint("CK_OrganizationSchedulingPreferences_SubjectMaxOccurrencesPerDayLimit", "\"SubjectMaxOccurrencesPerDayLimit\" >= 1 AND \"SubjectMaxOccurrencesPerDayLimit\" <= 8");
+                        });
                 });
 
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.RoomTimeSlotPreference", b =>
@@ -491,6 +637,126 @@ namespace TTOptimizer.Web.Migrations
                     b.ToTable("ScheduleConstraints");
                 });
 
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ClassGroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DivisionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassGroupId")
+                        .IsUnique()
+                        .HasFilter("\"Type\" = 0");
+
+                    b.HasIndex("DivisionId");
+
+                    b.HasIndex("OrganizationId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("StudentGroups");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroupDivision", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassGroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("ClassGroupId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("StudentGroupDivisions");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroupMember", b =>
+                {
+                    b.Property<int>("StudentGroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MemberGroupId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("StudentGroupId", "MemberGroupId");
+
+                    b.HasIndex("MemberGroupId");
+
+                    b.ToTable("StudentGroupMembers");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.SubjectSchedulingPreferences", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AvoidDoubleLessons")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MaxOccurrencesPerDay")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MaxOccurrencesPerDayLimit")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PreferDoubleLessons")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SpreadAcrossDays")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubjectId")
+                        .IsUnique();
+
+                    b.ToTable("SubjectSchedulingPreferences", t =>
+                        {
+                            t.HasCheckConstraint("CK_SubjectSchedulingPreferences_MaxOccurrencesPerDayLimit", "\"MaxOccurrencesPerDayLimit\" IS NULL OR (\"MaxOccurrencesPerDayLimit\" >= 1 AND \"MaxOccurrencesPerDayLimit\" <= 8)");
+                        });
+                });
+
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.SubjectTimeSlotPreference", b =>
                 {
                     b.Property<int>("Id")
@@ -532,6 +798,21 @@ namespace TTOptimizer.Web.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AvoidSingleLessonDay")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MaxConsecutiveLessons")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MaxConsecutiveLessonsLimit")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MaxLessonsPerDay")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MaxLessonsPerDayLimit")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("MinimizeGaps")
                         .HasColumnType("integer");
 
@@ -543,7 +824,12 @@ namespace TTOptimizer.Web.Migrations
                     b.HasIndex("TeacherId")
                         .IsUnique();
 
-                    b.ToTable("TeacherSchedulingPreferences");
+                    b.ToTable("TeacherSchedulingPreferences", t =>
+                        {
+                            t.HasCheckConstraint("CK_TeacherSchedulingPreferences_MaxConsecutiveLessonsLimit", "\"MaxConsecutiveLessonsLimit\" IS NULL OR (\"MaxConsecutiveLessonsLimit\" >= 1 AND \"MaxConsecutiveLessonsLimit\" <= 8)");
+
+                            t.HasCheckConstraint("CK_TeacherSchedulingPreferences_MaxLessonsPerDayLimit", "\"MaxLessonsPerDayLimit\" IS NULL OR (\"MaxLessonsPerDayLimit\" >= 1 AND \"MaxLessonsPerDayLimit\" <= 8)");
+                        });
                 });
 
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.TeacherTimeSlotPreference", b =>
@@ -661,14 +947,18 @@ namespace TTOptimizer.Web.Migrations
                     b.HasOne("ClassGroup", "ClassGroup")
                         .WithMany()
                         .HasForeignKey("ClassGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TTOptimizer.Web.Models.Domain.Organization", "Organization")
                         .WithMany("LessonRequirements")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("TTOptimizer.Web.Models.Domain.StudentGroup", "StudentGroup")
+                        .WithMany()
+                        .HasForeignKey("StudentGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Subject", "Subject")
                         .WithMany()
@@ -685,6 +975,8 @@ namespace TTOptimizer.Web.Migrations
                     b.Navigation("ClassGroup");
 
                     b.Navigation("Organization");
+
+                    b.Navigation("StudentGroup");
 
                     b.Navigation("Subject");
 
@@ -812,6 +1104,17 @@ namespace TTOptimizer.Web.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.ClassGroupSchedulingPreferences", b =>
+                {
+                    b.HasOne("ClassGroup", "ClassGroup")
+                        .WithMany()
+                        .HasForeignKey("ClassGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassGroup");
+                });
+
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.ClassGroupTimeSlotPreference", b =>
                 {
                     b.HasOne("ClassGroup", "ClassGroup")
@@ -854,6 +1157,80 @@ namespace TTOptimizer.Web.Migrations
                         .IsRequired();
 
                     b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroup", b =>
+                {
+                    b.HasOne("ClassGroup", "ClassGroup")
+                        .WithMany("StudentGroups")
+                        .HasForeignKey("ClassGroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TTOptimizer.Web.Models.Domain.StudentGroupDivision", "Division")
+                        .WithMany("StudentGroups")
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TTOptimizer.Web.Models.Domain.Organization", "Organization")
+                        .WithMany("StudentGroups")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassGroup");
+
+                    b.Navigation("Division");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroupDivision", b =>
+                {
+                    b.HasOne("ClassGroup", "ClassGroup")
+                        .WithMany()
+                        .HasForeignKey("ClassGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TTOptimizer.Web.Models.Domain.Organization", "Organization")
+                        .WithMany("StudentGroupDivisions")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassGroup");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroupMember", b =>
+                {
+                    b.HasOne("TTOptimizer.Web.Models.Domain.StudentGroup", "MemberGroup")
+                        .WithMany("MemberOf")
+                        .HasForeignKey("MemberGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TTOptimizer.Web.Models.Domain.StudentGroup", "StudentGroup")
+                        .WithMany("Members")
+                        .HasForeignKey("StudentGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MemberGroup");
+
+                    b.Navigation("StudentGroup");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.SubjectSchedulingPreferences", b =>
+                {
+                    b.HasOne("Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.SubjectTimeSlotPreference", b =>
@@ -904,6 +1281,11 @@ namespace TTOptimizer.Web.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("ClassGroup", b =>
+                {
+                    b.Navigation("StudentGroups");
+                });
+
             modelBuilder.Entity("OptimizationRun", b =>
                 {
                     b.Navigation("ScheduledLessons");
@@ -938,9 +1320,25 @@ namespace TTOptimizer.Web.Migrations
 
                     b.Navigation("Rooms");
 
+                    b.Navigation("StudentGroupDivisions");
+
+                    b.Navigation("StudentGroups");
+
                     b.Navigation("Subjects");
 
                     b.Navigation("Teachers");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroup", b =>
+                {
+                    b.Navigation("MemberOf");
+
+                    b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.StudentGroupDivision", b =>
+                {
+                    b.Navigation("StudentGroups");
                 });
 #pragma warning restore 612, 618
         }

@@ -20,15 +20,15 @@ public:
         SubjectScheduleStats result;
 
         std::map<
-            ClassGroupSubjectKey,
+            StudentGroupSubjectKey,
             std::vector<std::vector<bool>>>
             occupancy;
 
         for (const LessonRequirement& requirement :
             problem.lessonRequirements)
         {
-            const ClassGroupSubjectKey key{
-                requirement.classGroupId,
+            const StudentGroupSubjectKey key{
+                requirement.studentGroupId,
                 requirement.subjectId
             };
 
@@ -48,7 +48,7 @@ public:
 
         std::map<
             LessonRequirementId,
-            ClassGroupSubjectKey>
+            StudentGroupSubjectKey>
             keyByRequirementId;
 
         for (const LessonRequirement& requirement :
@@ -56,8 +56,8 @@ public:
         {
             keyByRequirementId.emplace(
                 requirement.id,
-                ClassGroupSubjectKey{
-                    requirement.classGroupId,
+                StudentGroupSubjectKey{
+                    requirement.studentGroupId,
                     requirement.subjectId
                 });
         }
@@ -189,7 +189,7 @@ public:
                         dayIndex)] = dayStats;
             }
 
-            result.byClassGroupAndSubject.emplace(
+            result.byStudentGroupAndSubject.emplace(
                 key,
                 std::move(stats));
         }

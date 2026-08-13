@@ -157,6 +157,9 @@ namespace TTOptimizer.Web.Migrations
                     b.Property<int?>("AppUserId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("BuildingId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Info")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
@@ -178,6 +181,8 @@ namespace TTOptimizer.Web.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
+
+                    b.HasIndex("BuildingId");
 
                     b.HasIndex("PreferredSubjectId");
 
@@ -312,6 +317,38 @@ namespace TTOptimizer.Web.Migrations
                     b.ToTable("AppUserOrganizations");
                 });
 
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.Building", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Info")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Buildings");
+                });
+
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.ClassGroupSchedulingPreferences", b =>
                 {
                     b.Property<int>("Id")
@@ -394,6 +431,14 @@ namespace TTOptimizer.Web.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("DirectorName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -993,6 +1038,11 @@ namespace TTOptimizer.Web.Migrations
                         .WithMany("Rooms")
                         .HasForeignKey("AppUserId");
 
+                    b.HasOne("TTOptimizer.Web.Models.Domain.Building", "Building")
+                        .WithMany("Rooms")
+                        .HasForeignKey("BuildingId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("TTOptimizer.Web.Models.Domain.Organization", "Organization")
                         .WithMany("Rooms")
                         .HasForeignKey("OrganizationId")
@@ -1008,6 +1058,8 @@ namespace TTOptimizer.Web.Migrations
                         .WithMany()
                         .HasForeignKey("RestrictedToSubjectId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Building");
 
                     b.Navigation("Organization");
 
@@ -1089,6 +1141,17 @@ namespace TTOptimizer.Web.Migrations
                         .IsRequired();
 
                     b.Navigation("AppUser");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.Building", b =>
+                {
+                    b.HasOne("TTOptimizer.Web.Models.Domain.Organization", "Organization")
+                        .WithMany("Buildings")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Organization");
                 });
@@ -1297,9 +1360,16 @@ namespace TTOptimizer.Web.Migrations
                     b.Navigation("Teachers");
                 });
 
+            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.Building", b =>
+                {
+                    b.Navigation("Rooms");
+                });
+
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.Organization", b =>
                 {
                     b.Navigation("AppUserOrganizations");
+
+                    b.Navigation("Buildings");
 
                     b.Navigation("ClassGroups");
 

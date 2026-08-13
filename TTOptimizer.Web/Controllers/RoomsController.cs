@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
@@ -40,6 +40,11 @@ public class RoomsController : ControllerBase
                 Id = room.Id,
                 Name = room.Name,
                 Info = room.Info,
+
+                BuildingId = room.BuildingId,
+                BuildingName = room.Building != null
+                    ? room.Building.Name
+                    : null,
 
                 RestrictedToSubjectId =
                     room.RestrictedToSubjectId,
@@ -100,6 +105,7 @@ public class RoomsController : ControllerBase
             organizationId,
             request.Name,
             request.Info,
+            request.BuildingId,
             request.RestrictedToSubjectId,
             request.PreferredSubjectId
         );
@@ -132,6 +138,7 @@ public class RoomsController : ControllerBase
             OrganizationId = organizationId,
             Name = normalizedName,
             Info = NormalizeOptionalText(request.Info),
+            BuildingId = request.BuildingId,
 
             RestrictedToSubjectId =
                 request.RestrictedToSubjectId,
@@ -203,6 +210,7 @@ public class RoomsController : ControllerBase
             organizationId,
             request.Name,
             request.Info,
+            request.BuildingId,
             request.RestrictedToSubjectId,
             request.PreferredSubjectId
         );
@@ -234,6 +242,7 @@ public class RoomsController : ControllerBase
 
         room.Name = normalizedName;
         room.Info = NormalizeOptionalText(request.Info);
+        room.BuildingId = request.BuildingId;
 
         room.RestrictedToSubjectId =
             request.RestrictedToSubjectId;
@@ -485,6 +494,7 @@ public class RoomsController : ControllerBase
         int organizationId,
         string? name,
         string? info,
+        int? buildingId,
         int? restrictedToSubjectId,
         int? preferredSubjectId)
     {
@@ -513,6 +523,23 @@ public class RoomsController : ControllerBase
                     "Room information cannot contain more than " +
                     "2000 characters."
             });
+        }
+
+        if (buildingId.HasValue)
+        {
+            var buildingExists = await _db.Buildings
+                .AnyAsync(building =>
+                    building.Id == buildingId.Value &&
+                    building.OrganizationId == organizationId
+                );
+
+            if (!buildingExists)
+            {
+                return BadRequest(new
+                {
+                    message = "The selected building does not exist."
+                });
+            }
         }
 
         if (restrictedToSubjectId.HasValue)
@@ -572,6 +599,11 @@ public class RoomsController : ControllerBase
                 Id = room.Id,
                 Name = room.Name,
                 Info = room.Info,
+
+                BuildingId = room.BuildingId,
+                BuildingName = room.Building != null
+                    ? room.Building.Name
+                    : null,
 
                 RestrictedToSubjectId =
                     room.RestrictedToSubjectId,

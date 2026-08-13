@@ -29,6 +29,21 @@ public class TimetableProblemBuilderService
             .OrderBy(c => c.Id)
             .ToListAsync();
 
+        await EnsureWholeClassStudentGroupsAsync(
+            organizationId,
+            classGroups);
+
+        var studentGroupEntities = await _context.StudentGroups
+            .Where(group => group.OrganizationId == organizationId)
+            .Include(group => group.Members)
+                .ThenInclude(member => member.MemberGroup)
+            .OrderBy(group => group.Id)
+            .ToListAsync();
+
+        var wholeClassGroupByClassId = studentGroupEntities
+            .Where(group => group.Type == StudentGroupType.WholeClass && group.ClassGroupId.HasValue)
+            .ToDictionary(group => group.ClassGroupId!.Value, group => group.Id);
+
         var subjects = await _context.Subjects
             .Where(s => s.OrganizationId == organizationId)
             .OrderBy(s => s.Id)
@@ -43,6 +58,25 @@ public class TimetableProblemBuilderService
             .Where(lr => lr.OrganizationId == organizationId)
             .OrderBy(lr => lr.Id)
             .ToListAsync();
+
+        foreach (var requirement in lessonRequirements)
+        {
+            if (requirement.StudentGroupId.HasValue)
+            {
+                continue;
+            }
+
+            if (requirement.ClassGroupId.HasValue &&
+                wholeClassGroupByClassId.TryGetValue(
+                    requirement.ClassGroupId.Value,
+                    out var wholeClassStudentGroupId))
+            {
+                requirement.StudentGroupId = wholeClassStudentGroupId;
+            }
+        }
+
+        var studentGroups = BuildStudentGroupInputs(studentGroupEntities);
+        var studentGroupConflicts = BuildStudentGroupConflicts(studentGroupEntities);
 
         var teacherTimeSlotPreferences =
             await _context.TeacherTimeSlotPreferences
@@ -341,6 +375,8 @@ public class TimetableProblemBuilderService
             ClassGroups = classGroups,
             Subjects = subjects,
             Rooms = rooms,
+            StudentGroups = studentGroups,
+            StudentGroupConflicts = studentGroupConflicts,
             LessonRequirements = lessonRequirements,
 
             TeacherTimeSlotPreferences = teacherTimeSlotPreferences,
@@ -358,6 +394,143 @@ public class TimetableProblemBuilderService
         };
 
         return TimetableProblemBuildResult.Ok(problem);
+    }
+
+    private async Task EnsureWholeClassStudentGroupsAsync(
+        int organizationId,
+        IReadOnlyCollection<ClassGroup> classGroups)
+    {
+        var existingClassIds = (await _context.StudentGroups
+            .Where(group =>
+                group.OrganizationId == organizationId &&
+                group.Type == StudentGroupType.WholeClass &&
+                group.ClassGroupId.HasValue)
+            .Select(group => group.ClassGroupId!.Value)
+            .ToListAsync())
+            .ToHashSet();
+
+        foreach (var classGroup in classGroups)
+        {
+            if (existingClassIds.Contains(classGroup.Id))
+            {
+                continue;
+            }
+
+            _context.StudentGroups.Add(new StudentGroup
+            {
+                OrganizationId = organizationId,
+                ClassGroupId = classGroup.Id,
+                Name = classGroup.Name,
+                Type = StudentGroupType.WholeClass
+            });
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    private static List<StudentGroupInput> BuildStudentGroupInputs(
+        IReadOnlyCollection<StudentGroup> groups)
+    {
+        var byId = groups.ToDictionary(group => group.Id);
+
+        List<int> ResolveClassGroupIds(StudentGroup group)
+        {
+            if (group.Type != StudentGroupType.Combined)
+            {
+                return group.ClassGroupId.HasValue
+                    ? new List<int> { group.ClassGroupId.Value }
+                    : new List<int>();
+            }
+
+            return group.Members
+                .Select(member => byId.GetValueOrDefault(member.MemberGroupId))
+                .Where(member => member != null)
+                .SelectMany(member => ResolveClassGroupIds(member!))
+                .Distinct()
+                .OrderBy(id => id)
+                .ToList();
+        }
+
+        return groups.Select(group => new StudentGroupInput
+        {
+            Id = group.Id,
+            Name = group.Name,
+            Type = group.Type,
+            ClassGroupId = group.ClassGroupId,
+            DivisionId = group.DivisionId,
+            ClassGroupIds = ResolveClassGroupIds(group)
+        }).ToList();
+    }
+
+    private static List<StudentGroupConflictInput> BuildStudentGroupConflicts(
+        IReadOnlyCollection<StudentGroup> groups)
+    {
+        var list = groups.OrderBy(group => group.Id).ToList();
+        var byId = list.ToDictionary(group => group.Id);
+
+        bool Conflicts(StudentGroup first, StudentGroup second)
+        {
+            if (first.Id == second.Id)
+            {
+                return true;
+            }
+
+            if (first.Type == StudentGroupType.Combined)
+            {
+                return first.Members.Any(member =>
+                    byId.TryGetValue(member.MemberGroupId, out var memberGroup) &&
+                    Conflicts(memberGroup, second));
+            }
+
+            if (second.Type == StudentGroupType.Combined)
+            {
+                return second.Members.Any(member =>
+                    byId.TryGetValue(member.MemberGroupId, out var memberGroup) &&
+                    Conflicts(first, memberGroup));
+            }
+
+            if (!first.ClassGroupId.HasValue ||
+                first.ClassGroupId != second.ClassGroupId)
+            {
+                return false;
+            }
+
+            if (first.Type == StudentGroupType.Individual &&
+                second.Type == StudentGroupType.Individual)
+            {
+                return false;
+            }
+
+            if (first.Type == StudentGroupType.Subgroup &&
+                second.Type == StudentGroupType.Subgroup &&
+                first.DivisionId.HasValue &&
+                first.DivisionId == second.DivisionId)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        var result = new List<StudentGroupConflictInput>();
+        for (var firstIndex = 0; firstIndex < list.Count; firstIndex++)
+        {
+            for (var secondIndex = firstIndex + 1; secondIndex < list.Count; secondIndex++)
+            {
+                if (!Conflicts(list[firstIndex], list[secondIndex]))
+                {
+                    continue;
+                }
+
+                result.Add(new StudentGroupConflictInput
+                {
+                    FirstStudentGroupId = list[firstIndex].Id,
+                    SecondStudentGroupId = list[secondIndex].Id
+                });
+            }
+        }
+
+        return result;
     }
 
     private static ValidationResult ValidateData(

@@ -46,6 +46,8 @@ public:
         readClassGroups(root, problem);
         readSubjects(root, problem);
         readRooms(root, problem);
+        readStudentGroups(root, problem);
+        readStudentGroupConflicts(root, problem);
         readLessonRequirements(root, problem);
 
         readTimeSlotPreferences(root, problem);
@@ -229,6 +231,43 @@ private:
         }
     }
 
+    static StudentGroupType parseStudentGroupType(const std::string& value)
+    {
+        if (value == "WholeClass") return StudentGroupType::WholeClass;
+        if (value == "Subgroup") return StudentGroupType::Subgroup;
+        if (value == "Combined") return StudentGroupType::Combined;
+        if (value == "Individual") return StudentGroupType::Individual;
+        throw std::runtime_error("Unknown student group type: " + value);
+    }
+
+    static void readStudentGroups(const json& root, TimetableProblem& problem)
+    {
+        if (!root.contains("studentGroups") || !root["studentGroups"].is_array()) return;
+        for (const auto& item : root["studentGroups"])
+        {
+            StudentGroup group;
+            group.id = item.value("id", 0);
+            group.name = item.value("name", "");
+            group.type = parseStudentGroupType(item.value("type", "WholeClass"));
+            if (item.contains("classGroupIds") && item["classGroupIds"].is_array())
+                for (const auto& classId : item["classGroupIds"])
+                    group.classGroupIds.push_back(classId.get<ClassGroupId>());
+            problem.studentGroups.push_back(std::move(group));
+        }
+    }
+
+    static void readStudentGroupConflicts(const json& root, TimetableProblem& problem)
+    {
+        if (!root.contains("studentGroupConflicts") || !root["studentGroupConflicts"].is_array()) return;
+        for (const auto& item : root["studentGroupConflicts"])
+        {
+            StudentGroupConflict conflict;
+            conflict.firstStudentGroupId = item.value("firstStudentGroupId", 0);
+            conflict.secondStudentGroupId = item.value("secondStudentGroupId", 0);
+            problem.studentGroupConflicts.push_back(conflict);
+        }
+    }
+
     static void readLessonRequirements(
         const json& root,
         TimetableProblem& problem)
@@ -245,6 +284,7 @@ private:
             requirement.id = item.value("id", 0);
             requirement.teacherId = item.value("teacherId", 0);
             requirement.classGroupId = item.value("classGroupId", 0);
+            requirement.studentGroupId = item.value("studentGroupId", 0);
             requirement.subjectId = item.value("subjectId", 0);
             requirement.weeklyCount = item.value("lessonsPerWeek", 0);
             problem.lessonRequirements.push_back(requirement);

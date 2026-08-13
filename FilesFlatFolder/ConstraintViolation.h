@@ -14,6 +14,7 @@ enum class ConstraintViolationType
 
     TeacherConflict,
     ClassGroupConflict,
+    StudentGroupConflict,
     RoomConflict,
 
     TeacherGap,
@@ -40,6 +41,8 @@ struct ConstraintViolation
 
     int teacherId{};
     int classGroupId{};
+    int studentGroupId{};
+    int otherStudentGroupId{};
     int roomId{};
     int subjectId{};
 

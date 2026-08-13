@@ -26,7 +26,7 @@
                 </button>
 </nav></div></header>
 <main class="content-card teachers-card">
-<div class="section-header teachers-section-header"><div><h2>Requirements list</h2><p class="teachers-section-description">Connect classes, subjects and teachers with weekly lesson hours.</p></div>
+<div class="section-header teachers-section-header"><div><h2>Requirements list</h2><p class="teachers-section-description">Connect student groups, subjects and teachers with weekly lesson hours.</p></div>
 
 <button class="primary-button teachers-add-button" id="addRequirementButton" type="button"><span aria-hidden="true">+</span>
                     Add requirement
@@ -39,12 +39,12 @@
 <input id="requirementId" type="hidden"/>
 <div class="form-grid teachers-form-grid">
 <div class="form-field">
-<label for="requirementClassGroupId">
-                            Class
+<label for="requirementStudentGroupId">
+                            Student group
                         </label>
-<select id="requirementClassGroupId" required="">
+<select id="requirementStudentGroupId" required="">
 <option value="">
-                                Select class
+                                Select student group
                             </option>
 </select>
 </div>
@@ -90,7 +90,7 @@
 <table class="data-table teachers-table" id="requirementsTable">
 <thead>
 <tr>
-<th>Class</th>
+<th>Student group</th>
 <th>Subject</th>
 <th>Teacher</th>
 <th>Hours/week</th>

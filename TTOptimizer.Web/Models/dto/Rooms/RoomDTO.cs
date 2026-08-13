@@ -1,4 +1,4 @@
-﻿namespace TTOptimizer.Web.Models.DTO.Rooms;
+namespace TTOptimizer.Web.Models.DTO.Rooms;
 
 public class RoomDTO
 {
@@ -7,6 +7,10 @@ public class RoomDTO
     public string Name { get; set; } = string.Empty;
 
     public string? Info { get; set; }
+
+    public int? BuildingId { get; set; }
+
+    public string? BuildingName { get; set; }
 
     public int? RestrictedToSubjectId { get; set; }
 

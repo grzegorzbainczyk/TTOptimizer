@@ -1,5 +1,5 @@
 let availableTeachers = [];
-let availableClasses = [];
+let availableStudentGroups = [];
 let availableSubjects = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function refreshPageData() {
     await Promise.all([
         loadTeachers(),
-        loadClasses(),
+        loadStudentGroups(),
         loadSubjects()
     ]);
 
@@ -90,13 +90,13 @@ async function loadTeachers() {
     }
 }
 
-async function loadClasses() {
+async function loadStudentGroups() {
     try {
         const organizationId =
             window.appContext.requireOrganizationId();
 
         const response = await fetch(
-            `/api/classes?organizationId=${encodeURIComponent(
+            `/api/student-groups?organizationId=${encodeURIComponent(
                 organizationId
             )}`
         );
@@ -107,23 +107,21 @@ async function loadClasses() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not load classes. Status: ${response.status}`
+                    `Could not load student groups. Status: ${response.status}`
                 )
             );
         }
 
-        availableClasses = Array.isArray(data)
+        availableStudentGroups = Array.isArray(data)
             ? data
-            : data?.classes ??
-            data?.classGroups ??
-            [];
+            : data?.groups ?? [];
 
-        populateClassOptions();
+        populateStudentGroupOptions();
     } catch (error) {
-        console.error("Error loading classes:", error);
+        console.error("Error loading student groups:", error);
 
-        availableClasses = [];
-        populateClassOptions();
+        availableStudentGroups = [];
+        populateStudentGroupOptions();
     }
 }
 
@@ -248,7 +246,7 @@ function renderRequirements(requirements) {
         row.className = "teacher-row";
 
         row.appendChild(
-            createTableCell(requirement.className)
+            createTableCell(requirement.studentGroupName)
         );
 
         row.appendChild(
@@ -383,10 +381,10 @@ function populateTeacherOptions() {
     select.value = selectedValue;
 }
 
-function populateClassOptions() {
+function populateStudentGroupOptions() {
     const select =
         document.getElementById(
-            "requirementClassGroupId"
+            "requirementStudentGroupId"
         );
 
     if (!select) {
@@ -401,16 +399,16 @@ function populateClassOptions() {
         document.createElement("option");
 
     emptyOption.value = "";
-    emptyOption.textContent = "Select class";
+    emptyOption.textContent = "Select student group";
 
     select.appendChild(emptyOption);
 
-    availableClasses.forEach(classGroup => {
+    availableStudentGroups.forEach(studentGroup => {
         const option =
             document.createElement("option");
 
-        option.value = classGroup.id;
-        option.textContent = classGroup.name;
+        option.value = studentGroup.id;
+        option.textContent = studentGroup.name;
 
         select.appendChild(option);
     });
@@ -459,7 +457,7 @@ function openAddRequirementForm() {
     ).value = "";
 
     document.getElementById(
-        "requirementClassGroupId"
+        "requirementStudentGroupId"
     ).value = "";
 
     document.getElementById(
@@ -485,7 +483,7 @@ function openAddRequirementForm() {
     ).hidden = false;
 
     document.getElementById(
-        "requirementClassGroupId"
+        "requirementStudentGroupId"
     ).focus();
 }
 
@@ -495,9 +493,9 @@ function openEditRequirementForm(requirement) {
     ).value = requirement.id;
 
     document.getElementById(
-        "requirementClassGroupId"
+        "requirementStudentGroupId"
     ).value =
-        requirement.classGroupId?.toString() ?? "";
+        requirement.studentGroupId?.toString() ?? "";
 
     document.getElementById(
         "requirementSubjectId"
@@ -525,7 +523,7 @@ function openEditRequirementForm(requirement) {
     ).hidden = false;
 
     document.getElementById(
-        "requirementClassGroupId"
+        "requirementStudentGroupId"
     ).focus();
 }
 
@@ -548,10 +546,10 @@ async function saveRequirement() {
             "requirementId"
         ).value;
 
-    const classGroupId =
+    const studentGroupId =
         Number(
             document.getElementById(
-                "requirementClassGroupId"
+                "requirementStudentGroupId"
             ).value
         );
 
@@ -576,9 +574,9 @@ async function saveRequirement() {
             ).value
         );
 
-    if (classGroupId <= 0) {
+    if (studentGroupId <= 0) {
         showRequirementFormMessage(
-            "Class is required.",
+            "Student group is required.",
             true
         );
 
@@ -618,7 +616,7 @@ async function saveRequirement() {
 
     const requestBody = {
         teacherId,
-        classGroupId,
+        studentGroupId,
         subjectId,
         hoursPerWeek
     };
@@ -684,7 +682,7 @@ async function saveRequirement() {
 async function deleteRequirement(requirement) {
     const confirmed = window.confirm(
         `Delete ${requirement.subjectName} for ` +
-        `${requirement.className}?`
+        `${requirement.studentGroupName}?`
     );
 
     if (!confirmed) {

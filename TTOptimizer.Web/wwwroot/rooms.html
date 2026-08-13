@@ -45,6 +45,16 @@
 <input id="roomName" maxlength="100" required="" type="text"/>
 </div>
 <div class="form-field">
+<label for="roomBuildingId">
+                            Building
+                        </label>
+<select id="roomBuildingId">
+<option value="">
+                                No building assigned
+                            </option>
+</select>
+</div>
+<div class="form-field">
 <label for="restrictedToSubjectId">
                             Restricted to subject
                         </label>
@@ -87,6 +97,7 @@
 <thead>
 <tr>
 <th>Name</th>
+<th>Building</th>
 <th>Restricted to</th>
 <th>Preferred subject</th>
 <th>Info</th>
@@ -97,7 +108,7 @@
 </thead>
 <tbody>
 <tr>
-<td class="teachers-table-state" colspan="5">
+<td class="teachers-table-state" colspan="6">
                                 Loading rooms...
                             </td>
 </tr>
