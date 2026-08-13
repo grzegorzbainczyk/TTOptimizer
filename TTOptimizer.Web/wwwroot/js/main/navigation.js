@@ -1,16 +1,13 @@
 const NAVIGATION_TARGETS = {
     teachersButton: "teachers.html",
     classesButton: "classes.html",
-    studentGroupsButton: "student-groups.html",
     roomsButton: "rooms.html",
-    buildingsButton: "buildings.html",
     subjectsButton: "subjects.html",
     requirementsButton: "requirements.html",
-    schoolButton: "school.html",
+    organizationPreferencesButton: "organization-preferences.html",
     rulesButton: "rules.html",
     aboutProjectButton: "about.html",
-    optimizationSettingsButton: "optimization-settings.html",
-    optimizationInfoButton: "optimization-info.html"
+    optimizationSettingsButton: "optimization-settings.html"
 };
 
 export function setupDashboardNavigation() {

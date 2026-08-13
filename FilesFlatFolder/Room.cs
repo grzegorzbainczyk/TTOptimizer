@@ -1,4 +1,4 @@
-﻿using TTOptimizer.Web.Models.Domain;
+using TTOptimizer.Web.Models.Domain;
 
 public class Room
 {
@@ -10,11 +10,15 @@ public class Room
 
     public string? Info { get; set; }
 
+    public int? BuildingId { get; set; }
+
     public int? RestrictedToSubjectId { get; set; }
 
     public int? PreferredSubjectId { get; set; }
 
     public Organization Organization { get; set; } = null!;
+
+    public Building? Building { get; set; }
 
     public Subject? RestrictedToSubject { get; set; }
 

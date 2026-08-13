@@ -1,3 +1,4 @@
+let availableBuildings = [];
 let availableSubjects = [];
 
 document.addEventListener(
@@ -61,8 +62,43 @@ document.addEventListener(
 );
 
 async function refreshPageData() {
-    await loadSubjects();
+    await Promise.all([
+        loadSubjects(),
+        loadBuildings()
+    ]);
     await loadRooms();
+}
+
+async function loadBuildings() {
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/buildings?organizationId=${encodeURIComponent(organizationId)}`
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not load buildings. Status: ${response.status}`
+                )
+            );
+        }
+
+        availableBuildings =
+            Array.isArray(data)
+                ? data
+                : data?.buildings ?? [];
+    } catch (error) {
+        console.error("Error loading buildings:", error);
+        availableBuildings = [];
+    }
+
+    populateBuildingOptions();
 }
 
 async function loadSubjects() {
@@ -121,7 +157,7 @@ async function loadRooms() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="5" class="teachers-table-state">Loading rooms...</td>
+            <td colspan="6" class="teachers-table-state">Loading rooms...</td>
         </tr>
     `;
 
@@ -191,7 +227,7 @@ function renderRooms(rooms) {
     ) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="teachers-table-state">No rooms found.</td>
+                <td colspan="6" class="teachers-table-state">No rooms found.</td>
             </tr>
         `;
 
@@ -206,6 +242,12 @@ function renderRooms(rooms) {
 
         row.appendChild(
             createTableCell(room.name)
+        );
+
+        row.appendChild(
+            createTableCell(
+                room.buildingName ?? ""
+            )
         );
 
         row.appendChild(
@@ -335,6 +377,34 @@ function createTableCell(value) {
     return cell;
 }
 
+function populateBuildingOptions() {
+    const select =
+        document.getElementById(
+            "roomBuildingId"
+        );
+
+    if (!select) {
+        return;
+    }
+
+    const selectedValue = select.value;
+    select.innerHTML = "";
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "No building assigned";
+    select.appendChild(emptyOption);
+
+    availableBuildings.forEach(building => {
+        const option = document.createElement("option");
+        option.value = building.id;
+        option.textContent = building.name;
+        select.appendChild(option);
+    });
+
+    select.value = selectedValue;
+}
+
 function populateSubjectOptions() {
     populateSingleSubjectSelect(
         "restrictedToSubjectId",
@@ -411,6 +481,10 @@ function openAddRoomForm() {
     ).value = "";
 
     document.getElementById(
+        "roomBuildingId"
+    ).value = "";
+
+    document.getElementById(
         "restrictedToSubjectId"
     ).value = "";
 
@@ -446,6 +520,12 @@ function openEditRoomForm(room) {
         "roomName"
     ).value =
         room.name ?? "";
+
+    document.getElementById(
+        "roomBuildingId"
+    ).value =
+        room.buildingId
+            ?.toString() ?? "";
 
     document.getElementById(
         "restrictedToSubjectId"
@@ -503,6 +583,11 @@ async function saveRoom() {
             "roomName"
         ).value.trim();
 
+    const buildingValue =
+        document.getElementById(
+            "roomBuildingId"
+        ).value;
+
     const restrictedSubjectValue =
         document.getElementById(
             "restrictedToSubjectId"
@@ -529,6 +614,11 @@ async function saveRoom() {
 
     const requestBody = {
         name,
+
+        buildingId:
+            buildingValue
+                ? Number(buildingValue)
+                : null,
 
         info:
             info || null,

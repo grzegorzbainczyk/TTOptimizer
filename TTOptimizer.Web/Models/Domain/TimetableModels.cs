@@ -72,6 +72,8 @@ public class TeacherSchedulingPreferenceInput
 
     public SchedulingPreferenceLevel AvoidSingleLessonDay { get; set; }
 
+    public SchedulingPreferenceLevel AvoidImmediateBuildingChange { get; set; }
+
     public SchedulingPreferenceLevel MaxConsecutiveLessons { get; set; }
 
     public int MaxConsecutiveLessonsLimit { get; set; }
@@ -89,6 +91,8 @@ public class ClassGroupSchedulingPreferenceInput
     public SchedulingPreferenceLevel MinimizeGaps { get; set; }
 
     public SchedulingPreferenceLevel AvoidSingleLessonDay { get; set; }
+
+    public SchedulingPreferenceLevel AvoidImmediateBuildingChange { get; set; }
 
     public SchedulingPreferenceLevel MaxConsecutiveLessons { get; set; }
 

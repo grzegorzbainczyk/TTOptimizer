@@ -160,6 +160,10 @@ public class TimetableProblemBuilderService
             organizationSchedulingPreferences?.TeacherAvoidSingleLessonDay
             ?? SchedulingPreferenceLevel.Low;
 
+        var defaultTeacherAvoidImmediateBuildingChange =
+            organizationSchedulingPreferences?.TeacherAvoidImmediateBuildingChange
+            ?? SchedulingPreferenceLevel.Medium;
+
         var defaultTeacherMaxConsecutiveLessons =
             organizationSchedulingPreferences?.TeacherMaxConsecutiveLessons
             ?? SchedulingPreferenceLevel.Medium;
@@ -247,6 +251,10 @@ public class TimetableProblemBuilderService
                         AvoidSingleLessonDay =
                             overrideValue?.AvoidSingleLessonDay
                             ?? defaultTeacherAvoidSingleLessonDay,
+
+                        // Building transitions are organization-wide for now.
+                        AvoidImmediateBuildingChange =
+                            defaultTeacherAvoidImmediateBuildingChange,
 
                         MaxConsecutiveLessons =
                             overrideValue?.MaxConsecutiveLessons

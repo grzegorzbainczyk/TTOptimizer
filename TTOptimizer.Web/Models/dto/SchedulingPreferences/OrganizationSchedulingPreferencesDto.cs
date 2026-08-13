@@ -10,6 +10,7 @@ public class OrganizationSchedulingPreferencesDto
 
     public SchedulingPreferenceLevel TeacherMinimizeGaps { get; set; }
     public SchedulingPreferenceLevel TeacherAvoidSingleLessonDay { get; set; }
+    public SchedulingPreferenceLevel TeacherAvoidImmediateBuildingChange { get; set; }
     public SchedulingPreferenceLevel TeacherMaxConsecutiveLessons { get; set; }
     public int TeacherMaxConsecutiveLessonsLimit { get; set; }
     public SchedulingPreferenceLevel TeacherMaxLessonsPerDay { get; set; }
@@ -33,6 +34,7 @@ public class UpdateOrganizationSchedulingPreferencesRequest
 {
     public SchedulingPreferenceLevel TeacherMinimizeGaps { get; set; }
     public SchedulingPreferenceLevel TeacherAvoidSingleLessonDay { get; set; }
+    public SchedulingPreferenceLevel TeacherAvoidImmediateBuildingChange { get; set; }
     public SchedulingPreferenceLevel TeacherMaxConsecutiveLessons { get; set; }
     public int TeacherMaxConsecutiveLessonsLimit { get; set; }
     public SchedulingPreferenceLevel TeacherMaxLessonsPerDay { get; set; }

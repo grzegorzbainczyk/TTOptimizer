@@ -18,6 +18,7 @@ namespace TTOptimizer.Web.Data
         public DbSet<ClassGroup> ClassGroups => Set<ClassGroup>();
         public DbSet<Subject> Subjects => Set<Subject>();
         public DbSet<Room> Rooms => Set<Room>();
+        public DbSet<Building> Buildings => Set<Building>();
 
         public DbSet<LessonRequirement> LessonRequirements => Set<LessonRequirement>();
 
@@ -160,6 +161,31 @@ namespace TTOptimizer.Web.Data
                 .IsUnique();
             });
 
+            modelBuilder.Entity<Building>(entity =>
+            {
+                entity.Property(building => building.Name)
+                    .IsRequired()
+                    .HasMaxLength(150);
+
+                entity.Property(building => building.Address)
+                    .HasMaxLength(500);
+
+                entity.Property(building => building.Info)
+                    .HasMaxLength(2000);
+
+                entity.HasIndex(building => new
+                {
+                    building.OrganizationId,
+                    building.Name
+                })
+                .IsUnique();
+
+                entity.HasOne(building => building.Organization)
+                    .WithMany(organization => organization.Buildings)
+                    .HasForeignKey(building => building.OrganizationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
             modelBuilder.Entity<Room>(entity =>
             {
                 entity.Property(room => room.Name)
@@ -168,6 +194,11 @@ namespace TTOptimizer.Web.Data
 
                 entity.Property(room => room.Info)
                     .HasMaxLength(2000);
+
+                entity.HasOne(room => room.Building)
+                    .WithMany(building => building.Rooms)
+                    .HasForeignKey(room => room.BuildingId)
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasIndex(room => new
                 {

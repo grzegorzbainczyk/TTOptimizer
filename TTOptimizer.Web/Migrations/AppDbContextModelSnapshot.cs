@@ -516,6 +516,11 @@ namespace TTOptimizer.Web.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(2);
 
+                    b.Property<int>("TeacherAvoidImmediateBuildingChange")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
                     b.Property<int>("TeacherAvoidSingleLessonDay")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")

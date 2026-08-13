@@ -226,6 +226,14 @@ private:
             Room room;
             room.id = item.value("id", 0);
             room.name = item.value("name", "");
+
+            if (item.contains("buildingId") &&
+                !item.at("buildingId").is_null())
+            {
+                room.buildingId =
+                    item.at("buildingId").get<BuildingId>();
+            }
+
             room.capacity = item.value("capacity", 0);
             problem.rooms.push_back(room);
         }
@@ -388,6 +396,12 @@ private:
                     item.value(
                         "avoidSingleLessonDay",
                         "Low"));
+
+            preference.avoidImmediateBuildingChange =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "avoidImmediateBuildingChange",
+                        "Medium"));
 
             preference.maxConsecutiveLessons =
                 parseSchedulingPreferenceLevel(

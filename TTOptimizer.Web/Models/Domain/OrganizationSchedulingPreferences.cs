@@ -12,6 +12,9 @@ public class OrganizationSchedulingPreferences
     public SchedulingPreferenceLevel TeacherAvoidSingleLessonDay { get; set; }
         = SchedulingPreferenceLevel.Low;
 
+    public SchedulingPreferenceLevel TeacherAvoidImmediateBuildingChange { get; set; }
+        = SchedulingPreferenceLevel.Medium;
+
     public SchedulingPreferenceLevel TeacherMaxConsecutiveLessons { get; set; }
         = SchedulingPreferenceLevel.Medium;
 

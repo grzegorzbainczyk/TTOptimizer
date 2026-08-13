@@ -24,6 +24,7 @@ function initializeLevelSelects() {
     for (const id of [
         "teacherMinimizeGaps",
         "teacherAvoidSingleLessonDay",
+        "teacherAvoidImmediateBuildingChange",
         "teacherMaxConsecutiveLessons",
         "teacherMaxLessonsPerDay",
         "classGroupMinimizeGaps",
@@ -76,6 +77,9 @@ async function loadOrganizationPreferences() {
 
         setValue("teacherAvoidSingleLessonDay",
             preferences.teacherAvoidSingleLessonDay ?? "Low");
+
+        setValue("teacherAvoidImmediateBuildingChange",
+            preferences.teacherAvoidImmediateBuildingChange ?? "Medium");
 
         setValue("teacherMaxConsecutiveLessons",
             preferences.teacherMaxConsecutiveLessons ?? "Medium");
@@ -160,6 +164,8 @@ async function saveOrganizationPreferences() {
                 getValue("teacherMinimizeGaps"),
             teacherAvoidSingleLessonDay:
                 getValue("teacherAvoidSingleLessonDay"),
+            teacherAvoidImmediateBuildingChange:
+                getValue("teacherAvoidImmediateBuildingChange"),
             teacherMaxConsecutiveLessons:
                 getValue("teacherMaxConsecutiveLessons"),
             teacherMaxConsecutiveLessonsLimit:

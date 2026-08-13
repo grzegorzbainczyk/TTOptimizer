@@ -11,6 +11,7 @@ using ClassGroupId = int;
 using StudentGroupId = int;
 using SubjectId = int;
 using RoomId = int;
+using BuildingId = int;
 using LessonRequirementId = int;
 using LessonInstanceId = int;
 
@@ -166,6 +167,10 @@ struct Room
 {
     RoomId id{};
     std::string name;
+
+    // 0 means that the room has no building assigned.
+    BuildingId buildingId{};
+
     int capacity{};
     std::vector<SubjectId> allowedSubjects;
 };

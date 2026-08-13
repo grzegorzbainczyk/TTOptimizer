@@ -360,6 +360,9 @@ namespace TTOptimizer.Web.Data
                 entity.Property(item => item.TeacherAvoidSingleLessonDay)
                     .HasDefaultValue(SchedulingPreferenceLevel.Low);
 
+                entity.Property(item => item.TeacherAvoidImmediateBuildingChange)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Medium);
+
                 entity.Property(item => item.TeacherMaxConsecutiveLessons)
                     .HasDefaultValue(SchedulingPreferenceLevel.Medium);
 

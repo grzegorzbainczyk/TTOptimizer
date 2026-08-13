@@ -19,6 +19,7 @@ enum class ConstraintViolationType
 
     TeacherGap,
     TeacherSingleLessonDay,
+    TeacherImmediateBuildingChange,
     TeacherMaxConsecutiveLessons,
     TeacherMaxLessonsPerDay,
 
@@ -41,8 +42,10 @@ struct ConstraintViolation
 
     int teacherId{};
     int classGroupId{};
+
     int studentGroupId{};
     int otherStudentGroupId{};
+
     int roomId{};
     int subjectId{};
 

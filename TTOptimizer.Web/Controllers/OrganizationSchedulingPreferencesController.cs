@@ -88,6 +88,7 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
 
         if (!IsValidLevel(request.TeacherMinimizeGaps) ||
             !IsValidLevel(request.TeacherAvoidSingleLessonDay) ||
+            !IsValidLevel(request.TeacherAvoidImmediateBuildingChange) ||
             !IsValidLevel(request.TeacherMaxConsecutiveLessons) ||
             !IsValidLevel(request.TeacherMaxLessonsPerDay) ||
             !IsValidLevel(request.ClassGroupMinimizeGaps) ||
@@ -169,6 +170,9 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
         preferences.TeacherAvoidSingleLessonDay =
             request.TeacherAvoidSingleLessonDay;
 
+        preferences.TeacherAvoidImmediateBuildingChange =
+            request.TeacherAvoidImmediateBuildingChange;
+
         preferences.TeacherMaxConsecutiveLessons =
             request.TeacherMaxConsecutiveLessons;
 
@@ -244,6 +248,10 @@ public class OrganizationSchedulingPreferencesController : ControllerBase
             TeacherAvoidSingleLessonDay =
                 preferences?.TeacherAvoidSingleLessonDay
                 ?? SchedulingPreferenceLevel.Low,
+
+            TeacherAvoidImmediateBuildingChange =
+                preferences?.TeacherAvoidImmediateBuildingChange
+                ?? SchedulingPreferenceLevel.Medium,
 
             TeacherMaxConsecutiveLessons =
                 preferences?.TeacherMaxConsecutiveLessons
