@@ -375,6 +375,9 @@ namespace TTOptimizer.Web.Data
                 entity.Property(item => item.TeacherMaxLessonsPerDayLimit)
                     .HasDefaultValue(6);
 
+                entity.Property(item => item.StudentGroupAvoidImmediateBuildingChange)
+                    .HasDefaultValue(SchedulingPreferenceLevel.Medium);
+
                 entity.Property(item => item.ClassGroupMinimizeGaps)
                     .HasDefaultValue(SchedulingPreferenceLevel.Medium);
 

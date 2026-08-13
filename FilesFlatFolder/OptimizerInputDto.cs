@@ -166,6 +166,11 @@ public class OptimizerRoomDto
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the building assigned to the room. Null means unknown/not assigned.
+    /// </summary>
+    public int? BuildingId { get; set; }
+
+    /// <summary>
     /// Gets or sets the maximum number of students that can use the room.
     /// </summary>
     public int Capacity { get; set; }

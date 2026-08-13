@@ -15,6 +15,7 @@ enum class ConstraintViolationType
     TeacherConflict,
     ClassGroupConflict,
     StudentGroupConflict,
+    StudentGroupImmediateBuildingChange,
     RoomConflict,
 
     TeacherGap,

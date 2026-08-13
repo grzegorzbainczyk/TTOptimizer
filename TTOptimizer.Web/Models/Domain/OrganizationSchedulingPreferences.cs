@@ -26,6 +26,10 @@ public class OrganizationSchedulingPreferences
     public int TeacherMaxLessonsPerDayLimit { get; set; } = 6;
 
 
+    public SchedulingPreferenceLevel StudentGroupAvoidImmediateBuildingChange { get; set; }
+        = SchedulingPreferenceLevel.Medium;
+
+
     public SchedulingPreferenceLevel ClassGroupMinimizeGaps { get; set; }
         = SchedulingPreferenceLevel.Medium;
 

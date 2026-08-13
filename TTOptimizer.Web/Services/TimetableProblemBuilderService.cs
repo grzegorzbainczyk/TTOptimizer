@@ -180,6 +180,10 @@ public class TimetableProblemBuilderService
             organizationSchedulingPreferences?.TeacherMaxLessonsPerDayLimit
             ?? 6;
 
+        var defaultStudentGroupAvoidImmediateBuildingChange =
+            organizationSchedulingPreferences?.StudentGroupAvoidImmediateBuildingChange
+            ?? SchedulingPreferenceLevel.Medium;
+
         var defaultClassGroupMinimizeGaps =
             organizationSchedulingPreferences?.ClassGroupMinimizeGaps
             ?? SchedulingPreferenceLevel.Medium;
@@ -386,6 +390,9 @@ public class TimetableProblemBuilderService
             StudentGroups = studentGroups,
             StudentGroupConflicts = studentGroupConflicts,
             LessonRequirements = lessonRequirements,
+
+            StudentGroupAvoidImmediateBuildingChange =
+                defaultStudentGroupAvoidImmediateBuildingChange,
 
             TeacherTimeSlotPreferences = teacherTimeSlotPreferences,
             ClassGroupTimeSlotPreferences = classGroupTimeSlotPreferences,

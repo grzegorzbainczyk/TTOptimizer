@@ -48,6 +48,7 @@ public:
         readRooms(root, problem);
         readStudentGroups(root, problem);
         readStudentGroupConflicts(root, problem);
+        readStudentGroupSchedulingPreferences(root, problem);
         readLessonRequirements(root, problem);
 
         readTimeSlotPreferences(root, problem);
@@ -275,6 +276,18 @@ private:
             problem.studentGroupConflicts.push_back(conflict);
         }
     }
+
+    static void readStudentGroupSchedulingPreferences(
+        const json& root,
+        TimetableProblem& problem)
+    {
+        problem.studentGroupAvoidImmediateBuildingChange =
+            parseSchedulingPreferenceLevel(
+                root.value(
+                    "studentGroupAvoidImmediateBuildingChange",
+                    "Medium"));
+    }
+
 
     static void readLessonRequirements(
         const json& root,

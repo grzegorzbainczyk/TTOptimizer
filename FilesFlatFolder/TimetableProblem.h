@@ -72,6 +72,10 @@ struct TeacherSchedulingPreference
         SchedulingPreferenceLevel::Low
     };
 
+    SchedulingPreferenceLevel avoidImmediateBuildingChange{
+        SchedulingPreferenceLevel::Medium
+    };
+
     SchedulingPreferenceLevel maxConsecutiveLessons{
         SchedulingPreferenceLevel::Medium
     };

@@ -506,7 +506,8 @@ public class CppOptimizerService
                     new OptimizerRoomDto
                     {
                         Id = room.Id,
-                        Name = room.Name
+                        Name = room.Name,
+                        BuildingId = room.BuildingId
                     })
                 .ToList(),
 
