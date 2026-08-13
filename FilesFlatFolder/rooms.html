@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClassFlow - Rooms</title>
+<link href="css/style.css" rel="stylesheet"/>
+</head>
+<body class="teachers-page">
+<div class="page-container">
+<header class="app-header teachers-header">
+
+
+<div class="teachers-header-content"><div class="teachers-title-group">
+<span class="teachers-page-label">Organization resources</span><h1>Rooms</h1>
+<p class="page-subtitle">
+                    Rooms assigned to your organization
+                </p>
+</div><nav class="header-actions">
+<button class="secondary-button teachers-header-button" id="backToMainButton" type="button">
+                    Back
+                </button>
+<button class="secondary-button teachers-header-button" id="refreshRoomsButton" type="button">
+                    Refresh
+                </button>
+</nav></div></header>
+<main class="content-card teachers-card">
+<div class="section-header teachers-section-header"><div><h2>Rooms list</h2><p class="teachers-section-description">Manage rooms, subject restrictions and room availability.</p></div>
+
+<button class="primary-button teachers-add-button" id="addRoomButton" type="button"><span aria-hidden="true">+</span>
+                    Add room
+                </button>
+</div>
+<section class="resource-form-section teachers-form-section" hidden="" id="roomFormSection">
+<h3 id="roomFormTitle">
+                    Add room
+                </h3>
+<input id="roomId" type="hidden"/>
+<div class="form-grid teachers-form-grid">
+<div class="form-field">
+<label for="roomName">
+                            Name
+                        </label>
+<input id="roomName" maxlength="100" required="" type="text"/>
+</div>
+<div class="form-field">
+<label for="restrictedToSubjectId">
+                            Restricted to subject
+                        </label>
+<select id="restrictedToSubjectId">
+<option value="">
+                                No restriction
+                            </option>
+</select>
+</div>
+<div class="form-field">
+<label for="preferredSubjectId">
+                            Preferred subject
+                        </label>
+<select id="preferredSubjectId">
+<option value="">
+                                No preference
+                            </option>
+</select>
+</div>
+<div class="form-field form-field-full-width">
+<label for="roomInfo">
+                            Info
+                        </label>
+<textarea id="roomInfo" maxlength="2000" placeholder="Optional information about the room" rows="4"></textarea>
+</div>
+</div>
+<div class="form-actions teachers-form-actions">
+<button class="primary-button" id="saveRoomButton" type="button">
+                        Save
+                    </button>
+<button class="secondary-button" id="cancelRoomButton" type="button">
+                        Cancel
+                    </button>
+</div>
+<p aria-live="polite" class="form-message" id="roomFormMessage">
+</p>
+</section>
+<div class="teachers-table-summary"><span id="roomsCount">Loading rooms...</span></div><div class="table-wrapper teachers-table-wrapper">
+<table class="data-table teachers-table" id="roomsTable">
+<thead>
+<tr>
+<th>Name</th>
+<th>Restricted to</th>
+<th>Preferred subject</th>
+<th>Info</th>
+<th class="table-actions-column">
+                                Actions
+                            </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="teachers-table-state" colspan="5">
+                                Loading rooms...
+                            </td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+</div>
+<script src="js/appContext.js"></script>
+<script src="js/rooms.js"></script>
+</body>
+</html>

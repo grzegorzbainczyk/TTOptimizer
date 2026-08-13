@@ -18,6 +18,10 @@
 
         public List<LessonRequirement> LessonRequirements { get; set; } = new();
 
+        public List<StudentGroup> StudentGroups { get; set; } = new();
+
+        public List<StudentGroupDivision> StudentGroupDivisions { get; set; } = new();
+
         public List<OptimizationRun> OptimizationRuns { get; set; } = new();
     }
 }

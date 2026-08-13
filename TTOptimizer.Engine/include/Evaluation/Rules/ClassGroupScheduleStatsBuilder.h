@@ -1,180 +1,55 @@
 #pragma once
-
 #include <algorithm>
 #include <unordered_map>
 #include <vector>
-
 #include "Domain/TimetableProblem.h"
 #include "Evaluation/Rules/ClassGroupScheduleStats.h"
 
 class ClassGroupScheduleStatsBuilder
 {
 public:
-    static ClassGroupScheduleStats build(
-        const Chromosome& chromosome,
+    static ClassGroupScheduleStats build(const Chromosome& chromosome,
         const TimetableProblem& problem,
         const std::vector<LessonInstance>& lessonInstances,
         const std::vector<ScheduleSlot>& scheduleSlots)
     {
         ClassGroupScheduleStats result;
+        std::unordered_map<ClassGroupId, std::vector<std::vector<bool>>> occupancy;
+        for (const ClassGroup& c : problem.classGroups)
+            occupancy.emplace(c.id, std::vector<std::vector<bool>>(problem.daysPerWeek,
+                std::vector<bool>(problem.slotsPerDay, false)));
 
-        std::unordered_map<
-            ClassGroupId,
-            std::vector<std::vector<bool>>>
-            occupancy;
+        std::unordered_map<StudentGroupId, std::vector<ClassGroupId>> classIdsByStudentGroup;
+        for (const StudentGroup& g : problem.studentGroups) classIdsByStudentGroup.emplace(g.id, g.classGroupIds);
+        std::unordered_map<LessonRequirementId, StudentGroupId> groupByRequirement;
+        for (const LessonRequirement& r : problem.lessonRequirements) groupByRequirement.emplace(r.id, r.studentGroupId);
 
-        for (const ClassGroup& classGroup : problem.classGroups)
+        for (LessonInstanceIndex i=0; i<chromosome.genes.size() && i<lessonInstances.size(); ++i)
         {
-            occupancy.emplace(
-                classGroup.id,
-                std::vector<std::vector<bool>>(
-                    static_cast<std::size_t>(
-                        problem.daysPerWeek),
-                    std::vector<bool>(
-                        static_cast<std::size_t>(
-                            problem.slotsPerDay),
-                        false)));
+            const auto slotIndex=chromosome.genes[i]; if(slotIndex>=scheduleSlots.size()) continue;
+            const auto rg=groupByRequirement.find(lessonInstances[i].requirementId); if(rg==groupByRequirement.end()) continue;
+            const auto classes=classIdsByStudentGroup.find(rg->second); if(classes==classIdsByStudentGroup.end()) continue;
+            const auto& slot=scheduleSlots[slotIndex]; const int d=static_cast<int>(slot.timeSlot.day); const int s=slot.timeSlot.lessonNumber;
+            if(d<0||d>=problem.daysPerWeek||s<0||s>=problem.slotsPerDay) continue;
+            for(ClassGroupId classId: classes->second) { auto it=occupancy.find(classId); if(it!=occupancy.end()) it->second[d][s]=true; }
         }
 
-        std::unordered_map<
-            LessonRequirementId,
-            ClassGroupId>
-            classGroupByRequirementId;
-
-        for (const LessonRequirement& requirement :
-            problem.lessonRequirements)
+        for(auto& [classId,days]:occupancy)
         {
-            classGroupByRequirementId.emplace(
-                requirement.id,
-                requirement.classGroupId);
-        }
-
-        for (LessonInstanceIndex lessonIndex = 0;
-            lessonIndex < chromosome.genes.size();
-            ++lessonIndex)
-        {
-            if (lessonIndex >= lessonInstances.size())
+            std::vector<ClassGroupDayScheduleStats> statsDays(problem.daysPerWeek);
+            for(int d=0;d<problem.daysPerWeek;++d)
             {
-                continue;
-            }
-
-            const ScheduleSlotIndex scheduleSlotIndex =
-                chromosome.genes[lessonIndex];
-
-            if (scheduleSlotIndex >= scheduleSlots.size())
-            {
-                continue;
-            }
-
-            const auto classGroupIterator =
-                classGroupByRequirementId.find(
-                    lessonInstances[lessonIndex].requirementId);
-
-            if (classGroupIterator ==
-                classGroupByRequirementId.end())
-            {
-                continue;
-            }
-
-            const auto occupancyIterator =
-                occupancy.find(
-                    classGroupIterator->second);
-
-            if (occupancyIterator ==
-                occupancy.end())
-            {
-                continue;
-            }
-
-            const ScheduleSlot& scheduleSlot =
-                scheduleSlots[scheduleSlotIndex];
-
-            const int dayIndex =
-                static_cast<int>(
-                    scheduleSlot.timeSlot.day);
-
-            const int slotIndex =
-                scheduleSlot.timeSlot.lessonNumber;
-
-            if (dayIndex < 0 ||
-                dayIndex >= problem.daysPerWeek ||
-                slotIndex < 0 ||
-                slotIndex >= problem.slotsPerDay)
-            {
-                continue;
-            }
-
-            occupancyIterator
-                ->second[
-                    static_cast<std::size_t>(
-                        dayIndex)]
-                [
-                    static_cast<std::size_t>(
-                        slotIndex)
-                ] = true;
-        }
-
-        for (auto& [classGroupId, days] : occupancy)
-        {
-            std::vector<ClassGroupDayScheduleStats>
-                classGroupDays(
-                    static_cast<std::size_t>(
-                        problem.daysPerWeek));
-
-            for (int dayIndex = 0;
-                dayIndex < problem.daysPerWeek;
-                ++dayIndex)
-            {
-                const auto& slots =
-                    days[
-                        static_cast<std::size_t>(
-                            dayIndex)];
-
-                ClassGroupDayScheduleStats stats;
-                int currentConsecutive = 0;
-
-                for (int slotIndex = 0;
-                    slotIndex < problem.slotsPerDay;
-                    ++slotIndex)
+                ClassGroupDayScheduleStats stats; int consecutive=0;
+                for(int s=0;s<problem.slotsPerDay;++s)
                 {
-                    const bool occupied =
-                        slots[
-                            static_cast<std::size_t>(
-                                slotIndex)];
-
-                    if (!occupied)
-                    {
-                        currentConsecutive = 0;
-                        continue;
-                    }
-
-                    ++stats.lessonCount;
-
-                    if (stats.firstSlot < 0)
-                    {
-                        stats.firstSlot = slotIndex;
-                    }
-
-                    stats.lastSlot = slotIndex;
-
-                    ++currentConsecutive;
-
-                    stats.maxConsecutiveLessons =
-                        std::max(
-                            stats.maxConsecutiveLessons,
-                            currentConsecutive);
+                    if(!days[d][s]){consecutive=0;continue;}
+                    ++stats.lessonCount; if(stats.firstSlot<0) stats.firstSlot=s; stats.lastSlot=s;
+                    ++consecutive; stats.maxConsecutiveLessons=std::max(stats.maxConsecutiveLessons,consecutive);
                 }
-
-                classGroupDays[
-                    static_cast<std::size_t>(
-                        dayIndex)] = stats;
+                statsDays[d]=stats;
             }
-
-            result.byClassGroup.emplace(
-                classGroupId,
-                std::move(classGroupDays));
+            result.byClassGroup.emplace(classId,std::move(statsDays));
         }
-
         return result;
     }
 };

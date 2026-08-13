@@ -59,7 +59,7 @@ public:
             }
 
             for (const auto& [key, stats] :
-                context.subjectScheduleStats.byClassGroupAndSubject)
+                context.subjectScheduleStats.byStudentGroupAndSubject)
             {
                 if (key.second != preference.subjectId)
                 {
@@ -101,7 +101,7 @@ public:
                     violation.type =
                         ConstraintViolationType::
                         SubjectAvoidDoubleLessons;
-                    violation.classGroupId =
+                    violation.studentGroupId =
                         key.first;
                     violation.subjectId =
                         key.second;

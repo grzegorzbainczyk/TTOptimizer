@@ -66,18 +66,18 @@ public:
                     continue;
                 }
 
-                const ClassGroupSubjectKey key{
-                    requirement.classGroupId,
+                const StudentGroupSubjectKey key{
+                    requirement.studentGroupId,
                     requirement.subjectId
                 };
 
                 const auto statsIterator =
                     context.subjectScheduleStats
-                        .byClassGroupAndSubject.find(key);
+                        .byStudentGroupAndSubject.find(key);
 
                 if (statsIterator ==
                     context.subjectScheduleStats
-                        .byClassGroupAndSubject.end())
+                        .byStudentGroupAndSubject.end())
                 {
                     continue;
                 }
@@ -119,8 +119,8 @@ public:
                     violation.type =
                         ConstraintViolationType::
                         SubjectSpreadAcrossDays;
-                    violation.classGroupId =
-                        requirement.classGroupId;
+                    violation.studentGroupId =
+                        requirement.studentGroupId;
                     violation.subjectId =
                         requirement.subjectId;
                     violation.occurrenceCount =

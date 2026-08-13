@@ -115,6 +115,24 @@ public class SubjectSchedulingPreferenceInput
     public SchedulingPreferenceLevel AvoidDoubleLessons { get; set; }
 }
 
+
+
+public class StudentGroupInput
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public StudentGroupType Type { get; set; }
+    public int? ClassGroupId { get; set; }
+    public int? DivisionId { get; set; }
+    public List<int> ClassGroupIds { get; set; } = new();
+}
+
+public class StudentGroupConflictInput
+{
+    public int FirstStudentGroupId { get; set; }
+    public int SecondStudentGroupId { get; set; }
+}
+
 public class TimetableProblem
 {
     public List<Teacher> Teachers { get; set; } = new();
@@ -124,6 +142,10 @@ public class TimetableProblem
     public List<Subject> Subjects { get; set; } = new();
 
     public List<Room> Rooms { get; set; } = new();
+
+    public List<StudentGroupInput> StudentGroups { get; set; } = new();
+
+    public List<StudentGroupConflictInput> StudentGroupConflicts { get; set; } = new();
 
     public List<LessonRequirement> LessonRequirements { get; set; } = new();
 

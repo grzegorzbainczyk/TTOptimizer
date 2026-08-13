@@ -510,6 +510,24 @@ public class CppOptimizerService
                     })
                 .ToList(),
 
+            StudentGroups = problem.StudentGroups
+                .Select(group => new OptimizerStudentGroupDto
+                {
+                    Id = group.Id,
+                    Name = group.Name,
+                    Type = group.Type.ToString(),
+                    ClassGroupIds = group.ClassGroupIds
+                })
+                .ToList(),
+
+            StudentGroupConflicts = problem.StudentGroupConflicts
+                .Select(conflict => new OptimizerStudentGroupConflictDto
+                {
+                    FirstStudentGroupId = conflict.FirstStudentGroupId,
+                    SecondStudentGroupId = conflict.SecondStudentGroupId
+                })
+                .ToList(),
+
             LessonRequirements =
                 problem.LessonRequirements
                     .Select(requirement =>
@@ -517,7 +535,8 @@ public class CppOptimizerService
                         {
                             Id = requirement.Id,
                             TeacherId = requirement.TeacherId,
-                            ClassGroupId = requirement.ClassGroupId,
+                            ClassGroupId = requirement.ClassGroupId ?? 0,
+                            StudentGroupId = requirement.StudentGroupId ?? 0,
                             SubjectId = requirement.SubjectId,
                             LessonsPerWeek = requirement.HoursPerWeek
                         })

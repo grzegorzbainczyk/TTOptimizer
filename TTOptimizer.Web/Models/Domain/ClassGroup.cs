@@ -19,4 +19,6 @@ public class ClassGroup
     public Teacher? HomeroomTeacher { get; set; }
 
     public Room? DefaultRoom { get; set; }
+
+    public List<StudentGroup> StudentGroups { get; set; } = new();
 }

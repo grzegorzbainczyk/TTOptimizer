@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassFlow - Class preferences</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="teachers-page">
+    <div class="page-container">
+        <header class="app-header teachers-header">
+            <div class="teachers-header-content">
+                <div class="teachers-title-group">
+                    <span class="teachers-page-label">Class scheduling</span>
+                    <h1 id="classGroupName">Class preferences</h1>
+                    <p class="page-subtitle">
+                        Configure scheduling preferences for this class.
+                        Default values are inherited from the organization.
+                    </p>
+                </div>
+
+                <nav class="header-actions">
+                    <button id="backToClassesButton"
+                            class="secondary-button teachers-header-button"
+                            type="button">
+                        Back to classes
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <main class="content-card teachers-card">
+            <div class="section-header teachers-section-header">
+                <div>
+                    <h2>Scheduling preferences</h2>
+                    <p class="teachers-section-description">
+                        Override only the rules that should differ from organization defaults.
+                    </p>
+                </div>
+            </div>
+
+            <section class="resource-form-section teachers-form-section teacher-preferences-form">
+                <input id="classGroupId" type="hidden" />
+
+                <section class="teacher-preferences-group">
+                    <div class="teacher-preferences-group-header">
+                        <h3>Schedule quality</h3>
+                        <p>Preferences affecting the shape of a class timetable.</p>
+                    </div>
+
+                    <div class="teacher-preferences-simple-grid">
+                        <article class="teacher-preference-card">
+                            <div class="teacher-preference-card-header">
+                                <h4>Minimize gaps</h4>
+                                <p>Reduce empty slots between the first and last lesson of the day.</p>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="minimizeGapsImportance">Importance</label>
+                                <select id="minimizeGapsImportance"></select>
+                            </div>
+                        </article>
+
+                        <article class="teacher-preference-card">
+                            <div class="teacher-preference-card-header">
+                                <h4>Avoid single-lesson day</h4>
+                                <p>Discourage class days containing exactly one lesson.</p>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="avoidSingleLessonDayImportance">Importance</label>
+                                <select id="avoidSingleLessonDayImportance"></select>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="teacher-preferences-group">
+                    <div class="teacher-preferences-group-header">
+                        <h3>Daily workload</h3>
+                        <p>Control consecutive lessons and total lessons per day.</p>
+                    </div>
+
+                    <div class="teacher-preferences-limit-grid">
+                        <article class="teacher-preference-card">
+                            <div class="teacher-preference-card-header">
+                                <h4>Max consecutive lessons</h4>
+                                <p>Penalize lesson runs longer than the configured limit.</p>
+                            </div>
+
+                            <div class="teacher-preference-paired-fields">
+                                <div class="form-field">
+                                    <label for="maxConsecutiveLessonsImportance">Importance</label>
+                                    <select id="maxConsecutiveLessonsImportance"></select>
+                                </div>
+
+                                <div class="form-field">
+                                    <label for="maxConsecutiveLessonsLimit">Maximum lessons</label>
+                                    <input id="maxConsecutiveLessonsLimit"
+                                           type="number"
+                                           min="1"
+                                           max="8"
+                                           step="1" />
+                                    <small id="maxConsecutiveLessonsLimitHint"></small>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="teacher-preference-card">
+                            <div class="teacher-preference-card-header">
+                                <h4>Max lessons per day</h4>
+                                <p>Penalize days that exceed the configured daily lesson limit.</p>
+                            </div>
+
+                            <div class="teacher-preference-paired-fields">
+                                <div class="form-field">
+                                    <label for="maxLessonsPerDayImportance">Importance</label>
+                                    <select id="maxLessonsPerDayImportance"></select>
+                                </div>
+
+                                <div class="form-field">
+                                    <label for="maxLessonsPerDayLimit">Maximum lessons</label>
+                                    <input id="maxLessonsPerDayLimit"
+                                           type="number"
+                                           min="1"
+                                           max="8"
+                                           step="1" />
+                                    <small id="maxLessonsPerDayLimitHint"></small>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <div class="teacher-preferences-footer">
+                    <div class="teachers-form-actions">
+                        <button id="saveClassGroupPreferencesButton"
+                                class="main-action-button"
+                                type="button">
+                            Save
+                        </button>
+
+                        <button id="resetClassGroupPreferencesButton"
+                                class="secondary-button"
+                                type="button">
+                            Use all defaults
+                        </button>
+                    </div>
+
+                    <p id="classGroupPreferencesMessage"
+                       class="form-message teacher-preferences-message"
+                       role="status"
+                       aria-live="polite"></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/js/appContext.js"></script>
+    <script src="/js/class-preferences.js"></script>
+</body>
+</html>

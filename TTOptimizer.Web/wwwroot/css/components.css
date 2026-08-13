@@ -1537,3 +1537,27 @@ border: var(--border-thin) solid var(--color-border-neutral);
     font-size: 0.84rem;
     font-weight: 650;
 }
+
+
+/* =========================================================
+   Student groups
+   ========================================================= */
+.student-group-actions-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; padding:24px 28px; border-bottom:1px solid var(--color-divider); }
+.student-group-form-card { display:flex; flex-direction:column; gap:12px; padding:18px; border:1px solid var(--color-border-neutral); border-radius:var(--radius-md); background:var(--color-surface-soft); }
+.student-group-form-card h3 { margin:0 0 4px; color:var(--color-primary); }
+.student-group-form-card label { display:flex; flex-direction:column; gap:6px; font-weight:700; font-size:.86rem; }
+.student-group-form-card input,.student-group-form-card select,.student-group-form-card textarea { width:100%; padding:10px 12px; border:1px solid var(--color-border-neutral); border-radius:var(--radius-sm); background:var(--color-input-background); font:inherit; }
+.student-group-member-list { display:flex; flex-direction:column; gap:7px; max-height:180px; overflow:auto; padding:10px; border:1px solid var(--color-border-neutral); border-radius:var(--radius-sm); background:var(--color-input-background); }
+.student-group-member-option { display:flex !important; flex-direction:row !important; align-items:center; gap:8px !important; font-weight:500 !important; }
+.student-group-member-option input { width:auto; }
+.student-groups-tree { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; padding:24px 28px 28px; }
+.student-group-tree-card { padding:18px; border:1px solid var(--color-border-neutral); border-radius:var(--radius-md); background:var(--color-surface-elevated); }
+.student-group-tree-card h3 { margin:0 0 14px; color:var(--color-primary); }
+.student-group-tree-row,.student-group-division-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 10px; border-bottom:1px solid var(--color-divider); }
+.student-group-tree-row span { display:flex; flex-direction:column; gap:2px; }
+.student-group-tree-row small { color:var(--color-text-muted); }
+.student-group-division { margin:10px 0; padding-left:12px; border-left:3px solid var(--color-secondary); }
+.student-group-division-heading { background:var(--color-secondary-soft); border-radius:var(--radius-sm); }
+.student-group-combined-card { grid-column:1 / -1; }
+#studentGroupsMessage { margin:18px 28px 0; }
+@media (max-width:1000px){.student-group-actions-grid{grid-template-columns:1fr}.student-groups-tree{grid-template-columns:1fr}}

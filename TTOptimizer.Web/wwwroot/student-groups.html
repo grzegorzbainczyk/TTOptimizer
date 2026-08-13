@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassFlow - Student Groups</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="teachers-page">
+<div class="page-container">
+    <header class="app-header teachers-header">
+        <div class="teachers-header-content">
+            <div class="teachers-title-group">
+                <span class="teachers-page-label">Timetable input</span>
+                <h1>Student groups</h1>
+                <p class="page-subtitle">Define class divisions, individual groups and groups combined across classes.</p>
+            </div>
+            <nav class="header-actions">
+                <button class="secondary-button teachers-header-button" id="backToMainButton">Back</button>
+                <button class="secondary-button teachers-header-button" id="refreshStudentGroupsButton">Refresh</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="content-card teachers-card student-groups-card">
+        <div class="section-header teachers-section-header">
+            <div><h2>Group structure</h2><p class="teachers-section-description">Whole-class groups are created automatically. Add divisions only when a class is split.</p></div>
+        </div>
+
+        <section class="student-group-actions-grid">
+            <form id="divisionForm" class="student-group-form-card">
+                <h3>Create class division</h3>
+                <label>Class<select id="divisionClassId" required></select></label>
+                <label>Division name<input id="divisionName" placeholder="English" required /></label>
+                <label>Group names<textarea id="divisionGroupNames" rows="3" placeholder="1A English G1, 1A English G2" required></textarea></label>
+                <small>Separate group names with commas or new lines.</small>
+                <button class="main-action-button" type="submit">Create division</button>
+            </form>
+
+            <form id="individualForm" class="student-group-form-card">
+                <h3>Create individual group</h3>
+                <label>Class<select id="individualClassId" required></select></label>
+                <label>Name<input id="individualName" placeholder="1A / Individual - Jan Kowalski" required /></label>
+                <button class="main-action-button" type="submit">Create individual group</button>
+            </form>
+
+            <form id="combinedForm" class="student-group-form-card">
+                <h3>Create combined group</h3>
+                <label>Name<input id="combinedName" placeholder="Boys PE" required /></label>
+                <div id="combinedMembers" class="student-group-member-list"></div>
+                <button class="main-action-button" type="submit">Create combined group</button>
+            </form>
+        </section>
+
+        <p id="studentGroupsMessage" class="form-message" aria-live="polite"></p>
+        <section id="studentGroupsTree" class="student-groups-tree"></section>
+    </main>
+</div>
+<script src="js/appContext.js"></script>
+<script src="js/student-groups.js"></script>
+</body>
+</html>

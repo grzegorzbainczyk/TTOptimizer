@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassFlow - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <main class="app-shell">
+        <div class="app-container">
+
+            <header class="app-header app-hero">
+                <div class="hero-title-row">
+                    <img src="images/logos/logo.png" alt="ClassFlow logo" class="app-logo">
+
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            Timetable optimization demo
+                        </div>
+
+                        <h1>ClassFlow</h1>
+
+                        <p class="hero-subtitle">
+                            A friendly timetable optimization prototype for schools
+                        </p>
+
+                        <p class="hero-tech">
+                            Built with ASP.NET Core, C++ and JavaScript
+                        </p>
+                    </div>
+
+                    <button id="optimizationSettingsButton"
+                            class="settings-button"
+                            type="button"
+                            title="Optimization settings">
+                        <span class="settings-button-icon">⚙️</span>
+                        <span>Settings</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="dashboard-layout">
+
+                <aside class="resource-sidebar app-card">
+                    <h2>Resources</h2>
+
+                    <p class="sidebar-subtitle">
+                        Manage input data used by the optimizer.
+                    </p>
+
+                    <button id="teachersButton" class="resource-button">
+                        <span class="resource-button-icon">👤</span>
+                        <span>
+                            <strong>Teachers</strong>
+                            <small>Manage staff</small>
+                        </span>
+                    </button>
+
+                    <button id="classesButton" class="resource-button">
+                        <span class="resource-button-icon">🎓</span>
+                        <span>
+                            <strong>Classes</strong>
+                            <small>Student groups</small>
+                        </span>
+                    </button>
+
+                    <button id="roomsButton" class="resource-button">
+                        <span class="resource-button-icon">🚪</span>
+                        <span>
+                            <strong>Rooms</strong>
+                            <small>Classrooms</small>
+                        </span>
+                    </button>
+
+                    <button id="subjectsButton" class="resource-button">
+                        <span class="resource-button-icon">📚</span>
+                        <span>
+                            <strong>Subjects</strong>
+                            <small>Lesson topics</small>
+                        </span>
+                    </button>
+
+                    <button id="requirementsButton" class="resource-button">
+                        <span class="resource-button-icon">🧩</span>
+                        <span>
+                            <strong>Requirements</strong>
+                            <small>Lesson rules</small>
+                        </span>
+                    </button>
+
+                    <button id="organizationPreferencesButton" class="resource-button">
+                        <span class="resource-button-icon">🏫</span>
+                        <span>
+                            <strong>Scheduling defaults</strong>
+                            <small>Organization-wide preferences</small>
+                        </span>
+                    </button>
+
+                    <button id="rulesButton" class="resource-button">
+                        <span class="resource-button-icon">⚙️</span>
+                        <span>
+                            <strong>Rules</strong>
+                            <small>Availability and constraints</small>
+                        </span>
+                    </button>
+                </aside>
+
+                <div class="dashboard-content">
+
+                    <section class="app-card app-panel optimization-panel">
+                        <div class="optimization-heading">
+                            <h2>Optimization</h2>
+                        </div>
+
+                        <p>
+                            Run the C++ optimization engine and display the decoded timetable result.
+                        </p>
+
+                        <div class="toolbar">
+                            <button id="runOptimizationButton"
+                                    class="app-button optimization-run-button">
+                                <span class="optimization-run-icon" aria-hidden="true"></span>
+                                <span class="optimization-run-label">Run optimization</span>
+                            </button>
+
+                            <button id="stopOptimizationButton"
+                                    class="app-button app-button-secondary"
+                                    type="button"
+                                    disabled>
+                                Stop
+                            </button>
+
+                            <button id="optimizationInfoButton"
+                                    class="app-button app-button-secondary"
+                                    type="button">
+                                Info
+                            </button>
+                        </div>
+
+                        <div id="optimizationProgressPanel"
+                             class="optimization-progress-panel hidden">
+
+                            <div class="optimization-progress-header">
+                                <strong>Optimization in progress</strong>
+
+                                <span id="optimizationProgressPercentage">
+                                    0%
+                                </span>
+                            </div>
+
+                            <progress id="optimizationProgressBar"
+                                      max="100"
+                                      value="0">
+                            </progress>
+
+                            <div class="optimization-progress-details">
+                                <div class="optimization-progress-meta">
+                                    <span id="optimizationGenerationText">
+                                        Generation: 0 / 0
+                                    </span>
+
+                                    <span id="optimizationBestFoundText">
+                                        Best found: initial population
+                                    </span>
+                                </div>
+
+                                <div class="optimization-metrics">
+                                    <div id="optimizationHardMetric"
+                                         class="optimization-metric optimization-metric-neutral">
+                                        <span class="optimization-metric-label">
+                                            Hard violations
+                                        </span>
+
+                                        <strong id="optimizationHardViolationCount">
+                                            -
+                                        </strong>
+
+                                        <small id="optimizationFeasibilityText">
+                                            Waiting for first evaluation
+                                        </small>
+                                    </div>
+
+                                    <div class="optimization-metric optimization-metric-soft">
+                                        <span class="optimization-metric-label">
+                                            Soft penalty
+                                        </span>
+
+                                        <strong id="optimizationSoftPenalty">
+                                            -
+                                        </strong>
+
+                                        <small>
+                                            Best value found so far
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p id="statusText">Ready.</p>
+                    </section>
+
+                    <section class="app-card app-panel">
+                        <div class="section-header-row">
+                            <h2>Timetable result</h2>
+
+                            <div class="section-actions">
+                                <button id="exportCsvButton" class="app-button app-button-secondary">
+                                    Export CSV
+                                </button>
+
+                                <button id="clearSavedResultButton" class="app-button app-button-secondary">
+                                    Clear saved result
+                                </button>
+
+                                <button id="aboutProjectButton" class="app-button app-button-secondary">
+                                    About project
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="resultMessages" class="result-messages">
+                            <section id="resultMessagePanel"
+                                     class="result-message-panel result-message-neutral">
+<div class="result-message-content">
+                                    <span class="result-message-label">
+                                        Optimization result
+                                    </span>
+
+                                    <h3 id="resultMessageTitle">
+                                        No optimization result yet
+                                    </h3>
+
+                                    <p id="resultMessageText">
+                                        Run the optimizer to generate a timetable.
+                                    </p>
+                                </div>
+                            </section>
+
+                            <section id="preprocessingDetails"
+                                     class="preprocessing-details hidden">
+                                <div class="preprocessing-details-header">
+                                    <div>
+                                        <span class="result-message-label">
+                                            Problem details
+                                        </span>
+
+                                        <h3>Input data requires attention</h3>
+                                    </div>
+
+                                    <span id="preprocessingIssueCount"
+                                          class="issue-count-badge">
+                                        0 problems
+                                    </span>
+                                </div>
+
+                                <ul id="preprocessingIssuesList"
+                                    class="preprocessing-issues-list">
+                                </ul>
+                            </section>
+                        </div>
+
+                        <div id="timetableContent">
+                            <div class="filters-row">
+                                <label>
+                                    Class:
+                                    <select id="classFilter">
+                                        <option value="">All classes</option>
+                                    </select>
+                                </label>
+
+                                <label>
+                                    Teacher:
+                                    <select id="teacherFilter">
+                                        <option value="">All teachers</option>
+                                    </select>
+                                </label>
+
+                                <label>
+                                    Room:
+                                    <select id="roomFilter">
+                                        <option value="">All rooms</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Slot</th>
+                                        <th>Lesson</th>
+                                        <th>Class</th>
+                                        <th>Subject</th>
+                                        <th>Teacher</th>
+                                        <th>Room</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="timetableBody">
+                                    <tr>
+                                        <td colspan="7">No timetable generated yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                Created by Grzegorz Bainczyk
+            </footer>
+
+        </div>
+    </main>
+
+    <script src="/js/appContext.js"></script>
+    <script src="/js/signalr/dist/browser/signalr.min.js"></script>
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>

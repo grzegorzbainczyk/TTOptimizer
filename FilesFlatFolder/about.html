@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>About ClassFlow</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+</head>
+
+<body>
+    <main class="app-shell">
+        <div class="app-container">
+
+            <header class="app-header">
+                <div>
+                    <h1>About ClassFlow</h1>
+
+                    <p class="app-subtitle">
+                        A school timetable management and optimization application
+                        built with ASP.NET Core, C++, Entity Framework Core and JavaScript.
+                    </p>
+                </div>
+
+                <div class="header-actions">
+                    <button id="backToMainButton"
+                            class="app-button app-button-secondary"
+                            type="button">
+                        Back to dashboard
+                    </button>
+                </div>
+            </header>
+
+            <section class="app-card about-section">
+                <h2>Project overview</h2>
+
+                <p>
+                    ClassFlow is a web application for preparing school timetable data,
+                    running timetable optimization and presenting the generated schedule
+                    in a clear and filterable form.
+                </p>
+
+                <p>
+                    The project combines a browser-based user interface, an ASP.NET Core
+                    backend, a PostgreSQL database and an external C++ optimization engine.
+                    Each layer has a separate responsibility, which keeps the application
+                    easier to develop, test and extend.
+                </p>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>What ClassFlow does</h2>
+
+                <p>
+                    Users can manage the main resources required to build a timetable:
+                    teachers, classes, subjects, rooms and lesson requirements.
+                </p>
+
+                <p>
+                    ClassFlow also supports resource availability, scheduling rules,
+                    optimization settings, preprocessing validation and live optimization
+                    progress. When optimization completes, the generated timetable is shown
+                    in a table that can be filtered by class, teacher and room.
+                </p>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Architecture</h2>
+
+                <div class="architecture-flow">
+                    <div class="architecture-step">
+                        <strong>Browser</strong>
+                        <span>HTML / CSS / JavaScript</span>
+                    </div>
+
+                    <div class="architecture-arrow">→</div>
+
+                    <div class="architecture-step">
+                        <strong>ASP.NET Core</strong>
+                        <span>API / Services / SignalR</span>
+                    </div>
+
+                    <div class="architecture-arrow">→</div>
+
+                    <div class="architecture-step">
+                        <strong>PostgreSQL</strong>
+                        <span>Entity Framework Core / Npgsql</span>
+                    </div>
+
+                    <div class="architecture-arrow">→</div>
+
+                    <div class="architecture-step">
+                        <strong>C++ Engine</strong>
+                        <span>Timetable optimization</span>
+                    </div>
+
+                    <div class="architecture-arrow">→</div>
+
+                    <div class="architecture-step">
+                        <strong>Timetable result</strong>
+                        <span>Filters / CSV / local storage</span>
+                    </div>
+                </div>
+
+                <p>
+                    JSON is used as the data contract between the ASP.NET Core backend
+                    and the C++ engine. SignalR is used to send optimization progress
+                    updates from the server to the browser.
+                </p>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Technologies used</h2>
+
+                <div class="tech-grid">
+                    <div class="tech-item">
+                        <h3>ASP.NET Core</h3>
+                        <p>
+                            Web API, controllers, services, dependency injection,
+                            external process execution and application orchestration.
+                        </p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>C++</h3>
+                        <p>
+                            External optimization engine responsible for generating
+                            and evaluating timetable candidates.
+                        </p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>PostgreSQL</h3>
+                        <p>
+                            Relational database used to store organizations,
+                            users, teachers, classes, rooms, subjects,
+                            requirements and scheduling data.
+                        </p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>Entity Framework Core</h3>
+                        <p>
+                            Database access, domain models, migrations and
+                            PostgreSQL integration through the Npgsql provider.
+                        </p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>SignalR</h3>
+                        <p>
+                            Live optimization progress updates sent from the server
+                            to the dashboard.
+                        </p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>JavaScript</h3>
+                        <p>
+                            API communication, forms, navigation, table rendering,
+                            filtering, CSV export and browser storage.
+                        </p>
+                    </div>
+
+                    <div class="tech-item">
+                        <h3>HTML / CSS</h3>
+                        <p>
+                            Responsive application layout, resource pages, forms,
+                            tables and the Classic Ink visual theme.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Implemented features</h2>
+
+                <ul class="feature-list">
+                    <li>Demo login with prepared school datasets.</li>
+                    <li>Management of teachers, classes, rooms, subjects and lesson requirements.</li>
+                    <li>Weekly availability configuration for teachers, classes and rooms.</li>
+                    <li>Scheduling rules and constraints.</li>
+                    <li>Configurable genetic algorithm parameters and penalty values.</li>
+                    <li>ASP.NET Core integration with an external C++ optimization engine.</li>
+                    <li>Live optimization progress using SignalR.</li>
+                    <li>Validation and user-friendly preprocessing messages.</li>
+                    <li>Filterable timetable result by class, teacher and room.</li>
+                    <li>CSV export and storage of the latest result in the browser.</li>
+                </ul>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Project goals</h2>
+
+                <p>
+                    ClassFlow is both a practical application and a learning project.
+                    It is used to develop experience in modern C++, ASP.NET Core,
+                    PostgreSQL, database design, frontend development, process integration,
+                    real-time communication and deployment.
+                </p>
+
+                <p>
+                    A major design goal is to keep the optimization engine independent
+                    from the web interface. The C++ engine focuses on optimization,
+                    the backend prepares and validates data, and the browser presents
+                    the result in a form useful to the user.
+                </p>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Current status</h2>
+
+                <p>
+                    ClassFlow is a working prototype under active development.
+                    Resource management, availability, optimization settings,
+                    timetable generation, progress reporting, filtering and CSV export
+                    are already available.
+                </p>
+
+                <p>
+                    The current development work focuses on improving diagnostics
+                    and making execution of the external optimization engine reliable
+                    in the server environment.
+                </p>
+            </section>
+
+            <section class="app-card about-section">
+                <h2>Next steps</h2>
+
+                <ul class="feature-list">
+                    <li>Improve server-side process diagnostics and optimization logs.</li>
+                    <li>Store optimization runs and generated timetables in the database.</li>
+                    <li>Add Excel import and export.</li>
+                    <li>Expand timetable constraints and optimization quality measures.</li>
+                    <li>Complete registration and regular user authentication.</li>
+                    <li>Continue deployment hardening and production preparation.</li>
+                </ul>
+            </section>
+
+            <footer class="app-footer">
+                Created by Grzegorz Bainczyk
+            </footer>
+
+        </div>
+    </main>
+
+    <script>
+        document
+            .getElementById("backToMainButton")
+            ?.addEventListener("click", () => {
+                window.location.href = "main.html";
+            });
+    </script>
+</body>
+</html>

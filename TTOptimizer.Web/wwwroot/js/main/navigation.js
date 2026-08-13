@@ -1,11 +1,11 @@
 const NAVIGATION_TARGETS = {
     teachersButton: "teachers.html",
     classesButton: "classes.html",
+    studentGroupsButton: "student-groups.html",
     roomsButton: "rooms.html",
     subjectsButton: "subjects.html",
     requirementsButton: "requirements.html",
     rulesButton: "rules.html",
-    organizationPreferencesButton: "organization-preferences.html",
     aboutProjectButton: "about.html",
     optimizationSettingsButton: "optimization-settings.html",
     optimizationInfoButton: "optimization-info.html"

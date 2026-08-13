@@ -1,9 +1,11 @@
 #include <algorithm>
 #include <map>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
+#include <set>
 
 #include "Evaluation/FitnessEvaluator.h"
 #include "Evaluation/Rules/ConstraintRuleContext.h"
@@ -16,8 +18,8 @@ namespace
     using TimeKey = std::pair<int, int>;
     using TeacherTimeKey =
         std::pair<TeacherId, TimeKey>;
-    using ClassGroupTimeKey =
-        std::pair<ClassGroupId, TimeKey>;
+    using StudentGroupTimeKey =
+        std::pair<StudentGroupId, TimeKey>;
 
     const LessonRequirement& FindRequirementById(
         const TimetableProblem& problem,
@@ -117,6 +119,60 @@ namespace
     }
 
 
+
+    const StudentGroup& FindStudentGroupById(
+        const TimetableProblem& problem,
+        StudentGroupId studentGroupId)
+    {
+        const auto iterator = std::find_if(
+            problem.studentGroups.begin(), problem.studentGroups.end(),
+            [studentGroupId](const StudentGroup& group) { return group.id == studentGroupId; });
+        if (iterator == problem.studentGroups.end())
+            throw std::runtime_error("Student group not found.");
+        return *iterator;
+    }
+
+    bool StudentGroupsConflict(const TimetableProblem& problem,
+        StudentGroupId first, StudentGroupId second)
+    {
+        if (first == second) return true;
+        if (first > second) std::swap(first, second);
+        return std::any_of(problem.studentGroupConflicts.begin(), problem.studentGroupConflicts.end(),
+            [first, second](const StudentGroupConflict& conflict)
+            {
+                return conflict.firstStudentGroupId == first && conflict.secondStudentGroupId == second;
+            });
+    }
+
+    int PreferenceRank(TimeSlotPreferenceType value)
+    {
+        switch(value)
+        {
+        case TimeSlotPreferenceType::Preferred: return 0;
+        case TimeSlotPreferenceType::Available: return 1;
+        case TimeSlotPreferenceType::NotPreferred: return 2;
+        case TimeSlotPreferenceType::Unavailable: return 3;
+        }
+        return 1;
+    }
+
+    TimeSlotPreferenceType FindStudentGroupClassPreference(
+        const TimetableProblem& problem,
+        StudentGroupId studentGroupId,
+        int dayIndex,
+        int slotIndex)
+    {
+        const StudentGroup& group = FindStudentGroupById(problem, studentGroupId);
+        TimeSlotPreferenceType result = TimeSlotPreferenceType::Preferred;
+        for (ClassGroupId classGroupId : group.classGroupIds)
+        {
+            const auto current = FindTimeSlotPreference(problem.classGroupTimeSlotPreferences,
+                classGroupId, dayIndex, slotIndex, &ClassGroupTimeSlotPreference::classGroupId);
+            if (PreferenceRank(current) > PreferenceRank(result)) result = current;
+        }
+        return group.classGroupIds.empty() ? TimeSlotPreferenceType::Available : result;
+    }
+
     ConstraintViolation CreateViolation(
         ConstraintViolationType type,
         std::string message)
@@ -171,8 +227,11 @@ FitnessScore FitnessEvaluator::evaluate(
     std::map<TeacherTimeKey, int>
         teacherTimeUsage;
 
-    std::map<ClassGroupTimeKey, int>
-        classGroupTimeUsage;
+    std::map<StudentGroupTimeKey, int>
+        studentGroupTimeUsage;
+
+    std::map<TimeKey, std::set<StudentGroupId>>
+        studentGroupsAtTime;
 
     for (LessonInstanceIndex lessonIndex = 0;
         lessonIndex < chromosome.genes.size();
@@ -229,15 +288,16 @@ FitnessScore FitnessEvaluator::evaluate(
                 requirement.teacherId,
                 timeKey);
 
-        const ClassGroupTimeKey
-            classGroupTimeKey =
+        const StudentGroupTimeKey
+            studentGroupTimeKey =
             std::make_pair(
-                requirement.classGroupId,
+                requirement.studentGroupId,
                 timeKey);
 
         scheduleSlotUsage[scheduleSlotIndex]++;
         teacherTimeUsage[teacherTimeKey]++;
-        classGroupTimeUsage[classGroupTimeKey]++;
+        studentGroupTimeUsage[studentGroupTimeKey]++;
+        studentGroupsAtTime[timeKey].insert(requirement.studentGroupId);
 
         const TimeSlotPreferenceType teacherPreference =
             FindTimeSlotPreference(
@@ -248,12 +308,11 @@ FitnessScore FitnessEvaluator::evaluate(
                 &TeacherTimeSlotPreference::teacherId);
 
         const TimeSlotPreferenceType classGroupPreference =
-            FindTimeSlotPreference(
-                problem.classGroupTimeSlotPreferences,
-                requirement.classGroupId,
+            FindStudentGroupClassPreference(
+                problem,
+                requirement.studentGroupId,
                 dayIndex,
-                slotIndex,
-                &ClassGroupTimeSlotPreference::classGroupId);
+                slotIndex);
 
         const TimeSlotPreferenceType roomPreference =
             FindTimeSlotPreference(
@@ -483,48 +542,37 @@ FitnessScore FitnessEvaluator::evaluate(
             usageCount - 1);
     }
 
-    /*
-     * Hard constraint:
-     * class group is assigned to multiple lessons
-     * at the same time.
-     */
-    for (const auto& [classGroupTimeKey,
-        usageCount] :
-        classGroupTimeUsage)
+    /* Hard constraint: the same student group has multiple lessons at the same time. */
+    for (const auto& [studentGroupTimeKey, usageCount] : studentGroupTimeUsage)
     {
-        if (usageCount <= 1)
+        if (usageCount <= 1) continue;
+        ConstraintViolation violation = CreateViolation(
+            ConstraintViolationType::StudentGroupConflict,
+            "Student group is assigned to multiple lessons at the same time.");
+        violation.studentGroupId = studentGroupTimeKey.first;
+        violation.dayIndex = studentGroupTimeKey.second.first;
+        violation.slotIndex = studentGroupTimeKey.second.second;
+        score.addHardViolation(std::move(violation), usageCount - 1);
+    }
+
+    /* Hard constraint: overlapping student groups may not be scheduled simultaneously. */
+    for (const auto& [timeKey, groups] : studentGroupsAtTime)
+    {
+        for (auto first = groups.begin(); first != groups.end(); ++first)
         {
-            continue;
+            for (auto second = std::next(first); second != groups.end(); ++second)
+            {
+                if (!StudentGroupsConflict(problem, *first, *second)) continue;
+                ConstraintViolation violation = CreateViolation(
+                    ConstraintViolationType::StudentGroupConflict,
+                    "Overlapping student groups are assigned lessons at the same time.");
+                violation.studentGroupId = *first;
+                violation.otherStudentGroupId = *second;
+                violation.dayIndex = timeKey.first;
+                violation.slotIndex = timeKey.second;
+                score.addHardViolation(std::move(violation));
+            }
         }
-
-        const ClassGroupId classGroupId =
-            classGroupTimeKey.first;
-
-        const int dayIndex =
-            classGroupTimeKey.second.first;
-
-        const int slotIndex =
-            classGroupTimeKey.second.second;
-
-        ConstraintViolation violation =
-            CreateViolation(
-                ConstraintViolationType::
-                ClassGroupConflict,
-                "Class group is assigned to multiple "
-                "lessons at the same time.");
-
-        violation.classGroupId =
-            classGroupId;
-
-        violation.dayIndex =
-            dayIndex;
-
-        violation.slotIndex =
-            slotIndex;
-
-        score.addHardViolation(
-            std::move(violation),
-            usageCount - 1);
     }
 
 

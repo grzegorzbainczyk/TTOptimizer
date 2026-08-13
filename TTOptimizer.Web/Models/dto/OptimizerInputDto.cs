@@ -43,6 +43,10 @@ public class OptimizerInputDto
     /// </summary>
     public List<OptimizerRoomDto> Rooms { get; set; } = new();
 
+    public List<OptimizerStudentGroupDto> StudentGroups { get; set; } = new();
+
+    public List<OptimizerStudentGroupConflictDto> StudentGroupConflicts { get; set; } = new();
+
     /// <summary>
     /// Gets or sets the collection of lesson requirements that must be scheduled
     /// by the optimization engine.
@@ -188,6 +192,8 @@ public class OptimizerLessonRequirementDto
     /// </summary>
     public int ClassGroupId { get; set; }
 
+    public int StudentGroupId { get; set; }
+
     /// <summary>
     /// Gets or sets the identifier of the subject assigned to the requirement.
     /// </summary>
@@ -198,4 +204,18 @@ public class OptimizerLessonRequirementDto
     /// during one week.
     /// </summary>
     public int LessonsPerWeek { get; set; }
+}
+
+public class OptimizerStudentGroupDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public List<int> ClassGroupIds { get; set; } = new();
+}
+
+public class OptimizerStudentGroupConflictDto
+{
+    public int FirstStudentGroupId { get; set; }
+    public int SecondStudentGroupId { get; set; }
 }

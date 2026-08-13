@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.DTO.Requirements;
+using TTOptimizer.Web.Models.Domain;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -10,431 +11,160 @@ namespace TTOptimizer.Web.Controllers;
 public class RequirementsController : ControllerBase
 {
     private readonly AppDbContext _db;
-
-    public RequirementsController(AppDbContext db)
-    {
-        _db = db;
-    }
+    public RequirementsController(AppDbContext db) => _db = db;
 
     [HttpGet]
-    public async Task<ActionResult<List<LessonRequirementDTO>>>
-        GetRequirements(
-            [FromQuery] int organizationId)
+    public async Task<ActionResult<List<LessonRequirementDTO>>> GetRequirements([FromQuery] int organizationId)
     {
         if (organizationId <= 0)
-        {
-            return BadRequest(new
-            {
-                message = "Organization ID is required."
-            });
-        }
+            return BadRequest(new { message = "Organization ID is required." });
+
+        await EnsureWholeClassGroupsAsync(organizationId);
+        await BackfillLegacyStudentGroupsAsync(organizationId);
 
         var requirements = await _db.LessonRequirements
             .AsNoTracking()
-            .Where(requirement =>
-                requirement.OrganizationId == organizationId)
-            .OrderBy(requirement =>
-                requirement.ClassGroup.Name)
-            .ThenBy(requirement =>
-                requirement.Subject.Name)
-            .ThenBy(requirement =>
-                requirement.Teacher.Name)
-            .Select(requirement =>
-                new LessonRequirementDTO
-                {
-                    Id = requirement.Id,
-
-                    TeacherId =
-                        requirement.TeacherId,
-
-                    TeacherName =
-                        requirement.Teacher.Name,
-
-                    ClassGroupId =
-                        requirement.ClassGroupId,
-
-                    ClassName =
-                        requirement.ClassGroup.Name,
-
-                    SubjectId =
-                        requirement.SubjectId,
-
-                    SubjectName =
-                        requirement.Subject.Name,
-
-                    HoursPerWeek =
-                        requirement.HoursPerWeek
-                })
+            .Where(x => x.OrganizationId == organizationId)
+            .OrderBy(x => x.StudentGroup!.Name)
+            .ThenBy(x => x.Subject.Name)
+            .ThenBy(x => x.Teacher.Name)
+            .Select(x => new LessonRequirementDTO
+            {
+                Id = x.Id,
+                TeacherId = x.TeacherId,
+                TeacherName = x.Teacher.Name,
+                StudentGroupId = x.StudentGroupId!.Value,
+                StudentGroupName = x.StudentGroup!.Name,
+                ClassGroupId = x.StudentGroup.ClassGroupId,
+                ClassName = x.StudentGroup.ClassGroup != null ? x.StudentGroup.ClassGroup.Name : null,
+                SubjectId = x.SubjectId,
+                SubjectName = x.Subject.Name,
+                HoursPerWeek = x.HoursPerWeek
+            })
             .ToListAsync();
-
         return Ok(requirements);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<LessonRequirementDTO>>
-        GetRequirement(
-            int id,
-            [FromQuery] int organizationId)
+    public async Task<ActionResult<LessonRequirementDTO>> GetRequirement(int id, [FromQuery] int organizationId)
     {
-        var requirement = await GetRequirementDTOAsync(
-            id,
-            organizationId
-        );
-
-        if (requirement == null)
-        {
-            return NotFound(new
-            {
-                message = "Lesson requirement not found."
-            });
-        }
-
-        return Ok(requirement);
+        await EnsureWholeClassGroupsAsync(organizationId);
+        await BackfillLegacyStudentGroupsAsync(organizationId);
+        var dto = await GetRequirementDTOAsync(id, organizationId);
+        return dto == null ? NotFound(new { message = "Lesson requirement not found." }) : Ok(dto);
     }
 
     [HttpPost]
-    public async Task<ActionResult<LessonRequirementDTO>>
-        CreateRequirement(
-            [FromQuery] int organizationId,
-            [FromBody]
-            CreateLessonRequirementRequest request)
+    public async Task<ActionResult<LessonRequirementDTO>> CreateRequirement(
+        [FromQuery] int organizationId,
+        [FromBody] CreateStudentGroupLessonRequirementRequest request)
     {
-        if (organizationId <= 0)
-        {
-            return BadRequest(new
-            {
-                message = "Organization ID is required."
-            });
-        }
+        var validation = await ValidateRequestAsync(organizationId, request.TeacherId, request.StudentGroupId, request.SubjectId, request.HoursPerWeek);
+        if (validation != null) return validation;
 
-        var validationResult =
-            await ValidateRequestAsync(
-                organizationId,
-                request.TeacherId,
-                request.ClassGroupId,
-                request.SubjectId,
-                request.HoursPerWeek
-            );
+        var group = await _db.StudentGroups.FirstAsync(x => x.Id == request.StudentGroupId);
+        var duplicate = await _db.LessonRequirements.AnyAsync(x =>
+            x.OrganizationId == organizationId && x.TeacherId == request.TeacherId &&
+            x.StudentGroupId == request.StudentGroupId && x.SubjectId == request.SubjectId);
+        if (duplicate) return Conflict(new { message = "This lesson requirement already exists." });
 
-        if (validationResult != null)
-        {
-            return validationResult;
-        }
-
-        var duplicateExists =
-            await _db.LessonRequirements
-                .AnyAsync(requirement =>
-                    requirement.OrganizationId ==
-                        organizationId &&
-                    requirement.TeacherId ==
-                        request.TeacherId &&
-                    requirement.ClassGroupId ==
-                        request.ClassGroupId &&
-                    requirement.SubjectId ==
-                        request.SubjectId
-                );
-
-        if (duplicateExists)
-        {
-            return Conflict(new
-            {
-                message =
-                    "This lesson requirement already exists."
-            });
-        }
-
-        var requirement = new LessonRequirement
+        var entity = new LessonRequirement
         {
             OrganizationId = organizationId,
             TeacherId = request.TeacherId,
-            ClassGroupId = request.ClassGroupId,
+            StudentGroupId = request.StudentGroupId,
+            ClassGroupId = group.ClassGroupId,
             SubjectId = request.SubjectId,
             HoursPerWeek = request.HoursPerWeek
         };
-
-        _db.LessonRequirements.Add(requirement);
+        _db.LessonRequirements.Add(entity);
         await _db.SaveChangesAsync();
-
-        var result = await GetRequirementDTOAsync(
-            requirement.Id,
-            organizationId
-        );
-
-        return CreatedAtAction(
-            nameof(GetRequirement),
-            new
-            {
-                id = requirement.Id,
-                organizationId
-            },
-            result
-        );
+        return CreatedAtAction(nameof(GetRequirement), new { id = entity.Id, organizationId },
+            await GetRequirementDTOAsync(entity.Id, organizationId));
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<LessonRequirementDTO>>
-        UpdateRequirement(
-            int id,
-            [FromQuery] int organizationId,
-            [FromBody]
-            UpdateLessonRequirementRequest request)
+    public async Task<ActionResult<LessonRequirementDTO>> UpdateRequirement(
+        int id, [FromQuery] int organizationId,
+        [FromBody] UpdateStudentGroupLessonRequirementRequest request)
     {
-        if (organizationId <= 0)
-        {
-            return BadRequest(new
-            {
-                message = "Organization ID is required."
-            });
-        }
+        var entity = await _db.LessonRequirements.FirstOrDefaultAsync(x => x.Id == id && x.OrganizationId == organizationId);
+        if (entity == null) return NotFound(new { message = "Lesson requirement not found." });
 
-        var requirement =
-            await _db.LessonRequirements
-                .FirstOrDefaultAsync(requirement =>
-                    requirement.Id == id &&
-                    requirement.OrganizationId ==
-                        organizationId
-                );
+        var validation = await ValidateRequestAsync(organizationId, request.TeacherId, request.StudentGroupId, request.SubjectId, request.HoursPerWeek);
+        if (validation != null) return validation;
 
-        if (requirement == null)
-        {
-            return NotFound(new
-            {
-                message = "Lesson requirement not found."
-            });
-        }
+        var duplicate = await _db.LessonRequirements.AnyAsync(x => x.OrganizationId == organizationId && x.Id != id &&
+            x.TeacherId == request.TeacherId && x.StudentGroupId == request.StudentGroupId && x.SubjectId == request.SubjectId);
+        if (duplicate) return Conflict(new { message = "This lesson requirement already exists." });
 
-        var validationResult =
-            await ValidateRequestAsync(
-                organizationId,
-                request.TeacherId,
-                request.ClassGroupId,
-                request.SubjectId,
-                request.HoursPerWeek
-            );
-
-        if (validationResult != null)
-        {
-            return validationResult;
-        }
-
-        var duplicateExists =
-            await _db.LessonRequirements
-                .AnyAsync(otherRequirement =>
-                    otherRequirement.OrganizationId ==
-                        organizationId &&
-                    otherRequirement.Id != id &&
-                    otherRequirement.TeacherId ==
-                        request.TeacherId &&
-                    otherRequirement.ClassGroupId ==
-                        request.ClassGroupId &&
-                    otherRequirement.SubjectId ==
-                        request.SubjectId
-                );
-
-        if (duplicateExists)
-        {
-            return Conflict(new
-            {
-                message =
-                    "This lesson requirement already exists."
-            });
-        }
-
-        requirement.TeacherId =
-            request.TeacherId;
-
-        requirement.ClassGroupId =
-            request.ClassGroupId;
-
-        requirement.SubjectId =
-            request.SubjectId;
-
-        requirement.HoursPerWeek =
-            request.HoursPerWeek;
-
+        var group = await _db.StudentGroups.FirstAsync(x => x.Id == request.StudentGroupId);
+        entity.TeacherId = request.TeacherId;
+        entity.StudentGroupId = request.StudentGroupId;
+        entity.ClassGroupId = group.ClassGroupId;
+        entity.SubjectId = request.SubjectId;
+        entity.HoursPerWeek = request.HoursPerWeek;
         await _db.SaveChangesAsync();
-
-        var result = await GetRequirementDTOAsync(
-            requirement.Id,
-            organizationId
-        );
-
-        return Ok(result);
+        return Ok(await GetRequirementDTOAsync(id, organizationId));
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteRequirement(
-        int id,
-        [FromQuery] int organizationId)
+    public async Task<IActionResult> DeleteRequirement(int id, [FromQuery] int organizationId)
     {
-        if (organizationId <= 0)
-        {
-            return BadRequest(new
-            {
-                message = "Organization ID is required."
-            });
-        }
-
-        var requirement =
-            await _db.LessonRequirements
-                .FirstOrDefaultAsync(requirement =>
-                    requirement.Id == id &&
-                    requirement.OrganizationId ==
-                        organizationId
-                );
-
-        if (requirement == null)
-        {
-            return NotFound(new
-            {
-                message = "Lesson requirement not found."
-            });
-        }
-
-        _db.LessonRequirements.Remove(requirement);
-
+        var entity = await _db.LessonRequirements.FirstOrDefaultAsync(x => x.Id == id && x.OrganizationId == organizationId);
+        if (entity == null) return NotFound(new { message = "Lesson requirement not found." });
+        _db.LessonRequirements.Remove(entity);
         await _db.SaveChangesAsync();
-
         return NoContent();
     }
 
-    private async Task<ActionResult?>
-        ValidateRequestAsync(
-            int organizationId,
-            int teacherId,
-            int classGroupId,
-            int subjectId,
-            int hoursPerWeek)
+    private async Task<ActionResult?> ValidateRequestAsync(int organizationId, int teacherId, int studentGroupId, int subjectId, int hoursPerWeek)
     {
-        if (teacherId <= 0)
-        {
-            return BadRequest(new
-            {
-                message = "Teacher is required."
-            });
-        }
-
-        if (classGroupId <= 0)
-        {
-            return BadRequest(new
-            {
-                message = "Class is required."
-            });
-        }
-
-        if (subjectId <= 0)
-        {
-            return BadRequest(new
-            {
-                message = "Subject is required."
-            });
-        }
-
-        if (hoursPerWeek <= 0)
-        {
-            return BadRequest(new
-            {
-                message =
-                    "Hours per week must be greater than zero."
-            });
-        }
-
-        if (hoursPerWeek > 40)
-        {
-            return BadRequest(new
-            {
-                message =
-                    "Hours per week cannot be greater than 40."
-            });
-        }
-
-        var teacherExists =
-            await _db.Teachers.AnyAsync(teacher =>
-                teacher.Id == teacherId &&
-                teacher.OrganizationId == organizationId
-            );
-
-        if (!teacherExists)
-        {
-            return BadRequest(new
-            {
-                message =
-                    "The selected teacher does not exist."
-            });
-        }
-
-        var classExists =
-            await _db.ClassGroups.AnyAsync(classGroup =>
-                classGroup.Id == classGroupId &&
-                classGroup.OrganizationId ==
-                    organizationId
-            );
-
-        if (!classExists)
-        {
-            return BadRequest(new
-            {
-                message =
-                    "The selected class does not exist."
-            });
-        }
-
-        var subjectExists =
-            await _db.Subjects.AnyAsync(subject =>
-                subject.Id == subjectId &&
-                subject.OrganizationId ==
-                    organizationId
-            );
-
-        if (!subjectExists)
-        {
-            return BadRequest(new
-            {
-                message =
-                    "The selected subject does not exist."
-            });
-        }
-
+        if (organizationId <= 0) return BadRequest(new { message = "Organization ID is required." });
+        if (teacherId <= 0) return BadRequest(new { message = "Teacher is required." });
+        if (studentGroupId <= 0) return BadRequest(new { message = "Student group is required." });
+        if (subjectId <= 0) return BadRequest(new { message = "Subject is required." });
+        if (hoursPerWeek is < 1 or > 40) return BadRequest(new { message = "Hours per week must be between 1 and 40." });
+        if (!await _db.Teachers.AnyAsync(x => x.Id == teacherId && x.OrganizationId == organizationId))
+            return BadRequest(new { message = "Teacher was not found." });
+        if (!await _db.StudentGroups.AnyAsync(x => x.Id == studentGroupId && x.OrganizationId == organizationId))
+            return BadRequest(new { message = "Student group was not found." });
+        if (!await _db.Subjects.AnyAsync(x => x.Id == subjectId && x.OrganizationId == organizationId))
+            return BadRequest(new { message = "Subject was not found." });
         return null;
     }
 
-    private async Task<LessonRequirementDTO?>
-        GetRequirementDTOAsync(
-            int id,
-            int organizationId)
+    private Task<LessonRequirementDTO?> GetRequirementDTOAsync(int id, int organizationId) =>
+        _db.LessonRequirements.AsNoTracking()
+            .Where(x => x.Id == id && x.OrganizationId == organizationId)
+            .Select(x => new LessonRequirementDTO
+            {
+                Id = x.Id, TeacherId = x.TeacherId, TeacherName = x.Teacher.Name,
+                StudentGroupId = x.StudentGroupId!.Value, StudentGroupName = x.StudentGroup!.Name,
+                ClassGroupId = x.StudentGroup.ClassGroupId,
+                ClassName = x.StudentGroup.ClassGroup != null ? x.StudentGroup.ClassGroup.Name : null,
+                SubjectId = x.SubjectId, SubjectName = x.Subject.Name, HoursPerWeek = x.HoursPerWeek
+            }).FirstOrDefaultAsync();
+
+    private async Task EnsureWholeClassGroupsAsync(int organizationId)
     {
-        return await _db.LessonRequirements
-            .AsNoTracking()
-            .Where(requirement =>
-                requirement.Id == id &&
-                requirement.OrganizationId ==
-                    organizationId)
-            .Select(requirement =>
-                new LessonRequirementDTO
-                {
-                    Id = requirement.Id,
+        var classes = await _db.ClassGroups.Where(x => x.OrganizationId == organizationId).ToListAsync();
+        var existing = (await _db.StudentGroups.Where(x => x.OrganizationId == organizationId && x.Type == StudentGroupType.WholeClass && x.ClassGroupId.HasValue)
+            .Select(x => x.ClassGroupId!.Value).ToListAsync()).ToHashSet();
+        foreach (var c in classes.Where(x => !existing.Contains(x.Id)))
+            _db.StudentGroups.Add(new StudentGroup { OrganizationId = organizationId, ClassGroupId = c.Id, Name = c.Name, Type = StudentGroupType.WholeClass });
+        await _db.SaveChangesAsync();
+    }
 
-                    TeacherId =
-                        requirement.TeacherId,
-
-                    TeacherName =
-                        requirement.Teacher.Name,
-
-                    ClassGroupId =
-                        requirement.ClassGroupId,
-
-                    ClassName =
-                        requirement.ClassGroup.Name,
-
-                    SubjectId =
-                        requirement.SubjectId,
-
-                    SubjectName =
-                        requirement.Subject.Name,
-
-                    HoursPerWeek =
-                        requirement.HoursPerWeek
-                })
-            .FirstOrDefaultAsync();
+    private async Task BackfillLegacyStudentGroupsAsync(int organizationId)
+    {
+        var legacy = await _db.LessonRequirements.Where(x => x.OrganizationId == organizationId && x.StudentGroupId == null && x.ClassGroupId != null).ToListAsync();
+        if (legacy.Count == 0) return;
+        var whole = await _db.StudentGroups.Where(x => x.OrganizationId == organizationId && x.Type == StudentGroupType.WholeClass && x.ClassGroupId != null)
+            .ToDictionaryAsync(x => x.ClassGroupId!.Value, x => x.Id);
+        foreach (var requirement in legacy)
+            if (requirement.ClassGroupId.HasValue && whole.TryGetValue(requirement.ClassGroupId.Value, out var groupId))
+                requirement.StudentGroupId = groupId;
+        await _db.SaveChangesAsync();
     }
 }
