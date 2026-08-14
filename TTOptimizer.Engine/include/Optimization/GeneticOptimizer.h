@@ -32,6 +32,54 @@ public:
         const std::vector<ScheduleSlot>& scheduleSlots);
 
 private:
+    void validateOptimizationInput(
+        const std::vector<Chromosome>& initialPopulation,
+        const std::vector<LessonInstance>& lessonInstances,
+        const std::vector<ScheduleSlot>& scheduleSlots) const;
+
+    std::vector<Chromosome> initializePopulation(
+        std::vector<Chromosome> population,
+        const TimetableProblem& problem,
+        const std::vector<LessonInstance>& lessonInstances,
+        const std::vector<ScheduleSlot>& scheduleSlots);
+
+    std::vector<Chromosome> createNextGeneration(
+        const std::vector<Chromosome>& population,
+        const TimetableProblem& problem,
+        const std::vector<LessonInstance>& lessonInstances,
+        const std::vector<ScheduleSlot>& scheduleSlots);
+
+    void copyElite(
+        const std::vector<Chromosome>& population,
+        std::vector<Chromosome>& nextPopulation) const;
+
+    Chromosome createChild(
+        const std::vector<Chromosome>& population,
+        const TimetableProblem& problem,
+        const std::vector<LessonInstance>& lessonInstances,
+        const std::vector<ScheduleSlot>& scheduleSlots);
+
+    Chromosome findBestMutation(
+        const Chromosome& parent,
+        const TimetableProblem& problem,
+        const std::vector<LessonInstance>& lessonInstances,
+        const std::vector<ScheduleSlot>& scheduleSlots);
+
+    void updateBestChromosome(
+        const std::vector<Chromosome>& population,
+        Chromosome& bestChromosome,
+        int generation,
+        int& bestFoundAtGeneration) const;
+
+    bool shouldStopEarly(
+        const Chromosome& bestChromosome) const;
+
+    static void reportInitialState(
+        const Chromosome& bestChromosome);
+
+    static void reportPerfectSolution(
+        int generation);
+
     void reportProgress(
         int generation,
         int totalGenerations,

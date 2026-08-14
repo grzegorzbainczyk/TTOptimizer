@@ -17,6 +17,14 @@
     {
       "id": 391,
       "name": "Magdalena Koz\u0142owska"
+    },
+    {
+      "id": 392,
+      "name": "Jerzy Po\u0142omski"
+    },
+    {
+      "id": 393,
+      "name": "Stanis\u0142aw B\u0105bka"
     }
   ],
   "classes": [
@@ -63,29 +71,143 @@
     {
       "id": 275,
       "name": "101",
+      "buildingId": 1,
       "capacity": 0
     },
     {
       "id": 276,
       "name": "102",
+      "buildingId": 2,
       "capacity": 0
     },
     {
       "id": 277,
       "name": "8",
+      "buildingId": 2,
       "capacity": 0
     },
     {
       "id": 278,
       "name": "6",
+      "buildingId": 2,
+      "capacity": 0
+    },
+    {
+      "id": 279,
+      "name": "2",
+      "buildingId": 1,
+      "capacity": 0
+    },
+    {
+      "id": 280,
+      "name": "13",
+      "buildingId": 2,
       "capacity": 0
     }
   ],
+  "studentGroups": [
+    {
+      "id": 1,
+      "name": "1A",
+      "type": "WholeClass",
+      "classGroupIds": [
+        256
+      ]
+    },
+    {
+      "id": 2,
+      "name": "1B",
+      "type": "WholeClass",
+      "classGroupIds": [
+        257
+      ]
+    },
+    {
+      "id": 3,
+      "name": "1C",
+      "type": "WholeClass",
+      "classGroupIds": [
+        258
+      ]
+    },
+    {
+      "id": 4,
+      "name": "2A",
+      "type": "WholeClass",
+      "classGroupIds": [
+        259
+      ]
+    },
+    {
+      "id": 5,
+      "name": "1Cangielski1",
+      "type": "Subgroup",
+      "classGroupIds": [
+        258
+      ]
+    },
+    {
+      "id": 6,
+      "name": "1Cangielski2",
+      "type": "Subgroup",
+      "classGroupIds": [
+        258
+      ]
+    },
+    {
+      "id": 7,
+      "name": "1Cangielski3",
+      "type": "Subgroup",
+      "classGroupIds": [
+        258
+      ]
+    },
+    {
+      "id": 8,
+      "name": "1C Jan Kowalski dodatkowa matematyka",
+      "type": "Individual",
+      "classGroupIds": [
+        258
+      ]
+    }
+  ],
+  "studentGroupConflicts": [
+    {
+      "firstStudentGroupId": 3,
+      "secondStudentGroupId": 5
+    },
+    {
+      "firstStudentGroupId": 3,
+      "secondStudentGroupId": 6
+    },
+    {
+      "firstStudentGroupId": 3,
+      "secondStudentGroupId": 7
+    },
+    {
+      "firstStudentGroupId": 3,
+      "secondStudentGroupId": 8
+    },
+    {
+      "firstStudentGroupId": 5,
+      "secondStudentGroupId": 8
+    },
+    {
+      "firstStudentGroupId": 6,
+      "secondStudentGroupId": 8
+    },
+    {
+      "firstStudentGroupId": 7,
+      "secondStudentGroupId": 8
+    }
+  ],
+  "studentGroupAvoidImmediateBuildingChange": "Medium",
   "lessonRequirements": [
     {
       "id": 1159,
       "teacherId": 388,
       "classGroupId": 256,
+      "studentGroupId": 1,
       "subjectId": 371,
       "lessonsPerWeek": 4
     },
@@ -93,6 +215,7 @@
       "id": 1160,
       "teacherId": 389,
       "classGroupId": 256,
+      "studentGroupId": 1,
       "subjectId": 372,
       "lessonsPerWeek": 3
     },
@@ -100,6 +223,7 @@
       "id": 1161,
       "teacherId": 390,
       "classGroupId": 256,
+      "studentGroupId": 1,
       "subjectId": 373,
       "lessonsPerWeek": 2
     },
@@ -107,6 +231,7 @@
       "id": 1162,
       "teacherId": 388,
       "classGroupId": 257,
+      "studentGroupId": 2,
       "subjectId": 371,
       "lessonsPerWeek": 4
     },
@@ -114,6 +239,7 @@
       "id": 1163,
       "teacherId": 389,
       "classGroupId": 257,
+      "studentGroupId": 2,
       "subjectId": 372,
       "lessonsPerWeek": 3
     },
@@ -121,6 +247,7 @@
       "id": 1164,
       "teacherId": 390,
       "classGroupId": 257,
+      "studentGroupId": 2,
       "subjectId": 373,
       "lessonsPerWeek": 2
     },
@@ -128,6 +255,7 @@
       "id": 1165,
       "teacherId": 391,
       "classGroupId": 257,
+      "studentGroupId": 2,
       "subjectId": 371,
       "lessonsPerWeek": 4
     },
@@ -135,6 +263,7 @@
       "id": 1166,
       "teacherId": 391,
       "classGroupId": 258,
+      "studentGroupId": 3,
       "subjectId": 375,
       "lessonsPerWeek": 2
     },
@@ -142,204 +271,438 @@
       "id": 1167,
       "teacherId": 388,
       "classGroupId": 259,
+      "studentGroupId": 4,
+      "subjectId": 371,
+      "lessonsPerWeek": 1
+    },
+    {
+      "id": 1168,
+      "teacherId": 392,
+      "classGroupId": 257,
+      "studentGroupId": 2,
+      "subjectId": 374,
+      "lessonsPerWeek": 4
+    },
+    {
+      "id": 1169,
+      "teacherId": 390,
+      "classGroupId": 258,
+      "studentGroupId": 3,
+      "subjectId": 375,
+      "lessonsPerWeek": 5
+    },
+    {
+      "id": 1170,
+      "teacherId": 393,
+      "classGroupId": 257,
+      "studentGroupId": 2,
+      "subjectId": 375,
+      "lessonsPerWeek": 4
+    },
+    {
+      "id": 1171,
+      "teacherId": 393,
+      "classGroupId": 259,
+      "studentGroupId": 4,
+      "subjectId": 375,
+      "lessonsPerWeek": 3
+    },
+    {
+      "id": 1172,
+      "teacherId": 393,
+      "classGroupId": 258,
+      "studentGroupId": 3,
+      "subjectId": 375,
+      "lessonsPerWeek": 6
+    },
+    {
+      "id": 1173,
+      "teacherId": 393,
+      "classGroupId": 258,
+      "studentGroupId": 3,
+      "subjectId": 374,
+      "lessonsPerWeek": 5
+    },
+    {
+      "id": 1174,
+      "teacherId": 392,
+      "classGroupId": 258,
+      "studentGroupId": 5,
+      "subjectId": 373,
+      "lessonsPerWeek": 3
+    },
+    {
+      "id": 1175,
+      "teacherId": 392,
+      "classGroupId": 258,
+      "studentGroupId": 6,
+      "subjectId": 373,
+      "lessonsPerWeek": 1
+    },
+    {
+      "id": 1176,
+      "teacherId": 391,
+      "classGroupId": 258,
+      "studentGroupId": 8,
       "subjectId": 371,
       "lessonsPerWeek": 1
     }
   ],
-  "teacherUnavailabilities": [
+  "teacherTimeSlotPreferences": [
+    {
+      "teacherId": 388,
+      "dayIndex": 0,
+      "slotIndex": 0,
+      "preferenceType": "Preferred"
+    },
+    {
+      "teacherId": 388,
+      "dayIndex": 0,
+      "slotIndex": 1,
+      "preferenceType": "Preferred"
+    },
     {
       "teacherId": 388,
       "dayIndex": 1,
-      "slotIndex": 3
+      "slotIndex": 0,
+      "preferenceType": "Unavailable"
     },
     {
-      "teacherId": 390,
-      "dayIndex": 0,
-      "slotIndex": 0
-    },
-    {
-      "teacherId": 390,
-      "dayIndex": 0,
-      "slotIndex": 1
-    },
-    {
-      "teacherId": 390,
-      "dayIndex": 0,
-      "slotIndex": 2
-    },
-    {
-      "teacherId": 390,
-      "dayIndex": 0,
-      "slotIndex": 3
-    },
-    {
-      "teacherId": 390,
-      "dayIndex": 0,
-      "slotIndex": 4
-    },
-    {
-      "teacherId": 390,
-      "dayIndex": 0,
-      "slotIndex": 5
-    },
-    {
-      "teacherId": 390,
-      "dayIndex": 0,
-      "slotIndex": 6
-    },
-    {
-      "teacherId": 390,
-      "dayIndex": 0,
-      "slotIndex": 7
-    },
-    {
-      "teacherId": 390,
+      "teacherId": 388,
       "dayIndex": 1,
-      "slotIndex": 0
+      "slotIndex": 1,
+      "preferenceType": "Unavailable"
     },
     {
-      "teacherId": 390,
+      "teacherId": 388,
       "dayIndex": 1,
-      "slotIndex": 1
+      "slotIndex": 2,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 390,
+      "teacherId": 388,
       "dayIndex": 1,
-      "slotIndex": 2
+      "slotIndex": 3,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 390,
+      "teacherId": 388,
       "dayIndex": 1,
-      "slotIndex": 3
+      "slotIndex": 4,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 390,
+      "teacherId": 388,
       "dayIndex": 1,
-      "slotIndex": 4
+      "slotIndex": 5,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 390,
+      "teacherId": 388,
       "dayIndex": 1,
-      "slotIndex": 5
+      "slotIndex": 6,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 390,
+      "teacherId": 388,
       "dayIndex": 1,
-      "slotIndex": 6
+      "slotIndex": 7,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 390,
-      "dayIndex": 1,
-      "slotIndex": 7
+      "teacherId": 388,
+      "dayIndex": 2,
+      "slotIndex": 0,
+      "preferenceType": "Unavailable"
     },
     {
-      "teacherId": 391,
-      "dayIndex": 0,
-      "slotIndex": 0
+      "teacherId": 388,
+      "dayIndex": 2,
+      "slotIndex": 1,
+      "preferenceType": "Unavailable"
     },
     {
-      "teacherId": 391,
-      "dayIndex": 0,
-      "slotIndex": 1
+      "teacherId": 388,
+      "dayIndex": 3,
+      "slotIndex": 0,
+      "preferenceType": "Preferred"
     },
     {
-      "teacherId": 391,
-      "dayIndex": 0,
-      "slotIndex": 2
+      "teacherId": 388,
+      "dayIndex": 3,
+      "slotIndex": 1,
+      "preferenceType": "Preferred"
     },
     {
-      "teacherId": 391,
-      "dayIndex": 0,
-      "slotIndex": 3
+      "teacherId": 388,
+      "dayIndex": 3,
+      "slotIndex": 2,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 391,
-      "dayIndex": 0,
-      "slotIndex": 4
+      "teacherId": 388,
+      "dayIndex": 3,
+      "slotIndex": 3,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 391,
-      "dayIndex": 0,
-      "slotIndex": 5
+      "teacherId": 388,
+      "dayIndex": 3,
+      "slotIndex": 4,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 391,
-      "dayIndex": 0,
-      "slotIndex": 6
+      "teacherId": 388,
+      "dayIndex": 3,
+      "slotIndex": 5,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 391,
-      "dayIndex": 0,
-      "slotIndex": 7
+      "teacherId": 388,
+      "dayIndex": 3,
+      "slotIndex": 6,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 391,
-      "dayIndex": 1,
-      "slotIndex": 0
+      "teacherId": 388,
+      "dayIndex": 3,
+      "slotIndex": 7,
+      "preferenceType": "NotPreferred"
     },
     {
-      "teacherId": 391,
-      "dayIndex": 1,
-      "slotIndex": 1
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 1,
-      "slotIndex": 2
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 1,
-      "slotIndex": 3
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 1,
-      "slotIndex": 4
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 1,
-      "slotIndex": 5
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 1,
-      "slotIndex": 6
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 1,
-      "slotIndex": 7
-    },
-    {
-      "teacherId": 391,
+      "teacherId": 388,
       "dayIndex": 4,
-      "slotIndex": 4
+      "slotIndex": 0,
+      "preferenceType": "Preferred"
     },
     {
-      "teacherId": 391,
+      "teacherId": 388,
       "dayIndex": 4,
-      "slotIndex": 5
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 4,
-      "slotIndex": 6
-    },
-    {
-      "teacherId": 391,
-      "dayIndex": 4,
-      "slotIndex": 7
+      "slotIndex": 1,
+      "preferenceType": "Preferred"
     }
   ],
-  "classGroupUnavailabilities": [],
-  "roomUnavailabilities": [],
+  "classGroupTimeSlotPreferences": [],
+  "roomTimeSlotPreferences": [
+    {
+      "roomId": 276,
+      "dayIndex": 0,
+      "slotIndex": 0,
+      "preferenceType": "Preferred"
+    },
+    {
+      "roomId": 276,
+      "dayIndex": 1,
+      "slotIndex": 0,
+      "preferenceType": "Preferred"
+    },
+    {
+      "roomId": 276,
+      "dayIndex": 1,
+      "slotIndex": 2,
+      "preferenceType": "Preferred"
+    },
+    {
+      "roomId": 276,
+      "dayIndex": 1,
+      "slotIndex": 5,
+      "preferenceType": "Unavailable"
+    },
+    {
+      "roomId": 276,
+      "dayIndex": 2,
+      "slotIndex": 0,
+      "preferenceType": "Preferred"
+    },
+    {
+      "roomId": 276,
+      "dayIndex": 2,
+      "slotIndex": 2,
+      "preferenceType": "Preferred"
+    },
+    {
+      "roomId": 276,
+      "dayIndex": 3,
+      "slotIndex": 0,
+      "preferenceType": "Preferred"
+    },
+    {
+      "roomId": 276,
+      "dayIndex": 4,
+      "slotIndex": 2,
+      "preferenceType": "Unavailable"
+    },
+    {
+      "roomId": 276,
+      "dayIndex": 4,
+      "slotIndex": 3,
+      "preferenceType": "Unavailable"
+    },
+    {
+      "roomId": 276,
+      "dayIndex": 4,
+      "slotIndex": 4,
+      "preferenceType": "Unavailable"
+    },
+    {
+      "roomId": 276,
+      "dayIndex": 4,
+      "slotIndex": 5,
+      "preferenceType": "Unavailable"
+    }
+  ],
+  "subjectTimeSlotPreferences": [],
+  "teacherSchedulingPreferences": [
+    {
+      "teacherId": 388,
+      "minimizeGaps": "Hard",
+      "avoidSingleLessonDay": "Low",
+      "avoidImmediateBuildingChange": "Hard",
+      "maxConsecutiveLessons": "High",
+      "maxConsecutiveLessonsLimit": 4,
+      "maxLessonsPerDay": "Medium",
+      "maxLessonsPerDayLimit": 6
+    },
+    {
+      "teacherId": 389,
+      "minimizeGaps": "Low",
+      "avoidSingleLessonDay": "Low",
+      "avoidImmediateBuildingChange": "Hard",
+      "maxConsecutiveLessons": "High",
+      "maxConsecutiveLessonsLimit": 4,
+      "maxLessonsPerDay": "Medium",
+      "maxLessonsPerDayLimit": 6
+    },
+    {
+      "teacherId": 390,
+      "minimizeGaps": "Low",
+      "avoidSingleLessonDay": "Low",
+      "avoidImmediateBuildingChange": "Hard",
+      "maxConsecutiveLessons": "High",
+      "maxConsecutiveLessonsLimit": 4,
+      "maxLessonsPerDay": "Medium",
+      "maxLessonsPerDayLimit": 6
+    },
+    {
+      "teacherId": 391,
+      "minimizeGaps": "Low",
+      "avoidSingleLessonDay": "Low",
+      "avoidImmediateBuildingChange": "Hard",
+      "maxConsecutiveLessons": "Low",
+      "maxConsecutiveLessonsLimit": 4,
+      "maxLessonsPerDay": "Medium",
+      "maxLessonsPerDayLimit": 6
+    },
+    {
+      "teacherId": 392,
+      "minimizeGaps": "Low",
+      "avoidSingleLessonDay": "Low",
+      "avoidImmediateBuildingChange": "Hard",
+      "maxConsecutiveLessons": "High",
+      "maxConsecutiveLessonsLimit": 4,
+      "maxLessonsPerDay": "Medium",
+      "maxLessonsPerDayLimit": 6
+    },
+    {
+      "teacherId": 393,
+      "minimizeGaps": "Low",
+      "avoidSingleLessonDay": "Low",
+      "avoidImmediateBuildingChange": "Hard",
+      "maxConsecutiveLessons": "High",
+      "maxConsecutiveLessonsLimit": 4,
+      "maxLessonsPerDay": "Medium",
+      "maxLessonsPerDayLimit": 6
+    }
+  ],
+  "classGroupSchedulingPreferences": [
+    {
+      "classGroupId": 256,
+      "minimizeGaps": "Medium",
+      "avoidSingleLessonDay": "Disabled",
+      "avoidImmediateBuildingChange": "Disabled",
+      "maxConsecutiveLessons": "Medium",
+      "maxConsecutiveLessonsLimit": 6,
+      "maxLessonsPerDay": "Hard",
+      "maxLessonsPerDayLimit": 4
+    },
+    {
+      "classGroupId": 257,
+      "minimizeGaps": "Medium",
+      "avoidSingleLessonDay": "Disabled",
+      "avoidImmediateBuildingChange": "Disabled",
+      "maxConsecutiveLessons": "Medium",
+      "maxConsecutiveLessonsLimit": 6,
+      "maxLessonsPerDay": "High",
+      "maxLessonsPerDayLimit": 8
+    },
+    {
+      "classGroupId": 258,
+      "minimizeGaps": "Medium",
+      "avoidSingleLessonDay": "Disabled",
+      "avoidImmediateBuildingChange": "Disabled",
+      "maxConsecutiveLessons": "Medium",
+      "maxConsecutiveLessonsLimit": 6,
+      "maxLessonsPerDay": "High",
+      "maxLessonsPerDayLimit": 8
+    },
+    {
+      "classGroupId": 259,
+      "minimizeGaps": "Medium",
+      "avoidSingleLessonDay": "Disabled",
+      "avoidImmediateBuildingChange": "Disabled",
+      "maxConsecutiveLessons": "Medium",
+      "maxConsecutiveLessonsLimit": 6,
+      "maxLessonsPerDay": "High",
+      "maxLessonsPerDayLimit": 8
+    }
+  ],
+  "subjectSchedulingPreferences": [
+    {
+      "subjectId": 371,
+      "spreadAcrossDays": "Medium",
+      "maxOccurrencesPerDay": "Medium",
+      "maxOccurrencesPerDayLimit": 1,
+      "preferDoubleLessons": "Disabled",
+      "avoidDoubleLessons": "Disabled"
+    },
+    {
+      "subjectId": 372,
+      "spreadAcrossDays": "Medium",
+      "maxOccurrencesPerDay": "Medium",
+      "maxOccurrencesPerDayLimit": 1,
+      "preferDoubleLessons": "Disabled",
+      "avoidDoubleLessons": "Disabled"
+    },
+    {
+      "subjectId": 373,
+      "spreadAcrossDays": "Medium",
+      "maxOccurrencesPerDay": "Medium",
+      "maxOccurrencesPerDayLimit": 1,
+      "preferDoubleLessons": "Disabled",
+      "avoidDoubleLessons": "Disabled"
+    },
+    {
+      "subjectId": 374,
+      "spreadAcrossDays": "Medium",
+      "maxOccurrencesPerDay": "Medium",
+      "maxOccurrencesPerDayLimit": 1,
+      "preferDoubleLessons": "Disabled",
+      "avoidDoubleLessons": "Disabled"
+    },
+    {
+      "subjectId": 375,
+      "spreadAcrossDays": "Medium",
+      "maxOccurrencesPerDay": "Medium",
+      "maxOccurrencesPerDayLimit": 1,
+      "preferDoubleLessons": "Disabled",
+      "avoidDoubleLessons": "Disabled"
+    }
+  ],
   "optimizationSettings": {
     "populationSize": 100,
-    "iterations": 10000,
+    "generations": 100,
     "eliteCount": 5,
-    "tournamentSize": 5,
+    "tournamentSize": 3,
     "mutationAttempts": 5,
     "mutationProbability": 1,
     "randomSeed": 12345,
