@@ -48,6 +48,12 @@ public class OptimizerInputDto
     public List<OptimizerStudentGroupConflictDto> StudentGroupConflicts { get; set; } = new();
 
     /// <summary>
+    /// Organization-wide preference controlling immediate building changes
+    /// for overlapping student groups.
+    /// </summary>
+    public string StudentGroupAvoidImmediateBuildingChange { get; set; } = "Medium";
+
+    /// <summary>
     /// Gets or sets the collection of lesson requirements that must be scheduled
     /// by the optimization engine.
     /// </summary>

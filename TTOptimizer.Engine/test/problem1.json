@@ -699,7 +699,7 @@
     }
   ],
   "optimizationSettings": {
-    "populationSize": 100,
+    "populationSize": 1000,
     "generations": 100,
     "eliteCount": 5,
     "tournamentSize": 3,

@@ -11,10 +11,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("2e82d197-75b7-43f5-ab8d-7b55226e3b7f")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("TTOptimizer.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+392a9ada4151f08941a601d19cb17025e16b8bf7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f9f0bf4479aa0849dea81d39f9eb9baeb076800")]
 [assembly: System.Reflection.AssemblyProductAttribute("TTOptimizer.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TTOptimizer.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

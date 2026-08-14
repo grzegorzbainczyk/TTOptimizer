@@ -491,6 +491,11 @@ namespace TTOptimizer.Web.Migrations
                     b.Property<int>("OrganizationId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("StudentGroupAvoidImmediateBuildingChange")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
                     b.Property<int>("SubjectAvoidDoubleLessons")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")

@@ -27,6 +27,7 @@ function initializeLevelSelects() {
         "teacherAvoidImmediateBuildingChange",
         "teacherMaxConsecutiveLessons",
         "teacherMaxLessonsPerDay",
+        "studentGroupAvoidImmediateBuildingChange",
         "classGroupMinimizeGaps",
         "classGroupAvoidSingleLessonDay",
         "classGroupMaxConsecutiveLessons",
@@ -92,6 +93,9 @@ async function loadOrganizationPreferences() {
 
         setValue("teacherMaxLessonsPerDayLimit",
             preferences.teacherMaxLessonsPerDayLimit ?? 6);
+
+        setValue("studentGroupAvoidImmediateBuildingChange",
+            preferences.studentGroupAvoidImmediateBuildingChange ?? "Medium");
 
         setValue("classGroupMinimizeGaps",
             preferences.classGroupMinimizeGaps ?? "Medium");
@@ -174,6 +178,9 @@ async function saveOrganizationPreferences() {
                 getValue("teacherMaxLessonsPerDay"),
             teacherMaxLessonsPerDayLimit:
                 getInteger("teacherMaxLessonsPerDayLimit"),
+
+            studentGroupAvoidImmediateBuildingChange:
+                getValue("studentGroupAvoidImmediateBuildingChange"),
 
             classGroupMinimizeGaps:
                 getValue("classGroupMinimizeGaps"),

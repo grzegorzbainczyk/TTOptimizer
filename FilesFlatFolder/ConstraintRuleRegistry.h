@@ -8,6 +8,7 @@
 #include "Soft/TeacherMinimizeGapsRule.h"
 #include "Soft/TeacherAvoidSingleLessonDayRule.h"
 #include "Soft/TeacherAvoidImmediateBuildingChangeRule.h"
+#include "Soft/StudentGroupAvoidImmediateBuildingChangeRule.h"
 #include "Soft/TeacherMaxConsecutiveLessonsRule.h"
 #include "Soft/TeacherMaxLessonsPerDayRule.h"
 #include "Soft/ClassGroupMinimizeGapsRule.h"
@@ -35,6 +36,9 @@ public:
 
         rules_.push_back(
             std::make_unique<TeacherAvoidImmediateBuildingChangeRule>());
+
+        rules_.push_back(
+            std::make_unique<StudentGroupAvoidImmediateBuildingChangeRule>());
 
         rules_.push_back(
             std::make_unique<TeacherMaxConsecutiveLessonsRule>());

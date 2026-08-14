@@ -1,25 +1,22 @@
 #include "Optimization/GeneticOptimizer.h"
 
 #include <algorithm>
+#include <chrono>
+#include <future>
 #include <iostream>
 #include <stdexcept>
 #include <utility>
+#include <thread>
 
 #include "Evaluation/Validation/ChromosomeValidator.h"
 
-GeneticOptimizer::GeneticOptimizer(const OptimizationSettings& settings,
-    ProgressCallback progressCallback)
-    : settings(settings),
-    progressCallback(std::move(progressCallback)),
-    chromosomeFactory(settings.randomSeed),
-    mutator(settings.randomSeed),
-    randomEngine(settings.randomSeed)
+GeneticOptimizer::GeneticOptimizer(const OptimizationSettings& settings, ProgressCallback progressCallback)
+    : settings(settings), progressCallback(std::move(progressCallback)), chromosomeFactory(settings.randomSeed), mutator(settings.randomSeed), randomEngine(settings.randomSeed),
+    threadPool(std::max(1u, std::thread::hardware_concurrency()))
 {
 }
 
-std::vector<Chromosome> GeneticOptimizer::createInitialPopulation(
-    const TimetableProblem& problem,
-    const std::vector<LessonInstance>& lessonInstances,
+std::vector<Chromosome> GeneticOptimizer::createInitialPopulation(const TimetableProblem& problem, const std::vector<LessonInstance>& lessonInstances,
     const std::vector<ScheduleSlot>& scheduleSlots)
 {
     const int populationSize = settings.populationSize;
@@ -32,34 +29,24 @@ std::vector<Chromosome> GeneticOptimizer::createInitialPopulation(
     std::vector<Chromosome> population;
     population.reserve(static_cast<std::size_t>(populationSize));
 
-    // Build independent random timetable candidates. Every chromosome is validated
-    // and evaluated immediately, so the returned population already has valid fitness values.
+    // Build independent random timetable candidates first, then evaluate the whole batch through the persistent thread pool.
     for (int index = 0; index < populationSize; ++index)
     {
-        Chromosome chromosome = chromosomeFactory.createRandom(scheduleSlots, lessonInstances);
-
-        ChromosomeValidator::validate(chromosome, lessonInstances, scheduleSlots);
-        chromosome.fitness = fitnessEvaluator.evaluate(
-            chromosome, problem, lessonInstances, scheduleSlots);
-
-        population.push_back(std::move(chromosome));
+        population.push_back(chromosomeFactory.createRandom(scheduleSlots, lessonInstances));
     }
 
+    evaluatePopulation(population, problem, lessonInstances, scheduleSlots);
     return population;
 }
 
-Chromosome GeneticOptimizer::optimize(
-    std::vector<Chromosome> initialPopulation,
-    const TimetableProblem& problem,
-    const std::vector<LessonInstance>& lessonInstances,
+Chromosome GeneticOptimizer::optimize(std::vector<Chromosome> initialPopulation, const TimetableProblem& problem, const std::vector<LessonInstance>& lessonInstances,
     const std::vector<ScheduleSlot>& scheduleSlots)
 {
     // Keep this method at the level of the genetic algorithm itself. Detailed operations
     // are delegated to smaller methods, so this function can be read almost like pseudocode.
     validateOptimizationInput(initialPopulation, lessonInstances, scheduleSlots);
 
-    std::vector<Chromosome> population = initializePopulation(
-        std::move(initialPopulation), problem, lessonInstances, scheduleSlots);
+    std::vector<Chromosome> population = initializePopulation(std::move(initialPopulation), problem, lessonInstances, scheduleSlots);
 
     // initializePopulation() returns a sorted population, so front() is the initial best.
     Chromosome bestChromosome = population.front();
@@ -67,8 +54,7 @@ Chromosome GeneticOptimizer::optimize(
     int lastReportedPercentage = -1;
 
     reportInitialState(bestChromosome);
-    reportProgress(0, settings.generations, bestFoundAtGeneration,
-        bestChromosome, lastReportedPercentage);
+    reportProgress(0, settings.generations, bestFoundAtGeneration, bestChromosome, lastReportedPercentage);
 
     // Each iteration creates one complete generation. createNextGeneration() returns it sorted.
     for (int generation = 1; generation <= settings.generations; ++generation)
@@ -76,8 +62,7 @@ Chromosome GeneticOptimizer::optimize(
         population = createNextGeneration(population, problem, lessonInstances, scheduleSlots);
 
         updateBestChromosome(population, bestChromosome, generation, bestFoundAtGeneration);
-        reportProgress(generation, settings.generations, bestFoundAtGeneration,
-            bestChromosome, lastReportedPercentage);
+        reportProgress(generation, settings.generations, bestFoundAtGeneration, bestChromosome, lastReportedPercentage);
 
         if (shouldStopEarly(bestChromosome))
         {
@@ -87,8 +72,7 @@ Chromosome GeneticOptimizer::optimize(
     }
 
     // Final consistency check: recalculate fitness against the current problem and rules.
-    bestChromosome.fitness = fitnessEvaluator.evaluate(
-        bestChromosome, problem, lessonInstances, scheduleSlots);
+    bestChromosome.fitness = fitnessEvaluator.evaluate(bestChromosome, problem, lessonInstances, scheduleSlots);
 
     return bestChromosome;
 }
@@ -207,23 +191,44 @@ Chromosome GeneticOptimizer::createChild(
     return findBestMutation(parent, problem, lessonInstances, scheduleSlots);
 }
 
-Chromosome GeneticOptimizer::findBestMutation(
-    const Chromosome& parent,
-    const TimetableProblem& problem,
-    const std::vector<LessonInstance>& lessonInstances,
+Chromosome GeneticOptimizer::findBestMutation(const Chromosome& parent, const TimetableProblem& problem, const std::vector<LessonInstance>& lessonInstances,
     const std::vector<ScheduleSlot>& scheduleSlots)
 {
-    // The parent is the baseline. A mutation is accepted only if it improves this baseline.
     Chromosome bestCandidate = parent;
 
-    for (int attempt = 0; attempt < settings.mutationAttempts; ++attempt)
+    if (settings.mutationAttempts <= 0)
     {
-        // Every attempt starts from the same parent, so mutation attempts are independent.
-        Chromosome candidate = parent;
-        mutator.mutateAssignment(candidate, scheduleSlots.size());
+        return bestCandidate;
+    }
 
-        candidate.fitness = fitnessEvaluator.evaluate(
-            candidate, problem, lessonInstances, scheduleSlots);
+    // Generate seeds on the optimizer thread. Every task then gets its own RNG, so std::mt19937 is never shared between workers.
+    std::vector<unsigned int> seeds(static_cast<std::size_t>(settings.mutationAttempts));
+
+    for (unsigned int& seed : seeds)
+    {
+        seed = randomEngine();
+    }
+
+    std::vector<std::future<Chromosome>> futures;
+    futures.reserve(seeds.size());
+
+    for (const unsigned int seed : seeds)
+    {
+        futures.push_back(threadPool.enqueue([this, &parent, &problem, &lessonInstances, &scheduleSlots, seed]()
+        {
+            std::mt19937 localRandomEngine(seed);
+            Chromosome candidate = parent;
+
+            mutator.mutateAssignment(candidate, scheduleSlots.size(), localRandomEngine);
+            candidate.fitness = fitnessEvaluator.evaluate(candidate, problem, lessonInstances, scheduleSlots);
+
+            return candidate;
+        }));
+    }
+
+    for (std::future<Chromosome>& future : futures)
+    {
+        Chromosome candidate = future.get();
 
         if (candidate.fitness.isBetterThan(bestCandidate.fitness))
         {
@@ -307,20 +312,86 @@ void GeneticOptimizer::reportProgress(
     lastReportedPercentage = percentage;
 }
 
-void GeneticOptimizer::evaluatePopulation(
-    std::vector<Chromosome>& population,
-    const TimetableProblem& problem,
-    const std::vector<LessonInstance>& lessonInstances,
+void GeneticOptimizer::evaluatePopulation(std::vector<Chromosome>& population, const TimetableProblem& problem, const std::vector<LessonInstance>& lessonInstances,
     const std::vector<ScheduleSlot>& scheduleSlots)
 {
-    // This is intentionally the single population-evaluation boundary. Later it is the natural
-    // place for parallelization without spreading threading logic through the optimizer.
+    if (population.empty())
+    {
+        return;
+    }
+
+    // -------------------------------------------------------------------------
+    // Single-threaded
+    // -------------------------------------------------------------------------
+
+   /* const auto singleStart = std::chrono::steady_clock::now();
+
     for (Chromosome& chromosome : population)
     {
         ChromosomeValidator::validate(chromosome, lessonInstances, scheduleSlots);
-        chromosome.fitness = fitnessEvaluator.evaluate(
-            chromosome, problem, lessonInstances, scheduleSlots);
+        chromosome.fitness = fitnessEvaluator.evaluate(chromosome, problem, lessonInstances, scheduleSlots);
     }
+
+    const auto singleEnd = std::chrono::steady_clock::now();
+    const auto singleDuration = std::chrono::duration_cast<std::chrono::microseconds>(singleEnd - singleStart);*/
+
+    // -------------------------------------------------------------------------
+    // Thread pool
+    // -------------------------------------------------------------------------
+
+    const auto poolStart = std::chrono::steady_clock::now();
+
+    const std::size_t taskCount = std::min(threadPool.size(), population.size());
+    const std::size_t chunkSize = (population.size() + taskCount - 1) / taskCount;
+
+    std::vector<std::future<void>> futures;
+    futures.reserve(taskCount);
+
+    for (std::size_t taskIndex = 0; taskIndex < taskCount; ++taskIndex)
+    {
+        const std::size_t begin = taskIndex * chunkSize;
+        const std::size_t end = std::min(begin + chunkSize, population.size());
+
+        if (begin >= end)
+        {
+            break;
+        }
+
+        futures.push_back(threadPool.enqueue([this, &population, &problem, &lessonInstances, &scheduleSlots, begin, end]()
+            {
+                for (std::size_t index = begin; index < end; ++index)
+                {
+                    Chromosome& chromosome = population[index];
+                    ChromosomeValidator::validate(chromosome, lessonInstances, scheduleSlots);
+                    chromosome.fitness = fitnessEvaluator.evaluate(chromosome, problem, lessonInstances, scheduleSlots);
+                }
+            }));
+    }
+
+    for (std::future<void>& future : futures)
+    {
+        future.get();
+    }
+
+    const auto poolEnd = std::chrono::steady_clock::now();
+    const auto poolDuration = std::chrono::duration_cast<std::chrono::microseconds>(poolEnd - poolStart);
+
+    // -------------------------------------------------------------------------
+    // Benchmark
+    // -------------------------------------------------------------------------
+
+   /* std::cout << "Population: " << population.size()
+        << ", workers: " << threadPool.size()
+        << ", single-threaded: " << singleDuration.count() << " us"
+        << ", thread-pool: " << poolDuration.count() << " us";
+
+    if (poolDuration.count() > 0)
+    {
+        const double speedup = static_cast<double>(singleDuration.count()) / static_cast<double>(poolDuration.count());
+        std::cout << ", speedup: " << speedup << "x";
+    }
+
+    std::cout << '\n';*/
 }
 
 void GeneticOptimizer::sortPopulation(std::vector<Chromosome>& population)

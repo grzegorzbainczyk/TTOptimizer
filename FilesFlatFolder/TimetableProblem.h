@@ -149,6 +149,10 @@ struct TimetableProblem
     std::vector<StudentGroupConflict> studentGroupConflicts;
     std::vector<LessonRequirement> lessonRequirements;
 
+    SchedulingPreferenceLevel studentGroupAvoidImmediateBuildingChange{
+        SchedulingPreferenceLevel::Medium
+    };
+
     std::vector<TeacherTimeSlotPreference>
         teacherTimeSlotPreferences;
 

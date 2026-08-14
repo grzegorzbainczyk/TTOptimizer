@@ -153,6 +153,9 @@ public class TimetableProblem
 
     public List<LessonRequirement> LessonRequirements { get; set; } = new();
 
+    public SchedulingPreferenceLevel StudentGroupAvoidImmediateBuildingChange { get; set; }
+        = SchedulingPreferenceLevel.Medium;
+
     public List<TeacherTimeSlotPreferenceInput> TeacherTimeSlotPreferences { get; set; } = new();
     public List<ClassGroupTimeSlotPreferenceInput> ClassGroupTimeSlotPreferences { get; set; } = new();
     public List<RoomTimeSlotPreferenceInput> RoomTimeSlotPreferences { get; set; } = new();

@@ -529,6 +529,9 @@ public class CppOptimizerService
                 })
                 .ToList(),
 
+            StudentGroupAvoidImmediateBuildingChange =
+                problem.StudentGroupAvoidImmediateBuildingChange.ToString(),
+
             LessonRequirements =
                 problem.LessonRequirements
                     .Select(requirement =>

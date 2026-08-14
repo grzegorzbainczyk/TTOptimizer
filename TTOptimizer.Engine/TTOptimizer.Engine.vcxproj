@@ -135,6 +135,7 @@
     <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Optimization\GeneticOptimizer.cpp" />
+    <ClCompile Include="src\Optimization\ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\nlohmann\json.hpp" />
