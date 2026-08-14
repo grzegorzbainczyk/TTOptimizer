@@ -16,10 +16,8 @@
 namespace
 {
     using TimeKey = std::pair<int, int>;
-    using TeacherTimeKey =
-        std::pair<TeacherId, TimeKey>;
-    using StudentGroupTimeKey =
-        std::pair<StudentGroupId, TimeKey>;
+    using TeacherTimeKey = std::pair<TeacherId, TimeKey>;
+    using StudentGroupTimeKey = std::pair<StudentGroupId, TimeKey>;
 
     const LessonRequirement& FindRequirementById(
         const TimetableProblem& problem,
@@ -31,15 +29,13 @@ namespace
             [requirementId](
                 const LessonRequirement& requirement)
             {
-                return requirement.id ==
-                    requirementId;
+                return requirement.id == requirementId;
             });
 
         if (iterator ==
             problem.lessonRequirements.end())
         {
-            throw std::runtime_error(
-                "Lesson requirement not found.");
+            throw std::runtime_error("Lesson requirement not found.");
         }
 
         return *iterator;
@@ -59,14 +55,11 @@ namespace
 
         if (iterator == problem.rooms.end())
         {
-            throw std::runtime_error(
-                "Room not found.");
+            throw std::runtime_error("Room not found.");
         }
 
         return *iterator;
     }
-
-
 
     template <typename Preference, typename ResourceId>
     TimeSlotPreferenceType FindTimeSlotPreference(
@@ -83,8 +76,7 @@ namespace
                 const Preference& preference)
             {
                 return preference.*idMember == resourceId
-                    && preference.dayIndex == dayIndex
-                    && preference.slotIndex == slotIndex;
+                    && preference.dayIndex == dayIndex && preference.slotIndex == slotIndex;
             });
 
         if (iterator == preferences.end())
@@ -101,15 +93,12 @@ namespace
     {
         switch (preferenceType)
         {
-        case TimeSlotPreferenceType::Preferred:
+        case TimeSlotPreferenceType::Preferred: return;
+
+        case TimeSlotPreferenceType::Available: score.addSoftPenalty(1.0);
             return;
 
-        case TimeSlotPreferenceType::Available:
-            score.addSoftPenalty(1.0);
-            return;
-
-        case TimeSlotPreferenceType::NotPreferred:
-            score.addSoftPenalty(10.0);
+        case TimeSlotPreferenceType::NotPreferred: score.addSoftPenalty(10.0);
             return;
 
         case TimeSlotPreferenceType::Unavailable:
@@ -117,8 +106,6 @@ namespace
             return;
         }
     }
-
-
 
     const StudentGroup& FindStudentGroupById(
         const TimetableProblem& problem,
@@ -146,7 +133,7 @@ namespace
 
     int PreferenceRank(TimeSlotPreferenceType value)
     {
-        switch(value)
+        switch (value)
         {
         case TimeSlotPreferenceType::Preferred: return 0;
         case TimeSlotPreferenceType::Available: return 1;
@@ -207,11 +194,9 @@ FitnessScore FitnessEvaluator::evaluate(
             CreateViolation(
                 ConstraintViolationType::
                 InvalidChromosome,
-                "Chromosome genes count is not equal "
-                "to lesson instances count.");
+                "Chromosome genes count is not equal " "to lesson instances count.");
 
-        score.addHardViolation(
-            std::move(violation));
+        score.addHardViolation(std::move(violation));
 
         return score;
     }
@@ -221,24 +206,19 @@ FitnessScore FitnessEvaluator::evaluate(
      *
      * room + day + lesson number
      */
-    std::map<ScheduleSlotIndex, int>
-        scheduleSlotUsage;
+    std::map<ScheduleSlotIndex, int> scheduleSlotUsage;
 
-    std::map<TeacherTimeKey, int>
-        teacherTimeUsage;
+    std::map<TeacherTimeKey, int> teacherTimeUsage;
 
-    std::map<StudentGroupTimeKey, int>
-        studentGroupTimeUsage;
+    std::map<StudentGroupTimeKey, int> studentGroupTimeUsage;
 
-    std::map<TimeKey, std::set<StudentGroupId>>
-        studentGroupsAtTime;
+    std::map<TimeKey, std::set<StudentGroupId>> studentGroupsAtTime;
 
     for (LessonInstanceIndex lessonIndex = 0;
         lessonIndex < chromosome.genes.size();
         ++lessonIndex)
     {
-        const ScheduleSlotIndex scheduleSlotIndex =
-            chromosome.genes[lessonIndex];
+        const ScheduleSlotIndex scheduleSlotIndex = chromosome.genes[lessonIndex];
 
         if (scheduleSlotIndex >=
             scheduleSlots.size())
@@ -246,53 +226,32 @@ FitnessScore FitnessEvaluator::evaluate(
             ConstraintViolation violation =
                 CreateViolation(
                     ConstraintViolationType::
-                    InvalidScheduleSlot,
-                    "Schedule slot index is out of range.");
+                    InvalidScheduleSlot, "Schedule slot index is out of range.");
 
-            score.addHardViolation(
-                std::move(violation));
+            score.addHardViolation(std::move(violation));
 
             continue;
         }
 
-        const LessonInstance& lessonInstance =
-            lessonInstances[lessonIndex];
+        const LessonInstance& lessonInstance = lessonInstances[lessonIndex];
 
         const LessonRequirement& requirement =
-            FindRequirementById(
-                problem,
-                lessonInstance.requirementId);
+            FindRequirementById(problem, lessonInstance.requirementId);
 
-        const ScheduleSlot& scheduleSlot =
-            scheduleSlots[scheduleSlotIndex];
+        const ScheduleSlot& scheduleSlot = scheduleSlots[scheduleSlotIndex];
 
-        const Room& room =
-            FindRoomById(
-                problem,
-                scheduleSlot.roomId);
+        const Room& room = FindRoomById(problem, scheduleSlot.roomId);
 
-        const int dayIndex =
-            static_cast<int>(
-                scheduleSlot.timeSlot.day);
+        const int dayIndex = static_cast<int>(scheduleSlot.timeSlot.day);
 
-        const int slotIndex =
-            scheduleSlot.timeSlot.lessonNumber;
+        const int slotIndex = scheduleSlot.timeSlot.lessonNumber;
 
-        const TimeKey timeKey =
-            std::make_pair(
-                dayIndex,
-                slotIndex);
+        const TimeKey timeKey = std::make_pair(dayIndex, slotIndex);
 
-        const TeacherTimeKey teacherTimeKey =
-            std::make_pair(
-                requirement.teacherId,
-                timeKey);
+        const TeacherTimeKey teacherTimeKey = std::make_pair(requirement.teacherId, timeKey);
 
         const StudentGroupTimeKey
-            studentGroupTimeKey =
-            std::make_pair(
-                requirement.studentGroupId,
-                timeKey);
+            studentGroupTimeKey = std::make_pair(requirement.studentGroupId, timeKey);
 
         scheduleSlotUsage[scheduleSlotIndex]++;
         teacherTimeUsage[teacherTimeKey]++;
@@ -302,33 +261,21 @@ FitnessScore FitnessEvaluator::evaluate(
         const TimeSlotPreferenceType teacherPreference =
             FindTimeSlotPreference(
                 problem.teacherTimeSlotPreferences,
-                requirement.teacherId,
-                dayIndex,
-                slotIndex,
-                &TeacherTimeSlotPreference::teacherId);
+                requirement.teacherId, dayIndex, slotIndex, &TeacherTimeSlotPreference::teacherId);
 
         const TimeSlotPreferenceType classGroupPreference =
             FindStudentGroupClassPreference(
-                problem,
-                requirement.studentGroupId,
-                dayIndex,
-                slotIndex);
+                problem, requirement.studentGroupId, dayIndex, slotIndex);
 
         const TimeSlotPreferenceType roomPreference =
             FindTimeSlotPreference(
                 problem.roomTimeSlotPreferences,
-                scheduleSlot.roomId,
-                dayIndex,
-                slotIndex,
-                &RoomTimeSlotPreference::roomId);
+                scheduleSlot.roomId, dayIndex, slotIndex, &RoomTimeSlotPreference::roomId);
 
         const TimeSlotPreferenceType subjectPreference =
             FindTimeSlotPreference(
                 problem.subjectTimeSlotPreferences,
-                requirement.subjectId,
-                dayIndex,
-                slotIndex,
-                &SubjectTimeSlotPreference::subjectId);
+                requirement.subjectId, dayIndex, slotIndex, &SubjectTimeSlotPreference::subjectId);
 
         AddTimeSlotPreferencePenalty(score, teacherPreference);
         AddTimeSlotPreferencePenalty(score, classGroupPreference);
@@ -342,27 +289,19 @@ FitnessScore FitnessEvaluator::evaluate(
             ConstraintViolation violation =
                 CreateViolation(
                     ConstraintViolationType::
-                    TeacherUnavailable,
-                    "Teacher is unavailable at the "
-                    "assigned time.");
+                    TeacherUnavailable, "Teacher is unavailable at the " "assigned time.");
 
-            violation.teacherId =
-                requirement.teacherId;
+            violation.teacherId = requirement.teacherId;
 
-            violation.classGroupId =
-                requirement.classGroupId;
+            violation.classGroupId = requirement.classGroupId;
 
-            violation.roomId =
-                scheduleSlot.roomId;
+            violation.roomId = scheduleSlot.roomId;
 
-            violation.dayIndex =
-                dayIndex;
+            violation.dayIndex = dayIndex;
 
-            violation.slotIndex =
-                slotIndex;
+            violation.slotIndex = slotIndex;
 
-            score.addHardViolation(
-                std::move(violation));
+            score.addHardViolation(std::move(violation));
         }
 
         // Hard constraint: class group is unavailable.
@@ -372,27 +311,19 @@ FitnessScore FitnessEvaluator::evaluate(
             ConstraintViolation violation =
                 CreateViolation(
                     ConstraintViolationType::
-                    ClassGroupUnavailable,
-                    "Class group is unavailable at the "
-                    "assigned time.");
+                    ClassGroupUnavailable, "Class group is unavailable at the " "assigned time.");
 
-            violation.teacherId =
-                requirement.teacherId;
+            violation.teacherId = requirement.teacherId;
 
-            violation.classGroupId =
-                requirement.classGroupId;
+            violation.classGroupId = requirement.classGroupId;
 
-            violation.roomId =
-                scheduleSlot.roomId;
+            violation.roomId = scheduleSlot.roomId;
 
-            violation.dayIndex =
-                dayIndex;
+            violation.dayIndex = dayIndex;
 
-            violation.slotIndex =
-                slotIndex;
+            violation.slotIndex = slotIndex;
 
-            score.addHardViolation(
-                std::move(violation));
+            score.addHardViolation(std::move(violation));
         }
 
         // Hard constraint: room is unavailable.
@@ -402,27 +333,19 @@ FitnessScore FitnessEvaluator::evaluate(
             ConstraintViolation violation =
                 CreateViolation(
                     ConstraintViolationType::
-                    RoomUnavailable,
-                    "Room is unavailable at the "
-                    "assigned time.");
+                    RoomUnavailable, "Room is unavailable at the " "assigned time.");
 
-            violation.teacherId =
-                requirement.teacherId;
+            violation.teacherId = requirement.teacherId;
 
-            violation.classGroupId =
-                requirement.classGroupId;
+            violation.classGroupId = requirement.classGroupId;
 
-            violation.roomId =
-                scheduleSlot.roomId;
+            violation.roomId = scheduleSlot.roomId;
 
-            violation.dayIndex =
-                dayIndex;
+            violation.dayIndex = dayIndex;
 
-            violation.slotIndex =
-                slotIndex;
+            violation.slotIndex = slotIndex;
 
-            score.addHardViolation(
-                std::move(violation));
+            score.addHardViolation(std::move(violation));
         }
 
         // Hard constraint: subject is unavailable.
@@ -432,30 +355,21 @@ FitnessScore FitnessEvaluator::evaluate(
             ConstraintViolation violation =
                 CreateViolation(
                     ConstraintViolationType::
-                    SubjectUnavailable,
-                    "Subject is unavailable at the "
-                    "assigned time.");
+                    SubjectUnavailable, "Subject is unavailable at the " "assigned time.");
 
-            violation.teacherId =
-                requirement.teacherId;
+            violation.teacherId = requirement.teacherId;
 
-            violation.classGroupId =
-                requirement.classGroupId;
+            violation.classGroupId = requirement.classGroupId;
 
-            violation.roomId =
-                scheduleSlot.roomId;
+            violation.roomId = scheduleSlot.roomId;
 
-            violation.subjectId =
-                requirement.subjectId;
+            violation.subjectId = requirement.subjectId;
 
-            violation.dayIndex =
-                dayIndex;
+            violation.dayIndex = dayIndex;
 
-            violation.slotIndex =
-                slotIndex;
+            violation.slotIndex = slotIndex;
 
-            score.addHardViolation(
-                std::move(violation));
+            score.addHardViolation(std::move(violation));
         }
     }
 
@@ -473,29 +387,21 @@ FitnessScore FitnessEvaluator::evaluate(
             continue;
         }
 
-        const ScheduleSlot& scheduleSlot =
-            scheduleSlots[scheduleSlotIndex];
+        const ScheduleSlot& scheduleSlot = scheduleSlots[scheduleSlotIndex];
 
         ConstraintViolation violation =
             CreateViolation(
                 ConstraintViolationType::
                 RoomConflict,
-                "Multiple lessons are assigned to "
-                "the same room at the same time.");
+                "Multiple lessons are assigned to " "the same room at the same time.");
 
-        violation.roomId =
-            scheduleSlot.roomId;
+        violation.roomId = scheduleSlot.roomId;
 
-        violation.dayIndex =
-            static_cast<int>(
-                scheduleSlot.timeSlot.day);
+        violation.dayIndex = static_cast<int>(scheduleSlot.timeSlot.day);
 
-        violation.slotIndex =
-            scheduleSlot.timeSlot.lessonNumber;
+        violation.slotIndex = scheduleSlot.timeSlot.lessonNumber;
 
-        score.addHardViolation(
-            std::move(violation),
-            usageCount - 1);
+        score.addHardViolation(std::move(violation), usageCount - 1);
     }
 
     /*
@@ -512,34 +418,24 @@ FitnessScore FitnessEvaluator::evaluate(
             continue;
         }
 
-        const TeacherId teacherId =
-            teacherTimeKey.first;
+        const TeacherId teacherId = teacherTimeKey.first;
 
-        const int dayIndex =
-            teacherTimeKey.second.first;
+        const int dayIndex = teacherTimeKey.second.first;
 
-        const int slotIndex =
-            teacherTimeKey.second.second;
+        const int slotIndex = teacherTimeKey.second.second;
 
         ConstraintViolation violation =
             CreateViolation(
                 ConstraintViolationType::
-                TeacherConflict,
-                "Teacher is assigned to multiple "
-                "lessons at the same time.");
+                TeacherConflict, "Teacher is assigned to multiple " "lessons at the same time.");
 
-        violation.teacherId =
-            teacherId;
+        violation.teacherId = teacherId;
 
-        violation.dayIndex =
-            dayIndex;
+        violation.dayIndex = dayIndex;
 
-        violation.slotIndex =
-            slotIndex;
+        violation.slotIndex = slotIndex;
 
-        score.addHardViolation(
-            std::move(violation),
-            usageCount - 1);
+        score.addHardViolation(std::move(violation), usageCount - 1);
     }
 
     /* Hard constraint: the same student group has multiple lessons at the same time. */
@@ -575,27 +471,14 @@ FitnessScore FitnessEvaluator::evaluate(
         }
     }
 
-
     const TeacherScheduleStats teacherScheduleStats =
-        TeacherScheduleStatsBuilder::build(
-            chromosome,
-            problem,
-            lessonInstances,
-            scheduleSlots);
+        TeacherScheduleStatsBuilder::build(chromosome, problem, lessonInstances, scheduleSlots);
 
     const ClassGroupScheduleStats classGroupScheduleStats =
-        ClassGroupScheduleStatsBuilder::build(
-            chromosome,
-            problem,
-            lessonInstances,
-            scheduleSlots);
+        ClassGroupScheduleStatsBuilder::build(chromosome, problem, lessonInstances, scheduleSlots);
 
     const SubjectScheduleStats subjectScheduleStats =
-        SubjectScheduleStatsBuilder::build(
-            chromosome,
-            problem,
-            lessonInstances,
-            scheduleSlots);
+        SubjectScheduleStatsBuilder::build(chromosome, problem, lessonInstances, scheduleSlots);
 
     const ConstraintRuleContext context{
         chromosome,
@@ -609,13 +492,11 @@ FitnessScore FitnessEvaluator::evaluate(
 
     for (const auto& rule : ruleRegistry_.rules())
     {
-        auto ruleResults =
-            rule->evaluate(context);
+        auto ruleResults = rule->evaluate(context);
 
         for (auto& ruleResult : ruleResults)
         {
-            score.addRuleResult(
-                std::move(ruleResult));
+            score.addRuleResult(std::move(ruleResult));
         }
     }
 
