@@ -1,3 +1,5 @@
+import { t } from "../i18n.js";
+
 export function initializeCsvExport() {
     const exportCsvButton = document.getElementById(
         "exportCsvButton"
@@ -20,18 +22,18 @@ function exportVisibleTimetableRowsToCsv() {
     );
 
     if (!rows || rows.length === 0) {
-        alert("There is no timetable data to export.");
+        alert(t("csv.noData"));
         return;
     }
 
     const csvRows = [[
-        "Day",
-        "Lesson number",
-        "Lesson",
-        "Class",
-        "Subject",
-        "Teacher",
-        "Room"
+        t("table.day"),
+        t("csv.lessonNumber"),
+        t("table.lesson"),
+        t("table.class"),
+        t("table.subject"),
+        t("table.teacher"),
+        t("table.room")
     ]];
 
     let exportedRowsCount = 0;
@@ -57,7 +59,7 @@ function exportVisibleTimetableRowsToCsv() {
     }
 
     if (exportedRowsCount === 0) {
-        alert("There are no visible rows to export.");
+        alert(t("csv.noVisibleRows"));
         return;
     }
 

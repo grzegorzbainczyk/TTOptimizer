@@ -21,9 +21,6 @@ ThreadPool::~ThreadPool()
     }
 
     taskAvailable.notify_all();
-
-    // Clearing the vector destroys the std::jthread objects and joins all worker threads
-    // while the mutex, condition variable and task queue are still alive.
     workers.clear();
 }
 

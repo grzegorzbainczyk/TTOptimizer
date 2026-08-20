@@ -16,9 +16,7 @@ GeneticOptimizer::GeneticOptimizer(const OptimizationSettings& settings, Progres
 {
 }
 
-std::vector<Chromosome> GeneticOptimizer::createInitialPopulation(
-    const TimetableProblem& problem,
-    const std::vector<LessonInstance>& lessonInstances,
+std::vector<Chromosome> GeneticOptimizer::createInitialPopulation(const TimetableProblem& problem, const std::vector<LessonInstance>& lessonInstances,
     const std::vector<ScheduleSlot>& scheduleSlots)
 {
     const int populationSize = settings.populationSize;
@@ -41,10 +39,7 @@ std::vector<Chromosome> GeneticOptimizer::createInitialPopulation(
     return population;
 }
 
-Chromosome GeneticOptimizer::optimize(
-    std::vector<Chromosome> initialPopulation,
-    const TimetableProblem& problem,
-    const std::vector<LessonInstance>& lessonInstances,
+Chromosome GeneticOptimizer::optimize(std::vector<Chromosome> initialPopulation, const TimetableProblem& problem, const std::vector<LessonInstance>& lessonInstances,
     const std::vector<ScheduleSlot>& scheduleSlots)
 {
     // Keep this method at the level of the genetic algorithm itself. Detailed operations
@@ -196,22 +191,44 @@ Chromosome GeneticOptimizer::createChild(
     return findBestMutation(parent, problem, lessonInstances, scheduleSlots);
 }
 
-Chromosome GeneticOptimizer::findBestMutation(
-    const Chromosome& parent,
-    const TimetableProblem& problem,
-    const std::vector<LessonInstance>& lessonInstances,
+Chromosome GeneticOptimizer::findBestMutation(const Chromosome& parent, const TimetableProblem& problem, const std::vector<LessonInstance>& lessonInstances,
     const std::vector<ScheduleSlot>& scheduleSlots)
 {
-    // The parent is the baseline. A mutation is accepted only if it improves this baseline.
     Chromosome bestCandidate = parent;
 
-    for (int attempt = 0; attempt < settings.mutationAttempts; ++attempt)
+    if (settings.mutationAttempts <= 0)
     {
-        // Every attempt starts from the same parent, so mutation attempts are independent.
-        Chromosome candidate = parent;
-        mutator.mutateAssignment(candidate, scheduleSlots.size());
+        return bestCandidate;
+    }
 
-        candidate.fitness = fitnessEvaluator.evaluate(candidate, problem, lessonInstances, scheduleSlots);
+    // Generate seeds on the optimizer thread. Every task then gets its own RNG, so std::mt19937 is never shared between workers.
+    std::vector<unsigned int> seeds(static_cast<std::size_t>(settings.mutationAttempts));
+
+    for (unsigned int& seed : seeds)
+    {
+        seed = randomEngine();
+    }
+
+    std::vector<std::future<Chromosome>> futures;
+    futures.reserve(seeds.size());
+
+    for (const unsigned int seed : seeds)
+    {
+        futures.push_back(threadPool.enqueue([this, &parent, &problem, &lessonInstances, &scheduleSlots, seed]()
+        {
+            std::mt19937 localRandomEngine(seed);
+            Chromosome candidate = parent;
+
+            mutator.mutateAssignment(candidate, scheduleSlots.size(), localRandomEngine);
+            candidate.fitness = fitnessEvaluator.evaluate(candidate, problem, lessonInstances, scheduleSlots);
+
+            return candidate;
+        }));
+    }
+
+    for (std::future<Chromosome>& future : futures)
+    {
+        Chromosome candidate = future.get();
 
         if (candidate.fitness.isBetterThan(bestCandidate.fitness))
         {
@@ -307,7 +324,7 @@ void GeneticOptimizer::evaluatePopulation(std::vector<Chromosome>& population, c
     // Single-threaded
     // -------------------------------------------------------------------------
 
-    const auto singleStart = std::chrono::steady_clock::now();
+   /* const auto singleStart = std::chrono::steady_clock::now();
 
     for (Chromosome& chromosome : population)
     {
@@ -316,7 +333,7 @@ void GeneticOptimizer::evaluatePopulation(std::vector<Chromosome>& population, c
     }
 
     const auto singleEnd = std::chrono::steady_clock::now();
-    const auto singleDuration = std::chrono::duration_cast<std::chrono::microseconds>(singleEnd - singleStart);
+    const auto singleDuration = std::chrono::duration_cast<std::chrono::microseconds>(singleEnd - singleStart);*/
 
     // -------------------------------------------------------------------------
     // Thread pool
@@ -363,7 +380,7 @@ void GeneticOptimizer::evaluatePopulation(std::vector<Chromosome>& population, c
     // Benchmark
     // -------------------------------------------------------------------------
 
-    std::cout << "Population: " << population.size()
+   /* std::cout << "Population: " << population.size()
         << ", workers: " << threadPool.size()
         << ", single-threaded: " << singleDuration.count() << " us"
         << ", thread-pool: " << poolDuration.count() << " us";
@@ -374,7 +391,7 @@ void GeneticOptimizer::evaluatePopulation(std::vector<Chromosome>& population, c
         std::cout << ", speedup: " << speedup << "x";
     }
 
-    std::cout << '\n';
+    std::cout << '\n';*/
 }
 
 void GeneticOptimizer::sortPopulation(std::vector<Chromosome>& population)
