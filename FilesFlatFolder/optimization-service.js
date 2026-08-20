@@ -1,3 +1,4 @@
+import { t } from "../i18n.js";
 import { loadOptimizationSettings } from "./settings.js";
 import {
     hideOptimizationProgress,
@@ -145,7 +146,7 @@ function stopOptimization() {
         return;
     }
 
-    setStatusText("Stopping optimization...");
+    setStatusText(t("optimization.stopping"));
     currentOptimizationAbortController.abort();
 }
 
@@ -153,7 +154,7 @@ async function runOptimization() {
     try {
         clearOptimizationResultForNewRun();
         showOptimizationProgress();
-        setStatusText("Running optimization...");
+        setStatusText(t("optimization.running"));
         setOptimizationRunningState(true);
 
         currentOptimizationAbortController =
@@ -195,7 +196,7 @@ async function runOptimization() {
 
         renderOptimizationResult(data);
         saveLastOptimizationResultToStorage(data);
-        setStatusText("Optimization finished.");
+        setStatusText(t("optimization.finished"));
 
         updateOptimizationProgress({
             generation: optimizationSettings.generations,
@@ -220,7 +221,7 @@ function getOrganizationId() {
         );
     } catch (error) {
         console.error(error);
-        alert("Organization context is missing.");
+        alert(t("organization.contextMissing"));
         return null;
     }
 }
@@ -252,7 +253,7 @@ function sendOptimizationRequest(
 async function handleFailedResponse(response) {
     const errorText = await response.text();
 
-    setStatusText("Optimization failed.");
+    setStatusText(t("optimization.failed"));
 
     console.error(
         "Optimization request failed:",
@@ -261,7 +262,8 @@ async function handleFailedResponse(response) {
     );
 
     alert(
-        `Optimization failed. Status: ${response.status}`
+        t("optimization.failedWithStatus")
+            .replace("{status}", response.status)
     );
 }
 
@@ -269,12 +271,12 @@ function handleOptimizationError(error) {
     hideOptimizationProgress();
 
     if (error?.name === "AbortError") {
-        setStatusText("Optimization stopped.");
+        setStatusText(t("optimization.stopped"));
 
         setResultMessage(
             "warning",
-            "Optimization stopped",
-            "The optimization was stopped by the user."
+            t("optimization.stoppedTitle"),
+            t("optimization.stoppedByUser")
         );
 
         console.info(
@@ -284,7 +286,7 @@ function handleOptimizationError(error) {
         return;
     }
 
-    setStatusText("Error while running optimization.");
+    setStatusText(t("optimization.error"));
 
     console.error(
         "Error while running optimization:",
@@ -292,6 +294,6 @@ function handleOptimizationError(error) {
     );
 
     alert(
-        "Error while running optimization. Check console for details."
+        t("optimization.errorDetails")
     );
 }

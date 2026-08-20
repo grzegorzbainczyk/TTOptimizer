@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClassFlow - Dashboard</title>
+    <title data-i18n="app.pageTitle">ClassFlow - Dashboard</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -18,120 +18,129 @@
 
                     <div class="hero-content">
                         <div class="hero-badge">
-                            Timetable optimization demo
+                            <span data-i18n="app.demo">Timetable optimization demo</span>
                         </div>
 
                         <h1>ClassFlow</h1>
 
                         <p class="hero-subtitle">
-                            A friendly timetable optimization prototype for schools
+                            <span data-i18n="app.subtitle">A friendly timetable optimization prototype for schools</span>
                         </p>
 
                         <p id="organizationName" class="hero-organization-name">
-                            Loading school...
+                            <span data-i18n="app.loadingSchool">Loading school...</span>
                         </p>
 
                         <p class="hero-tech">
-                            Built with ASP.NET Core, C++ and JavaScript
+                            <span data-i18n="app.technology">Built with ASP.NET Core, C++ and JavaScript</span>
                         </p>
                     </div>
+
+                    <div class="header-actions">
+                        <label for="languageSelector" class="visually-hidden" data-i18n="language.label">Language</label>
+                        <select id="languageSelector" aria-label="Language" data-i18n-aria-label="language.label">
+                            <option value="en">English</option>
+                            <option value="pl">Polski</option>
+                        </select>
 
                     <button id="optimizationSettingsButton"
                             class="settings-button"
                             type="button"
-                            title="Optimization settings">
+                            title="Optimization settings"
+                            data-i18n-title="settings.title">
                         <span class="settings-button-icon">⚙️</span>
-                        <span>Settings</span>
+                        <span data-i18n="settings.button">Settings</span>
                     </button>
+                    </div>
                 </div>
             </header>
 
             <div class="dashboard-layout">
 
                 <aside class="resource-sidebar app-card">
-                    <h2>Resources</h2>
+                    <h2 data-i18n="resources.title">Resources</h2>
 
                     <p class="sidebar-subtitle">
-                        Manage input data used by the optimizer.
+                        <span data-i18n="resources.description">Manage input data used by the optimizer.</span>
                     </p>
 
                     <button id="teachersButton" class="resource-button">
                         <span class="resource-button-icon">👤</span>
                         <span>
-                            <strong>Teachers</strong>
-                            <small>Manage staff</small>
+                            <strong data-i18n="resources.teachers">Teachers</strong>
+                            <small data-i18n="resources.teachers.description">Manage staff</small>
                         </span>
                     </button>
 
                     <button id="classesButton" class="resource-button">
                         <span class="resource-button-icon">🎓</span>
                         <span>
-                            <strong>Classes</strong>
-                            <small>Formal classes</small>
+                            <strong data-i18n="resources.classes">Classes</strong>
+                            <small data-i18n="resources.classes.description">Formal classes</small>
                         </span>
                     </button>
 
                     <button id="studentGroupsButton" class="resource-button">
                         <span class="resource-button-icon">👥</span>
                         <span>
-                            <strong>Student groups</strong>
-                            <small>Divisions and combined groups</small>
+                            <strong data-i18n="resources.studentGroups">Student groups</strong>
+                            <small data-i18n="resources.studentGroups.description">Divisions and combined groups</small>
                         </span>
                     </button>
 
                     <button id="roomsButton" class="resource-button">
                         <span class="resource-button-icon">🚪</span>
                         <span>
-                            <strong>Rooms</strong>
-                            <small>Classrooms</small>
+                            <strong data-i18n="resources.rooms">Rooms</strong>
+                            <small data-i18n="resources.rooms.description">Classrooms</small>
                         </span>
                     </button>
 
                     <button id="buildingsButton" class="resource-button">
                         <span class="resource-button-icon">🏢</span>
                         <span>
-                            <strong>Buildings</strong>
-                            <small>School locations</small>
+                            <strong data-i18n="resources.buildings">Buildings</strong>
+                            <small data-i18n="resources.buildings.description">School locations</small>
                         </span>
                     </button>
 
                     <button id="subjectsButton" class="resource-button">
                         <span class="resource-button-icon">📚</span>
                         <span>
-                            <strong>Subjects</strong>
-                            <small>Lesson topics</small>
+                            <strong data-i18n="resources.subjects">Subjects</strong>
+                            <small data-i18n="resources.subjects.description">Lesson topics</small>
                         </span>
                     </button>
 
                     <button id="requirementsButton" class="resource-button">
                         <span class="resource-button-icon">🧩</span>
                         <span>
-                            <strong>Requirements</strong>
-                            <small>Lesson rules</small>
+                            <strong data-i18n="resources.requirements">Requirements</strong>
+                            <small data-i18n="resources.requirements.description">Lesson rules</small>
                         </span>
                     </button>
 
                     <button id="schoolButton" class="resource-button">
                         <span class="resource-button-icon">🏫</span>
                         <span>
-                            <strong>School</strong>
-                            <small>School information</small>
+                            <strong data-i18n="resources.school">School</strong>
+                            <small data-i18n="resources.school.description">School information</small>
                         </span>
                     </button>
 
                     <button id="organizationPreferencesButton" class="resource-button">
                         <span class="resource-button-icon">🏫</span>
                         <span>
-                            <strong>Scheduling defaults</strong>
-                            <small>Organization-wide preferences</small>
+                            <strong data-i18n="resources.preferences">Scheduling defaults</strong>
+                            <small data-i18n="resources.preferences.description">Organization-wide preferences</small>
                         </span>
                     </button>
 
                     <button id="rulesButton" class="resource-button">
                         <span class="resource-button-icon">⚙️</span>
                         <span>
-                            <strong>Rules</strong>
-                            <small>Availability and constraints</small>
+                            <strong data-i18n="resources.rules">Rules</strong>
+                            <small data-i18n="resources.rules.description">Availability and constraints</small>
                         </span>
                     </button>
                 </aside>
@@ -140,31 +149,31 @@
 
                     <section class="app-card app-panel optimization-panel">
                         <div class="optimization-heading">
-                            <h2>Optimization</h2>
+                            <h2 data-i18n="optimization.title">Optimization</h2>
                         </div>
 
                         <p>
-                            Run the C++ optimization engine and display the decoded timetable result.
+                            <span data-i18n="optimization.description">Run the C++ optimization engine and display the decoded timetable result.</span>
                         </p>
 
                         <div class="toolbar">
                             <button id="runOptimizationButton"
                                     class="app-button optimization-run-button">
                                 <span class="optimization-run-icon" aria-hidden="true"></span>
-                                <span class="optimization-run-label">Run optimization</span>
+                                <span class="optimization-run-label" data-i18n="optimization.run">Run optimization</span>
                             </button>
 
                             <button id="stopOptimizationButton"
                                     class="app-button app-button-secondary"
                                     type="button"
                                     disabled>
-                                Stop
+                                <span data-i18n="optimization.stop">Stop</span>
                             </button>
 
                             <button id="optimizationInfoButton"
                                     class="app-button app-button-secondary"
                                     type="button">
-                                Info
+                                <span data-i18n="optimization.info">Info</span>
                             </button>
                         </div>
 
@@ -172,7 +181,7 @@
                              class="optimization-progress-panel hidden">
 
                             <div class="optimization-progress-header">
-                                <strong>Optimization in progress</strong>
+                                <strong data-i18n="optimization.progress">Optimization in progress</strong>
 
                                 <span id="optimizationProgressPercentage">
                                     0%
@@ -187,11 +196,11 @@
                             <div class="optimization-progress-details">
                                 <div class="optimization-progress-meta">
                                     <span id="optimizationGenerationText">
-                                        Generation: 0 / 0
+                                        <span data-i18n="optimization.generationInitial">Generation: 0 / 0</span>
                                     </span>
 
                                     <span id="optimizationBestFoundText">
-                                        Best found: initial population
+                                        <span data-i18n="optimization.bestFoundInitial">Best found: initial population</span>
                                     </span>
                                 </div>
 
@@ -199,7 +208,7 @@
                                     <div id="optimizationHardMetric"
                                          class="optimization-metric optimization-metric-neutral">
                                         <span class="optimization-metric-label">
-                                            Hard violations
+                                            <span data-i18n="optimization.hardViolations">Hard violations</span>
                                         </span>
 
                                         <strong id="optimizationHardViolationCount">
@@ -207,13 +216,13 @@
                                         </strong>
 
                                         <small id="optimizationFeasibilityText">
-                                            Waiting for first evaluation
+                                            <span data-i18n="optimization.waitingEvaluation">Waiting for first evaluation</span>
                                         </small>
                                     </div>
 
                                     <div class="optimization-metric optimization-metric-soft">
                                         <span class="optimization-metric-label">
-                                            Soft penalty
+                                            <span data-i18n="optimization.softPenalty">Soft penalty</span>
                                         </span>
 
                                         <strong id="optimizationSoftPenalty">
@@ -221,31 +230,31 @@
                                         </strong>
 
                                         <small>
-                                            Best value found so far
+                                            <span data-i18n="optimization.bestValue">Best value found so far</span>
                                         </small>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <p id="statusText">Ready.</p>
+                        <p id="statusText" data-i18n="optimization.ready">Ready.</p>
                     </section>
 
                     <section class="app-card app-panel">
                         <div class="section-header-row">
-                            <h2>Timetable result</h2>
+                            <h2 data-i18n="result.title">Timetable result</h2>
 
                             <div class="section-actions">
                                 <button id="exportCsvButton" class="app-button app-button-secondary">
-                                    Export CSV
+                                    <span data-i18n="result.exportCsv">Export CSV</span>
                                 </button>
 
                                 <button id="clearSavedResultButton" class="app-button app-button-secondary">
-                                    Clear saved result
+                                    <span data-i18n="result.clear">Clear saved result</span>
                                 </button>
 
                                 <button id="aboutProjectButton" class="app-button app-button-secondary">
-                                    About project
+                                    <span data-i18n="result.about">About project</span>
                                 </button>
                             </div>
                         </div>
@@ -255,15 +264,15 @@
                                      class="result-message-panel result-message-neutral">
 <div class="result-message-content">
                                     <span class="result-message-label">
-                                        Optimization result
+                                        <span data-i18n="result.optimizationResult">Optimization result</span>
                                     </span>
 
                                     <h3 id="resultMessageTitle">
-                                        No optimization result yet
+                                        <span data-i18n="result.none">No optimization result yet</span>
                                     </h3>
 
                                     <p id="resultMessageText">
-                                        Run the optimizer to generate a timetable.
+                                        <span data-i18n="result.noneDescription">Run the optimizer to generate a timetable.</span>
                                     </p>
                                 </div>
                             </section>
@@ -273,15 +282,15 @@
                                 <div class="preprocessing-details-header">
                                     <div>
                                         <span class="result-message-label">
-                                            Problem details
+                                            <span data-i18n="problem.details">Problem details</span>
                                         </span>
 
-                                        <h3>Input data requires attention</h3>
+                                        <h3 data-i18n="problem.inputRequiresAttention">Input data requires attention</h3>
                                     </div>
 
                                     <span id="preprocessingIssueCount"
                                           class="issue-count-badge">
-                                        0 problems
+                                        <span data-i18n="problem.zeroProblems">0 problems</span>
                                     </span>
                                 </div>
 
@@ -294,23 +303,23 @@
                         <div id="timetableContent">
                             <div class="filters-row">
                                 <label>
-                                    Class:
+                                    <span data-i18n="filter.class">Class:</span>
                                     <select id="classFilter">
-                                        <option value="">All classes</option>
+                                        <option value="" data-i18n="filter.allClasses">All classes</option>
                                     </select>
                                 </label>
 
                                 <label>
-                                    Teacher:
+                                    <span data-i18n="filter.teacher">Teacher:</span>
                                     <select id="teacherFilter">
-                                        <option value="">All teachers</option>
+                                        <option value="" data-i18n="filter.allTeachers">All teachers</option>
                                     </select>
                                 </label>
 
                                 <label>
-                                    Room:
+                                    <span data-i18n="filter.room">Room:</span>
                                     <select id="roomFilter">
-                                        <option value="">All rooms</option>
+                                        <option value="" data-i18n="filter.allRooms">All rooms</option>
                                     </select>
                                 </label>
                             </div>
@@ -318,19 +327,19 @@
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Day</th>
-                                        <th>Slot</th>
-                                        <th>Lesson</th>
-                                        <th>Class</th>
-                                        <th>Subject</th>
-                                        <th>Teacher</th>
-                                        <th>Room</th>
+                                        <th data-i18n="table.day">Day</th>
+                                        <th data-i18n="table.slot">Slot</th>
+                                        <th data-i18n="table.lesson">Lesson</th>
+                                        <th data-i18n="table.class">Class</th>
+                                        <th data-i18n="table.subject">Subject</th>
+                                        <th data-i18n="table.teacher">Teacher</th>
+                                        <th data-i18n="table.room">Room</th>
                                     </tr>
                                 </thead>
 
                                 <tbody id="timetableBody">
                                     <tr>
-                                        <td colspan="7">No timetable generated yet.</td>
+                                        <td colspan="7" data-i18n="table.noTimetable">No timetable generated yet.</td>
                                     </tr>
                                 </tbody>
                             </table>

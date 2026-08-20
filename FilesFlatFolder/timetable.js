@@ -1,3 +1,4 @@
+import { t } from "../i18n.js";
 import {
     hidePreprocessingIssues,
     renderPreprocessingIssues,
@@ -12,6 +13,11 @@ const LAST_RESULT_STORAGE_KEY =
 export function initializeTimetable() {
     setupClearResultButton();
     loadLastOptimizationResultFromStorage();
+
+    window.addEventListener(
+        "classflow:language-changed",
+        refreshTimetableLanguage
+    );
 }
 
 export function renderOptimizationResult(data) {
@@ -60,13 +66,13 @@ export function renderOptimizationResult(data) {
 export function clearOptimizationResultForNewRun() {
     setResultMessage(
         "neutral",
-        "Optimization in progress",
-        "The previous result has been cleared. Please wait for the new timetable."
+        t("optimization.progress"),
+        t("result.previousCleared")
     );
 
     hidePreprocessingIssues();
     setTimetableContentVisible(true);
-    setTimetableMessage("Optimization is running...");
+    setTimetableMessage(t("optimization.running"));
     resetAllFilters();
     clearLastOptimizationResultFromStorage();
 }
@@ -142,7 +148,7 @@ function createInvalidResult() {
         success: false,
         canOptimize: false,
         message:
-            "The optimization result could not be parsed.",
+            t("result.parseError"),
         preprocessingIssues: [],
         scheduledLessons: []
     };
@@ -156,11 +162,11 @@ function renderPreprocessingFailure(
         result.message ??
         result.error ??
         result.optimizationInfo?.message ??
-        "The input data contains blocking errors.";
+        t("problem.blockingErrors");
 
     setResultMessage(
         "error",
-        "Optimization cannot be started",
+        t("optimization.cannotStart"),
         generalMessage
     );
 
@@ -176,11 +182,12 @@ function renderOptimizationSuccess(
 
     const message =
         result.optimizationInfo?.message ??
-        `The optimizer scheduled ${lessonCount} lessons.`;
+        t("result.scheduledLessons")
+            .replace("{count}", lessonCount);
 
     setResultMessage(
         "success",
-        "Optimization completed",
+        t("result.completed"),
         message
     );
 
@@ -202,7 +209,7 @@ function renderScheduledLessonRows(scheduledLessons) {
 
     if (!scheduledLessons || scheduledLessons.length === 0) {
         setTimetableMessage(
-            "No scheduled lessons returned by optimizer."
+            t("table.noScheduledLessons")
         );
         return;
     }
@@ -291,7 +298,7 @@ function populateFilters(scheduledLessons) {
                     item.classGroupId
             )
             .filter(hasValue),
-        "All classes"
+        t("filter.allClasses")
     );
 
     fillSelect(
@@ -304,7 +311,7 @@ function populateFilters(scheduledLessons) {
                     item.teacherId
             )
             .filter(hasValue),
-        "All teachers"
+        t("filter.allTeachers")
     );
 
     fillSelect(
@@ -317,7 +324,7 @@ function populateFilters(scheduledLessons) {
                     item.roomId
             )
             .filter(hasValue),
-        "All rooms"
+        t("filter.allRooms")
     );
 
     setupFilterEvents();
@@ -417,22 +424,22 @@ function applyFilters() {
 function clearOptimizationResult() {
     setResultMessage(
         "neutral",
-        "No optimization result yet",
-        "Run the optimizer to generate a timetable."
+        t("result.none"),
+        t("result.noneDescription")
     );
 
     hidePreprocessingIssues();
     setTimetableContentVisible(true);
-    setStatusText("Ready.");
-    setTimetableMessage("No timetable generated yet.");
+    setStatusText(t("optimization.ready"));
+    setTimetableMessage(t("table.noTimetable"));
     resetAllFilters();
     clearLastOptimizationResultFromStorage();
 }
 
 function resetAllFilters() {
-    resetSelect("classFilter", "All classes");
-    resetSelect("teacherFilter", "All teachers");
-    resetSelect("roomFilter", "All rooms");
+    resetSelect("classFilter", t("filter.allClasses"));
+    resetSelect("teacherFilter", t("filter.allTeachers"));
+    resetSelect("roomFilter", t("filter.allRooms"));
 }
 
 function resetSelect(selectId, defaultText) {
@@ -463,7 +470,7 @@ function loadLastOptimizationResultFromStorage() {
         const data = JSON.parse(savedJson);
 
         renderOptimizationResult(data);
-        setStatusText("Loaded last optimization result.");
+        setStatusText(t("result.loadedLast"));
     } catch (error) {
         console.error(
             "Could not load optimization result from localStorage.",
@@ -471,7 +478,28 @@ function loadLastOptimizationResultFromStorage() {
         );
 
         localStorage.removeItem(LAST_RESULT_STORAGE_KEY);
-        setStatusText("Could not load saved result.");
+        setStatusText(t("result.loadSavedFailed"));
+    }
+}
+
+
+function refreshTimetableLanguage() {
+    try {
+        const savedJson = localStorage.getItem(
+            LAST_RESULT_STORAGE_KEY
+        );
+
+        if (savedJson) {
+            renderOptimizationResult(JSON.parse(savedJson));
+        } else {
+            resetAllFilters();
+            setTimetableMessage(t("table.noTimetable"));
+        }
+    } catch (error) {
+        console.error(
+            "Could not refresh timetable language.",
+            error
+        );
     }
 }
 

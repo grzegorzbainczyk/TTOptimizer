@@ -1,3 +1,5 @@
+import { t } from "../i18n.js";
+
 export async function initializeSchoolSummary() {
     const organizationNameElement =
         document.getElementById("organizationName");
@@ -24,10 +26,10 @@ export async function initializeSchoolSummary() {
         }
 
         organizationNameElement.textContent =
-            data.name || "Unnamed school";
+            data.name || t("school.unnamed");
     } catch (error) {
         console.error("Could not load school information:", error);
-        organizationNameElement.textContent = "School information unavailable";
+        organizationNameElement.textContent = t("school.unavailable");
     }
 }
 
