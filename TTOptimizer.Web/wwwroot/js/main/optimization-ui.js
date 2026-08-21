@@ -1,3 +1,5 @@
+import { t } from "../i18n.js";
+
 export function setOptimizationRunningState(isRunning) {
     const runButton = document.getElementById(
         "runOptimizationButton"
@@ -16,8 +18,8 @@ export function setOptimizationRunningState(isRunning) {
 
         if (runButtonLabel) {
             runButtonLabel.textContent = isRunning
-                ? "Running..."
-                : "Run optimization";
+                ? t("optimization.runningButton")
+                : t("optimization.run");
         }
     }
 
@@ -108,14 +110,14 @@ export function renderPreprocessingIssues(issues) {
 
         const badge = document.createElement("span");
         badge.className = "preprocessing-issue-severity";
-        badge.textContent = issue.severity ?? "Error";
+        badge.textContent = issue.severity ?? t("problem.error");
 
         heading.append(title, badge);
 
         const message = document.createElement("p");
         message.textContent =
             issue.message ??
-            "An unspecified preprocessing problem was found.";
+            t("problem.unspecifiedPreprocessingProblem");
 
         listItem.append(heading, message);
 
@@ -129,8 +131,8 @@ export function renderPreprocessingIssues(issues) {
     }
 
     issueCount.textContent = issues.length === 1
-        ? "1 problem"
-        : `${issues.length} problems`;
+        ? t("problem.oneProblem")
+        : t("problem.problemCount").replace("{count}", issues.length);
 
     details.classList.remove("hidden");
 }
@@ -205,7 +207,9 @@ export function updateOptimizationProgress(progress) {
 
     if (generationText) {
         generationText.textContent =
-            `Generation: ${generation} / ${totalGenerations}`;
+            t("optimization.generation")
+                .replace("{generation}", generation)
+                .replace("{totalGenerations}", totalGenerations);
     }
 
     if (progress.best) {
@@ -256,8 +260,9 @@ function updateBestOptimizationMetrics(progress) {
     if (bestFoundText) {
         bestFoundText.textContent =
             bestFoundAtGeneration > 0
-                ? `Best found: generation ${bestFoundAtGeneration}`
-                : "Best found: initial population";
+                ? t("optimization.bestFoundGeneration")
+                    .replace("{generation}", bestFoundAtGeneration)
+                : t("optimization.bestFoundInitial");
     }
 
     if (
@@ -277,14 +282,14 @@ function updateBestOptimizationMetrics(progress) {
             );
 
             feasibilityText.textContent =
-                "Feasible solution found";
+                t("optimization.feasibleSolutionFound");
         } else {
             hardMetric.classList.add(
                 "optimization-metric-warning"
             );
 
             feasibilityText.textContent =
-                "No feasible solution yet";
+                t("optimization.noFeasibleSolutionYet");
         }
     }
 }
@@ -292,7 +297,7 @@ function updateBestOptimizationMetrics(progress) {
 function resetOptimizationProgressMetrics() {
     setText(
         "optimizationBestFoundText",
-        "Best found: initial population"
+        t("optimization.bestFoundInitial")
     );
 
     setText(
@@ -307,7 +312,7 @@ function resetOptimizationProgressMetrics() {
 
     setText(
         "optimizationFeasibilityText",
-        "Waiting for first evaluation"
+        t("optimization.waitingEvaluation")
     );
 
     const hardMetric = document.getElementById(
@@ -375,14 +380,14 @@ function createIssueCountsElement(issue) {
     element.className = "preprocessing-issue-counts";
 
     const required = document.createElement("span");
-    required.append("Required: ");
+    required.append(`${t("problem.required")} `);
 
     const requiredValue = document.createElement("strong");
     requiredValue.textContent = String(requiredCount);
     required.appendChild(requiredValue);
 
     const available = document.createElement("span");
-    available.append("Available: ");
+    available.append(`${t("problem.available")} `);
 
     const availableValue = document.createElement("strong");
     availableValue.textContent = String(availableCount);
@@ -394,7 +399,7 @@ function createIssueCountsElement(issue) {
 
 function formatIssueCode(code) {
     if (!code) {
-        return "Preprocessing problem";
+        return t("problem.preprocessingProblem");
     }
 
     return String(code)

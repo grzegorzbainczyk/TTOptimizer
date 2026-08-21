@@ -188,5 +188,17 @@
   "settings.penalties.high": "Wysoka",
   "settings.penalties.hard": "Twarda",
   "settings.save": "Zapisz ustawienia",
-  "settings.reset": "Przywróć domyślne"
+  "settings.reset": "Przywróć domyślne",
+  "optimization.generation": "Generacja: {generation} / {totalGenerations}",
+  "optimization.bestFoundGeneration": "Najlepszy wynik: generacja {generation}",
+  "optimization.feasibleSolutionFound": "Znaleziono rozwiązanie dopuszczalne",
+  "optimization.noFeasibleSolutionYet": "Nie znaleziono jeszcze rozwiązania dopuszczalnego",
+  "optimization.runningButton": "Trwa optymalizacja...",
+  "problem.oneProblem": "1 problem",
+  "problem.problemCount": "{count} problemów",
+  "problem.required": "Wymagane:",
+  "problem.available": "Dostępne:",
+  "problem.preprocessingProblem": "Problem przetwarzania wstępnego",
+  "problem.unspecifiedPreprocessingProblem": "Wykryto nieokreślony problem podczas przetwarzania wstępnego.",
+  "problem.error": "Błąd"
 }
