@@ -28,9 +28,13 @@
 <main class="content-card teachers-card">
 <div class="section-header teachers-section-header"><div><h2>Rooms list</h2><p class="teachers-section-description">Manage rooms, subject restrictions and room availability.</p></div>
 
+<div class="teachers-header-actions">
+<button class="secondary-button" id="importRoomsButton" type="button">Import XLSX</button>
+<input id="roomImportFileInput" type="file" accept=".xlsx" hidden />
 <button class="primary-button teachers-add-button" id="addRoomButton" type="button"><span aria-hidden="true">+</span>
                     Add room
                 </button>
+</div>
 </div>
 <section class="resource-form-section teachers-form-section" hidden="" id="roomFormSection">
 <h3 id="roomFormTitle">
@@ -92,6 +96,45 @@
 <p aria-live="polite" class="form-message" id="roomFormMessage">
 </p>
 </section>
+
+<section id="roomImportPreviewSection"
+         class="resource-form-section"
+         hidden>
+    <div class="section-header teachers-section-header">
+        <div>
+            <h3>Import preview</h3>
+            <p>Review data read from the XLSX file. Nothing has been saved yet.</p>
+        </div>
+        <div class="teachers-header-actions">
+            <button id="confirmRoomsImportButton"
+                    class="primary-button"
+                    type="button"
+                    disabled>
+                Import rooms
+            </button>
+            <button id="closeRoomsImportPreviewButton"
+                    class="secondary-button"
+                    type="button">
+                Close
+            </button>
+        </div>
+    </div>
+    <p id="roomImportMessage"
+       class="form-message"
+       aria-live="polite"></p>
+    <div class="table-wrapper">
+        <table class="data-table" id="roomImportPreviewTable">
+            <thead>
+                <tr>
+                    <th>Row</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</section>
 <div class="teachers-table-summary"><span id="roomsCount">Loading rooms...</span></div><div class="table-wrapper teachers-table-wrapper">
 <table class="data-table teachers-table" id="roomsTable">
 <thead>
@@ -118,6 +161,6 @@
 </main>
 </div>
 <script src="js/appContext.js"></script>
-<script src="js/rooms.js"></script>
+<script type="module" src="js/rooms.js"></script>
 </body>
 </html>

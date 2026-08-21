@@ -5,6 +5,7 @@ using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 using TTOptimizer.Web.Models.DTO.Teachers;
 using TTOptimizer.Web.Models.DTO.SchedulingPreferences;
+using TTOptimizer.Web.Services;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -322,6 +323,222 @@ public class TeachersController : ControllerBase
     }
 
 
+
+
+    [HttpPost("import")]
+    public async Task<IActionResult> ImportTeachers(
+        [FromQuery] int organizationId,
+        [FromBody] TeacherImportRequestDto request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        var organizationExists =
+            await _dbContext.Organizations.AnyAsync(
+                organization => organization.Id == organizationId);
+
+        if (!organizationExists)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Organization was not found."
+            });
+        }
+
+        if (request.Names == null || request.Names.Count == 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "There are no teachers to import."
+            });
+        }
+
+        var requestedNames = request.Names
+            .Select(name => name?.Trim() ?? string.Empty)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (requestedNames.Count == 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "There are no valid teacher names to import."
+            });
+        }
+
+        var existingTeachers =
+            await _dbContext.Teachers
+                .Where(teacher =>
+                    teacher.OrganizationId == organizationId)
+                .Select(teacher => new
+                {
+                    teacher.Name,
+                    teacher.Alias
+                })
+                .ToListAsync();
+
+        var existingNames = new HashSet<string>(
+            existingTeachers.Select(teacher => teacher.Name),
+            StringComparer.OrdinalIgnoreCase);
+
+        var usedAliases = new HashSet<string>(
+            existingTeachers.Select(teacher => teacher.Alias),
+            StringComparer.OrdinalIgnoreCase);
+
+        var namesToImport = requestedNames
+            .Where(name => !existingNames.Contains(name))
+            .ToList();
+
+        var skippedExistingCount =
+            requestedNames.Count - namesToImport.Count;
+
+        if (namesToImport.Count == 0)
+        {
+            return Ok(new
+            {
+                success = true,
+                importedCount = 0,
+                skippedExistingCount,
+                message = "No new teachers were imported."
+            });
+        }
+
+        var nextTeacherNumber =
+            (await _dbContext.Teachers
+                .Where(teacher =>
+                    teacher.OrganizationId == organizationId)
+                .MaxAsync(teacher =>
+                    (int?)teacher.TeacherNumber) ?? 0) + 1;
+
+        var teachers = new List<Teacher>();
+
+        foreach (var name in namesToImport)
+        {
+            var alias =
+                GenerateUniqueAliasForImport(
+                    name,
+                    usedAliases);
+
+            var teacher = new Teacher
+            {
+                OrganizationId = organizationId,
+                TeacherNumber = nextTeacherNumber++,
+                Name = name,
+                Alias = alias,
+                Info = null
+            };
+
+            teachers.Add(teacher);
+        }
+
+        _dbContext.Teachers.AddRange(teachers);
+        await _dbContext.SaveChangesAsync();
+
+        return Ok(new
+        {
+            success = true,
+            importedCount = teachers.Count,
+            skippedExistingCount,
+            message = $"{teachers.Count} teacher(s) imported."
+        });
+    }
+
+    private static string GenerateUniqueAliasForImport(
+        string name,
+        HashSet<string> usedAliases)
+    {
+        var parts = name.Split(
+            ' ',
+            StringSplitOptions.RemoveEmptyEntries |
+            StringSplitOptions.TrimEntries);
+
+        var baseAlias = string.Concat(
+            parts.Select(part =>
+                char.ToUpperInvariant(part[0])));
+
+        if (string.IsNullOrWhiteSpace(baseAlias))
+        {
+            baseAlias = "T";
+        }
+
+        var alias = baseAlias;
+        var suffix = 2;
+
+        while (usedAliases.Contains(alias))
+        {
+            alias = $"{baseAlias}{suffix}";
+            suffix++;
+        }
+
+        usedAliases.Add(alias);
+
+        return alias;
+    }
+
+    [HttpPost("import/preview")]
+    public IActionResult PreviewImport(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "File is required."
+            });
+        }
+
+        var extension = Path.GetExtension(file.FileName);
+
+        if (!string.Equals(
+            extension,
+            ".xlsx",
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Only .xlsx files are supported."
+            });
+        }
+
+        try
+        {
+            using var stream = file.OpenReadStream();
+
+            var preview =
+                TeacherImportService.ReadPreview(stream);
+
+            if (!preview.Success)
+            {
+                return BadRequest(preview);
+            }
+
+            return Ok(preview);
+        }
+        catch (Exception error)
+        {
+            Console.Error.WriteLine(
+                $"Could not read teacher import file: {error}");
+
+            return BadRequest(new
+            {
+                success = false,
+                message =
+                    "The XLSX file could not be read. " +
+                    "Make sure it is a valid spreadsheet."
+            });
+        }
+    }
 
     // Time slot preferences endpoint for a specific teacher
 

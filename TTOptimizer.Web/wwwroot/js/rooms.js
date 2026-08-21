@@ -1,3 +1,5 @@
+import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
+
 let availableBuildings = [];
 let availableSubjects = [];
 
@@ -56,6 +58,28 @@ document.addEventListener(
             "click",
             closeRoomForm
         );
+
+        initializeSimpleXlsxImport({
+            resourceName: "room",
+            pluralName: "Rooms",
+            previewUrl: "/api/rooms/import/preview",
+            importUrlFactory: () => {
+                const organizationId =
+                    window.appContext.requireOrganizationId();
+
+                return `/api/rooms/import?organizationId=${encodeURIComponent(
+                    organizationId
+                )}`;
+            },
+            importButtonId: "importRoomsButton",
+            fileInputId: "roomImportFileInput",
+            previewSectionId: "roomImportPreviewSection",
+            previewTableId: "roomImportPreviewTable",
+            messageId: "roomImportMessage",
+            confirmButtonId: "confirmRoomsImportButton",
+            closeButtonId: "closeRoomsImportPreviewButton",
+            onImported: loadRooms
+        });
 
         await refreshPageData();
     }

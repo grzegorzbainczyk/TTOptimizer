@@ -1,3 +1,5 @@
+import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
+
 let availableTeachers = [];
 let availableRooms = [];
 
@@ -40,6 +42,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         "click",
         closeClassForm
     );
+
+    initializeSimpleXlsxImport({
+        resourceName: "class",
+        pluralName: "Classes",
+        previewUrl: "/api/classes/import/preview",
+        importUrlFactory: () => {
+            const organizationId = window.appContext.requireOrganizationId();
+            return `/api/classes/import?organizationId=${encodeURIComponent(organizationId)}`;
+        },
+        importButtonId: "importClassesButton",
+        fileInputId: "classImportFileInput",
+        previewSectionId: "classImportPreviewSection",
+        previewTableId: "classImportPreviewTable",
+        messageId: "classImportMessage",
+        confirmButtonId: "confirmClassesImportButton",
+        closeButtonId: "closeClassesImportPreviewButton",
+        onImported: loadClasses
+    });
 
     await refreshPageData();
 });

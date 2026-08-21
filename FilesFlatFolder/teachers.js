@@ -1,3 +1,5 @@
+let currentTeacherImportRows = [];
+
 document.addEventListener("DOMContentLoaded", async () => {
     const backToMainButton =
         document.getElementById("backToMainButton");
@@ -13,6 +15,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const cancelTeacherButton =
         document.getElementById("cancelTeacherButton");
+
+    const importTeachersButton =
+        document.getElementById("importTeachersButton");
+
+    const teacherImportFileInput =
+        document.getElementById("teacherImportFileInput");
+
+    const closeTeacherImportPreviewButton =
+        document.getElementById("closeTeacherImportPreviewButton");
+
+    const confirmTeacherImportButton =
+        document.getElementById("confirmTeacherImportButton");
+
 
     backToMainButton?.addEventListener("click", () => {
         window.location.href = "main.html";
@@ -37,6 +52,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         "click",
         closeTeacherForm
     );
+
+    importTeachersButton?.addEventListener(
+        "click",
+        () => teacherImportFileInput?.click()
+    );
+
+    teacherImportFileInput?.addEventListener(
+        "change",
+        handleTeacherImportFileSelected
+    );
+
+    closeTeacherImportPreviewButton?.addEventListener(
+        "click",
+        closeTeacherImportPreview
+    );
+
+    confirmTeacherImportButton?.addEventListener(
+        "click",
+        confirmTeacherImport
+    );
+
 
     await loadTeachers();
 });
@@ -507,6 +543,301 @@ function clearTeacherFormMessage() {
 
     messageElement.textContent = "";
     messageElement.classList.remove("error-message");
+}
+
+
+async function handleTeacherImportFileSelected(event) {
+    const input = event.target;
+    const file = input?.files?.[0];
+
+    if (!file) {
+        return;
+    }
+
+    if (!file.name.toLowerCase().endsWith(".xlsx")) {
+        window.alert("Please select an XLSX file.");
+        input.value = "";
+        return;
+    }
+
+    try {
+        showTeacherImportMessage(
+            `Reading ${file.name}...`,
+            false
+        );
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch(
+            "/api/teachers/import/preview",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                data?.message ??
+                `Could not read XLSX file. Status: ${response.status}`
+            );
+        }
+
+        const rows = Array.isArray(data?.rows)
+            ? data.rows
+            : [];
+
+        currentTeacherImportRows = rows;
+
+        renderTeacherImportPreview(rows);
+        updateConfirmTeacherImportButton();
+
+        showTeacherImportMessage(
+            `${rows.length} row(s) read from the file.`,
+            false
+        );
+    } catch (error) {
+        console.error(
+            "Error reading teacher import file:",
+            error
+        );
+
+        currentTeacherImportRows = [];
+        renderTeacherImportPreview([]);
+        updateConfirmTeacherImportButton();
+
+        showTeacherImportMessage(
+            error instanceof Error
+                ? error.message
+                : "Could not read XLSX file.",
+            true
+        );
+    } finally {
+        input.value = "";
+    }
+}
+
+function renderTeacherImportPreview(rows) {
+    const previewSection =
+        document.getElementById("teacherImportPreviewSection");
+
+    const tbody =
+        document.querySelector(
+            "#teacherImportPreviewTable tbody"
+        );
+
+    if (!previewSection || !tbody) {
+        return;
+    }
+
+    tbody.innerHTML = "";
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+
+        cell.colSpan = 3;
+        cell.textContent = "No teacher rows found.";
+
+        row.appendChild(cell);
+        tbody.appendChild(row);
+
+        previewSection.hidden = false;
+        return;
+    }
+
+    for (const item of rows) {
+        const row = document.createElement("tr");
+
+        row.appendChild(
+            createTableCell(item.rowNumber)
+        );
+
+        row.appendChild(
+            createTableCell(item.name ?? "")
+        );
+
+        const statusText = item.isValid
+            ? "OK"
+            : item.message || "Invalid row";
+
+        const statusCell =
+            createTableCell(statusText);
+
+        if (!item.isValid) {
+            statusCell.classList.add("error-message");
+        }
+
+        row.appendChild(statusCell);
+        tbody.appendChild(row);
+    }
+
+    previewSection.hidden = false;
+}
+
+function closeTeacherImportPreview() {
+    const previewSection =
+        document.getElementById("teacherImportPreviewSection");
+
+    if (previewSection) {
+        previewSection.hidden = true;
+    }
+
+    currentTeacherImportRows = [];
+    updateConfirmTeacherImportButton();
+    clearTeacherImportMessage();
+}
+
+
+function updateConfirmTeacherImportButton() {
+    const button =
+        document.getElementById("confirmTeacherImportButton");
+
+    if (!button) {
+        return;
+    }
+
+    const validRows = currentTeacherImportRows.filter(
+        row => row?.isValid === true
+    );
+
+    button.disabled = validRows.length === 0;
+}
+
+async function confirmTeacherImport() {
+    const validRows = currentTeacherImportRows.filter(
+        row =>
+            row?.isValid === true &&
+            typeof row?.name === "string" &&
+            row.name.trim() !== ""
+    );
+
+    if (validRows.length === 0) {
+        showTeacherImportMessage(
+            "There are no valid teachers to import.",
+            true
+        );
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Import ${validRows.length} teacher(s) into ClassFlow?`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const button =
+        document.getElementById("confirmTeacherImportButton");
+
+    if (button) {
+        button.disabled = true;
+    }
+
+    try {
+        showTeacherImportMessage(
+            "Importing teachers...",
+            false
+        );
+
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/teachers/import?organizationId=${encodeURIComponent(
+                organizationId
+            )}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    names: validRows.map(
+                        row => row.name.trim()
+                    )
+                })
+            }
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                data?.message ??
+                `Could not import teachers. Status: ${response.status}`
+            );
+        }
+
+        const importedCount =
+            Number(data?.importedCount ?? 0);
+
+        const skippedExistingCount =
+            Number(data?.skippedExistingCount ?? 0);
+
+        let message =
+            `Imported ${importedCount} teacher(s).`;
+
+        if (skippedExistingCount > 0) {
+            message +=
+                ` ${skippedExistingCount} existing teacher(s) were skipped.`;
+        }
+
+        showTeacherImportMessage(
+            message,
+            false
+        );
+
+        currentTeacherImportRows = [];
+        updateConfirmTeacherImportButton();
+
+        await loadTeachers();
+    } catch (error) {
+        console.error(
+            "Error importing teachers:",
+            error
+        );
+
+        showTeacherImportMessage(
+            error instanceof Error
+                ? error.message
+                : "Could not import teachers.",
+            true
+        );
+
+        updateConfirmTeacherImportButton();
+    }
+}
+
+function showTeacherImportMessage(message, isError) {
+    const element =
+        document.getElementById("teacherImportMessage");
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent = message;
+    element.classList.toggle(
+        "error-message",
+        isError
+    );
+}
+
+function clearTeacherImportMessage() {
+    const element =
+        document.getElementById("teacherImportMessage");
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent = "";
+    element.classList.remove("error-message");
 }
 
 async function readJsonResponse(response) {

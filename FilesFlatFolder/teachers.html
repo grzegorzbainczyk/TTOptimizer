@@ -47,11 +47,24 @@
                     </p>
                 </div>
 
-                <button id="addTeacherButton"
-                        class="main-action-button teachers-add-button"
-                        type="button">
-                    <span aria-hidden="true">+</span> Add teacher
-                </button>
+                <div class="teachers-header-actions">
+                    <button id="importTeachersButton"
+                            class="secondary-button"
+                            type="button">
+                        Import XLSX
+                    </button>
+
+                    <input id="teacherImportFileInput"
+                           type="file"
+                           accept=".xlsx"
+                           hidden />
+
+                    <button id="addTeacherButton"
+                            class="main-action-button teachers-add-button"
+                            type="button">
+                        <span aria-hidden="true">+</span> Add teacher
+                    </button>
+                </div>
             </div>
 
             <section id="teacherFormSection"
@@ -133,6 +146,57 @@
                    class="form-message"
                    aria-live="polite">
                 </p>
+            </section>
+
+            <section id="teacherImportPreviewSection"
+                     class="resource-form-section"
+                     hidden>
+
+                <div class="section-header teachers-section-header">
+                    <div>
+                        <h3>Import preview</h3>
+                        <p>
+                            Review the teachers read from the XLSX file.
+                            Nothing has been saved yet.
+                        </p>
+                    </div>
+
+                    <div class="teachers-header-actions">
+                        <button id="confirmTeacherImportButton"
+                                class="main-action-button"
+                                type="button"
+                                disabled>
+                            Import teachers
+                        </button>
+
+                        <button id="closeTeacherImportPreviewButton"
+                                class="secondary-button"
+                                type="button">
+                            Close
+                        </button>
+                    </div>
+                </div>
+
+                <p id="teacherImportMessage"
+                   class="form-message"
+                   aria-live="polite">
+                </p>
+
+                <div class="table-wrapper">
+                    <table class="data-table"
+                           id="teacherImportPreviewTable">
+                        <thead>
+                            <tr>
+                                <th>Row</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </section>
 
             <div class="teachers-table-summary">

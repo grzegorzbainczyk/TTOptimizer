@@ -28,9 +28,13 @@
 <main class="content-card teachers-card">
 <div class="section-header teachers-section-header"><div><h2>Subjects list</h2><p class="teachers-section-description">Manage subjects and optional information used by the timetable.</p></div>
 
+<div class="teachers-header-actions">
+<button class="secondary-button" id="importSubjectsButton" type="button">Import XLSX</button>
+<input id="subjectImportFileInput" type="file" accept=".xlsx" hidden />
 <button class="primary-button teachers-add-button" id="addSubjectButton" type="button"><span aria-hidden="true">+</span>
                     Add subject
                 </button>
+</div>
 </div>
 <section class="resource-form-section teachers-form-section" hidden="" id="subjectFormSection">
 <h3 id="subjectFormTitle">
@@ -62,6 +66,45 @@
 <p aria-live="polite" class="form-message" id="subjectFormMessage">
 </p>
 </section>
+
+<section id="subjectImportPreviewSection"
+         class="resource-form-section"
+         hidden>
+    <div class="section-header teachers-section-header">
+        <div>
+            <h3>Import preview</h3>
+            <p>Review data read from the XLSX file. Nothing has been saved yet.</p>
+        </div>
+        <div class="teachers-header-actions">
+            <button id="confirmSubjectsImportButton"
+                    class="primary-button"
+                    type="button"
+                    disabled>
+                Import subjects
+            </button>
+            <button id="closeSubjectsImportPreviewButton"
+                    class="secondary-button"
+                    type="button">
+                Close
+            </button>
+        </div>
+    </div>
+    <p id="subjectImportMessage"
+       class="form-message"
+       aria-live="polite"></p>
+    <div class="table-wrapper">
+        <table class="data-table" id="subjectImportPreviewTable">
+            <thead>
+                <tr>
+                    <th>Row</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</section>
 <div class="teachers-table-summary"><span id="subjectsCount">Loading subjects...</span></div><div class="table-wrapper teachers-table-wrapper">
 <table class="data-table teachers-table" id="subjectsTable">
 <thead>
@@ -85,6 +128,6 @@
 </main>
 </div>
 <script src="js/appContext.js"></script>
-<script src="js/subjects.js"></script>
+<script type="module" src="js/subjects.js"></script>
 </body>
 </html>

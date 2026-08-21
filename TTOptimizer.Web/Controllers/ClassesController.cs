@@ -5,6 +5,8 @@ using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.ClassGroups;
 using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 using TTOptimizer.Web.Models.DTO.SchedulingPreferences;
+using TTOptimizer.Web.Models.DTO.Import;
+using TTOptimizer.Web.Services;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -267,6 +269,172 @@ public class ClassesController : ControllerBase
     }
 
 
+
+    [HttpPost("import/preview")]
+    public IActionResult PreviewImport(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "File is required."
+            });
+        }
+
+        var extension = Path.GetExtension(file.FileName);
+
+        if (!string.Equals(extension, ".xlsx", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Only .xlsx files are supported."
+            });
+        }
+
+        try
+        {
+            using var stream = file.OpenReadStream();
+
+            var preview = XlsxImportService.ReadSingleNameColumnPreview(
+                stream,
+                expectedHeader: "Name",
+                maxNameLength: 50);
+
+            if (!preview.Success)
+            {
+                return BadRequest(preview);
+            }
+
+            return Ok(preview);
+        }
+        catch (Exception error)
+        {
+            Console.Error.WriteLine($"Could not read class import file: {error}");
+
+            return BadRequest(new
+            {
+                success = false,
+                message = "The XLSX file could not be read. Make sure it is a valid spreadsheet."
+            });
+        }
+    }
+
+    [HttpPost("import")]
+    public async Task<IActionResult> ImportClasses(
+        [FromQuery] int organizationId,
+        [FromBody] SimpleNameImportRequestDto request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        var organizationExists = await _db.Organizations.AnyAsync(
+            organization => organization.Id == organizationId);
+
+        if (!organizationExists)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Organization was not found."
+            });
+        }
+
+        var requestedNames = request.Names
+            .Select(name => name?.Trim() ?? string.Empty)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Where(name => name.Length <= 50)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (requestedNames.Count == 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "There are no valid class names to import."
+            });
+        }
+
+        var existingNames = await _db.ClassGroups
+            .Where(classGroup => classGroup.OrganizationId == organizationId)
+            .Select(classGroup => classGroup.Name)
+            .ToListAsync();
+
+        var existingNameSet = new HashSet<string>(
+            existingNames,
+            StringComparer.OrdinalIgnoreCase);
+
+        var namesToImport = requestedNames
+            .Where(name => !existingNameSet.Contains(name))
+            .ToList();
+
+        var skippedExistingCount = requestedNames.Count - namesToImport.Count;
+
+        if (namesToImport.Count == 0)
+        {
+            return Ok(new
+            {
+                success = true,
+                importedCount = 0,
+                skippedExistingCount
+            });
+        }
+
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+
+        try
+        {
+            foreach (var name in namesToImport)
+            {
+                var classGroup = new ClassGroup
+                {
+                    OrganizationId = organizationId,
+                    Name = name,
+                    Info = null,
+                    HomeroomTeacherId = null,
+                    DefaultRoomId = null
+                };
+
+                _db.ClassGroups.Add(classGroup);
+
+                _db.StudentGroups.Add(new StudentGroup
+                {
+                    OrganizationId = organizationId,
+                    Name = name,
+                    Type = StudentGroupType.WholeClass,
+                    ClassGroup = classGroup
+                });
+            }
+
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (DbUpdateException)
+        {
+            await transaction.RollbackAsync();
+
+            return Conflict(new
+            {
+                success = false,
+                message = "One or more classes already exist."
+            });
+        }
+
+        return Ok(new
+        {
+            success = true,
+            importedCount = namesToImport.Count,
+            skippedExistingCount
+        });
+    }
     [HttpGet("{id:int}/time-slot-preferences")]
     public async Task<IActionResult> GetTimeSlotPreferences(
         int id,

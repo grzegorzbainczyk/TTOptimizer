@@ -1,3 +1,5 @@
+import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
     const backToMainButton =
         document.getElementById("backToMainButton");
@@ -37,6 +39,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         "click",
         closeSubjectForm
     );
+
+    initializeSimpleXlsxImport({
+        resourceName: "subject",
+        pluralName: "Subjects",
+        previewUrl: "/api/subjects/import/preview",
+        importUrlFactory: () => {
+            const organizationId =
+                window.appContext.requireOrganizationId();
+
+            return `/api/subjects/import?organizationId=${encodeURIComponent(
+                organizationId
+            )}`;
+        },
+        importButtonId: "importSubjectsButton",
+        fileInputId: "subjectImportFileInput",
+        previewSectionId: "subjectImportPreviewSection",
+        previewTableId: "subjectImportPreviewTable",
+        messageId: "subjectImportMessage",
+        confirmButtonId: "confirmSubjectsImportButton",
+        closeButtonId: "closeSubjectsImportPreviewButton",
+        onImported: loadSubjects
+    });
 
     await loadSubjects();
 });

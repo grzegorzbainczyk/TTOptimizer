@@ -4,6 +4,8 @@ using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 using TTOptimizer.Web.Models.DTO.Rooms;
+using TTOptimizer.Web.Models.DTO.Import;
+using TTOptimizer.Web.Services;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -271,6 +273,152 @@ public class RoomsController : ControllerBase
         return Ok(result);
     }
 
+
+
+    [HttpPost("import/preview")]
+    public IActionResult PreviewImport(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "File is required."
+            });
+        }
+
+        var extension = Path.GetExtension(file.FileName);
+
+        if (!string.Equals(
+            extension,
+            ".xlsx",
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Only .xlsx files are supported."
+            });
+        }
+
+        try
+        {
+            using var stream = file.OpenReadStream();
+
+            var preview =
+                XlsxImportService.ReadSingleNameColumnPreview(
+                    stream,
+                    expectedHeader: "Name",
+                    maxNameLength: 100);
+
+            if (!preview.Success)
+            {
+                return BadRequest(preview);
+            }
+
+            return Ok(preview);
+        }
+        catch (Exception error)
+        {
+            Console.Error.WriteLine(
+                $"Could not read room import file: {error}");
+
+            return BadRequest(new
+            {
+                success = false,
+                message =
+                    "The XLSX file could not be read. " +
+                    "Make sure it is a valid spreadsheet."
+            });
+        }
+    }
+
+    [HttpPost("import")]
+    public async Task<IActionResult> ImportRooms(
+        [FromQuery] int organizationId,
+        [FromBody] SimpleNameImportRequestDto request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        var organizationExists =
+            await _db.Organizations.AnyAsync(
+                organization => organization.Id == organizationId);
+
+        if (!organizationExists)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Organization was not found."
+            });
+        }
+
+        var requestedNames = request.Names
+            .Select(name => name?.Trim() ?? string.Empty)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Where(name => name.Length <= 100)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (requestedNames.Count == 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "There are no valid room names to import."
+            });
+        }
+
+        var existingNames =
+            await _db.Rooms
+                .Where(room =>
+                    room.OrganizationId == organizationId)
+                .Select(room => room.Name)
+                .ToListAsync();
+
+        var existingNameSet = new HashSet<string>(
+            existingNames,
+            StringComparer.OrdinalIgnoreCase);
+
+        var namesToImport = requestedNames
+            .Where(name => !existingNameSet.Contains(name))
+            .ToList();
+
+        var skippedExistingCount =
+            requestedNames.Count - namesToImport.Count;
+
+        var roomsToAdd = namesToImport
+            .Select(name => new Room
+            {
+                OrganizationId = organizationId,
+                Name = name,
+                Info = null,
+                BuildingId = null,
+                RestrictedToSubjectId = null,
+                PreferredSubjectId = null
+            })
+            .ToList();
+
+        if (roomsToAdd.Count > 0)
+        {
+            _db.Rooms.AddRange(roomsToAdd);
+            await _db.SaveChangesAsync();
+        }
+
+        return Ok(new
+        {
+            success = true,
+            importedCount = roomsToAdd.Count,
+            skippedExistingCount
+        });
+    }
 
     [HttpGet("{id:int}/time-slot-preferences")]
     public async Task<IActionResult> GetTimeSlotPreferences(

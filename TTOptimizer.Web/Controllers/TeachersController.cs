@@ -4,6 +4,7 @@ using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 using TTOptimizer.Web.Models.DTO.Teachers;
+using TTOptimizer.Web.Models.DTO.Import;
 using TTOptimizer.Web.Models.DTO.SchedulingPreferences;
 using TTOptimizer.Web.Services;
 
@@ -328,7 +329,7 @@ public class TeachersController : ControllerBase
     [HttpPost("import")]
     public async Task<IActionResult> ImportTeachers(
         [FromQuery] int organizationId,
-        [FromBody] TeacherImportRequestDto request)
+        [FromBody] SimpleNameImportRequestDto request)
     {
         if (organizationId <= 0)
         {
@@ -516,7 +517,10 @@ public class TeachersController : ControllerBase
             using var stream = file.OpenReadStream();
 
             var preview =
-                TeacherImportService.ReadPreview(stream);
+                XlsxImportService.ReadSingleNameColumnPreview(
+                    stream,
+                    expectedHeader: "Name",
+                    maxNameLength: 200);
 
             if (!preview.Success)
             {
