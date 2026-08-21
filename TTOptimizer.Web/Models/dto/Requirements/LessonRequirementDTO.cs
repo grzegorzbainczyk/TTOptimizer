@@ -1,3 +1,5 @@
+using TTOptimizer.Web.Models.Domain;
+
 namespace TTOptimizer.Web.Models.DTO.Requirements;
 
 public class LessonRequirementDTO
@@ -12,4 +14,5 @@ public class LessonRequirementDTO
     public int SubjectId { get; set; }
     public string SubjectName { get; set; } = string.Empty;
     public int HoursPerWeek { get; set; }
+    public LessonPriority Priority { get; set; }
 }

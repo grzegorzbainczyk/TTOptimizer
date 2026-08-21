@@ -15,6 +15,8 @@ public class LessonRequirement
     public int TeacherId { get; set; }
     public int HoursPerWeek { get; set; }
 
+    public LessonPriority Priority { get; set; } = LessonPriority.Normal;
+
     public Organization Organization { get; set; } = null!;
     public ClassGroup? ClassGroup { get; set; }
     public StudentGroup? StudentGroup { get; set; }
