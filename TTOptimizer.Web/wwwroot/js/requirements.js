@@ -1,8 +1,11 @@
 let availableTeachers = [];
 let availableStudentGroups = [];
 let availableSubjects = [];
+let availableClasses = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
+    configureLessonsPageLanguage();
+
     const backToMainButton =
         document.getElementById("backToMainButton");
 
@@ -42,14 +45,120 @@ document.addEventListener("DOMContentLoaded", async () => {
         closeRequirementForm
     );
 
+    document.getElementById("newStudentGroupButton")
+        ?.addEventListener("click", openNewStudentGroupPanel);
+
+    document.getElementById("cancelNewStudentGroupButton")
+        ?.addEventListener("click", closeNewStudentGroupPanel);
+
+    document.getElementById("saveNewStudentGroupButton")
+        ?.addEventListener("click", saveNewStudentGroup);
+
+    document.getElementById("newSubjectButton")
+        ?.addEventListener("click", openNewSubjectPanel);
+
+    document.getElementById("cancelNewSubjectButton")
+        ?.addEventListener("click", closeNewSubjectPanel);
+
+    document.getElementById("saveNewSubjectButton")
+        ?.addEventListener("click", saveNewSubject);
+
+    document.getElementById("requirementIsAdditional")
+        ?.addEventListener("change", handleAdditionalLessonChanged);
+
     await refreshPageData();
 });
+
+function getLessonsPageText() {
+    const language =
+        localStorage.getItem("classFlowLanguage") === "pl"
+            ? "pl"
+            : "en";
+
+    if (language === "pl") {
+        return {
+            pageLabel: "Dane planu lekcji",
+            pageTitle: "Lekcje",
+            pageSubtitle:
+                "Zdefiniuj lekcje, które mają zostać uwzględnione w planie.",
+            listTitle: "Lista lekcji",
+            listDescription:
+                "Określ grupę uczniów, przedmiot, nauczyciela i liczbę lekcji w tygodniu.",
+            addLesson: "Dodaj lekcję",
+            addLessonForm: "Dodaj lekcję",
+            editLessonForm: "Edytuj lekcję",
+            additionalLesson: "Zajęcia dodatkowe",
+            additionalLessonHelp:
+                "Zajęcia dodatkowe otrzymują domyślnie niski priorytet.",
+            newItem: "+ Nowy",
+            addStudentGroup: "Dodaj grupę uczniów",
+            addSubject: "Dodaj przedmiot",
+            cancel: "Anuluj",
+            back: "Powrót",
+            refresh: "Odśwież"
+        };
+    }
+
+    return {
+        pageLabel: "Timetable input",
+        pageTitle: "Lessons",
+        pageSubtitle:
+            "Define the lessons that should be included in the timetable.",
+        listTitle: "Lessons list",
+        listDescription:
+            "Choose the student group, subject, teacher and number of lessons per week.",
+        addLesson: "Add lesson",
+        addLessonForm: "Add lesson",
+        editLessonForm: "Edit lesson",
+        additionalLesson: "Additional lesson",
+        additionalLessonHelp:
+            "Additional lessons start with Low priority.",
+        newItem: "+ New",
+        addStudentGroup: "Add student group",
+        addSubject: "Add subject",
+        cancel: "Cancel",
+        back: "Back",
+        refresh: "Refresh"
+    };
+}
+
+function configureLessonsPageLanguage() {
+    const text = getLessonsPageText();
+
+    document.title =
+        `ClassFlow - ${text.pageTitle}`;
+
+    const setText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    };
+
+    setText("requirementsPageLabel", text.pageLabel);
+    setText("requirementsPageTitle", text.pageTitle);
+    setText("requirementsPageSubtitle", text.pageSubtitle);
+    setText("requirementsListTitle", text.listTitle);
+    setText("requirementsListDescription", text.listDescription);
+    setText("addRequirementButtonLabel", text.addLesson);
+    setText("requirementIsAdditionalLabel", text.additionalLesson);
+    setText("requirementIsAdditionalHelp", text.additionalLessonHelp);
+    setText("newStudentGroupButton", text.newItem);
+    setText("newSubjectButton", text.newItem);
+    setText("saveNewStudentGroupButton", text.addStudentGroup);
+    setText("saveNewSubjectButton", text.addSubject);
+    setText("cancelNewStudentGroupButton", text.cancel);
+    setText("cancelNewSubjectButton", text.cancel);
+    setText("backToMainButton", text.back);
+    setText("refreshRequirementsButton", text.refresh);
+}
 
 async function refreshPageData() {
     await Promise.all([
         loadTeachers(),
         loadStudentGroups(),
-        loadSubjects()
+        loadSubjects(),
+        loadClasses()
     ]);
 
     await loadRequirements();
@@ -160,6 +269,41 @@ async function loadSubjects() {
     }
 }
 
+
+async function loadClasses() {
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/classes?organizationId=${encodeURIComponent(
+                organizationId
+            )}`
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not load classes. Status: ${response.status}`
+                )
+            );
+        }
+
+        availableClasses = Array.isArray(data)
+            ? data
+            : data?.classes ?? data?.classGroups ?? [];
+
+        populateNewStudentGroupClassOptions();
+    } catch (error) {
+        console.error("Error loading classes:", error);
+        availableClasses = [];
+        populateNewStudentGroupClassOptions();
+    }
+}
+
 async function loadRequirements() {
     const tbody =
         document.querySelector("#requirementsTable tbody");
@@ -170,7 +314,7 @@ async function loadRequirements() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="5" class="teachers-table-state">Loading requirements...</td>
+            <td colspan="7" class="teachers-table-state">Loading requirements...</td>
         </tr>
     `;
 
@@ -233,7 +377,7 @@ function renderRequirements(requirements) {
     ) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="teachers-table-state">No requirements found.</td>
+                <td colspan="7" class="teachers-table-state">No requirements found.</td>
             </tr>
         `;
 
@@ -244,6 +388,10 @@ function renderRequirements(requirements) {
         const row = document.createElement("tr");
 
         row.className = "teacher-row";
+
+        row.appendChild(
+            createTableCell(requirement.name)
+        );
 
         row.appendChild(
             createTableCell(requirement.studentGroupName)
@@ -259,6 +407,10 @@ function renderRequirements(requirements) {
 
         row.appendChild(
             createTableCell(requirement.hoursPerWeek)
+        );
+
+        row.appendChild(
+            createTableCell(formatPriority(requirement.priority))
         );
 
         const actionsCell =
@@ -323,14 +475,26 @@ function updateRequirementsCount(count) {
 
     if (!Number.isInteger(count)) {
         countElement.textContent =
-            "Could not determine the number of requirements.";
+            "Could not determine the number of lessons.";
         return;
     }
 
     countElement.textContent =
         count === 1
-            ? "1 requirement"
-            : `${count} requirements`;
+            ? "1 lesson"
+            : `${count} lessons`;
+}
+
+function formatPriority(priority) {
+    switch (Number(priority)) {
+        case 0:
+            return "Low";
+        case 2:
+            return "High";
+        case 1:
+        default:
+            return "Normal";
+    }
 }
 
 function createTableCell(value) {
@@ -451,9 +615,264 @@ function populateSubjectOptions() {
     select.value = selectedValue;
 }
 
+
+function populateNewStudentGroupClassOptions() {
+    const select =
+        document.getElementById("newStudentGroupClassId");
+
+    if (!select) {
+        return;
+    }
+
+    const selectedValue = select.value;
+    select.innerHTML = "";
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Select class";
+    select.appendChild(emptyOption);
+
+    availableClasses.forEach(classGroup => {
+        const option = document.createElement("option");
+        option.value = classGroup.id;
+        option.textContent = classGroup.name;
+        select.appendChild(option);
+    });
+
+    select.value = selectedValue;
+}
+
+function openNewStudentGroupPanel() {
+    const panel = document.getElementById("newStudentGroupPanel");
+    if (!panel) {
+        return;
+    }
+
+    document.getElementById("newStudentGroupClassId").value = "";
+    document.getElementById("newStudentGroupName").value = "";
+    clearQuickCreateMessage("newStudentGroupMessage");
+
+    panel.hidden = false;
+    document.getElementById("newStudentGroupName").focus();
+}
+
+function closeNewStudentGroupPanel() {
+    const panel = document.getElementById("newStudentGroupPanel");
+    if (panel) {
+        panel.hidden = true;
+    }
+
+    clearQuickCreateMessage("newStudentGroupMessage");
+}
+
+async function saveNewStudentGroup() {
+    const classGroupId =
+        Number(document.getElementById("newStudentGroupClassId").value);
+
+    const name =
+        document.getElementById("newStudentGroupName").value.trim();
+
+    if (classGroupId <= 0) {
+        showQuickCreateMessage(
+            "newStudentGroupMessage",
+            "Class is required.",
+            true
+        );
+        return;
+    }
+
+    if (!name) {
+        showQuickCreateMessage(
+            "newStudentGroupMessage",
+            "Student group name is required.",
+            true
+        );
+        return;
+    }
+
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/student-groups/individual?organizationId=${encodeURIComponent(
+                organizationId
+            )}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    classGroupId,
+                    name
+                })
+            }
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not create student group. Status: ${response.status}`
+                )
+            );
+        }
+
+        const newGroupId = Number(data?.groupId);
+
+        await loadStudentGroups();
+
+        if (newGroupId > 0) {
+            document.getElementById(
+                "requirementStudentGroupId"
+            ).value = newGroupId.toString();
+        }
+
+        closeNewStudentGroupPanel();
+    } catch (error) {
+        console.error("Error creating student group:", error);
+
+        showQuickCreateMessage(
+            "newStudentGroupMessage",
+            error instanceof Error
+                ? error.message
+                : "Could not create student group.",
+            true
+        );
+    }
+}
+
+function openNewSubjectPanel() {
+    const panel = document.getElementById("newSubjectPanel");
+    if (!panel) {
+        return;
+    }
+
+    document.getElementById("newSubjectName").value = "";
+    clearQuickCreateMessage("newSubjectMessage");
+
+    panel.hidden = false;
+    document.getElementById("newSubjectName").focus();
+}
+
+function closeNewSubjectPanel() {
+    const panel = document.getElementById("newSubjectPanel");
+    if (panel) {
+        panel.hidden = true;
+    }
+
+    clearQuickCreateMessage("newSubjectMessage");
+}
+
+async function saveNewSubject() {
+    const name =
+        document.getElementById("newSubjectName").value.trim();
+
+    if (!name) {
+        showQuickCreateMessage(
+            "newSubjectMessage",
+            "Subject name is required.",
+            true
+        );
+        return;
+    }
+
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/subjects?organizationId=${encodeURIComponent(
+                organizationId
+            )}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name,
+                    info: null
+                })
+            }
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not create subject. Status: ${response.status}`
+                )
+            );
+        }
+
+        const newSubjectId = Number(data?.id);
+
+        await loadSubjects();
+
+        if (newSubjectId > 0) {
+            document.getElementById(
+                "requirementSubjectId"
+            ).value = newSubjectId.toString();
+        }
+
+        closeNewSubjectPanel();
+    } catch (error) {
+        console.error("Error creating subject:", error);
+
+        showQuickCreateMessage(
+            "newSubjectMessage",
+            error instanceof Error
+                ? error.message
+                : "Could not create subject.",
+            true
+        );
+    }
+}
+
+function handleAdditionalLessonChanged() {
+    const checkbox =
+        document.getElementById("requirementIsAdditional");
+
+    const priority =
+        document.getElementById("requirementPriority");
+
+    if (!checkbox || !priority) {
+        return;
+    }
+
+    priority.value = checkbox.checked
+        ? "0"
+        : "1";
+}
+
+function showQuickCreateMessage(id, message, isError) {
+    const element = document.getElementById(id);
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent = message;
+    element.classList.toggle("error-message", isError);
+}
+
+function clearQuickCreateMessage(id) {
+    showQuickCreateMessage(id, "", false);
+}
+
 function openAddRequirementForm() {
     document.getElementById(
         "requirementId"
+    ).value = "";
+
+    document.getElementById(
+        "requirementName"
     ).value = "";
 
     document.getElementById(
@@ -472,11 +891,25 @@ function openAddRequirementForm() {
         "requirementHoursPerWeek"
     ).value = "1";
 
+    document.getElementById(
+        "requirementPriority"
+    ).value = "1";
+
+    document.getElementById(
+        "requirementIsAdditional"
+    ).checked = false;
+
+    document.getElementById(
+        "requirementName"
+    ).placeholder =
+        "Optional for regular lessons";
+
     clearRequirementFormMessage();
 
     document.getElementById(
         "requirementFormTitle"
-    ).textContent = "Add requirement";
+    ).textContent =
+        getLessonsPageText().addLessonForm;
 
     document.getElementById(
         "requirementFormSection"
@@ -487,10 +920,16 @@ function openAddRequirementForm() {
     ).focus();
 }
 
+
 function openEditRequirementForm(requirement) {
     document.getElementById(
         "requirementId"
     ).value = requirement.id;
+
+    document.getElementById(
+        "requirementName"
+    ).value =
+        requirement.name ?? "";
 
     document.getElementById(
         "requirementStudentGroupId"
@@ -512,11 +951,22 @@ function openEditRequirementForm(requirement) {
     ).value =
         requirement.hoursPerWeek ?? 1;
 
+    document.getElementById(
+        "requirementPriority"
+    ).value =
+        requirement.priority?.toString() ?? "1";
+
+    document.getElementById(
+        "requirementIsAdditional"
+    ).checked =
+        Boolean(requirement.isAdditional);
+
     clearRequirementFormMessage();
 
     document.getElementById(
         "requirementFormTitle"
-    ).textContent = "Edit requirement";
+    ).textContent =
+        getLessonsPageText().editLessonForm;
 
     document.getElementById(
         "requirementFormSection"
@@ -546,6 +996,11 @@ async function saveRequirement() {
             "requirementId"
         ).value;
 
+    const name =
+        document.getElementById(
+            "requirementName"
+        ).value.trim();
+
     const studentGroupId =
         Number(
             document.getElementById(
@@ -573,6 +1028,18 @@ async function saveRequirement() {
                 "requirementHoursPerWeek"
             ).value
         );
+
+    const priority =
+        Number(
+            document.getElementById(
+                "requirementPriority"
+            ).value
+        );
+
+    const isAdditional =
+        document.getElementById(
+            "requirementIsAdditional"
+        ).checked;
 
     if (studentGroupId <= 0) {
         showRequirementFormMessage(
@@ -614,11 +1081,23 @@ async function saveRequirement() {
         return;
     }
 
+    if (![0, 1, 2].includes(priority)) {
+        showRequirementFormMessage(
+            "Priority must be Low, Normal or High.",
+            true
+        );
+
+        return;
+    }
+
     const requestBody = {
+        name: name || null,
         teacherId,
         studentGroupId,
         subjectId,
-        hoursPerWeek
+        hoursPerWeek,
+        priority,
+        isAdditional
     };
 
     const isEditing =
@@ -749,7 +1228,7 @@ function showRequirementsError(message) {
     const cell =
         document.createElement("td");
 
-    cell.colSpan = 5;
+    cell.colSpan = 7;
     cell.textContent = message;
 
     row.appendChild(cell);

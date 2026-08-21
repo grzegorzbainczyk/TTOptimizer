@@ -5,6 +5,8 @@ namespace TTOptimizer.Web.Models.DTO.Requirements;
 public class LessonRequirementDTO
 {
     public int Id { get; set; }
+    public string? Name { get; set; }
+    public bool IsAdditional { get; set; }
     public int TeacherId { get; set; }
     public string TeacherName { get; set; } = string.Empty;
     public int StudentGroupId { get; set; }

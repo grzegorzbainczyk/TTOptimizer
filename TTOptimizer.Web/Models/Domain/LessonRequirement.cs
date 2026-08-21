@@ -5,6 +5,10 @@ public class LessonRequirement
     public int Id { get; set; }
     public int OrganizationId { get; set; }
 
+    public string? Name { get; set; }
+
+    public bool IsAdditional { get; set; } = false;
+
     // Transitional compatibility field. New requirements use StudentGroupId as
     // the scheduling target. ClassGroupId is kept temporarily so existing data
     // and demo seeders continue to work during the migration.

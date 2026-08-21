@@ -31,6 +31,8 @@ public class RequirementsController : ControllerBase
             .Select(x => new LessonRequirementDTO
             {
                 Id = x.Id,
+                Name = x.Name,
+                IsAdditional = x.IsAdditional,
                 TeacherId = x.TeacherId,
                 TeacherName = x.Teacher.Name,
                 StudentGroupId = x.StudentGroupId!.Value,
@@ -39,7 +41,8 @@ public class RequirementsController : ControllerBase
                 ClassName = x.StudentGroup.ClassGroup != null ? x.StudentGroup.ClassGroup.Name : null,
                 SubjectId = x.SubjectId,
                 SubjectName = x.Subject.Name,
-                HoursPerWeek = x.HoursPerWeek
+                HoursPerWeek = x.HoursPerWeek,
+                Priority = x.Priority
             })
             .ToListAsync();
         return Ok(requirements);
@@ -59,7 +62,7 @@ public class RequirementsController : ControllerBase
         [FromQuery] int organizationId,
         [FromBody] CreateStudentGroupLessonRequirementRequest request)
     {
-        var validation = await ValidateRequestAsync(organizationId, request.TeacherId, request.StudentGroupId, request.SubjectId, request.HoursPerWeek);
+        var validation = await ValidateRequestAsync(organizationId, request.TeacherId, request.StudentGroupId, request.SubjectId, request.HoursPerWeek, request.Priority);
         if (validation != null) return validation;
 
         var group = await _db.StudentGroups.FirstAsync(x => x.Id == request.StudentGroupId);
@@ -71,11 +74,14 @@ public class RequirementsController : ControllerBase
         var entity = new LessonRequirement
         {
             OrganizationId = organizationId,
+            Name = NormalizeName(request.Name),
+            IsAdditional = request.IsAdditional,
             TeacherId = request.TeacherId,
             StudentGroupId = request.StudentGroupId,
             ClassGroupId = group.ClassGroupId,
             SubjectId = request.SubjectId,
-            HoursPerWeek = request.HoursPerWeek
+            HoursPerWeek = request.HoursPerWeek,
+            Priority = request.Priority
         };
         _db.LessonRequirements.Add(entity);
         await _db.SaveChangesAsync();
@@ -91,7 +97,7 @@ public class RequirementsController : ControllerBase
         var entity = await _db.LessonRequirements.FirstOrDefaultAsync(x => x.Id == id && x.OrganizationId == organizationId);
         if (entity == null) return NotFound(new { message = "Lesson requirement not found." });
 
-        var validation = await ValidateRequestAsync(organizationId, request.TeacherId, request.StudentGroupId, request.SubjectId, request.HoursPerWeek);
+        var validation = await ValidateRequestAsync(organizationId, request.TeacherId, request.StudentGroupId, request.SubjectId, request.HoursPerWeek, request.Priority);
         if (validation != null) return validation;
 
         var duplicate = await _db.LessonRequirements.AnyAsync(x => x.OrganizationId == organizationId && x.Id != id &&
@@ -99,11 +105,14 @@ public class RequirementsController : ControllerBase
         if (duplicate) return Conflict(new { message = "This lesson requirement already exists." });
 
         var group = await _db.StudentGroups.FirstAsync(x => x.Id == request.StudentGroupId);
+        entity.Name = NormalizeName(request.Name);
+        entity.IsAdditional = request.IsAdditional;
         entity.TeacherId = request.TeacherId;
         entity.StudentGroupId = request.StudentGroupId;
         entity.ClassGroupId = group.ClassGroupId;
         entity.SubjectId = request.SubjectId;
         entity.HoursPerWeek = request.HoursPerWeek;
+        entity.Priority = request.Priority;
         await _db.SaveChangesAsync();
         return Ok(await GetRequirementDTOAsync(id, organizationId));
     }
@@ -118,13 +127,14 @@ public class RequirementsController : ControllerBase
         return NoContent();
     }
 
-    private async Task<ActionResult?> ValidateRequestAsync(int organizationId, int teacherId, int studentGroupId, int subjectId, int hoursPerWeek)
+    private async Task<ActionResult?> ValidateRequestAsync(int organizationId, int teacherId, int studentGroupId, int subjectId, int hoursPerWeek, LessonPriority priority)
     {
         if (organizationId <= 0) return BadRequest(new { message = "Organization ID is required." });
         if (teacherId <= 0) return BadRequest(new { message = "Teacher is required." });
         if (studentGroupId <= 0) return BadRequest(new { message = "Student group is required." });
         if (subjectId <= 0) return BadRequest(new { message = "Subject is required." });
         if (hoursPerWeek is < 1 or > 40) return BadRequest(new { message = "Hours per week must be between 1 and 40." });
+        if (!Enum.IsDefined(priority)) return BadRequest(new { message = "Priority is invalid." });
         if (!await _db.Teachers.AnyAsync(x => x.Id == teacherId && x.OrganizationId == organizationId))
             return BadRequest(new { message = "Teacher was not found." });
         if (!await _db.StudentGroups.AnyAsync(x => x.Id == studentGroupId && x.OrganizationId == organizationId))
@@ -139,12 +149,20 @@ public class RequirementsController : ControllerBase
             .Where(x => x.Id == id && x.OrganizationId == organizationId)
             .Select(x => new LessonRequirementDTO
             {
-                Id = x.Id, TeacherId = x.TeacherId, TeacherName = x.Teacher.Name,
+                Id = x.Id, Name = x.Name, IsAdditional = x.IsAdditional, TeacherId = x.TeacherId, TeacherName = x.Teacher.Name,
                 StudentGroupId = x.StudentGroupId!.Value, StudentGroupName = x.StudentGroup!.Name,
                 ClassGroupId = x.StudentGroup.ClassGroupId,
                 ClassName = x.StudentGroup.ClassGroup != null ? x.StudentGroup.ClassGroup.Name : null,
-                SubjectId = x.SubjectId, SubjectName = x.Subject.Name, HoursPerWeek = x.HoursPerWeek
+                SubjectId = x.SubjectId, SubjectName = x.Subject.Name, HoursPerWeek = x.HoursPerWeek, Priority = x.Priority
             }).FirstOrDefaultAsync();
+
+    private static string? NormalizeName(string? name)
+    {
+        var normalized = name?.Trim();
+        return string.IsNullOrWhiteSpace(normalized)
+            ? null
+            : normalized;
+    }
 
     private async Task EnsureWholeClassGroupsAsync(int organizationId)
     {

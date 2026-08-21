@@ -6,7 +6,9 @@ const NAVIGATION_TARGETS = {
     subjectsButton: "subjects.html",
     studentGroupsButton: "student-groups.html",
     schoolButton: "school.html",
-    requirementsButton: "requirements.html",    organizationPreferencesButton: "organization-preferences.html",
+    requirementsButton: "requirements.html",
+    additionalLessonsButton: "requirements.html?mode=additional",
+    organizationPreferencesButton: "organization-preferences.html",
     rulesButton: "rules.html",
     aboutProjectButton: "about.html",
     optimizationSettingsButton: "optimization-settings.html"

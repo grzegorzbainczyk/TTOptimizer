@@ -21,8 +21,8 @@
   "resources.buildings.description": "School locations",
   "resources.subjects": "Subjects",
   "resources.subjects.description": "Lesson topics",
-  "resources.requirements": "Requirements",
-  "resources.requirements.description": "Lesson rules",
+  "resources.requirements": "Lessons",
+  "resources.requirements.description": "Define weekly lessons",
   "resources.school": "School",
   "resources.school.description": "School information",
   "resources.preferences": "Scheduling defaults",
@@ -188,5 +188,10 @@
   "settings.penalties.high": "High",
   "settings.penalties.hard": "Hard",
   "settings.save": "Save settings",
-  "settings.reset": "Reset defaults"
+  "settings.reset": "Reset defaults",
+  "lessons.add": "Add lesson",
+  "lessons.additional": "Additional lesson",
+  "lessons.additionalHelp": "Additional lessons start with Low priority.",
+  "lessons.newStudentGroup": "New student group",
+  "lessons.newSubject": "New subject"
 }
