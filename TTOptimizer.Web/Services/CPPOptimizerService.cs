@@ -506,8 +506,7 @@ public class CppOptimizerService
                     new OptimizerRoomDto
                     {
                         Id = room.Id,
-                        Name = room.Name,
-                        BuildingId = room.BuildingId
+                        Name = room.Name
                     })
                 .ToList(),
 
@@ -529,9 +528,6 @@ public class CppOptimizerService
                 })
                 .ToList(),
 
-            StudentGroupAvoidImmediateBuildingChange =
-                problem.StudentGroupAvoidImmediateBuildingChange.ToString(),
-
             LessonRequirements =
                 problem.LessonRequirements
                     .Select(requirement =>
@@ -542,7 +538,9 @@ public class CppOptimizerService
                             ClassGroupId = requirement.ClassGroupId ?? 0,
                             StudentGroupId = requirement.StudentGroupId ?? 0,
                             SubjectId = requirement.SubjectId,
-                            LessonsPerWeek = requirement.HoursPerWeek
+                            LessonsPerWeek = requirement.HoursPerWeek,
+                            IsAdditional = requirement.IsAdditional,
+                            Priority = requirement.Priority
                         })
                     .ToList(),
 

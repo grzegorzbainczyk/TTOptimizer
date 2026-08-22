@@ -215,6 +215,16 @@ public class OptimizerLessonRequirementDto
     /// during one week.
     /// </summary>
     public int LessonsPerWeek { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the lesson is an additional activity.
+    /// </summary>
+    public bool IsAdditional { get; set; }
+
+    /// <summary>
+    /// Gets or sets the scheduling priority of the lesson requirement.
+    /// </summary>
+    public LessonPriority Priority { get; set; } = LessonPriority.Normal;
 }
 
 public class OptimizerStudentGroupDto
