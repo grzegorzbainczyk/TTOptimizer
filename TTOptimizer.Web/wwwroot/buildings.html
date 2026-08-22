@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>ClassFlow - Buildings</title>
+    <title data-i18n="buildings.pageTitle">ClassFlow - Buildings</title>
     <link href="css/style.css" rel="stylesheet"/>
 </head>
 <body class="teachers-page">
@@ -11,13 +11,13 @@
     <header class="app-header teachers-header">
         <div class="teachers-header-content">
             <div class="teachers-title-group">
-                <span class="teachers-page-label">Organization resources</span>
-                <h1>Buildings</h1>
-                <p class="page-subtitle">Manage school buildings used by rooms and timetable constraints.</p>
+                <span class="teachers-page-label" data-i18n="common.organizationResources">Organization resources</span>
+                <h1 data-i18n="buildings.title">Buildings</h1>
+                <p class="page-subtitle"><span data-i18n="buildings.subtitle">Manage school buildings used by rooms and timetable constraints.</span></p>
             </div>
             <nav class="header-actions">
-                <button class="secondary-button teachers-header-button" id="backToMainButton" type="button">Back</button>
-                <button class="secondary-button teachers-header-button" id="refreshBuildingsButton" type="button">Refresh</button>
+                <button class="secondary-button teachers-header-button" id="backToMainButton" type="button" data-i18n="common.back">Back</button>
+                <button class="secondary-button teachers-header-button" id="refreshBuildingsButton" type="button" data-i18n="common.refresh">Refresh</button>
             </nav>
         </div>
     </header>
@@ -25,34 +25,34 @@
     <main class="content-card teachers-card">
         <div class="section-header teachers-section-header">
             <div>
-                <h2>Buildings list</h2>
-                <p class="teachers-section-description">Rooms can optionally be assigned to a building.</p>
+                <h2 data-i18n="buildings.listTitle">Buildings list</h2>
+                <p class="teachers-section-description"><span data-i18n="buildings.listDescription">Rooms can optionally be assigned to a building.</span></p>
             </div>
             <button class="primary-button teachers-add-button" id="addBuildingButton" type="button">
-                <span aria-hidden="true">+</span> Add building
+                <span aria-hidden="true">+</span> <span data-i18n="buildings.add">Add building</span>
             </button>
         </div>
 
         <section class="resource-form-section teachers-form-section" hidden id="buildingFormSection">
-            <h3 id="buildingFormTitle">Add building</h3>
+            <h3 id="buildingFormTitle" data-i18n="buildings.add">Add building</h3>
             <input id="buildingId" type="hidden"/>
             <div class="form-grid teachers-form-grid">
                 <div class="form-field">
-                    <label for="buildingName">Name</label>
-                    <input id="buildingName" maxlength="150" required type="text" placeholder="e.g. Main building"/>
+                    <label for="buildingName" data-i18n="common.name">Name</label>
+                    <input id="buildingName" maxlength="150" required type="text" placeholder="e.g. Main building" data-i18n-placeholder="buildings.namePlaceholder"/>
                 </div>
                 <div class="form-field">
-                    <label for="buildingAddress">Address</label>
-                    <input id="buildingAddress" maxlength="500" type="text" placeholder="Optional address"/>
+                    <label for="buildingAddress" data-i18n="buildings.address">Address</label>
+                    <input id="buildingAddress" maxlength="500" type="text" placeholder="Optional address" data-i18n-placeholder="buildings.addressPlaceholder"/>
                 </div>
                 <div class="form-field form-field-full-width">
-                    <label for="buildingInfo">Info</label>
-                    <textarea id="buildingInfo" maxlength="2000" rows="4" placeholder="Optional information about the building"></textarea>
+                    <label for="buildingInfo" data-i18n="common.info">Info</label>
+                    <textarea id="buildingInfo" maxlength="2000" rows="4" placeholder="Optional information about the building" data-i18n-placeholder="buildings.infoPlaceholder"></textarea>
                 </div>
             </div>
             <div class="form-actions teachers-form-actions">
-                <button class="primary-button" id="saveBuildingButton" type="button">Save</button>
-                <button class="secondary-button" id="cancelBuildingButton" type="button">Cancel</button>
+                <button class="primary-button" id="saveBuildingButton" type="button" data-i18n="common.save">Save</button>
+                <button class="secondary-button" id="cancelBuildingButton" type="button" data-i18n="common.cancel">Cancel</button>
             </div>
             <p aria-live="polite" class="form-message" id="buildingFormMessage"></p>
         </section>
@@ -62,11 +62,11 @@
             <table class="data-table teachers-table" id="buildingsTable">
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Address</th>
-                    <th>Rooms</th>
-                    <th>Info</th>
-                    <th class="table-actions-column">Actions</th>
+                    <th data-i18n="common.name">Name</th>
+                    <th data-i18n="buildings.address">Address</th>
+                    <th data-i18n="buildings.rooms">Rooms</th>
+                    <th data-i18n="common.info">Info</th>
+                    <th class="table-actions-column" data-i18n="common.actions">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -77,6 +77,6 @@
     </main>
 </div>
 <script src="js/appContext.js"></script>
-<script src="js/buildings.js"></script>
+<script type="module" src="js/buildings.js"></script>
 </body>
 </html>

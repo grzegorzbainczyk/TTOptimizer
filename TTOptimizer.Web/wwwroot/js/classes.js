@@ -1,9 +1,12 @@
+import { initializeI18n, t } from "./i18n.js";
 import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
 
 let availableTeachers = [];
 let availableRooms = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
+    await initializeI18n();
+    document.title = t("classes.pageTitle", "ClassFlow - Classes");
     const backToMainButton =
         document.getElementById("backToMainButton");
 
@@ -90,7 +93,7 @@ async function loadTeachers() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not load teachers. Status: ${response.status}`
+                    `${t("teachers.loadFailed", "Could not load teachers.")} Status: ${response.status}`
                 )
             );
         }
@@ -125,7 +128,7 @@ async function loadRooms() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not load rooms. Status: ${response.status}`
+                    `${t("rooms.loadFailed", "Could not load rooms.")} Status: ${response.status}`
                 )
             );
         }
@@ -173,7 +176,7 @@ async function loadClasses() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not load classes. Status: ${response.status}`
+                    `${t("classes.loadFailed", "Could not load classes.")} Status: ${response.status}`
                 )
             );
         }
@@ -192,7 +195,7 @@ async function loadClasses() {
         showClassesError(
             error instanceof Error
                 ? error.message
-                : "Could not load classes."
+                : t("classes.loadFailed", "Could not load classes.")
         );
     }
 }
@@ -256,7 +259,7 @@ function renderClasses(classes) {
         editButton.type = "button";
         editButton.className =
             "small-button teacher-action-button teacher-edit-button";
-        editButton.textContent = "Edit";
+        editButton.textContent = t("common.edit", "Edit");
 
         editButton.addEventListener("click", () => {
             openEditClassForm(classGroup);
@@ -268,7 +271,7 @@ function renderClasses(classes) {
         availabilityButton.type = "button";
         availabilityButton.className =
             "small-button teacher-action-button teacher-availability-button";
-        availabilityButton.textContent = "Availability";
+        availabilityButton.textContent = t("common.availability", "Availability");
 
         availabilityButton.addEventListener("click", () => {
             const url =
@@ -288,7 +291,7 @@ function renderClasses(classes) {
         preferencesButton.type = "button";
         preferencesButton.className =
             "small-button teacher-action-button class-preferences-button";
-        preferencesButton.textContent = "Preferences";
+        preferencesButton.textContent = t("common.preferences", "Preferences");
 
         preferencesButton.addEventListener("click", () => {
             const url =
@@ -306,7 +309,7 @@ function renderClasses(classes) {
         deleteButton.type = "button";
         deleteButton.className =
             "small-button teacher-action-button teacher-delete-button";
-        deleteButton.textContent = "Delete";
+        deleteButton.textContent = t("common.delete", "Delete");
 
         deleteButton.addEventListener(
             "click",
@@ -345,14 +348,14 @@ function updateClassesCount(count) {
 
     if (!Number.isInteger(count)) {
         countElement.textContent =
-            "Could not determine the number of classes.";
+            t("classes.countUnknown", "Could not determine the number of classes.");
         return;
     }
 
     countElement.textContent =
         count === 1
-            ? "1 class"
-            : `${count} classes`;
+            ? t("classes.countOne", "1 class")
+            : t("classes.countMany", "{count} classes").replace("{count}", count);
 }
 
 function createTableCell(value) {
@@ -382,7 +385,7 @@ function populateTeacherOptions() {
         document.createElement("option");
 
     emptyOption.value = "";
-    emptyOption.textContent = "None";
+    emptyOption.textContent = t("common.none", "None");
 
     select.appendChild(emptyOption);
 
@@ -421,7 +424,7 @@ function populateRoomOptions() {
         document.createElement("option");
 
     emptyOption.value = "";
-    emptyOption.textContent = "None";
+    emptyOption.textContent = t("common.none", "None");
 
     select.appendChild(emptyOption);
 
@@ -459,7 +462,7 @@ function openAddClassForm() {
 
     document.getElementById(
         "classFormTitle"
-    ).textContent = "Add class";
+    ).textContent = t("classes.add", "Add class");
 
     document.getElementById(
         "classFormSection"
@@ -496,7 +499,7 @@ function openEditClassForm(classGroup) {
 
     document.getElementById(
         "classFormTitle"
-    ).textContent = "Edit class";
+    ).textContent = t("classes.edit", "Edit class");
 
     document.getElementById(
         "classFormSection"
@@ -548,7 +551,7 @@ async function saveClass() {
 
     if (!name) {
         showClassFormMessage(
-            "Class name is required.",
+            t("classes.nameRequired", "Class name is required."),
             true
         );
 
@@ -607,8 +610,7 @@ async function saveClass() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not save class. ` +
-                    `Status: ${response.status}`
+                    `${t("classes.saveFailed", "Could not save class.")} Status: ${response.status}`
                 )
             );
         }
@@ -624,7 +626,7 @@ async function saveClass() {
         showClassFormMessage(
             error instanceof Error
                 ? error.message
-                : "Could not save class.",
+                : t("classes.saveFailed", "Could not save class."),
             true
         );
     }
@@ -632,7 +634,8 @@ async function saveClass() {
 
 async function deleteClass(classGroup) {
     const confirmed = window.confirm(
-        `Delete class ${classGroup.name}?`
+        t("classes.deleteConfirm", "Delete class {name}?")
+            .replace("{name}", classGroup.name ?? "")
     );
 
     if (!confirmed) {
@@ -662,8 +665,7 @@ async function deleteClass(classGroup) {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not delete class. ` +
-                    `Status: ${response.status}`
+                    `${t("classes.deleteFailed", "Could not delete class.")} Status: ${response.status}`
                 )
             );
         }
@@ -678,7 +680,7 @@ async function deleteClass(classGroup) {
         window.alert(
             error instanceof Error
                 ? error.message
-                : "Could not delete class."
+                : t("classes.deleteFailed", "Could not delete class.")
         );
     }
 }

@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ClassFlow - Subjects</title>
+<title data-i18n="subjects.pageTitle">ClassFlow - Subjects</title>
 <link href="css/style.css" rel="stylesheet"/>
 </head>
 <body class="teachers-page">
@@ -13,53 +13,53 @@
 
 
 <div class="teachers-header-content"><div class="teachers-title-group">
-<span class="teachers-page-label">Organization resources</span><h1>Subjects</h1>
+<span class="teachers-page-label" data-i18n="common.organizationResources">Organization resources</span><h1 data-i18n="subjects.title">Subjects</h1>
 <p class="page-subtitle">
-                    Subjects assigned to your organization
+                    <span data-i18n="subjects.subtitle">Subjects assigned to your organization</span>
                 </p>
 </div><nav class="header-actions">
-<button class="secondary-button teachers-header-button" id="backToMainButton" type="button">
+<button class="secondary-button teachers-header-button" id="backToMainButton" type="button" data-i18n="common.back">
                     Back
                 </button>
-<button class="secondary-button teachers-header-button" id="refreshSubjectsButton" type="button">
+<button class="secondary-button teachers-header-button" id="refreshSubjectsButton" type="button" data-i18n="common.refresh">
                     Refresh
                 </button>
 </nav></div></header>
 <main class="content-card teachers-card">
-<div class="section-header teachers-section-header"><div><h2>Subjects list</h2><p class="teachers-section-description">Manage subjects and optional information used by the timetable.</p></div>
+<div class="section-header teachers-section-header"><div><h2 data-i18n="subjects.listTitle">Subjects list</h2><p class="teachers-section-description"><span data-i18n="subjects.listDescription">Manage subjects and optional information used by the timetable.</span></p></div>
 
 <div class="teachers-header-actions">
-<button class="secondary-button" id="importSubjectsButton" type="button">Import XLSX</button>
+<button class="secondary-button" id="importSubjectsButton" type="button" data-i18n="common.importXlsx">Import XLSX</button>
 <input id="subjectImportFileInput" type="file" accept=".xlsx" hidden />
 <button class="primary-button teachers-add-button" id="addSubjectButton" type="button"><span aria-hidden="true">+</span>
-                    Add subject
+                    <span data-i18n="subjects.add">Add subject</span>
                 </button>
 </div>
 </div>
 <section class="resource-form-section teachers-form-section" hidden="" id="subjectFormSection">
 <h3 id="subjectFormTitle">
-                    Add subject
+                    <span data-i18n="subjects.add">Add subject</span>
                 </h3>
 <input id="subjectId" type="hidden"/>
 <div class="form-grid teachers-form-grid">
 <div class="form-field">
 <label for="subjectName">
-                            Name
+                            <span data-i18n="common.name">Name</span>
                         </label>
 <input id="subjectName" maxlength="100" required="" type="text"/>
 </div>
 <div class="form-field form-field-full-width">
 <label for="subjectInfo">
-                            Info
+                            <span data-i18n="common.info">Info</span>
                         </label>
-<textarea id="subjectInfo" maxlength="2000" placeholder="Optional information about the subject" rows="4"></textarea>
+<textarea id="subjectInfo" maxlength="2000" placeholder="Optional information about the subject" data-i18n-placeholder="subjects.infoPlaceholder" rows="4"></textarea>
 </div>
 </div>
 <div class="form-actions teachers-form-actions">
-<button class="primary-button" id="saveSubjectButton" type="button">
+<button class="primary-button" id="saveSubjectButton" type="button" data-i18n="common.save">
                         Save
                     </button>
-<button class="secondary-button" id="cancelSubjectButton" type="button">
+<button class="secondary-button" id="cancelSubjectButton" type="button" data-i18n="common.cancel">
                         Cancel
                     </button>
 </div>
@@ -72,15 +72,15 @@
          hidden>
     <div class="section-header teachers-section-header">
         <div>
-            <h3>Import preview</h3>
-            <p>Review data read from the XLSX file. Nothing has been saved yet.</p>
+            <h3 data-i18n="common.importPreview">Import preview</h3>
+            <p><span data-i18n="subjects.importDescription">Review data read from the XLSX file. Nothing has been saved yet.</span></p>
         </div>
         <div class="teachers-header-actions">
             <button id="confirmSubjectsImportButton"
                     class="primary-button"
                     type="button"
                     disabled>
-                Import subjects
+                <span data-i18n="subjects.importConfirm">Import subjects</span>
             </button>
             <button id="closeSubjectsImportPreviewButton"
                     class="secondary-button"
@@ -96,9 +96,9 @@
         <table class="data-table" id="subjectImportPreviewTable">
             <thead>
                 <tr>
-                    <th>Row</th>
-                    <th>Name</th>
-                    <th>Status</th>
+                    <th data-i18n="common.row">Row</th>
+                    <th data-i18n="common.name">Name</th>
+                    <th data-i18n="common.status">Status</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -109,10 +109,10 @@
 <table class="data-table teachers-table" id="subjectsTable">
 <thead>
 <tr>
-<th>Name</th>
-<th>Info</th>
+<th data-i18n="common.name">Name</th>
+<th data-i18n="common.info">Info</th>
 <th class="table-actions-column">
-                                Actions
+                                <span data-i18n="common.actions">Actions</span>
                             </th>
 </tr>
 </thead>

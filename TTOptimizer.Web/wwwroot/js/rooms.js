@@ -1,3 +1,4 @@
+import { initializeI18n, t } from "./i18n.js";
 import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
 
 let availableBuildings = [];
@@ -6,6 +7,8 @@ let availableSubjects = [];
 document.addEventListener(
     "DOMContentLoaded",
     async () => {
+    await initializeI18n();
+    document.title = t("rooms.pageTitle", "ClassFlow - Rooms");
         const backToMainButton =
             document.getElementById(
                 "backToMainButton"
@@ -108,7 +111,7 @@ async function loadBuildings() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not load buildings. Status: ${response.status}`
+                    `${t("buildings.loadFailed", "Could not load buildings.")} Status: ${response.status}`
                 )
             );
         }
@@ -145,8 +148,7 @@ async function loadSubjects() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not load subjects. ` +
-                    `Status: ${response.status}`
+                    `${t("subjects.loadFailed", "Could not load subjects.")} Status: ${response.status}`
                 )
             );
         }
@@ -204,8 +206,7 @@ async function loadRooms() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not load rooms. ` +
-                    `Status: ${response.status}`
+                    `${t("rooms.loadFailed", "Could not load rooms.")} Status: ${response.status}`
                 )
             );
         }
@@ -228,7 +229,7 @@ async function loadRooms() {
         showRoomsError(
             error instanceof Error
                 ? error.message
-                : "Could not load rooms."
+                : t("rooms.loadFailed", "Could not load rooms.")
         );
     }
 }
@@ -305,7 +306,7 @@ function renderRooms(rooms) {
         editButton.type = "button";
         editButton.className =
             "small-button teacher-action-button teacher-edit-button";
-        editButton.textContent = "Edit";
+        editButton.textContent = t("common.edit", "Edit");
 
         editButton.addEventListener(
             "click",
@@ -320,7 +321,7 @@ function renderRooms(rooms) {
         availabilityButton.type = "button";
         availabilityButton.className =
             "small-button teacher-action-button teacher-availability-button";
-        availabilityButton.textContent = "Availability";
+        availabilityButton.textContent = t("common.availability", "Availability");
 
         availabilityButton.addEventListener(
             "click",
@@ -342,7 +343,7 @@ function renderRooms(rooms) {
         deleteButton.type = "button";
         deleteButton.className =
             "small-button teacher-action-button teacher-delete-button";
-        deleteButton.textContent = "Delete";
+        deleteButton.textContent = t("common.delete", "Delete");
 
         deleteButton.addEventListener(
             "click",
@@ -381,14 +382,14 @@ function updateRoomsCount(count) {
 
     if (!Number.isInteger(count)) {
         countElement.textContent =
-            "Could not determine the number of rooms.";
+            t("rooms.countUnknown", "Could not determine the number of rooms.");
         return;
     }
 
     countElement.textContent =
         count === 1
-            ? "1 room"
-            : `${count} rooms`;
+            ? t("rooms.countOne", "1 room")
+            : t("rooms.countMany", "{count} rooms").replace("{count}", count);
 }
 
 function createTableCell(value) {
@@ -416,7 +417,7 @@ function populateBuildingOptions() {
 
     const emptyOption = document.createElement("option");
     emptyOption.value = "";
-    emptyOption.textContent = "No building assigned";
+    emptyOption.textContent = t("rooms.noBuilding", "No building assigned");
     select.appendChild(emptyOption);
 
     availableBuildings.forEach(building => {
@@ -432,12 +433,12 @@ function populateBuildingOptions() {
 function populateSubjectOptions() {
     populateSingleSubjectSelect(
         "restrictedToSubjectId",
-        "No restriction"
+        t("rooms.noRestriction", "No restriction")
     );
 
     populateSingleSubjectSelect(
         "preferredSubjectId",
-        "No preference"
+        t("rooms.noPreference", "No preference")
     );
 }
 
@@ -524,7 +525,7 @@ function openAddRoomForm() {
 
     document.getElementById(
         "roomFormTitle"
-    ).textContent = "Add room";
+    ).textContent = t("rooms.add", "Add room");
 
     document.getElementById(
         "roomFormSection"
@@ -572,7 +573,7 @@ function openEditRoomForm(room) {
 
     document.getElementById(
         "roomFormTitle"
-    ).textContent = "Edit room";
+    ).textContent = t("rooms.edit", "Edit room");
 
     document.getElementById(
         "roomFormSection"
@@ -629,7 +630,7 @@ async function saveRoom() {
 
     if (!name) {
         showRoomFormMessage(
-            "Room name is required.",
+            t("rooms.nameRequired", "Room name is required."),
             true
         );
 
@@ -712,8 +713,7 @@ async function saveRoom() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not save room. ` +
-                    `Status: ${response.status}`
+                    `${t("rooms.saveFailed", "Could not save room.")} Status: ${response.status}`
                 )
             );
         }
@@ -730,7 +730,7 @@ async function saveRoom() {
         showRoomFormMessage(
             error instanceof Error
                 ? error.message
-                : "Could not save room.",
+                : t("rooms.saveFailed", "Could not save room."),
             true
         );
     }
@@ -739,7 +739,8 @@ async function saveRoom() {
 async function deleteRoom(room) {
     const confirmed =
         window.confirm(
-            `Delete room ${room.name}?`
+            t("rooms.deleteConfirm", "Delete room {name}?")
+                .replace("{name}", room.name ?? "")
         );
 
     if (!confirmed) {
@@ -774,8 +775,7 @@ async function deleteRoom(room) {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not delete room. ` +
-                    `Status: ${response.status}`
+                    `${t("rooms.deleteFailed", "Could not delete room.")} Status: ${response.status}`
                 )
             );
         }
@@ -790,7 +790,7 @@ async function deleteRoom(room) {
         window.alert(
             error instanceof Error
                 ? error.message
-                : "Could not delete room."
+                : t("rooms.deleteFailed", "Could not delete room.")
         );
     }
 }

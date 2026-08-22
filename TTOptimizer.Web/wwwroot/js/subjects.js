@@ -1,6 +1,9 @@
+import { initializeI18n, t } from "./i18n.js";
 import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
+    await initializeI18n();
+    document.title = t("subjects.pageTitle", "ClassFlow - Subjects");
     const backToMainButton =
         document.getElementById("backToMainButton");
 
@@ -95,7 +98,7 @@ async function loadSubjects() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not load subjects. Status: ${response.status}`
+                    `${t("subjects.loadFailed", "Could not load subjects.")} Status: ${response.status}`
                 )
             );
         }
@@ -117,7 +120,7 @@ async function loadSubjects() {
         showSubjectsError(
             error instanceof Error
                 ? error.message
-                : "Could not load subjects."
+                : t("subjects.loadFailed", "Could not load subjects.")
         );
     }
 }
@@ -171,7 +174,7 @@ function renderSubjects(subjects) {
         editButton.type = "button";
         editButton.className =
             "small-button teacher-action-button teacher-edit-button";
-        editButton.textContent = "Edit";
+        editButton.textContent = t("common.edit", "Edit");
 
         editButton.addEventListener(
             "click",
@@ -187,7 +190,7 @@ function renderSubjects(subjects) {
         availabilityButton.type = "button";
         availabilityButton.className =
             "small-button teacher-action-button teacher-availability-button";
-        availabilityButton.textContent = "Availability";
+        availabilityButton.textContent = t("common.availability", "Availability");
 
         availabilityButton.addEventListener("click", () => {
             const url =
@@ -206,7 +209,7 @@ function renderSubjects(subjects) {
         preferencesButton.type = "button";
         preferencesButton.className =
             "small-button teacher-action-button subject-preferences-button";
-        preferencesButton.textContent = "Preferences";
+        preferencesButton.textContent = t("common.preferences", "Preferences");
 
         preferencesButton.addEventListener("click", () => {
             const url =
@@ -224,7 +227,7 @@ function renderSubjects(subjects) {
         deleteButton.type = "button";
         deleteButton.className =
             "small-button teacher-action-button teacher-delete-button";
-        deleteButton.textContent = "Delete";
+        deleteButton.textContent = t("common.delete", "Delete");
 
         deleteButton.addEventListener(
             "click",
@@ -263,14 +266,14 @@ function updateSubjectsCount(count) {
 
     if (!Number.isInteger(count)) {
         countElement.textContent =
-            "Could not determine the number of subjects.";
+            t("subjects.countUnknown", "Could not determine the number of subjects.");
         return;
     }
 
     countElement.textContent =
         count === 1
-            ? "1 subject"
-            : `${count} subjects`;
+            ? t("subjects.countOne", "1 subject")
+            : t("subjects.countMany", "{count} subjects").replace("{count}", count);
 }
 
 function createTableCell(value) {
@@ -299,7 +302,7 @@ function openAddSubjectForm() {
 
     document.getElementById(
         "subjectFormTitle"
-    ).textContent = "Add subject";
+    ).textContent = t("subjects.add", "Add subject");
 
     document.getElementById(
         "subjectFormSection"
@@ -327,7 +330,7 @@ function openEditSubjectForm(subject) {
 
     document.getElementById(
         "subjectFormTitle"
-    ).textContent = "Edit subject";
+    ).textContent = t("subjects.edit", "Edit subject");
 
     document.getElementById(
         "subjectFormSection"
@@ -369,7 +372,7 @@ async function saveSubject() {
 
     if (!name) {
         showSubjectFormMessage(
-            "Subject name is required.",
+            t("subjects.nameRequired", "Subject name is required."),
             true
         );
 
@@ -418,7 +421,7 @@ async function saveSubject() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not save subject. Status: ${response.status}`
+                    `${t("subjects.saveFailed", "Could not save subject.")} Status: ${response.status}`
                 )
             );
         }
@@ -434,7 +437,7 @@ async function saveSubject() {
         showSubjectFormMessage(
             error instanceof Error
                 ? error.message
-                : "Could not save subject.",
+                : t("subjects.saveFailed", "Could not save subject."),
             true
         );
     }
@@ -442,7 +445,8 @@ async function saveSubject() {
 
 async function deleteSubject(subject) {
     const confirmed = window.confirm(
-        `Delete subject ${subject.name}?`
+        t("subjects.deleteConfirm", "Delete subject {name}?")
+            .replace("{name}", subject.name ?? "")
     );
 
     if (!confirmed) {
@@ -471,7 +475,7 @@ async function deleteSubject(subject) {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not delete subject. Status: ${response.status}`
+                    `${t("subjects.deleteFailed", "Could not delete subject.")} Status: ${response.status}`
                 )
             );
         }
@@ -486,7 +490,7 @@ async function deleteSubject(subject) {
         window.alert(
             error instanceof Error
                 ? error.message
-                : "Could not delete subject."
+                : t("subjects.deleteFailed", "Could not delete subject.")
         );
     }
 }

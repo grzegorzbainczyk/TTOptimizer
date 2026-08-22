@@ -1,6 +1,9 @@
+import { initializeI18n, t } from "./i18n.js";
 let currentTeacherImportRows = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
+    await initializeI18n();
+    document.title = t("teachers.pageTitle", "ClassFlow - Teachers");
     const backToMainButton =
         document.getElementById("backToMainButton");
 
@@ -106,7 +109,7 @@ async function loadTeachers() {
         if (!response.ok) {
             throw new Error(
                 data?.message ??
-                `Could not load teachers. Status: ${response.status}`
+                `${t("teachers.loadFailed", "Could not load teachers.")} Status: ${response.status}`
             );
         }
 
@@ -189,7 +192,7 @@ function renderTeachers(teachers) {
 
         editButton.type = "button";
         editButton.className = "small-button teacher-action-button teacher-edit-button";
-        editButton.textContent = "Edit";
+        editButton.textContent = t("common.edit", "Edit");
 
         editButton.addEventListener("click", () => {
             openEditTeacherForm(teacher);
@@ -200,7 +203,7 @@ function renderTeachers(teachers) {
 
         availabilityButton.type = "button";
         availabilityButton.className = "small-button teacher-action-button teacher-availability-button";
-        availabilityButton.textContent = "Availability";
+        availabilityButton.textContent = t("common.availability", "Availability");
 
         availabilityButton.addEventListener("click", () => {
             const url =
@@ -216,7 +219,7 @@ function renderTeachers(teachers) {
 
         preferencesButton.type = "button";
         preferencesButton.className = "small-button teacher-action-button teacher-preferences-button";
-        preferencesButton.textContent = "Preferences";
+        preferencesButton.textContent = t("common.preferences", "Preferences");
 
         preferencesButton.addEventListener("click", () => {
             const url =
@@ -232,7 +235,7 @@ function renderTeachers(teachers) {
 
         deleteButton.type = "button";
         deleteButton.className = "small-button teacher-action-button teacher-delete-button";
-        deleteButton.textContent = "Delete";
+        deleteButton.textContent = t("common.delete", "Delete");
 
         deleteButton.addEventListener("click", async () => {
             await deleteTeacher(teacher);
@@ -266,13 +269,13 @@ function updateTeachersCount(count) {
     }
 
     if (!Number.isInteger(count)) {
-        element.textContent = "Could not determine the number of teachers.";
+        element.textContent = t("teachers.countUnknown", "Could not determine the number of teachers.");
         return;
     }
 
     element.textContent = count === 1
-        ? "1 teacher"
-        : `${count} teachers`;
+        ? t("teachers.countOne", "1 teacher")
+        : t("teachers.countMany", "{count} teachers").replace("{count}", count);
 }
 
 function createTableCell(value) {
@@ -311,7 +314,7 @@ function openAddTeacherForm() {
     teacherAlias.value = "";
     teacherInfo.value = "";
 
-    formTitle.textContent = "Add teacher";
+    formTitle.textContent = t("teachers.add", "Add teacher");
     formSection.hidden = false;
 
     teacherName.focus();
@@ -347,7 +350,7 @@ function openEditTeacherForm(teacher) {
     teacherAlias.value = teacher.alias ?? "";
     teacherInfo.value = teacher.info ?? "";
 
-    formTitle.textContent = "Edit teacher";
+    formTitle.textContent = t("teachers.edit", "Edit teacher");
     formSection.hidden = false;
 
     teacherName.focus();
@@ -379,7 +382,7 @@ async function saveTeacher() {
 
     if (!name) {
         showTeacherFormMessage(
-            "Teacher name is required.",
+            t("teachers.nameRequired", "Teacher name is required."),
             true
         );
 
@@ -431,7 +434,7 @@ async function saveTeacher() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not save teacher. Status: ${response.status}`
+                    `${t("teachers.saveFailed", "Could not save teacher.")} Status: ${response.status}`
                 )
             );
         }
@@ -481,7 +484,7 @@ async function deleteTeacher(teacher) {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not delete teacher. Status: ${response.status}`
+                    `${t("teachers.deleteFailed", "Could not delete teacher.")} Status: ${response.status}`
                 )
             );
         }
@@ -555,7 +558,7 @@ async function handleTeacherImportFileSelected(event) {
     }
 
     if (!file.name.toLowerCase().endsWith(".xlsx")) {
-        window.alert("Please select an XLSX file.");
+        window.alert(t("teachers.selectXlsx", "Please select an XLSX file."));
         input.value = "";
         return;
     }
@@ -582,7 +585,7 @@ async function handleTeacherImportFileSelected(event) {
         if (!response.ok) {
             throw new Error(
                 data?.message ??
-                `Could not read XLSX file. Status: ${response.status}`
+                `${t("teachers.importReadFailed", "Could not read XLSX file.")} Status: ${response.status}`
             );
         }
 
@@ -612,7 +615,7 @@ async function handleTeacherImportFileSelected(event) {
         showTeacherImportMessage(
             error instanceof Error
                 ? error.message
-                : "Could not read XLSX file.",
+                : t("teachers.importReadFailed", "Could not read XLSX file."),
             true
         );
     } finally {
@@ -640,7 +643,7 @@ function renderTeacherImportPreview(rows) {
         const cell = document.createElement("td");
 
         cell.colSpan = 3;
-        cell.textContent = "No teacher rows found.";
+        cell.textContent = t("teachers.importNoRows", "No teacher rows found.");
 
         row.appendChild(cell);
         tbody.appendChild(row);
@@ -769,7 +772,7 @@ async function confirmTeacherImport() {
         if (!response.ok) {
             throw new Error(
                 data?.message ??
-                `Could not import teachers. Status: ${response.status}`
+                `${t("teachers.importFailed", "Could not import teachers.")} Status: ${response.status}`
             );
         }
 
@@ -805,7 +808,7 @@ async function confirmTeacherImport() {
         showTeacherImportMessage(
             error instanceof Error
                 ? error.message
-                : "Could not import teachers.",
+                : t("teachers.importFailed", "Could not import teachers."),
             true
         );
 

@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ClassFlow - Rooms</title>
+<title data-i18n="rooms.pageTitle">ClassFlow - Rooms</title>
 <link href="css/style.css" rel="stylesheet"/>
 </head>
 <body class="teachers-page">
@@ -13,83 +13,83 @@
 
 
 <div class="teachers-header-content"><div class="teachers-title-group">
-<span class="teachers-page-label">Organization resources</span><h1>Rooms</h1>
+<span class="teachers-page-label" data-i18n="common.organizationResources">Organization resources</span><h1 data-i18n="rooms.title">Rooms</h1>
 <p class="page-subtitle">
-                    Rooms assigned to your organization
+                    <span data-i18n="rooms.subtitle">Rooms assigned to your organization</span>
                 </p>
 </div><nav class="header-actions">
-<button class="secondary-button teachers-header-button" id="backToMainButton" type="button">
+<button class="secondary-button teachers-header-button" id="backToMainButton" type="button" data-i18n="common.back">
                     Back
                 </button>
-<button class="secondary-button teachers-header-button" id="refreshRoomsButton" type="button">
+<button class="secondary-button teachers-header-button" id="refreshRoomsButton" type="button" data-i18n="common.refresh">
                     Refresh
                 </button>
 </nav></div></header>
 <main class="content-card teachers-card">
-<div class="section-header teachers-section-header"><div><h2>Rooms list</h2><p class="teachers-section-description">Manage rooms, subject restrictions and room availability.</p></div>
+<div class="section-header teachers-section-header"><div><h2 data-i18n="rooms.listTitle">Rooms list</h2><p class="teachers-section-description"><span data-i18n="rooms.listDescription">Manage rooms, subject restrictions and room availability.</span></p></div>
 
 <div class="teachers-header-actions">
-<button class="secondary-button" id="importRoomsButton" type="button">Import XLSX</button>
+<button class="secondary-button" id="importRoomsButton" type="button" data-i18n="common.importXlsx">Import XLSX</button>
 <input id="roomImportFileInput" type="file" accept=".xlsx" hidden />
 <button class="primary-button teachers-add-button" id="addRoomButton" type="button"><span aria-hidden="true">+</span>
-                    Add room
+                    <span data-i18n="rooms.add">Add room</span>
                 </button>
 </div>
 </div>
 <section class="resource-form-section teachers-form-section" hidden="" id="roomFormSection">
 <h3 id="roomFormTitle">
-                    Add room
+                    <span data-i18n="rooms.add">Add room</span>
                 </h3>
 <input id="roomId" type="hidden"/>
 <div class="form-grid teachers-form-grid">
 <div class="form-field">
 <label for="roomName">
-                            Name
+                            <span data-i18n="common.name">Name</span>
                         </label>
 <input id="roomName" maxlength="100" required="" type="text"/>
 </div>
 <div class="form-field">
-<label for="roomBuildingId">
-                            Building
+<label for="room<span data-i18n="rooms.building">Building</span>Id">
+                            <span data-i18n="rooms.building">Building</span>
                         </label>
-<select id="roomBuildingId">
+<select id="room<span data-i18n="rooms.building">Building</span>Id">
 <option value="">
-                                No building assigned
+                                <span data-i18n="rooms.noBuilding">No building assigned</span>
                             </option>
 </select>
 </div>
 <div class="form-field">
 <label for="restrictedToSubjectId">
-                            Restricted to subject
+                            <span data-i18n="rooms.restrictedToSubject">Restricted to subject</span>
                         </label>
 <select id="restrictedToSubjectId">
 <option value="">
-                                No restriction
+                                <span data-i18n="rooms.noRestriction">No restriction</span>
                             </option>
 </select>
 </div>
 <div class="form-field">
 <label for="preferredSubjectId">
-                            Preferred subject
+                            <span data-i18n="rooms.preferredSubject">Preferred subject</span>
                         </label>
 <select id="preferredSubjectId">
 <option value="">
-                                No preference
+                                <span data-i18n="rooms.noPreference">No preference</span>
                             </option>
 </select>
 </div>
 <div class="form-field form-field-full-width">
 <label for="roomInfo">
-                            Info
+                            <span data-i18n="common.info">Info</span>
                         </label>
-<textarea id="roomInfo" maxlength="2000" placeholder="Optional information about the room" rows="4"></textarea>
+<textarea id="roomInfo" maxlength="2000" placeholder="Optional information about the room" data-i18n-placeholder="rooms.infoPlaceholder" rows="4"></textarea>
 </div>
 </div>
 <div class="form-actions teachers-form-actions">
-<button class="primary-button" id="saveRoomButton" type="button">
+<button class="primary-button" id="saveRoomButton" type="button" data-i18n="common.save">
                         Save
                     </button>
-<button class="secondary-button" id="cancelRoomButton" type="button">
+<button class="secondary-button" id="cancelRoomButton" type="button" data-i18n="common.cancel">
                         Cancel
                     </button>
 </div>
@@ -102,15 +102,15 @@
          hidden>
     <div class="section-header teachers-section-header">
         <div>
-            <h3>Import preview</h3>
-            <p>Review data read from the XLSX file. Nothing has been saved yet.</p>
+            <h3 data-i18n="common.importPreview">Import preview</h3>
+            <p><span data-i18n="rooms.importDescription">Review data read from the XLSX file. Nothing has been saved yet.</span></p>
         </div>
         <div class="teachers-header-actions">
             <button id="confirmRoomsImportButton"
                     class="primary-button"
                     type="button"
                     disabled>
-                Import rooms
+                <span data-i18n="rooms.importConfirm">Import rooms</span>
             </button>
             <button id="closeRoomsImportPreviewButton"
                     class="secondary-button"
@@ -126,9 +126,9 @@
         <table class="data-table" id="roomImportPreviewTable">
             <thead>
                 <tr>
-                    <th>Row</th>
-                    <th>Name</th>
-                    <th>Status</th>
+                    <th data-i18n="common.row">Row</th>
+                    <th data-i18n="common.name">Name</th>
+                    <th data-i18n="common.status">Status</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -139,13 +139,13 @@
 <table class="data-table teachers-table" id="roomsTable">
 <thead>
 <tr>
-<th>Name</th>
-<th>Building</th>
-<th>Restricted to</th>
-<th>Preferred subject</th>
-<th>Info</th>
+<th data-i18n="common.name">Name</th>
+<th><span data-i18n="rooms.building">Building</span></th>
+<th data-i18n="rooms.restrictedTo">Restricted to</th>
+<th><span data-i18n="rooms.preferredSubject">Preferred subject</span></th>
+<th data-i18n="common.info">Info</th>
 <th class="table-actions-column">
-                                Actions
+                                <span data-i18n="common.actions">Actions</span>
                             </th>
 </tr>
 </thead>

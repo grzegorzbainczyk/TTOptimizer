@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ClassFlow - Classes</title>
+<title data-i18n="classes.pageTitle">ClassFlow - Classes</title>
 <link href="css/style.css" rel="stylesheet"/>
 </head>
 <body class="teachers-page">
@@ -13,63 +13,63 @@
 
 
 <div class="teachers-header-content"><div class="teachers-title-group">
-<span class="teachers-page-label">Organization resources</span><h1>Classes</h1>
+<span class="teachers-page-label" data-i18n="common.organizationResources">Organization resources</span><h1 data-i18n="classes.title">Classes</h1>
 <p class="page-subtitle">
-                    Classes assigned to your organization
+                    <span data-i18n="classes.subtitle">Classes assigned to your organization</span>
                 </p>
 </div><nav class="header-actions">
-<button class="secondary-button teachers-header-button" id="backToMainButton" type="button">
+<button class="secondary-button teachers-header-button" id="backToMainButton" type="button" data-i18n="common.back">
                     Back
                 </button>
-<button class="secondary-button teachers-header-button" id="refreshClassesButton" type="button">
+<button class="secondary-button teachers-header-button" id="refreshClassesButton" type="button" data-i18n="common.refresh">
                     Refresh
                 </button>
 </nav></div></header>
 <main class="content-card teachers-card">
-<div class="section-header teachers-section-header"><div><h2>Classes list</h2><p class="teachers-section-description">Manage class groups, homeroom teachers and default rooms.</p></div>
+<div class="section-header teachers-section-header"><div><h2 data-i18n="classes.listTitle">Classes list</h2><p class="teachers-section-description"><span data-i18n="classes.listDescription">Manage class groups, homeroom teachers and default rooms.</span></p></div>
 
 <div class="teachers-header-actions">
-<button class="secondary-button" id="importClassesButton" type="button">Import XLSX</button>
+<button class="secondary-button" id="importClassesButton" type="button" data-i18n="common.importXlsx">Import XLSX</button>
 <input id="classImportFileInput" type="file" accept=".xlsx" hidden />
 <button class="main-action-button teachers-add-button" id="addClassButton" type="button"><span aria-hidden="true">+</span>
-                    Add class
+                    <span data-i18n="classes.add">Add class</span>
                 </button>
 </div>
 </div>
 <section class="resource-form-section teachers-form-section" hidden="" id="classFormSection">
-<h3 id="classFormTitle">Add class</h3>
+<h3 id="classFormTitle" data-i18n="classes.add">Add class</h3>
 <input id="classId" type="hidden"/>
 <div class="form-grid teachers-form-grid">
 <div class="form-field">
-<label for="className">Name</label>
+<label for="className" data-i18n="common.name">Name</label>
 <input id="className" maxlength="50" required="" type="text"/>
 </div>
 <div class="form-field">
 <label for="homeroomTeacherId">
-                            Homeroom teacher
+                            <span data-i18n="classes.homeroomTeacher">Homeroom teacher</span>
                         </label>
 <select id="homeroomTeacherId">
-<option value="">None</option>
+<option value="" data-i18n="common.none">None</option>
 </select>
 </div>
 <div class="form-field">
 <label for="defaultRoomId">
-                            Default room
+                            <span data-i18n="classes.defaultRoom">Default room</span>
                         </label>
 <select id="defaultRoomId">
-<option value="">None</option>
+<option value="" data-i18n="common.none">None</option>
 </select>
 </div>
 <div class="form-field form-field-full-width">
-<label for="classInfo">Info</label>
-<textarea id="classInfo" maxlength="2000" placeholder="Optional notes about the class" rows="4"></textarea>
+<label for="classInfo" data-i18n="common.info">Info</label>
+<textarea id="classInfo" maxlength="2000" placeholder="Optional notes about the class" data-i18n-placeholder="classes.infoPlaceholder" rows="4"></textarea>
 </div>
 </div>
 <div class="form-actions teachers-form-actions">
-<button class="main-action-button" id="saveClassButton" type="button">
+<button class="main-action-button" id="saveClassButton" type="button" data-i18n="common.save">
                         Save
                     </button>
-<button class="secondary-button" id="cancelClassButton" type="button">
+<button class="secondary-button" id="cancelClassButton" type="button" data-i18n="common.cancel">
                         Cancel
                     </button>
 </div>
@@ -80,12 +80,12 @@
 <section id="classImportPreviewSection" class="resource-form-section" hidden>
     <div class="section-header teachers-section-header">
         <div>
-            <h3>Import preview</h3>
-            <p>Review classes read from the XLSX file. Nothing has been saved yet.</p>
+            <h3 data-i18n="common.importPreview">Import preview</h3>
+            <p><span data-i18n="classes.importDescription">Review classes read from the XLSX file. Nothing has been saved yet.</span></p>
         </div>
         <div class="teachers-header-actions">
             <button id="confirmClassesImportButton" class="main-action-button" type="button" disabled>
-                Import classes
+                <span data-i18n="classes.importConfirm">Import classes</span>
             </button>
             <button id="closeClassesImportPreviewButton" class="secondary-button" type="button">
                 Close
@@ -95,7 +95,7 @@
     <p id="classImportMessage" class="form-message" aria-live="polite"></p>
     <div class="table-wrapper">
         <table class="data-table" id="classImportPreviewTable">
-            <thead><tr><th>Row</th><th>Name</th><th>Status</th></tr></thead>
+            <thead><tr><th data-i18n="common.row">Row</th><th data-i18n="common.name">Name</th><th data-i18n="common.status">Status</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
@@ -104,12 +104,12 @@
 <table class="data-table teachers-table" id="classesTable">
 <thead>
 <tr>
-<th>Name</th>
-<th>Homeroom teacher</th>
-<th>Default room</th>
-<th>Info</th>
+<th data-i18n="common.name">Name</th>
+<th><span data-i18n="classes.homeroomTeacher">Homeroom teacher</span></th>
+<th><span data-i18n="classes.defaultRoom">Default room</span></th>
+<th data-i18n="common.info">Info</th>
 <th class="table-actions-column">
-                                Actions
+                                <span data-i18n="common.actions">Actions</span>
                             </th>
 </tr>
 </thead>

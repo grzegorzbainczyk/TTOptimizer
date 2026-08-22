@@ -1,4 +1,7 @@
+import { initializeI18n, t } from "./i18n.js";
 document.addEventListener("DOMContentLoaded", async () => {
+    await initializeI18n();
+    document.title = t("buildings.pageTitle", "ClassFlow - Buildings");
     document.getElementById("backToMainButton")?.addEventListener("click", () => {
         window.location.href = "main.html";
     });
@@ -23,7 +26,7 @@ async function loadBuildings() {
         const data = await readJsonResponse(response);
 
         if (!response.ok) {
-            throw new Error(getApiErrorMessage(data, `Could not load buildings. Status: ${response.status}`));
+            throw new Error(getApiErrorMessage(data, `${t("buildings.loadFailed", "Could not load buildings.")} Status: ${response.status}`));
         }
 
         const buildings = Array.isArray(data) ? data : data?.buildings ?? [];
@@ -33,7 +36,7 @@ async function loadBuildings() {
         console.error("Error loading buildings:", error);
         updateCount(null);
         tbody.innerHTML = `<tr><td colspan="5" class="teachers-table-state"></td></tr>`;
-        tbody.querySelector("td").textContent = error instanceof Error ? error.message : "Could not load buildings.";
+        tbody.querySelector("td").textContent = error instanceof Error ? error.message : t("buildings.loadFailed", "Could not load buildings.");
     }
 }
 
@@ -60,8 +63,8 @@ function renderBuildings(buildings) {
         const actions = document.createElement("div");
         actions.className = "teacher-actions";
 
-        const editButton = createActionButton("Edit", "teacher-edit-button", () => openEditForm(building));
-        const deleteButton = createActionButton("Delete", "teacher-delete-button", () => deleteBuilding(building));
+        const editButton = createActionButton(t("common.edit", "Edit"), "teacher-edit-button", () => openEditForm(building));
+        const deleteButton = createActionButton(t("common.delete", "Delete"), "teacher-delete-button", () => deleteBuilding(building));
         actions.append(editButton, deleteButton);
         actionsCell.appendChild(actions);
         row.appendChild(actionsCell);
@@ -89,7 +92,7 @@ function openAddForm() {
     document.getElementById("buildingName").value = "";
     document.getElementById("buildingAddress").value = "";
     document.getElementById("buildingInfo").value = "";
-    document.getElementById("buildingFormTitle").textContent = "Add building";
+    document.getElementById("buildingFormTitle").textContent = t("buildings.add", "Add building");
     clearMessage();
     document.getElementById("buildingFormSection").hidden = false;
     document.getElementById("buildingName").focus();
@@ -100,7 +103,7 @@ function openEditForm(building) {
     document.getElementById("buildingName").value = building.name ?? "";
     document.getElementById("buildingAddress").value = building.address ?? "";
     document.getElementById("buildingInfo").value = building.info ?? "";
-    document.getElementById("buildingFormTitle").textContent = "Edit building";
+    document.getElementById("buildingFormTitle").textContent = t("buildings.edit", "Edit building");
     clearMessage();
     document.getElementById("buildingFormSection").hidden = false;
     document.getElementById("buildingName").focus();
@@ -118,7 +121,7 @@ async function saveBuilding() {
     const info = document.getElementById("buildingInfo").value.trim();
 
     if (!name) {
-        showMessage("Building name is required.", true);
+        showMessage(t("buildings.nameRequired", "Building name is required."), true);
         return;
     }
 
@@ -136,19 +139,22 @@ async function saveBuilding() {
 
         const data = await readJsonResponse(response);
         if (!response.ok) {
-            throw new Error(getApiErrorMessage(data, `Could not save building. Status: ${response.status}`));
+            throw new Error(getApiErrorMessage(data, `${t("buildings.saveFailed", "Could not save building.")} Status: ${response.status}`));
         }
 
         closeForm();
         await loadBuildings();
     } catch (error) {
         console.error("Error saving building:", error);
-        showMessage(error instanceof Error ? error.message : "Could not save building.", true);
+        showMessage(error instanceof Error ? error.message : t("buildings.saveFailed", "Could not save building."), true);
     }
 }
 
 async function deleteBuilding(building) {
-    if (!confirm(`Delete building '${building.name}'?`)) return;
+    if (!confirm(
+        t("buildings.deleteConfirm", "Delete building '{name}'?")
+            .replace("{name}", building.name ?? "")
+    )) return;
 
     try {
         const organizationId = window.appContext.requireOrganizationId();
@@ -159,13 +165,13 @@ async function deleteBuilding(building) {
 
         if (!response.ok) {
             const data = await readJsonResponse(response);
-            throw new Error(getApiErrorMessage(data, `Could not delete building. Status: ${response.status}`));
+            throw new Error(getApiErrorMessage(data, `${t("buildings.deleteFailed", "Could not delete building.")} Status: ${response.status}`));
         }
 
         await loadBuildings();
     } catch (error) {
         console.error("Error deleting building:", error);
-        alert(error instanceof Error ? error.message : "Could not delete building.");
+        alert(error instanceof Error ? error.message : t("buildings.deleteFailed", "Could not delete building."));
     }
 }
 
@@ -173,10 +179,12 @@ function updateCount(count) {
     const element = document.getElementById("buildingsCount");
     if (!element) return;
     if (!Number.isInteger(count)) {
-        element.textContent = "Could not determine the number of buildings.";
+        element.textContent = t("buildings.countUnknown", "Could not determine the number of buildings.");
         return;
     }
-    element.textContent = count === 1 ? "1 building" : `${count} buildings`;
+    element.textContent = count === 1
+        ? t("buildings.countOne", "1 building")
+        : t("buildings.countMany", "{count} buildings").replace("{count}", count);
 }
 
 function showMessage(message, isError) {
