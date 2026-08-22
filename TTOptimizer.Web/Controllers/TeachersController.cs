@@ -4,9 +4,7 @@ using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 using TTOptimizer.Web.Models.DTO.Teachers;
-using TTOptimizer.Web.Models.DTO.Import;
 using TTOptimizer.Web.Models.DTO.SchedulingPreferences;
-using TTOptimizer.Web.Services;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -324,12 +322,10 @@ public class TeachersController : ControllerBase
     }
 
 
-
-
-    [HttpPost("import")]
-    public async Task<IActionResult> ImportTeachers(
-        [FromQuery] int organizationId,
-        [FromBody] SimpleNameImportRequestDto request)
+    [HttpGet("{id:int}/assignments")]
+    public async Task<IActionResult> GetAssignments(
+        int id,
+        [FromQuery] int organizationId)
     {
         if (organizationId <= 0)
         {
@@ -340,209 +336,178 @@ public class TeachersController : ControllerBase
             });
         }
 
-        var organizationExists =
-            await _dbContext.Organizations.AnyAsync(
-                organization => organization.Id == organizationId);
+        var teacherExists =
+            await _dbContext.Teachers.AnyAsync(teacher =>
+                teacher.Id == id &&
+                teacher.OrganizationId == organizationId);
 
-        if (!organizationExists)
+        if (!teacherExists)
         {
             return NotFound(new
             {
                 success = false,
-                message = "Organization was not found."
+                message = "Teacher was not found."
             });
         }
 
-        if (request.Names == null || request.Names.Count == 0)
-        {
-            return BadRequest(new
-            {
-                success = false,
-                message = "There are no teachers to import."
-            });
-        }
-
-        var requestedNames = request.Names
-            .Select(name => name?.Trim() ?? string.Empty)
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        if (requestedNames.Count == 0)
-        {
-            return BadRequest(new
-            {
-                success = false,
-                message = "There are no valid teacher names to import."
-            });
-        }
-
-        var existingTeachers =
-            await _dbContext.Teachers
-                .Where(teacher =>
-                    teacher.OrganizationId == organizationId)
-                .Select(teacher => new
+        var assignments =
+            await _dbContext.TeacherAssignments
+                .AsNoTracking()
+                .Where(item =>
+                    item.OrganizationId == organizationId &&
+                    item.TeacherId == id)
+                .OrderBy(item => item.Subject.Name)
+                .ThenBy(item => item.ClassGroup.Name)
+                .Select(item => new
                 {
-                    teacher.Name,
-                    teacher.Alias
+                    item.Id,
+                    item.SubjectId,
+                    SubjectName = item.Subject.Name,
+                    item.ClassGroupId,
+                    ClassName = item.ClassGroup.Name
                 })
                 .ToListAsync();
 
-        var existingNames = new HashSet<string>(
-            existingTeachers.Select(teacher => teacher.Name),
-            StringComparer.OrdinalIgnoreCase);
-
-        var usedAliases = new HashSet<string>(
-            existingTeachers.Select(teacher => teacher.Alias),
-            StringComparer.OrdinalIgnoreCase);
-
-        var namesToImport = requestedNames
-            .Where(name => !existingNames.Contains(name))
-            .ToList();
-
-        var skippedExistingCount =
-            requestedNames.Count - namesToImport.Count;
-
-        if (namesToImport.Count == 0)
+        return Ok(new
         {
-            return Ok(new
+            success = true,
+            assignments
+        });
+    }
+
+    [HttpPost("{id:int}/assignments")]
+    public async Task<IActionResult> CreateAssignment(
+        int id,
+        [FromQuery] int organizationId,
+        [FromBody] CreateTeacherAssignmentRequest request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
             {
-                success = true,
-                importedCount = 0,
-                skippedExistingCount,
-                message = "No new teachers were imported."
+                success = false,
+                message = "Organization ID is required."
             });
         }
 
-        var nextTeacherNumber =
-            (await _dbContext.Teachers
-                .Where(teacher =>
-                    teacher.OrganizationId == organizationId)
-                .MaxAsync(teacher =>
-                    (int?)teacher.TeacherNumber) ?? 0) + 1;
+        var teacherExists =
+            await _dbContext.Teachers.AnyAsync(teacher =>
+                teacher.Id == id &&
+                teacher.OrganizationId == organizationId);
 
-        var teachers = new List<Teacher>();
-
-        foreach (var name in namesToImport)
+        if (!teacherExists)
         {
-            var alias =
-                GenerateUniqueAliasForImport(
-                    name,
-                    usedAliases);
-
-            var teacher = new Teacher
+            return NotFound(new
             {
-                OrganizationId = organizationId,
-                TeacherNumber = nextTeacherNumber++,
-                Name = name,
-                Alias = alias,
-                Info = null
-            };
-
-            teachers.Add(teacher);
+                success = false,
+                message = "Teacher was not found."
+            });
         }
 
-        _dbContext.Teachers.AddRange(teachers);
+        var subjectExists =
+            await _dbContext.Subjects.AnyAsync(subject =>
+                subject.Id == request.SubjectId &&
+                subject.OrganizationId == organizationId);
+
+        if (!subjectExists)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Subject was not found."
+            });
+        }
+
+        var classExists =
+            await _dbContext.ClassGroups.AnyAsync(classGroup =>
+                classGroup.Id == request.ClassGroupId &&
+                classGroup.OrganizationId == organizationId);
+
+        if (!classExists)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Class was not found."
+            });
+        }
+
+        var assignmentExists =
+            await _dbContext.TeacherAssignments.AnyAsync(item =>
+                item.OrganizationId == organizationId &&
+                item.TeacherId == id &&
+                item.SubjectId == request.SubjectId &&
+                item.ClassGroupId == request.ClassGroupId);
+
+        if (assignmentExists)
+        {
+            return Conflict(new
+            {
+                success = false,
+                message = "This teaching assignment already exists."
+            });
+        }
+
+        var assignment = new TeacherAssignment
+        {
+            OrganizationId = organizationId,
+            TeacherId = id,
+            SubjectId = request.SubjectId,
+            ClassGroupId = request.ClassGroupId
+        };
+
+        _dbContext.TeacherAssignments.Add(assignment);
         await _dbContext.SaveChangesAsync();
 
         return Ok(new
         {
             success = true,
-            importedCount = teachers.Count,
-            skippedExistingCount,
-            message = $"{teachers.Count} teacher(s) imported."
+            assignmentId = assignment.Id
         });
     }
 
-    private static string GenerateUniqueAliasForImport(
-        string name,
-        HashSet<string> usedAliases)
+    [HttpDelete("{id:int}/assignments/{assignmentId:int}")]
+    public async Task<IActionResult> DeleteAssignment(
+        int id,
+        int assignmentId,
+        [FromQuery] int organizationId)
     {
-        var parts = name.Split(
-            ' ',
-            StringSplitOptions.RemoveEmptyEntries |
-            StringSplitOptions.TrimEntries);
-
-        var baseAlias = string.Concat(
-            parts.Select(part =>
-                char.ToUpperInvariant(part[0])));
-
-        if (string.IsNullOrWhiteSpace(baseAlias))
+        if (organizationId <= 0)
         {
-            baseAlias = "T";
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
         }
 
-        var alias = baseAlias;
-        var suffix = 2;
+        var assignment =
+            await _dbContext.TeacherAssignments
+                .FirstOrDefaultAsync(item =>
+                    item.Id == assignmentId &&
+                    item.TeacherId == id &&
+                    item.OrganizationId == organizationId);
 
-        while (usedAliases.Contains(alias))
+        if (assignment == null)
         {
-            alias = $"{baseAlias}{suffix}";
-            suffix++;
+            return NotFound(new
+            {
+                success = false,
+                message = "Teaching assignment was not found."
+            });
         }
 
-        usedAliases.Add(alias);
+        _dbContext.TeacherAssignments.Remove(assignment);
+        await _dbContext.SaveChangesAsync();
 
-        return alias;
+        return Ok(new
+        {
+            success = true,
+            message = "Teaching assignment was removed."
+        });
     }
 
-    [HttpPost("import/preview")]
-    public IActionResult PreviewImport(IFormFile file)
-    {
-        if (file == null || file.Length == 0)
-        {
-            return BadRequest(new
-            {
-                success = false,
-                message = "File is required."
-            });
-        }
 
-        var extension = Path.GetExtension(file.FileName);
-
-        if (!string.Equals(
-            extension,
-            ".xlsx",
-            StringComparison.OrdinalIgnoreCase))
-        {
-            return BadRequest(new
-            {
-                success = false,
-                message = "Only .xlsx files are supported."
-            });
-        }
-
-        try
-        {
-            using var stream = file.OpenReadStream();
-
-            var preview =
-                XlsxImportService.ReadSingleNameColumnPreview(
-                    stream,
-                    expectedHeader: "Name",
-                    maxNameLength: 200);
-
-            if (!preview.Success)
-            {
-                return BadRequest(preview);
-            }
-
-            return Ok(preview);
-        }
-        catch (Exception error)
-        {
-            Console.Error.WriteLine(
-                $"Could not read teacher import file: {error}");
-
-            return BadRequest(new
-            {
-                success = false,
-                message =
-                    "The XLSX file could not be read. " +
-                    "Make sure it is a valid spreadsheet."
-            });
-        }
-    }
 
     // Time slot preferences endpoint for a specific teacher
 
@@ -979,3 +944,11 @@ public class TeachersController : ControllerBase
             value.Value is >= 1 and <= 8;
     }
 }
+
+public class CreateTeacherAssignmentRequest
+{
+    public int SubjectId { get; set; }
+
+    public int ClassGroupId { get; set; }
+}
+

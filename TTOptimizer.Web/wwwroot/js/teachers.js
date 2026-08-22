@@ -1,9 +1,9 @@
-import { initializeI18n, t } from "./i18n.js";
 let currentTeacherImportRows = [];
+let availableAssignmentSubjects = [];
+let availableAssignmentClasses = [];
+let currentAssignmentTeacher = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await initializeI18n();
-    document.title = t("teachers.pageTitle", "ClassFlow - Teachers");
     const backToMainButton =
         document.getElementById("backToMainButton");
 
@@ -76,6 +76,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         confirmTeacherImport
     );
 
+    document.getElementById("closeTeacherAssignmentsButton")
+        ?.addEventListener("click", closeTeacherAssignments);
+
+    document.getElementById("addTeacherAssignmentButton")
+        ?.addEventListener("click", addTeacherAssignment);
+
 
     await loadTeachers();
 });
@@ -109,7 +115,7 @@ async function loadTeachers() {
         if (!response.ok) {
             throw new Error(
                 data?.message ??
-                `${t("teachers.loadFailed", "Could not load teachers.")} Status: ${response.status}`
+                `Could not load teachers. Status: ${response.status}`
             );
         }
 
@@ -192,10 +198,22 @@ function renderTeachers(teachers) {
 
         editButton.type = "button";
         editButton.className = "small-button teacher-action-button teacher-edit-button";
-        editButton.textContent = t("common.edit", "Edit");
+        editButton.textContent = "Edit";
 
         editButton.addEventListener("click", () => {
             openEditTeacherForm(teacher);
+        });
+
+        const assignmentsButton =
+            document.createElement("button");
+
+        assignmentsButton.type = "button";
+        assignmentsButton.className =
+            "small-button teacher-action-button teacher-assignments-button";
+        assignmentsButton.textContent = "Assignments";
+
+        assignmentsButton.addEventListener("click", async () => {
+            await openTeacherAssignments(teacher);
         });
 
         const availabilityButton =
@@ -203,7 +221,7 @@ function renderTeachers(teachers) {
 
         availabilityButton.type = "button";
         availabilityButton.className = "small-button teacher-action-button teacher-availability-button";
-        availabilityButton.textContent = t("common.availability", "Availability");
+        availabilityButton.textContent = "Availability";
 
         availabilityButton.addEventListener("click", () => {
             const url =
@@ -219,7 +237,7 @@ function renderTeachers(teachers) {
 
         preferencesButton.type = "button";
         preferencesButton.className = "small-button teacher-action-button teacher-preferences-button";
-        preferencesButton.textContent = t("common.preferences", "Preferences");
+        preferencesButton.textContent = "Preferences";
 
         preferencesButton.addEventListener("click", () => {
             const url =
@@ -235,7 +253,7 @@ function renderTeachers(teachers) {
 
         deleteButton.type = "button";
         deleteButton.className = "small-button teacher-action-button teacher-delete-button";
-        deleteButton.textContent = t("common.delete", "Delete");
+        deleteButton.textContent = "Delete";
 
         deleteButton.addEventListener("click", async () => {
             await deleteTeacher(teacher);
@@ -248,6 +266,7 @@ function renderTeachers(teachers) {
 
         actionsContainer.append(
             editButton,
+            assignmentsButton,
             availabilityButton,
             preferencesButton,
             deleteButton
@@ -269,13 +288,13 @@ function updateTeachersCount(count) {
     }
 
     if (!Number.isInteger(count)) {
-        element.textContent = t("teachers.countUnknown", "Could not determine the number of teachers.");
+        element.textContent = "Could not determine the number of teachers.";
         return;
     }
 
     element.textContent = count === 1
-        ? t("teachers.countOne", "1 teacher")
-        : t("teachers.countMany", "{count} teachers").replace("{count}", count);
+        ? "1 teacher"
+        : `${count} teachers`;
 }
 
 function createTableCell(value) {
@@ -284,7 +303,384 @@ function createTableCell(value) {
     return cell;
 }
 
+
+async function openTeacherAssignments(teacher) {
+    closeTeacherForm();
+    closeTeacherImportPreview();
+
+    currentAssignmentTeacher = teacher;
+
+    const section =
+        document.getElementById("teacherAssignmentsSection");
+
+    if (!section) {
+        return;
+    }
+
+    document.getElementById("assignmentTeacherId").value =
+        teacher.id;
+
+    document.getElementById("teacherAssignmentsTitle").textContent =
+        `Teaching assignments: ${teacher.name}`;
+
+    clearTeacherAssignmentsMessage();
+    section.hidden = false;
+
+    try {
+        await Promise.all([
+            loadAssignmentSubjects(),
+            loadAssignmentClasses()
+        ]);
+
+        await loadTeacherAssignments(teacher.id);
+    } catch (error) {
+        console.error("Error opening teacher assignments:", error);
+
+        showTeacherAssignmentsMessage(
+            error instanceof Error
+                ? error.message
+                : "Could not load teaching assignments.",
+            true
+        );
+    }
+}
+
+function closeTeacherAssignments() {
+    const section =
+        document.getElementById("teacherAssignmentsSection");
+
+    if (section) {
+        section.hidden = true;
+    }
+
+    currentAssignmentTeacher = null;
+    clearTeacherAssignmentsMessage();
+}
+
+async function loadAssignmentSubjects() {
+    const organizationId =
+        window.appContext.requireOrganizationId();
+
+    const response = await fetch(
+        `/api/subjects?organizationId=${encodeURIComponent(
+            organizationId
+        )}`
+    );
+
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+        throw new Error(
+            getApiErrorMessage(
+                data,
+                `Could not load subjects. Status: ${response.status}`
+            )
+        );
+    }
+
+    availableAssignmentSubjects = Array.isArray(data)
+        ? data
+        : data?.subjects ?? [];
+
+    const select =
+        document.getElementById("assignmentSubjectId");
+
+    if (!select) {
+        return;
+    }
+
+    select.innerHTML = '<option value="">Select subject</option>';
+
+    availableAssignmentSubjects.forEach(subject => {
+        const option = document.createElement("option");
+        option.value = subject.id;
+        option.textContent = subject.name;
+        select.appendChild(option);
+    });
+}
+
+async function loadAssignmentClasses() {
+    const organizationId =
+        window.appContext.requireOrganizationId();
+
+    const response = await fetch(
+        `/api/classes?organizationId=${encodeURIComponent(
+            organizationId
+        )}`
+    );
+
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+        throw new Error(
+            getApiErrorMessage(
+                data,
+                `Could not load classes. Status: ${response.status}`
+            )
+        );
+    }
+
+    availableAssignmentClasses = Array.isArray(data)
+        ? data
+        : data?.classes ?? data?.classGroups ?? [];
+
+    const select =
+        document.getElementById("assignmentClassGroupId");
+
+    if (!select) {
+        return;
+    }
+
+    select.innerHTML = '<option value="">Select class</option>';
+
+    availableAssignmentClasses.forEach(classGroup => {
+        const option = document.createElement("option");
+        option.value = classGroup.id;
+        option.textContent = classGroup.name;
+        select.appendChild(option);
+    });
+}
+
+async function loadTeacherAssignments(teacherId) {
+    const organizationId =
+        window.appContext.requireOrganizationId();
+
+    const response = await fetch(
+        `/api/teachers/${encodeURIComponent(
+            teacherId
+        )}/assignments?organizationId=${encodeURIComponent(
+            organizationId
+        )}`
+    );
+
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+        throw new Error(
+            getApiErrorMessage(
+                data,
+                `Could not load assignments. Status: ${response.status}`
+            )
+        );
+    }
+
+    renderTeacherAssignments(
+        Array.isArray(data)
+            ? data
+            : data?.assignments ?? []
+    );
+}
+
+function renderTeacherAssignments(assignments) {
+    const tbody =
+        document.querySelector("#teacherAssignmentsTable tbody");
+
+    if (!tbody) {
+        return;
+    }
+
+    tbody.innerHTML = "";
+
+    if (!Array.isArray(assignments) ||
+        assignments.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="3">No teaching assignments yet.</td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    assignments.forEach(assignment => {
+        const row = document.createElement("tr");
+
+        row.appendChild(
+            createTableCell(assignment.subjectName)
+        );
+
+        row.appendChild(
+            createTableCell(assignment.className)
+        );
+
+        const actionsCell = document.createElement("td");
+        actionsCell.className = "table-actions-column";
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className =
+            "small-button teacher-action-button teacher-delete-button";
+        removeButton.textContent = "Remove";
+
+        removeButton.addEventListener("click", async () => {
+            await deleteTeacherAssignment(assignment.id);
+        });
+
+        actionsCell.appendChild(removeButton);
+        row.appendChild(actionsCell);
+        tbody.appendChild(row);
+    });
+}
+
+async function addTeacherAssignment() {
+    const teacherId =
+        Number(document.getElementById("assignmentTeacherId").value);
+
+    const subjectId =
+        Number(document.getElementById("assignmentSubjectId").value);
+
+    const classGroupId =
+        Number(document.getElementById("assignmentClassGroupId").value);
+
+    if (teacherId <= 0) {
+        showTeacherAssignmentsMessage(
+            "Teacher is required.",
+            true
+        );
+        return;
+    }
+
+    if (subjectId <= 0) {
+        showTeacherAssignmentsMessage(
+            "Subject is required.",
+            true
+        );
+        return;
+    }
+
+    if (classGroupId <= 0) {
+        showTeacherAssignmentsMessage(
+            "Class is required.",
+            true
+        );
+        return;
+    }
+
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/teachers/${encodeURIComponent(
+                teacherId
+            )}/assignments?organizationId=${encodeURIComponent(
+                organizationId
+            )}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    subjectId,
+                    classGroupId
+                })
+            }
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not add assignment. Status: ${response.status}`
+                )
+            );
+        }
+
+        document.getElementById("assignmentSubjectId").value = "";
+        document.getElementById("assignmentClassGroupId").value = "";
+
+        showTeacherAssignmentsMessage(
+            "Teaching assignment added.",
+            false
+        );
+
+        await loadTeacherAssignments(teacherId);
+    } catch (error) {
+        console.error("Error adding teacher assignment:", error);
+
+        showTeacherAssignmentsMessage(
+            error instanceof Error
+                ? error.message
+                : "Could not add assignment.",
+            true
+        );
+    }
+}
+
+async function deleteTeacherAssignment(assignmentId) {
+    if (!currentAssignmentTeacher) {
+        return;
+    }
+
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/teachers/${encodeURIComponent(
+                currentAssignmentTeacher.id
+            )}/assignments/${encodeURIComponent(
+                assignmentId
+            )}?organizationId=${encodeURIComponent(
+                organizationId
+            )}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not remove assignment. Status: ${response.status}`
+                )
+            );
+        }
+
+        showTeacherAssignmentsMessage(
+            "Teaching assignment removed.",
+            false
+        );
+
+        await loadTeacherAssignments(
+            currentAssignmentTeacher.id
+        );
+    } catch (error) {
+        console.error("Error removing teacher assignment:", error);
+
+        showTeacherAssignmentsMessage(
+            error instanceof Error
+                ? error.message
+                : "Could not remove assignment.",
+            true
+        );
+    }
+}
+
+function showTeacherAssignmentsMessage(message, isError) {
+    const element =
+        document.getElementById("teacherAssignmentsMessage");
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent = message;
+    element.classList.toggle("error-message", isError);
+}
+
+function clearTeacherAssignmentsMessage() {
+    showTeacherAssignmentsMessage("", false);
+}
+
 function openAddTeacherForm() {
+    closeTeacherAssignments();
     const formSection =
         document.getElementById("teacherFormSection");
 
@@ -314,13 +710,14 @@ function openAddTeacherForm() {
     teacherAlias.value = "";
     teacherInfo.value = "";
 
-    formTitle.textContent = t("teachers.add", "Add teacher");
+    formTitle.textContent = "Add teacher";
     formSection.hidden = false;
 
     teacherName.focus();
 }
 
 function openEditTeacherForm(teacher) {
+    closeTeacherAssignments();
     const formSection =
         document.getElementById("teacherFormSection");
 
@@ -350,7 +747,7 @@ function openEditTeacherForm(teacher) {
     teacherAlias.value = teacher.alias ?? "";
     teacherInfo.value = teacher.info ?? "";
 
-    formTitle.textContent = t("teachers.edit", "Edit teacher");
+    formTitle.textContent = "Edit teacher";
     formSection.hidden = false;
 
     teacherName.focus();
@@ -382,7 +779,7 @@ async function saveTeacher() {
 
     if (!name) {
         showTeacherFormMessage(
-            t("teachers.nameRequired", "Teacher name is required."),
+            "Teacher name is required.",
             true
         );
 
@@ -434,7 +831,7 @@ async function saveTeacher() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `${t("teachers.saveFailed", "Could not save teacher.")} Status: ${response.status}`
+                    `Could not save teacher. Status: ${response.status}`
                 )
             );
         }
@@ -484,7 +881,7 @@ async function deleteTeacher(teacher) {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `${t("teachers.deleteFailed", "Could not delete teacher.")} Status: ${response.status}`
+                    `Could not delete teacher. Status: ${response.status}`
                 )
             );
         }
@@ -558,7 +955,7 @@ async function handleTeacherImportFileSelected(event) {
     }
 
     if (!file.name.toLowerCase().endsWith(".xlsx")) {
-        window.alert(t("teachers.selectXlsx", "Please select an XLSX file."));
+        window.alert("Please select an XLSX file.");
         input.value = "";
         return;
     }
@@ -585,7 +982,7 @@ async function handleTeacherImportFileSelected(event) {
         if (!response.ok) {
             throw new Error(
                 data?.message ??
-                `${t("teachers.importReadFailed", "Could not read XLSX file.")} Status: ${response.status}`
+                `Could not read XLSX file. Status: ${response.status}`
             );
         }
 
@@ -615,7 +1012,7 @@ async function handleTeacherImportFileSelected(event) {
         showTeacherImportMessage(
             error instanceof Error
                 ? error.message
-                : t("teachers.importReadFailed", "Could not read XLSX file."),
+                : "Could not read XLSX file.",
             true
         );
     } finally {
@@ -643,7 +1040,7 @@ function renderTeacherImportPreview(rows) {
         const cell = document.createElement("td");
 
         cell.colSpan = 3;
-        cell.textContent = t("teachers.importNoRows", "No teacher rows found.");
+        cell.textContent = "No teacher rows found.";
 
         row.appendChild(cell);
         tbody.appendChild(row);
@@ -772,7 +1169,7 @@ async function confirmTeacherImport() {
         if (!response.ok) {
             throw new Error(
                 data?.message ??
-                `${t("teachers.importFailed", "Could not import teachers.")} Status: ${response.status}`
+                `Could not import teachers. Status: ${response.status}`
             );
         }
 
@@ -808,7 +1205,7 @@ async function confirmTeacherImport() {
         showTeacherImportMessage(
             error instanceof Error
                 ? error.message
-                : t("teachers.importFailed", "Could not import teachers."),
+                : "Could not import teachers.",
             true
         );
 

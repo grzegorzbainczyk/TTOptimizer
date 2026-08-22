@@ -4,6 +4,7 @@ let availableSubjects = [];
 let availableClasses = [];
 let curriculumDefinition = null;
 let curriculumPreviewRows = [];
+let curriculumTeacherAssignments = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
     configureLessonsPageLanguage();
@@ -118,6 +119,10 @@ function getLessonsPageText() {
             curriculumSelectGrade: "Wybierz poziom",
             curriculumCreated: "Lekcje zostały utworzone.",
             curriculumPartialError: "Nie udało się utworzyć wszystkich lekcji.",
+            curriculumCreateSubject: "Utwórz przedmiot",
+            curriculumCreateSubjectStatus: "Przedmiot zostanie utworzony",
+            curriculumMultipleTeachers: "Kilku przypisanych nauczycieli",
+            curriculumContextError: "Nie udało się wczytać domyślnych przypisań nauczycieli.",
             addLessonForm: "Dodaj lekcję",
             editLessonForm: "Edytuj lekcję",
             additionalLesson: "Zajęcia dodatkowe",
@@ -160,6 +165,10 @@ function getLessonsPageText() {
         curriculumSelectGrade: "Select grade",
         curriculumCreated: "Lessons were created.",
         curriculumPartialError: "Not all lessons could be created.",
+        curriculumCreateSubject: "Create subject",
+        curriculumCreateSubjectStatus: "Subject will be created",
+        curriculumMultipleTeachers: "Multiple assigned teachers",
+        curriculumContextError: "Could not load default teacher assignments.",
         addLessonForm: "Add lesson",
         editLessonForm: "Edit lesson",
         additionalLesson: "Additional lesson",
@@ -947,6 +956,7 @@ function closeCurriculumImport() {
     if (section) section.hidden = true;
 
     curriculumPreviewRows = [];
+    curriculumTeacherAssignments = [];
     const preview = document.getElementById("curriculumPreviewContainer");
     if (preview) preview.hidden = true;
     showCurriculumImportMessage("", false);
@@ -1009,6 +1019,135 @@ async function loadCurriculumDefinition(schoolYear) {
     return curriculumDefinition;
 }
 
+
+async function loadCurriculumTeacherAssignments(classGroupId) {
+    const organizationId =
+        window.appContext.requireOrganizationId();
+
+    const response = await fetch(
+        `/api/requirements/curriculum-context?organizationId=${encodeURIComponent(
+            organizationId
+        )}&classGroupId=${encodeURIComponent(classGroupId)}`
+    );
+
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+        throw new Error(
+            getApiErrorMessage(
+                data,
+                getLessonsPageText().curriculumContextError
+            )
+        );
+    }
+
+    curriculumTeacherAssignments =
+        Array.isArray(data?.teacherAssignments)
+            ? data.teacherAssignments
+            : [];
+}
+
+function getTeacherAssignmentsForSubject(subjectId) {
+    const normalizedSubjectId = Number(subjectId);
+
+    if (normalizedSubjectId <= 0) {
+        return [];
+    }
+
+    return curriculumTeacherAssignments.filter(assignment =>
+        Number(assignment.subjectId) === normalizedSubjectId
+    );
+}
+
+function applyDefaultTeacherToCurriculumRow(row) {
+    row.hasMultipleDefaultTeachers = false;
+    row.teacherWasAutoAssigned = false;
+
+    if (!row.subjectId) {
+        return;
+    }
+
+    const assignments =
+        getTeacherAssignmentsForSubject(row.subjectId);
+
+    if (assignments.length === 1) {
+        row.teacherId = Number(assignments[0].teacherId);
+        row.teacherWasAutoAssigned = true;
+        return;
+    }
+
+    if (assignments.length > 1) {
+        row.teacherId = null;
+        row.hasMultipleDefaultTeachers = true;
+    }
+}
+
+async function ensureCurriculumSubject(row) {
+    if (row.subjectId) {
+        return row.subjectId;
+    }
+
+    if (!row.createSubject) {
+        return null;
+    }
+
+    const organizationId =
+        window.appContext.requireOrganizationId();
+
+    const response = await fetch(
+        `/api/subjects?organizationId=${encodeURIComponent(
+            organizationId
+        )}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: row.sourceSubjectName,
+                info: null
+            })
+        }
+    );
+
+    const data = await readJsonResponse(response);
+
+    if (response.ok) {
+        row.subjectId = Number(data?.id) || null;
+        row.createSubject = false;
+
+        if (!row.subjectId) {
+            throw new Error(
+                `Subject "${row.sourceSubjectName}" was created but its ID was not returned.`
+            );
+        }
+
+        return row.subjectId;
+    }
+
+    // A concurrent change or a repeated import may have created the subject
+    // after the preview was loaded. Reload and try to match it before failing.
+    if (response.status === 409) {
+        await loadSubjects();
+
+        const matchedSubject =
+            findMatchingSubject(row.sourceSubjectName);
+
+        if (matchedSubject) {
+            row.subjectId = matchedSubject.id;
+            row.createSubject = false;
+            return row.subjectId;
+        }
+    }
+
+    throw new Error(
+        getApiErrorMessage(
+            data,
+            `Could not create subject "${row.sourceSubjectName}". Status: ${response.status}`
+        )
+    );
+}
+
 async function loadCurriculumPreview() {
     const text = getLessonsPageText();
     const classGroupId = Number(
@@ -1056,20 +1195,29 @@ async function loadCurriculumPreview() {
             );
         }
 
+        await loadCurriculumTeacherAssignments(classGroupId);
+
         curriculumPreviewRows =
             (gradeDefinition.lessons ?? []).map((lesson, index) => {
                 const matchedSubject =
                     findMatchingSubject(lesson.subject);
 
-                return {
+                const row = {
                     index,
                     sourceSubjectName: lesson.subject,
                     hoursPerWeek: Number(lesson.hoursPerWeek),
                     subjectId: matchedSubject?.id ?? null,
+                    createSubject: !matchedSubject,
                     teacherId: null,
+                    teacherWasAutoAssigned: false,
+                    hasMultipleDefaultTeachers: false,
                     studentGroupId: wholeClassGroup.id,
                     classGroupId
                 };
+
+                applyDefaultTeacherToCurriculumRow(row);
+
+                return row;
             });
 
         const source = definition.source ?? {};
@@ -1119,6 +1267,14 @@ function renderCurriculumPreview() {
         emptySubject.textContent = text.curriculumMissingSubject;
         subjectSelect.appendChild(emptySubject);
 
+        if (row.createSubject && !row.subjectId) {
+            const createOption = document.createElement("option");
+            createOption.value = "__create__";
+            createOption.textContent =
+                `${text.curriculumCreateSubject}: ${row.sourceSubjectName}`;
+            subjectSelect.appendChild(createOption);
+        }
+
         availableSubjects.forEach(subject => {
             const option = document.createElement("option");
             option.value = subject.id;
@@ -1126,17 +1282,9 @@ function renderCurriculumPreview() {
             subjectSelect.appendChild(option);
         });
 
-        subjectSelect.value =
-            row.subjectId?.toString() ?? "";
-
-        subjectSelect.addEventListener("change", () => {
-            row.subjectId =
-                Number(subjectSelect.value) || null;
-            updateCurriculumRowStatus(tr, row);
-        });
-
-        subjectCell.appendChild(subjectSelect);
-        tr.appendChild(subjectCell);
+        subjectSelect.value = row.createSubject
+            ? "__create__"
+            : row.subjectId?.toString() ?? "";
 
         const teacherCell = document.createElement("td");
         const teacherSelect = document.createElement("select");
@@ -1156,11 +1304,42 @@ function renderCurriculumPreview() {
             teacherSelect.appendChild(option);
         });
 
+        teacherSelect.value =
+            row.teacherId?.toString() ?? "";
+
+        subjectSelect.addEventListener("change", () => {
+            if (subjectSelect.value === "__create__") {
+                row.subjectId = null;
+                row.createSubject = true;
+                row.teacherWasAutoAssigned = false;
+                row.hasMultipleDefaultTeachers = false;
+            } else {
+                row.subjectId =
+                    Number(subjectSelect.value) || null;
+                row.createSubject = false;
+                row.teacherId = null;
+
+                applyDefaultTeacherToCurriculumRow(row);
+
+                teacherSelect.value =
+                    row.teacherId?.toString() ?? "";
+            }
+
+            updateCurriculumRowStatus(tr, row);
+        });
+
         teacherSelect.addEventListener("change", () => {
             row.teacherId =
                 Number(teacherSelect.value) || null;
+
+            // A manual selection always wins over the suggested default.
+            row.teacherWasAutoAssigned = false;
+
             updateCurriculumRowStatus(tr, row);
         });
+
+        subjectCell.appendChild(subjectSelect);
+        tr.appendChild(subjectCell);
 
         teacherCell.appendChild(teacherSelect);
         tr.appendChild(teacherCell);
@@ -1182,7 +1361,7 @@ function updateCurriculumRowStatus(rowElement, row) {
 
     const text = getLessonsPageText();
 
-    if (!row.subjectId) {
+    if (!row.subjectId && !row.createSubject) {
         statusCell.textContent =
             text.curriculumMissingSubject;
         return;
@@ -1190,7 +1369,15 @@ function updateCurriculumRowStatus(rowElement, row) {
 
     if (!row.teacherId) {
         statusCell.textContent =
-            text.curriculumMissingTeacher;
+            row.hasMultipleDefaultTeachers
+                ? text.curriculumMultipleTeachers
+                : text.curriculumMissingTeacher;
+        return;
+    }
+
+    if (row.createSubject) {
+        statusCell.textContent =
+            text.curriculumCreateSubjectStatus;
         return;
     }
 
@@ -1206,7 +1393,8 @@ async function confirmCurriculumImport() {
 
     const incomplete =
         curriculumPreviewRows.find(row =>
-            !row.subjectId || !row.teacherId
+            (!row.subjectId && !row.createSubject) ||
+            !row.teacherId
         );
 
     if (incomplete) {
@@ -1231,6 +1419,8 @@ async function confirmCurriculumImport() {
 
     try {
         for (const row of curriculumPreviewRows) {
+            await ensureCurriculumSubject(row);
+
             const response = await fetch(
                 `/api/requirements?organizationId=${encodeURIComponent(
                     organizationId

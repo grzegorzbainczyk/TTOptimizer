@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title data-i18n="teachers.pageTitle">ClassFlow - Teachers</title>
+    <title>ClassFlow - Teachers</title>
 
     <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -14,11 +14,11 @@
         <header class="app-header teachers-header">
             <div class="teachers-header-content">
                 <div>
-                    <span class="teachers-page-label" data-i18n="common.organizationResources">Organization resources</span>
-                    <h1 data-i18n="teachers.title">Teachers</h1>
+                    <span class="teachers-page-label">Organization resources</span>
+                    <h1>Teachers</h1>
 
                     <p class="page-subtitle">
-                        <span data-i18n="teachers.subtitle">Manage teachers, aliases and availability for your organization.</span>
+                        Manage teachers, aliases and availability for your organization.
                     </p>
                 </div>
 
@@ -41,9 +41,9 @@
         <main class="content-card teachers-card">
             <div class="section-header teachers-section-header">
                 <div>
-                    <h2 data-i18n="teachers.listTitle">Teachers list</h2>
+                    <h2>Teachers list</h2>
                     <p class="teachers-section-description">
-                        <span data-i18n="teachers.listDescription">Add teachers, edit their details and configure scheduling preferences.</span>
+                        Add teachers, edit their details and configure scheduling preferences.
                     </p>
                 </div>
 
@@ -51,7 +51,7 @@
                     <button id="importTeachersButton"
                             class="secondary-button"
                             type="button">
-                        <span data-i18n="common.importXlsx">Import XLSX</span>
+                        Import XLSX
                     </button>
 
                     <input id="teacherImportFileInput"
@@ -62,7 +62,7 @@
                     <button id="addTeacherButton"
                             class="main-action-button teachers-add-button"
                             type="button">
-                        <span aria-hidden="true">+</span> <span data-i18n="teachers.add">Add teacher</span>
+                        <span aria-hidden="true">+</span> Add teacher
                     </button>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                      hidden>
 
                 <h3 id="teacherFormTitle">
-                    <span data-i18n="teachers.add">Add teacher</span>
+                    Add teacher
                 </h3>
 
                 <input id="teacherId"
@@ -81,18 +81,18 @@
                 <div class="form-grid teachers-form-grid">
                     <div class="form-field">
                         <label for="teacherNumber">
-                            <span data-i18n="teachers.number">Teacher number</span>
+                            Teacher number
                         </label>
 
                         <input id="teacherNumber"
                                type="text"
                                readonly
-                               placeholder="Assigned automatically" data-i18n-placeholder="teachers.numberAuto" />
+                               placeholder="Assigned automatically" />
                     </div>
 
                     <div class="form-field">
                         <label for="teacherName">
-                            <span data-i18n="common.name">Name</span>
+                            Name
                         </label>
 
                         <input id="teacherName"
@@ -103,41 +103,41 @@
 
                     <div class="form-field">
                         <label for="teacherAlias">
-                            <span data-i18n="teachers.alias">Alias</span>
+                            Alias
                         </label>
 
                         <input id="teacherAlias"
                                type="text"
                                maxlength="30"
-                               placeholder="Generated automatically" data-i18n-placeholder="teachers.aliasAuto" />
+                               placeholder="Generated automatically" />
 
                         <small>
-                            <span data-i18n="teachers.aliasHelp">Leave empty when adding to generate an alias.</span>
+                            Leave empty when adding to generate an alias.
                         </small>
                     </div>
 
                     <div class="form-field form-field-full-width">
                         <label for="teacherInfo">
-                            <span data-i18n="common.info">Info</span>
+                            Info
                         </label>
 
                         <textarea id="teacherInfo"
                                   maxlength="2000"
                                   rows="4"
-                                  placeholder="Optional notes about the teacher" data-i18n-placeholder="teachers.infoPlaceholder"></textarea>
+                                  placeholder="Optional notes about the teacher"></textarea>
                     </div>
                 </div>
 
                 <div class="form-actions teachers-form-actions">
                     <button id="saveTeacherButton"
                             class="main-action-button"
-                            type="button" data-i18n="common.save">
+                            type="button">
                         Save
                     </button>
 
                     <button id="cancelTeacherButton"
                             class="secondary-button"
-                            type="button" data-i18n="common.cancel">
+                            type="button">
                         Cancel
                     </button>
                 </div>
@@ -148,15 +148,92 @@
                 </p>
             </section>
 
+            <section id="teacherAssignmentsSection"
+                     class="resource-form-section teachers-form-section"
+                     hidden>
+
+                <div class="section-header teachers-section-header">
+                    <div>
+                        <h3 id="teacherAssignmentsTitle">
+                            Teaching assignments
+                        </h3>
+                        <p class="teachers-section-description">
+                            Define which subjects and classes this teacher normally teaches.
+                            These assignments can later be used as defaults during curriculum import.
+                        </p>
+                    </div>
+
+                    <button id="closeTeacherAssignmentsButton"
+                            class="secondary-button"
+                            type="button">
+                        Close
+                    </button>
+                </div>
+
+                <input id="assignmentTeacherId" type="hidden" />
+
+                <div class="form-grid teachers-form-grid">
+                    <div class="form-field">
+                        <label for="assignmentSubjectId">
+                            Subject
+                        </label>
+                        <select id="assignmentSubjectId">
+                            <option value="">Select subject</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="assignmentClassGroupId">
+                            Class
+                        </label>
+                        <select id="assignmentClassGroupId">
+                            <option value="">Select class</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions teachers-form-actions">
+                    <button id="addTeacherAssignmentButton"
+                            class="main-action-button"
+                            type="button">
+                        Add assignment
+                    </button>
+                </div>
+
+                <p id="teacherAssignmentsMessage"
+                   class="form-message"
+                   aria-live="polite">
+                </p>
+
+                <div class="table-wrapper teachers-table-wrapper">
+                    <table class="data-table teachers-table"
+                           id="teacherAssignmentsTable">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Class</th>
+                                <th class="table-actions-column">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="3">No assignments loaded.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <section id="teacherImportPreviewSection"
                      class="resource-form-section"
                      hidden>
 
                 <div class="section-header teachers-section-header">
                     <div>
-                        <h3 data-i18n="common.importPreview">Import preview</h3>
-                        <p data-i18n="teachers.importDescription">
-                            Review the teachers read from the XLSX file. Nothing has been saved yet.
+                        <h3>Import preview</h3>
+                        <p>
+                            Review the teachers read from the XLSX file.
+                            Nothing has been saved yet.
                         </p>
                     </div>
 
@@ -165,12 +242,12 @@
                                 class="main-action-button"
                                 type="button"
                                 disabled>
-                            <span data-i18n="teachers.importConfirm">Import teachers</span>
+                            Import teachers
                         </button>
 
                         <button id="closeTeacherImportPreviewButton"
                                 class="secondary-button"
-                                type="button" data-i18n="common.close">
+                                type="button">
                             Close
                         </button>
                     </div>
@@ -186,9 +263,9 @@
                            id="teacherImportPreviewTable">
                         <thead>
                             <tr>
-                                <th data-i18n="common.row">Row</th>
-                                <th data-i18n="common.name">Name</th>
-                                <th data-i18n="common.status">Status</th>
+                                <th>Row</th>
+                                <th>Name</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
 
@@ -208,12 +285,12 @@
 
                     <thead>
                         <tr>
-                            <th class="teacher-number-column" data-i18n="teachers.tableNumber">Number</th>
-                            <th data-i18n="common.name">Name</th>
-                            <th class="teacher-alias-column" data-i18n="teachers.alias">Alias</th>
-                            <th data-i18n="common.info">Info</th>
+                            <th class="teacher-number-column">Number</th>
+                            <th>Name</th>
+                            <th class="teacher-alias-column">Alias</th>
+                            <th>Info</th>
                             <th class="table-actions-column">
-                                <span data-i18n="common.actions">Actions</span>
+                                Actions
                             </th>
                         </tr>
                     </thead>
@@ -231,6 +308,6 @@
     </div>
 
     <script src="js/appContext.js"></script>
-    <script type="module" src="js/teachers.js"></script>
+    <script src="js/teachers.js"></script>
 </body>
 </html>

@@ -48,6 +48,51 @@ public class RequirementsController : ControllerBase
         return Ok(requirements);
     }
 
+    [HttpGet("curriculum-context")]
+    public async Task<IActionResult> GetCurriculumContext(
+        [FromQuery] int organizationId,
+        [FromQuery] int classGroupId)
+    {
+        if (organizationId <= 0)
+            return BadRequest(new { message = "Organization ID is required." });
+
+        if (classGroupId <= 0)
+            return BadRequest(new { message = "Class is required." });
+
+        var classExists = await _db.ClassGroups
+            .AsNoTracking()
+            .AnyAsync(x =>
+                x.Id == classGroupId &&
+                x.OrganizationId == organizationId);
+
+        if (!classExists)
+            return NotFound(new { message = "Class was not found." });
+
+        var teacherAssignments = await _db.TeacherAssignments
+            .AsNoTracking()
+            .Where(x =>
+                x.OrganizationId == organizationId &&
+                x.ClassGroupId == classGroupId)
+            .OrderBy(x => x.Subject.Name)
+            .ThenBy(x => x.Teacher.Name)
+            .Select(x => new
+            {
+                x.Id,
+                x.SubjectId,
+                SubjectName = x.Subject.Name,
+                x.TeacherId,
+                TeacherName = x.Teacher.Name
+            })
+            .ToListAsync();
+
+        return Ok(new
+        {
+            classGroupId,
+            teacherAssignments
+        });
+    }
+
+
     [HttpGet("{id:int}")]
     public async Task<ActionResult<LessonRequirementDTO>> GetRequirement(int id, [FromQuery] int organizationId)
     {
