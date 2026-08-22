@@ -2,6 +2,8 @@ let availableTeachers = [];
 let availableStudentGroups = [];
 let availableSubjects = [];
 let availableClasses = [];
+let curriculumDefinition = null;
+let curriculumPreviewRows = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
     configureLessonsPageLanguage();
@@ -34,6 +36,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         "click",
         openAddRequirementForm
     );
+
+    document.getElementById("importCurriculumButton")
+        ?.addEventListener("click", openCurriculumImport);
+
+    document.getElementById("cancelCurriculumImportButton")
+        ?.addEventListener("click", closeCurriculumImport);
+
+    document.getElementById("loadCurriculumPreviewButton")
+        ?.addEventListener("click", loadCurriculumPreview);
+
+    document.getElementById("confirmCurriculumImportButton")
+        ?.addEventListener("click", confirmCurriculumImport);
 
     saveRequirementButton?.addEventListener(
         "click",
@@ -85,6 +99,25 @@ function getLessonsPageText() {
             listDescription:
                 "Określ grupę uczniów, przedmiot, nauczyciela i liczbę lekcji w tygodniu.",
             addLesson: "Dodaj lekcję",
+            importCurriculum: "Importuj z ramowego planu",
+            curriculumTitle: "Import z ramowego planu nauczania",
+            curriculumClass: "Klasa",
+            curriculumGrade: "Poziom klasy",
+            curriculumSchoolYear: "Rok szkolny",
+            curriculumLoadPreview: "Wczytaj podgląd",
+            curriculumCreateLessons: "Utwórz lekcje",
+            curriculumSubject: "Przedmiot",
+            curriculumHours: "Godziny/tydzień",
+            curriculumMappedSubject: "Przedmiot w ClassFlow",
+            curriculumTeacher: "Nauczyciel",
+            curriculumStatus: "Status",
+            curriculumReady: "Gotowe",
+            curriculumMissingSubject: "Wybierz przedmiot",
+            curriculumMissingTeacher: "Wybierz nauczyciela",
+            curriculumSelectClass: "Wybierz klasę",
+            curriculumSelectGrade: "Wybierz poziom",
+            curriculumCreated: "Lekcje zostały utworzone.",
+            curriculumPartialError: "Nie udało się utworzyć wszystkich lekcji.",
             addLessonForm: "Dodaj lekcję",
             editLessonForm: "Edytuj lekcję",
             additionalLesson: "Zajęcia dodatkowe",
@@ -108,6 +141,25 @@ function getLessonsPageText() {
         listDescription:
             "Choose the student group, subject, teacher and number of lessons per week.",
         addLesson: "Add lesson",
+        importCurriculum: "Import from curriculum",
+        curriculumTitle: "Import from official curriculum",
+        curriculumClass: "Class",
+        curriculumGrade: "Grade",
+        curriculumSchoolYear: "School year",
+        curriculumLoadPreview: "Load preview",
+        curriculumCreateLessons: "Create lessons",
+        curriculumSubject: "Subject",
+        curriculumHours: "Hours/week",
+        curriculumMappedSubject: "ClassFlow subject",
+        curriculumTeacher: "Teacher",
+        curriculumStatus: "Status",
+        curriculumReady: "Ready",
+        curriculumMissingSubject: "Select subject",
+        curriculumMissingTeacher: "Select teacher",
+        curriculumSelectClass: "Select class",
+        curriculumSelectGrade: "Select grade",
+        curriculumCreated: "Lessons were created.",
+        curriculumPartialError: "Not all lessons could be created.",
         addLessonForm: "Add lesson",
         editLessonForm: "Edit lesson",
         additionalLesson: "Additional lesson",
@@ -141,6 +193,18 @@ function configureLessonsPageLanguage() {
     setText("requirementsListTitle", text.listTitle);
     setText("requirementsListDescription", text.listDescription);
     setText("addRequirementButtonLabel", text.addLesson);
+    setText("importCurriculumButtonLabel", text.importCurriculum);
+    setText("curriculumImportTitle", text.curriculumTitle);
+    setText("curriculumClassLabel", text.curriculumClass);
+    setText("curriculumGradeLabel", text.curriculumGrade);
+    setText("curriculumSchoolYearLabel", text.curriculumSchoolYear);
+    setText("loadCurriculumPreviewButton", text.curriculumLoadPreview);
+    setText("confirmCurriculumImportButton", text.curriculumCreateLessons);
+    setText("curriculumPreviewSubjectHeader", text.curriculumSubject);
+    setText("curriculumPreviewHoursHeader", text.curriculumHours);
+    setText("curriculumPreviewMappedSubjectHeader", text.curriculumMappedSubject);
+    setText("curriculumPreviewTeacherHeader", text.curriculumTeacher);
+    setText("curriculumPreviewStatusHeader", text.curriculumStatus);
     setText("requirementIsAdditionalLabel", text.additionalLesson);
     setText("requirementIsAdditionalHelp", text.additionalLessonHelp);
     setText("newStudentGroupButton", text.newItem);
@@ -297,10 +361,12 @@ async function loadClasses() {
             : data?.classes ?? data?.classGroups ?? [];
 
         populateNewStudentGroupClassOptions();
+        populateCurriculumClassOptions();
     } catch (error) {
         console.error("Error loading classes:", error);
         availableClasses = [];
         populateNewStudentGroupClassOptions();
+        populateCurriculumClassOptions();
     }
 }
 
@@ -835,6 +901,405 @@ async function saveNewSubject() {
     }
 }
 
+
+function populateCurriculumClassOptions() {
+    const select = document.getElementById("curriculumClassId");
+    if (!select) return;
+
+    const text = getLessonsPageText();
+    const selectedValue = select.value;
+    select.innerHTML = "";
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = text.curriculumSelectClass;
+    select.appendChild(emptyOption);
+
+    availableClasses.forEach(classGroup => {
+        const option = document.createElement("option");
+        option.value = classGroup.id;
+        option.textContent = classGroup.name;
+        select.appendChild(option);
+    });
+
+    select.value = selectedValue;
+}
+
+function openCurriculumImport() {
+    closeRequirementForm();
+
+    const section = document.getElementById("curriculumImportSection");
+    if (!section) return;
+
+    document.getElementById("curriculumClassId").value = "";
+    document.getElementById("curriculumGrade").value = "";
+    document.getElementById("curriculumSchoolYear").value = "2026/2027";
+    document.getElementById("curriculumPreviewContainer").hidden = true;
+    document.getElementById("curriculumSourceInfo").textContent = "";
+    showCurriculumImportMessage("", false);
+
+    section.hidden = false;
+    document.getElementById("curriculumClassId").focus();
+}
+
+function closeCurriculumImport() {
+    const section = document.getElementById("curriculumImportSection");
+    if (section) section.hidden = true;
+
+    curriculumPreviewRows = [];
+    const preview = document.getElementById("curriculumPreviewContainer");
+    if (preview) preview.hidden = true;
+    showCurriculumImportMessage("", false);
+}
+
+function normalizeCurriculumName(value) {
+    return (value ?? "")
+        .toString()
+        .trim()
+        .toLocaleLowerCase("pl-PL")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, " ");
+}
+
+function findMatchingSubject(subjectName) {
+    const normalized = normalizeCurriculumName(subjectName);
+
+    return availableSubjects.find(subject =>
+        normalizeCurriculumName(subject.name) === normalized
+    ) ?? null;
+}
+
+function findWholeClassStudentGroup(classGroupId) {
+    const classId = Number(classGroupId);
+
+    return availableStudentGroups.find(group =>
+        Number(group.classGroupId) === classId &&
+        (
+            group.type === 0 ||
+            group.type === "WholeClass" ||
+            group.typeName === "WholeClass"
+        )
+    ) ?? availableStudentGroups.find(group =>
+        Number(group.classGroupId) === classId
+    ) ?? null;
+}
+
+async function loadCurriculumDefinition(schoolYear) {
+    if (schoolYear !== "2026/2027") {
+        throw new Error(`Unsupported school year: ${schoolYear}`);
+    }
+
+    if (curriculumDefinition?.schoolYear === schoolYear) {
+        return curriculumDefinition;
+    }
+
+    const response = await fetch(
+        "/data/curricula/pl/primary-school/2026-2027.json",
+        { cache: "no-cache" }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            `Could not load curriculum data. Status: ${response.status}`
+        );
+    }
+
+    curriculumDefinition = await response.json();
+    return curriculumDefinition;
+}
+
+async function loadCurriculumPreview() {
+    const text = getLessonsPageText();
+    const classGroupId = Number(
+        document.getElementById("curriculumClassId").value
+    );
+    const grade = Number(
+        document.getElementById("curriculumGrade").value
+    );
+    const schoolYear =
+        document.getElementById("curriculumSchoolYear").value;
+
+    if (classGroupId <= 0) {
+        showCurriculumImportMessage(text.curriculumSelectClass, true);
+        return;
+    }
+
+    if (!Number.isInteger(grade) || grade < 1 || grade > 8) {
+        showCurriculumImportMessage(text.curriculumSelectGrade, true);
+        return;
+    }
+
+    const wholeClassGroup =
+        findWholeClassStudentGroup(classGroupId);
+
+    if (!wholeClassGroup) {
+        showCurriculumImportMessage(
+            "Whole-class student group was not found for the selected class.",
+            true
+        );
+        return;
+    }
+
+    try {
+        const definition =
+            await loadCurriculumDefinition(schoolYear);
+
+        const gradeDefinition =
+            definition.grades?.find(item =>
+                Number(item.grade) === grade
+            );
+
+        if (!gradeDefinition) {
+            throw new Error(
+                `Curriculum for grade ${grade} was not found.`
+            );
+        }
+
+        curriculumPreviewRows =
+            (gradeDefinition.lessons ?? []).map((lesson, index) => {
+                const matchedSubject =
+                    findMatchingSubject(lesson.subject);
+
+                return {
+                    index,
+                    sourceSubjectName: lesson.subject,
+                    hoursPerWeek: Number(lesson.hoursPerWeek),
+                    subjectId: matchedSubject?.id ?? null,
+                    teacherId: null,
+                    studentGroupId: wholeClassGroup.id,
+                    classGroupId
+                };
+            });
+
+        const source = definition.source ?? {};
+        document.getElementById("curriculumSourceInfo").textContent =
+            `${source.journal ?? ""}` +
+            (gradeDefinition.sourceAnnex
+                ? `, annex ${gradeDefinition.sourceAnnex}`
+                : "");
+
+        renderCurriculumPreview();
+        document.getElementById(
+            "curriculumPreviewContainer"
+        ).hidden = false;
+
+        showCurriculumImportMessage("", false);
+    } catch (error) {
+        console.error("Error loading curriculum preview:", error);
+        showCurriculumImportMessage(
+            error instanceof Error
+                ? error.message
+                : "Could not load curriculum preview.",
+            true
+        );
+    }
+}
+
+function renderCurriculumPreview() {
+    const tbody =
+        document.querySelector("#curriculumPreviewTable tbody");
+
+    if (!tbody) return;
+
+    const text = getLessonsPageText();
+    tbody.innerHTML = "";
+
+    curriculumPreviewRows.forEach(row => {
+        const tr = document.createElement("tr");
+
+        tr.appendChild(createTableCell(row.sourceSubjectName));
+        tr.appendChild(createTableCell(row.hoursPerWeek));
+
+        const subjectCell = document.createElement("td");
+        const subjectSelect = document.createElement("select");
+
+        const emptySubject = document.createElement("option");
+        emptySubject.value = "";
+        emptySubject.textContent = text.curriculumMissingSubject;
+        subjectSelect.appendChild(emptySubject);
+
+        availableSubjects.forEach(subject => {
+            const option = document.createElement("option");
+            option.value = subject.id;
+            option.textContent = subject.name;
+            subjectSelect.appendChild(option);
+        });
+
+        subjectSelect.value =
+            row.subjectId?.toString() ?? "";
+
+        subjectSelect.addEventListener("change", () => {
+            row.subjectId =
+                Number(subjectSelect.value) || null;
+            updateCurriculumRowStatus(tr, row);
+        });
+
+        subjectCell.appendChild(subjectSelect);
+        tr.appendChild(subjectCell);
+
+        const teacherCell = document.createElement("td");
+        const teacherSelect = document.createElement("select");
+
+        const emptyTeacher = document.createElement("option");
+        emptyTeacher.value = "";
+        emptyTeacher.textContent = text.curriculumMissingTeacher;
+        teacherSelect.appendChild(emptyTeacher);
+
+        availableTeachers.forEach(teacher => {
+            const option = document.createElement("option");
+            option.value = teacher.id;
+            option.textContent =
+                teacher.alias
+                    ? `${teacher.name} (${teacher.alias})`
+                    : teacher.name;
+            teacherSelect.appendChild(option);
+        });
+
+        teacherSelect.addEventListener("change", () => {
+            row.teacherId =
+                Number(teacherSelect.value) || null;
+            updateCurriculumRowStatus(tr, row);
+        });
+
+        teacherCell.appendChild(teacherSelect);
+        tr.appendChild(teacherCell);
+
+        const statusCell = document.createElement("td");
+        statusCell.className = "curriculum-row-status";
+        tr.appendChild(statusCell);
+
+        updateCurriculumRowStatus(tr, row);
+        tbody.appendChild(tr);
+    });
+}
+
+function updateCurriculumRowStatus(rowElement, row) {
+    const statusCell =
+        rowElement.querySelector(".curriculum-row-status");
+
+    if (!statusCell) return;
+
+    const text = getLessonsPageText();
+
+    if (!row.subjectId) {
+        statusCell.textContent =
+            text.curriculumMissingSubject;
+        return;
+    }
+
+    if (!row.teacherId) {
+        statusCell.textContent =
+            text.curriculumMissingTeacher;
+        return;
+    }
+
+    statusCell.textContent = text.curriculumReady;
+}
+
+async function confirmCurriculumImport() {
+    const text = getLessonsPageText();
+
+    if (curriculumPreviewRows.length === 0) {
+        return;
+    }
+
+    const incomplete =
+        curriculumPreviewRows.find(row =>
+            !row.subjectId || !row.teacherId
+        );
+
+    if (incomplete) {
+        showCurriculumImportMessage(
+            `${text.curriculumMissingSubject} / ${text.curriculumMissingTeacher}`,
+            true
+        );
+        return;
+    }
+
+    const organizationId =
+        window.appContext.requireOrganizationId();
+
+    const button =
+        document.getElementById(
+            "confirmCurriculumImportButton"
+        );
+
+    if (button) button.disabled = true;
+
+    let createdCount = 0;
+
+    try {
+        for (const row of curriculumPreviewRows) {
+            const response = await fetch(
+                `/api/requirements?organizationId=${encodeURIComponent(
+                    organizationId
+                )}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: null,
+                        teacherId: row.teacherId,
+                        studentGroupId: row.studentGroupId,
+                        subjectId: row.subjectId,
+                        hoursPerWeek: row.hoursPerWeek,
+                        priority: 1,
+                        isAdditional: false
+                    })
+                }
+            );
+
+            const data = await readJsonResponse(response);
+
+            if (!response.ok) {
+                throw new Error(
+                    getApiErrorMessage(
+                        data,
+                        `Could not create lesson. Status: ${response.status}`
+                    )
+                );
+            }
+
+            createdCount++;
+        }
+
+        showCurriculumImportMessage(
+            text.curriculumCreated,
+            false
+        );
+
+        await loadRequirements();
+        document.getElementById(
+            "curriculumPreviewContainer"
+        ).hidden = true;
+        curriculumPreviewRows = [];
+    } catch (error) {
+        console.error("Error importing curriculum:", error);
+
+        showCurriculumImportMessage(
+            `${text.curriculumPartialError} ` +
+            `${createdCount}/${curriculumPreviewRows.length}. ` +
+            (error instanceof Error ? error.message : ""),
+            true
+        );
+    } finally {
+        if (button) button.disabled = false;
+    }
+}
+
+function showCurriculumImportMessage(message, isError) {
+    const element =
+        document.getElementById("curriculumImportMessage");
+
+    if (!element) return;
+
+    element.textContent = message;
+    element.classList.toggle("error-message", isError);
+}
+
 function handleAdditionalLessonChanged() {
     const checkbox =
         document.getElementById("requirementIsAdditional");
@@ -867,6 +1332,7 @@ function clearQuickCreateMessage(id) {
 }
 
 function openAddRequirementForm() {
+    closeCurriculumImport();
     document.getElementById(
         "requirementId"
     ).value = "";

@@ -1,0 +1,354 @@
+{
+  "country": "PL",
+  "schoolType": "PrimarySchool",
+  "schoolYear": "2026/2027",
+  "source": {
+    "title": "Rozporządzenie Ministra Edukacji z dnia 22 lipca 2026 r. w sprawie ramowych planów nauczania dla publicznych szkół",
+    "journal": "Dz.U. 2026 poz. 1028",
+    "effectiveFrom": "2026-09-01",
+    "eli": "https://eli.gov.pl/eli/DU/2026/1028/ogl",
+    "annexUsage": {
+      "1": "klasy I i IV",
+      "15": "klasy II, III oraz V-VIII"
+    }
+  },
+  "notes": [
+    "Godziny do dyspozycji dyrektora nie są automatycznie zamieniane na LessonRequirement.",
+    "Religia/etyka oraz inne zajęcia zależne od odrębnych przepisów nie są automatycznie tworzone.",
+    "W klasach I-III edukacja wczesnoszkolna jest pozostawiona jako jeden przedmiot."
+  ],
+  "grades": [
+    {
+      "grade": 1,
+      "sourceAnnex": 1,
+      "lessons": [
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "hoursPerWeek": 21
+        }
+      ]
+    },
+    {
+      "grade": 2,
+      "sourceAnnex": 15,
+      "lessons": [
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "hoursPerWeek": 20
+        }
+      ]
+    },
+    {
+      "grade": 3,
+      "sourceAnnex": 15,
+      "lessons": [
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "hoursPerWeek": 20
+        }
+      ]
+    },
+    {
+      "grade": 4,
+      "sourceAnnex": 1,
+      "lessons": [
+        {
+          "subject": "Język polski",
+          "hoursPerWeek": 5
+        },
+        {
+          "subject": "Język obcy nowożytny",
+          "hoursPerWeek": 3
+        },
+        {
+          "subject": "Muzyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Plastyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Historia",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Przyroda",
+          "hoursPerWeek": 3
+        },
+        {
+          "subject": "Matematyka",
+          "hoursPerWeek": 4
+        },
+        {
+          "subject": "Informatyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Zajęcia praktyczno-techniczne",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Wychowanie fizyczne",
+          "hoursPerWeek": 4
+        },
+        {
+          "subject": "Edukacja zdrowotna",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Zajęcia z wychowawcą",
+          "hoursPerWeek": 1
+        }
+      ]
+    },
+    {
+      "grade": 5,
+      "sourceAnnex": 15,
+      "lessons": [
+        {
+          "subject": "Język polski",
+          "hoursPerWeek": 5
+        },
+        {
+          "subject": "Język obcy nowożytny",
+          "hoursPerWeek": 3
+        },
+        {
+          "subject": "Muzyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Plastyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Historia",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Geografia",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Biologia",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Matematyka",
+          "hoursPerWeek": 4
+        },
+        {
+          "subject": "Informatyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Technika",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Wychowanie fizyczne",
+          "hoursPerWeek": 4
+        },
+        {
+          "subject": "Edukacja zdrowotna",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Zajęcia z wychowawcą",
+          "hoursPerWeek": 1
+        }
+      ]
+    },
+    {
+      "grade": 6,
+      "sourceAnnex": 15,
+      "lessons": [
+        {
+          "subject": "Język polski",
+          "hoursPerWeek": 5
+        },
+        {
+          "subject": "Język obcy nowożytny",
+          "hoursPerWeek": 3
+        },
+        {
+          "subject": "Muzyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Plastyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Historia",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Geografia",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Biologia",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Matematyka",
+          "hoursPerWeek": 4
+        },
+        {
+          "subject": "Informatyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Technika",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Wychowanie fizyczne",
+          "hoursPerWeek": 4
+        },
+        {
+          "subject": "Edukacja zdrowotna",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Zajęcia z wychowawcą",
+          "hoursPerWeek": 1
+        }
+      ]
+    },
+    {
+      "grade": 7,
+      "sourceAnnex": 15,
+      "lessons": [
+        {
+          "subject": "Język polski",
+          "hoursPerWeek": 5
+        },
+        {
+          "subject": "Język obcy nowożytny",
+          "hoursPerWeek": 3
+        },
+        {
+          "subject": "Drugi język obcy nowożytny albo język łaciński",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Muzyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Plastyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Historia",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Geografia",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Biologia",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Chemia",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Fizyka",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Matematyka",
+          "hoursPerWeek": 4
+        },
+        {
+          "subject": "Informatyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Wychowanie fizyczne",
+          "hoursPerWeek": 4
+        },
+        {
+          "subject": "Edukacja zdrowotna",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Zajęcia z wychowawcą",
+          "hoursPerWeek": 1
+        }
+      ]
+    },
+    {
+      "grade": 8,
+      "sourceAnnex": 15,
+      "lessons": [
+        {
+          "subject": "Język polski",
+          "hoursPerWeek": 5
+        },
+        {
+          "subject": "Język obcy nowożytny",
+          "hoursPerWeek": 3
+        },
+        {
+          "subject": "Drugi język obcy nowożytny albo język łaciński",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Historia",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Wiedza o społeczeństwie",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Geografia",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Biologia",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Chemia",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Fizyka",
+          "hoursPerWeek": 2
+        },
+        {
+          "subject": "Matematyka",
+          "hoursPerWeek": 4
+        },
+        {
+          "subject": "Informatyka",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Wychowanie fizyczne",
+          "hoursPerWeek": 4
+        },
+        {
+          "subject": "Edukacja dla bezpieczeństwa",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Edukacja zdrowotna",
+          "hoursPerWeek": 1
+        },
+        {
+          "subject": "Zajęcia z wychowawcą",
+          "hoursPerWeek": 1
+        }
+      ]
+    }
+  ]
+}

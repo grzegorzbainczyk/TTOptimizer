@@ -15,4 +15,7 @@ public class Teacher
     public string? Info { get; set; }
 
     public Organization Organization { get; set; } = null!;
+
+    public ICollection<TeacherAssignment> Assignments { get; set; }
+        = new List<TeacherAssignment>();
 }
