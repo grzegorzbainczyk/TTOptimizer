@@ -2,9 +2,12 @@ let availableTeachers = [];
 let availableStudentGroups = [];
 let availableSubjects = [];
 let availableClasses = [];
+let availableRequirements = [];
 let curriculumDefinition = null;
 let curriculumPreviewRows = [];
 let curriculumTeacherAssignments = [];
+let teachingPlanRowFilter = "all";
+let teachingPlanClassSelections = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
     configureLessonsPageLanguage();
@@ -49,6 +52,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById("confirmCurriculumImportButton")
         ?.addEventListener("click", confirmCurriculumImport);
+
+    document.getElementById("selectAllTeachingPlanClasses")
+        ?.addEventListener("change", handleSelectAllTeachingPlanClasses);
+
+    document.getElementById("showAllTeachingPlanRowsButton")
+        ?.addEventListener("click", () => setTeachingPlanRowFilter("all"));
+
+    document.getElementById("showTeachingPlanIssuesButton")
+        ?.addEventListener("click", () => setTeachingPlanRowFilter("issues"));
 
     saveRequirementButton?.addEventListener(
         "click",
@@ -100,18 +112,52 @@ function getLessonsPageText() {
             listDescription:
                 "Określ grupę uczniów, przedmiot, nauczyciela i liczbę lekcji w tygodniu.",
             addLesson: "Dodaj lekcję",
-            importCurriculum: "Importuj z ramowego planu",
+            importCurriculum: "Importuj plan nauczania",
             curriculumTitle: "Import z ramowego planu nauczania",
             curriculumClass: "Klasa",
             curriculumGrade: "Poziom klasy",
             curriculumSchoolYear: "Rok szkolny",
-            curriculumLoadPreview: "Wczytaj podgląd",
-            curriculumCreateLessons: "Utwórz lekcje",
+            curriculumLoadPreview: "Przygotuj import",
+            curriculumCreateLessons: "Importuj gotowe pozycje",
             curriculumSubject: "Przedmiot",
             curriculumHours: "Godziny/tydzień",
             curriculumMappedSubject: "Przedmiot w ClassFlow",
             curriculumTeacher: "Nauczyciel",
             curriculumStatus: "Status",
+        teachingPlanClassSelectionDescription:
+            "Select the classes to prepare. Check the grade for every selected class before creating the preview.",
+        teachingPlanClassHeader: "Class",
+        teachingPlanGradeHeader: "Grade",
+        teachingPlanSummaryTitle: "Import summary",
+        teachingPlanPreviewClassHeader: "Class",
+        teachingPlanAll: "All",
+        teachingPlanIssues: "Needs attention",
+        teachingPlanReadyItems: "Ready",
+        teachingPlanNewSubjects: "New subjects",
+        teachingPlanIssuesCount: "Needs attention",
+        teachingPlanDuplicates: "Already exists",
+        teachingPlanDuplicate: "Already exists",
+        teachingPlanSelectAtLeastOneClass: "Select at least one class.",
+        teachingPlanMissingGrade: "Choose a grade for every selected class.",
+        teachingPlanImported: "Import completed.",
+        teachingPlanNothingReady: "There are no ready items to import.",
+            teachingPlanClassSelectionDescription:
+                "Wybierz klasy do przygotowania. Przed podglądem sprawdź poziom każdej klasy.",
+            teachingPlanClassHeader: "Klasa",
+            teachingPlanGradeHeader: "Poziom",
+            teachingPlanSummaryTitle: "Podsumowanie importu",
+            teachingPlanPreviewClassHeader: "Klasa",
+            teachingPlanAll: "Wszystko",
+            teachingPlanIssues: "Wymaga uwagi",
+            teachingPlanReadyItems: "Gotowe",
+            teachingPlanNewSubjects: "Nowe przedmioty",
+            teachingPlanIssuesCount: "Wymaga uwagi",
+            teachingPlanDuplicates: "Już istnieje",
+            teachingPlanDuplicate: "Już istnieje",
+            teachingPlanSelectAtLeastOneClass: "Wybierz co najmniej jedną klasę.",
+            teachingPlanMissingGrade: "Uzupełnij poziom dla każdej wybranej klasy.",
+            teachingPlanImported: "Import zakończony.",
+            teachingPlanNothingReady: "Nie ma gotowych pozycji do importu.",
             curriculumReady: "Gotowe",
             curriculumMissingSubject: "Wybierz przedmiot",
             curriculumMissingTeacher: "Wybierz nauczyciela",
@@ -146,13 +192,13 @@ function getLessonsPageText() {
         listDescription:
             "Choose the student group, subject, teacher and number of lessons per week.",
         addLesson: "Add lesson",
-        importCurriculum: "Import from curriculum",
-        curriculumTitle: "Import from official curriculum",
+        importCurriculum: "Import teaching plan",
+        curriculumTitle: "Import from teaching plan",
         curriculumClass: "Class",
         curriculumGrade: "Grade",
         curriculumSchoolYear: "School year",
-        curriculumLoadPreview: "Load preview",
-        curriculumCreateLessons: "Create lessons",
+        curriculumLoadPreview: "Prepare import",
+        curriculumCreateLessons: "Import ready items",
         curriculumSubject: "Subject",
         curriculumHours: "Hours/week",
         curriculumMappedSubject: "ClassFlow subject",
@@ -214,6 +260,13 @@ function configureLessonsPageLanguage() {
     setText("curriculumPreviewMappedSubjectHeader", text.curriculumMappedSubject);
     setText("curriculumPreviewTeacherHeader", text.curriculumTeacher);
     setText("curriculumPreviewStatusHeader", text.curriculumStatus);
+    setText("teachingPlanClassSelectionDescription", text.teachingPlanClassSelectionDescription);
+    setText("teachingPlanClassHeader", text.teachingPlanClassHeader);
+    setText("teachingPlanGradeHeader", text.teachingPlanGradeHeader);
+    setText("teachingPlanSummaryTitle", text.teachingPlanSummaryTitle);
+    setText("teachingPlanPreviewClassHeader", text.teachingPlanPreviewClassHeader);
+    setText("showAllTeachingPlanRowsButton", text.teachingPlanAll);
+    setText("showTeachingPlanIssuesButton", text.teachingPlanIssues);
     setText("requirementIsAdditionalLabel", text.additionalLesson);
     setText("requirementIsAdditionalHelp", text.additionalLessonHelp);
     setText("newStudentGroupButton", text.newItem);
@@ -418,6 +471,7 @@ async function loadRequirements() {
             ? data
             : data?.requirements ?? [];
 
+        availableRequirements = requirements;
         renderRequirements(requirements);
         updateRequirementsCount(requirements.length);
     } catch (error) {
@@ -912,53 +966,168 @@ async function saveNewSubject() {
 
 
 function populateCurriculumClassOptions() {
-    const select = document.getElementById("curriculumClassId");
-    if (!select) return;
+    const tbody =
+        document.querySelector("#teachingPlanClassesTable tbody");
 
-    const text = getLessonsPageText();
-    const selectedValue = select.value;
-    select.innerHTML = "";
+    if (!tbody) return;
 
-    const emptyOption = document.createElement("option");
-    emptyOption.value = "";
-    emptyOption.textContent = text.curriculumSelectClass;
-    select.appendChild(emptyOption);
+    teachingPlanClassSelections = availableClasses.map(classGroup => ({
+        classGroupId: Number(classGroup.id),
+        className: classGroup.name ?? `Class #${classGroup.id}`,
+        grade: inferGradeFromClassName(classGroup.name),
+        selected: true
+    }));
 
-    availableClasses.forEach(classGroup => {
-        const option = document.createElement("option");
-        option.value = classGroup.id;
-        option.textContent = classGroup.name;
-        select.appendChild(option);
+    renderTeachingPlanClassSelections();
+}
+
+function inferGradeFromClassName(className) {
+    const match = (className ?? "")
+        .toString()
+        .trim()
+        .match(/(?:^|\D)([1-8])(?:\D|$)/);
+
+    return match ? Number(match[1]) : null;
+}
+
+function renderTeachingPlanClassSelections() {
+    const tbody =
+        document.querySelector("#teachingPlanClassesTable tbody");
+
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    teachingPlanClassSelections.forEach(selection => {
+        const row = document.createElement("tr");
+
+        const selectedCell = document.createElement("td");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = selection.selected;
+        checkbox.setAttribute(
+            "aria-label",
+            `Select ${selection.className}`
+        );
+
+        checkbox.addEventListener("change", () => {
+            selection.selected = checkbox.checked;
+            updateSelectAllTeachingPlanClassesState();
+        });
+
+        selectedCell.appendChild(checkbox);
+        row.appendChild(selectedCell);
+        row.appendChild(createTableCell(selection.className));
+
+        const gradeCell = document.createElement("td");
+        const gradeSelect = document.createElement("select");
+
+        const emptyOption = document.createElement("option");
+        emptyOption.value = "";
+        emptyOption.textContent =
+            getLessonsPageText().curriculumSelectGrade;
+        gradeSelect.appendChild(emptyOption);
+
+        for (let grade = 1; grade <= 8; grade++) {
+            const option = document.createElement("option");
+            option.value = grade.toString();
+            option.textContent = grade.toString();
+            gradeSelect.appendChild(option);
+        }
+
+        gradeSelect.value =
+            selection.grade?.toString() ?? "";
+
+        gradeSelect.addEventListener("change", () => {
+            selection.grade =
+                Number(gradeSelect.value) || null;
+        });
+
+        gradeCell.appendChild(gradeSelect);
+        row.appendChild(gradeCell);
+        tbody.appendChild(row);
     });
 
-    select.value = selectedValue;
+    updateSelectAllTeachingPlanClassesState();
+}
+
+function handleSelectAllTeachingPlanClasses(event) {
+    const selected = Boolean(event.target?.checked);
+
+    teachingPlanClassSelections.forEach(item => {
+        item.selected = selected;
+    });
+
+    renderTeachingPlanClassSelections();
+}
+
+function updateSelectAllTeachingPlanClassesState() {
+    const checkbox =
+        document.getElementById("selectAllTeachingPlanClasses");
+
+    if (!checkbox) return;
+
+    const selectedCount =
+        teachingPlanClassSelections.filter(item => item.selected).length;
+
+    checkbox.checked =
+        teachingPlanClassSelections.length > 0 &&
+        selectedCount === teachingPlanClassSelections.length;
+
+    checkbox.indeterminate =
+        selectedCount > 0 &&
+        selectedCount < teachingPlanClassSelections.length;
 }
 
 function openCurriculumImport() {
     closeRequirementForm();
 
-    const section = document.getElementById("curriculumImportSection");
+    const section =
+        document.getElementById("curriculumImportSection");
+
     if (!section) return;
 
-    document.getElementById("curriculumClassId").value = "";
-    document.getElementById("curriculumGrade").value = "";
-    document.getElementById("curriculumSchoolYear").value = "2026/2027";
-    document.getElementById("curriculumPreviewContainer").hidden = true;
-    document.getElementById("curriculumSourceInfo").textContent = "";
+    document.getElementById("curriculumSchoolYear").value =
+        "2026/2027";
+
+    teachingPlanRowFilter = "all";
+    curriculumPreviewRows = [];
+    curriculumTeacherAssignments = [];
+
+    populateCurriculumClassOptions();
+
+    document.getElementById(
+        "curriculumPreviewContainer"
+    ).hidden = true;
+
+    document.getElementById(
+        "curriculumSourceInfo"
+    ).textContent = "";
+
     showCurriculumImportMessage("", false);
 
     section.hidden = false;
-    document.getElementById("curriculumClassId").focus();
 }
 
 function closeCurriculumImport() {
-    const section = document.getElementById("curriculumImportSection");
-    if (section) section.hidden = true;
+    const section =
+        document.getElementById("curriculumImportSection");
+
+    if (section) {
+        section.hidden = true;
+    }
 
     curriculumPreviewRows = [];
     curriculumTeacherAssignments = [];
-    const preview = document.getElementById("curriculumPreviewContainer");
-    if (preview) preview.hidden = true;
+    teachingPlanRowFilter = "all";
+
+    const preview =
+        document.getElementById("curriculumPreviewContainer");
+
+    if (preview) {
+        preview.hidden = true;
+    }
+
     showCurriculumImportMessage("", false);
 }
 
@@ -973,7 +1142,8 @@ function normalizeCurriculumName(value) {
 }
 
 function findMatchingSubject(subjectName) {
-    const normalized = normalizeCurriculumName(subjectName);
+    const normalized =
+        normalizeCurriculumName(subjectName);
 
     return availableSubjects.find(subject =>
         normalizeCurriculumName(subject.name) === normalized
@@ -983,6 +1153,9 @@ function findMatchingSubject(subjectName) {
 function findWholeClassStudentGroup(classGroupId) {
     const classId = Number(classGroupId);
 
+    // Do not fall back to an arbitrary subgroup. Importing a whole-class
+    // teaching-plan item into a random subgroup would be wonderfully efficient
+    // at creating the wrong timetable.
     return availableStudentGroups.find(group =>
         Number(group.classGroupId) === classId &&
         (
@@ -990,14 +1163,14 @@ function findWholeClassStudentGroup(classGroupId) {
             group.type === "WholeClass" ||
             group.typeName === "WholeClass"
         )
-    ) ?? availableStudentGroups.find(group =>
-        Number(group.classGroupId) === classId
     ) ?? null;
 }
 
 async function loadCurriculumDefinition(schoolYear) {
     if (schoolYear !== "2026/2027") {
-        throw new Error(`Unsupported school year: ${schoolYear}`);
+        throw new Error(
+            `Unsupported school year: ${schoolYear}`
+        );
     }
 
     if (curriculumDefinition?.schoolYear === schoolYear) {
@@ -1011,7 +1184,7 @@ async function loadCurriculumDefinition(schoolYear) {
 
     if (!response.ok) {
         throw new Error(
-            `Could not load curriculum data. Status: ${response.status}`
+            `Could not load teaching plan data. Status: ${response.status}`
         );
     }
 
@@ -1019,43 +1192,56 @@ async function loadCurriculumDefinition(schoolYear) {
     return curriculumDefinition;
 }
 
-
-async function loadCurriculumTeacherAssignments(classGroupId) {
+async function loadTeachingPlanAssignmentsForClasses(classSelections) {
     const organizationId =
         window.appContext.requireOrganizationId();
 
-    const response = await fetch(
-        `/api/requirements/curriculum-context?organizationId=${encodeURIComponent(
-            organizationId
-        )}&classGroupId=${encodeURIComponent(classGroupId)}`
-    );
+    const result = [];
 
-    const data = await readJsonResponse(response);
-
-    if (!response.ok) {
-        throw new Error(
-            getApiErrorMessage(
-                data,
-                getLessonsPageText().curriculumContextError
-            )
+    await Promise.all(classSelections.map(async selection => {
+        const response = await fetch(
+            `/api/requirements/curriculum-context?organizationId=${encodeURIComponent(
+                organizationId
+            )}&classGroupId=${encodeURIComponent(
+                selection.classGroupId
+            )}`
         );
-    }
 
-    curriculumTeacherAssignments =
-        Array.isArray(data?.teacherAssignments)
-            ? data.teacherAssignments
-            : [];
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    getLessonsPageText().curriculumContextError
+                )
+            );
+        }
+
+        const assignments =
+            Array.isArray(data?.teacherAssignments)
+                ? data.teacherAssignments
+                : [];
+
+        assignments.forEach(assignment => {
+            result.push({
+                ...assignment,
+                classGroupId: selection.classGroupId
+            });
+        });
+    }));
+
+    curriculumTeacherAssignments = result;
 }
 
-function getTeacherAssignmentsForSubject(subjectId) {
-    const normalizedSubjectId = Number(subjectId);
-
-    if (normalizedSubjectId <= 0) {
+function getTeacherAssignmentsForRow(row) {
+    if (!row.subjectId) {
         return [];
     }
 
     return curriculumTeacherAssignments.filter(assignment =>
-        Number(assignment.subjectId) === normalizedSubjectId
+        Number(assignment.classGroupId) === Number(row.classGroupId) &&
+        Number(assignment.subjectId) === Number(row.subjectId)
     );
 }
 
@@ -1068,10 +1254,12 @@ function applyDefaultTeacherToCurriculumRow(row) {
     }
 
     const assignments =
-        getTeacherAssignmentsForSubject(row.subjectId);
+        getTeacherAssignmentsForRow(row);
 
     if (assignments.length === 1) {
-        row.teacherId = Number(assignments[0].teacherId);
+        row.teacherId =
+            Number(assignments[0].teacherId);
+
         row.teacherWasAutoAssigned = true;
         return;
     }
@@ -1082,128 +1270,122 @@ function applyDefaultTeacherToCurriculumRow(row) {
     }
 }
 
-async function ensureCurriculumSubject(row) {
-    if (row.subjectId) {
-        return row.subjectId;
-    }
+function isExistingTeachingPlanRequirement(row) {
+    const subjectName =
+        row.subjectId
+            ? availableSubjects.find(
+                subject => Number(subject.id) === Number(row.subjectId)
+            )?.name
+            : row.sourceSubjectName;
 
-    if (!row.createSubject) {
-        return null;
-    }
+    const normalizedSubject =
+        normalizeCurriculumName(subjectName);
 
-    const organizationId =
-        window.appContext.requireOrganizationId();
-
-    const response = await fetch(
-        `/api/subjects?organizationId=${encodeURIComponent(
-            organizationId
-        )}`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name: row.sourceSubjectName,
-                info: null
-            })
-        }
+    return availableRequirements.some(requirement =>
+        Number(requirement.studentGroupId) === Number(row.studentGroupId) &&
+        normalizeCurriculumName(requirement.subjectName) === normalizedSubject &&
+        !Boolean(requirement.isAdditional)
     );
+}
 
-    const data = await readJsonResponse(response);
+function refreshTeachingPlanRowState(row) {
+    row.isDuplicate =
+        isExistingTeachingPlanRequirement(row);
 
-    if (response.ok) {
-        row.subjectId = Number(data?.id) || null;
-        row.createSubject = false;
+    row.needsAttention =
+        !row.isDuplicate &&
+        (
+            (!row.subjectId && !row.createSubject) ||
+            !row.teacherId ||
+            row.hasMultipleDefaultTeachers
+        );
 
-        if (!row.subjectId) {
-            throw new Error(
-                `Subject "${row.sourceSubjectName}" was created but its ID was not returned.`
-            );
-        }
-
-        return row.subjectId;
-    }
-
-    // A concurrent change or a repeated import may have created the subject
-    // after the preview was loaded. Reload and try to match it before failing.
-    if (response.status === 409) {
-        await loadSubjects();
-
-        const matchedSubject =
-            findMatchingSubject(row.sourceSubjectName);
-
-        if (matchedSubject) {
-            row.subjectId = matchedSubject.id;
-            row.createSubject = false;
-            return row.subjectId;
-        }
-    }
-
-    throw new Error(
-        getApiErrorMessage(
-            data,
-            `Could not create subject "${row.sourceSubjectName}". Status: ${response.status}`
-        )
-    );
+    row.isReady =
+        !row.isDuplicate &&
+        !row.needsAttention &&
+        (Boolean(row.subjectId) || row.createSubject) &&
+        Boolean(row.teacherId);
 }
 
 async function loadCurriculumPreview() {
     const text = getLessonsPageText();
-    const classGroupId = Number(
-        document.getElementById("curriculumClassId").value
-    );
-    const grade = Number(
-        document.getElementById("curriculumGrade").value
-    );
     const schoolYear =
         document.getElementById("curriculumSchoolYear").value;
 
-    if (classGroupId <= 0) {
-        showCurriculumImportMessage(text.curriculumSelectClass, true);
-        return;
-    }
+    const selectedClasses =
+        teachingPlanClassSelections.filter(item => item.selected);
 
-    if (!Number.isInteger(grade) || grade < 1 || grade > 8) {
-        showCurriculumImportMessage(text.curriculumSelectGrade, true);
-        return;
-    }
-
-    const wholeClassGroup =
-        findWholeClassStudentGroup(classGroupId);
-
-    if (!wholeClassGroup) {
+    if (selectedClasses.length === 0) {
         showCurriculumImportMessage(
-            "Whole-class student group was not found for the selected class.",
+            text.teachingPlanSelectAtLeastOneClass,
+            true
+        );
+        return;
+    }
+
+    if (selectedClasses.some(item =>
+        !Number.isInteger(item.grade) ||
+        item.grade < 1 ||
+        item.grade > 8
+    )) {
+        showCurriculumImportMessage(
+            text.teachingPlanMissingGrade,
             true
         );
         return;
     }
 
     try {
+        showCurriculumImportMessage("", false);
+
+        // Requirements GET ensures WholeClass groups exist. Reload afterwards
+        // so the frontend sees groups that may just have been created.
+        await loadRequirements();
+        await loadStudentGroups();
+
         const definition =
             await loadCurriculumDefinition(schoolYear);
 
-        const gradeDefinition =
-            definition.grades?.find(item =>
-                Number(item.grade) === grade
-            );
+        await loadTeachingPlanAssignmentsForClasses(
+            selectedClasses
+        );
 
-        if (!gradeDefinition) {
-            throw new Error(
-                `Curriculum for grade ${grade} was not found.`
-            );
-        }
+        const rows = [];
 
-        await loadCurriculumTeacherAssignments(classGroupId);
+        for (const selection of selectedClasses) {
+            const wholeClassGroup =
+                findWholeClassStudentGroup(
+                    selection.classGroupId
+                );
 
-        curriculumPreviewRows =
-            (gradeDefinition.lessons ?? []).map((lesson, index) => {
+            if (!wholeClassGroup) {
+                throw new Error(
+                    `Whole-class student group was not found for ${selection.className}.`
+                );
+            }
+
+            const gradeDefinition =
+                definition.grades?.find(item =>
+                    Number(item.grade) ===
+                    Number(selection.grade)
+                );
+
+            if (!gradeDefinition) {
+                throw new Error(
+                    `Teaching plan for grade ${selection.grade} was not found.`
+                );
+            }
+
+            for (const lesson of gradeDefinition.lessons ?? []) {
                 const matchedSubject =
                     findMatchingSubject(lesson.subject);
 
                 const row = {
-                    index,
+                    index: rows.length,
+                    classGroupId: selection.classGroupId,
+                    className: selection.className,
+                    grade: selection.grade,
+                    studentGroupId: wholeClassGroup.id,
                     sourceSubjectName: lesson.subject,
                     hoursPerWeek: Number(lesson.hoursPerWeek),
                     subjectId: matchedSubject?.id ?? null,
@@ -1211,37 +1393,65 @@ async function loadCurriculumPreview() {
                     teacherId: null,
                     teacherWasAutoAssigned: false,
                     hasMultipleDefaultTeachers: false,
-                    studentGroupId: wholeClassGroup.id,
-                    classGroupId
+                    isDuplicate: false,
+                    needsAttention: false,
+                    isReady: false
                 };
 
                 applyDefaultTeacherToCurriculumRow(row);
+                refreshTeachingPlanRowState(row);
+                rows.push(row);
+            }
+        }
 
-                return row;
-            });
+        curriculumPreviewRows = rows;
+        teachingPlanRowFilter = "all";
 
         const source = definition.source ?? {};
-        document.getElementById("curriculumSourceInfo").textContent =
-            `${source.journal ?? ""}` +
-            (gradeDefinition.sourceAnnex
-                ? `, annex ${gradeDefinition.sourceAnnex}`
-                : "");
+
+        document.getElementById(
+            "curriculumSourceInfo"
+        ).textContent =
+            `${source.journal ?? ""}`;
 
         renderCurriculumPreview();
+        updateTeachingPlanSummary();
+
         document.getElementById(
             "curriculumPreviewContainer"
         ).hidden = false;
-
-        showCurriculumImportMessage("", false);
     } catch (error) {
-        console.error("Error loading curriculum preview:", error);
+        console.error(
+            "Error preparing teaching plan import:",
+            error
+        );
+
         showCurriculumImportMessage(
             error instanceof Error
                 ? error.message
-                : "Could not load curriculum preview.",
+                : "Could not prepare teaching plan import.",
             true
         );
     }
+}
+
+function setTeachingPlanRowFilter(filter) {
+    teachingPlanRowFilter =
+        filter === "issues"
+            ? "issues"
+            : "all";
+
+    renderCurriculumPreview();
+}
+
+function getVisibleTeachingPlanRows() {
+    if (teachingPlanRowFilter === "issues") {
+        return curriculumPreviewRows.filter(row =>
+            row.needsAttention
+        );
+    }
+
+    return curriculumPreviewRows;
 }
 
 function renderCurriculumPreview() {
@@ -1253,9 +1463,27 @@ function renderCurriculumPreview() {
     const text = getLessonsPageText();
     tbody.innerHTML = "";
 
-    curriculumPreviewRows.forEach(row => {
+    const visibleRows =
+        getVisibleTeachingPlanRows();
+
+    if (visibleRows.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 6;
+        cell.className = "teachers-table-state";
+        cell.textContent =
+            teachingPlanRowFilter === "issues"
+                ? "No items require attention."
+                : "No teaching-plan items found.";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+        return;
+    }
+
+    visibleRows.forEach(row => {
         const tr = document.createElement("tr");
 
+        tr.appendChild(createTableCell(row.className));
         tr.appendChild(createTableCell(row.sourceSubjectName));
         tr.appendChild(createTableCell(row.hoursPerWeek));
 
@@ -1264,7 +1492,8 @@ function renderCurriculumPreview() {
 
         const emptySubject = document.createElement("option");
         emptySubject.value = "";
-        emptySubject.textContent = text.curriculumMissingSubject;
+        emptySubject.textContent =
+            text.curriculumMissingSubject;
         subjectSelect.appendChild(emptySubject);
 
         if (row.createSubject && !row.subjectId) {
@@ -1282,16 +1511,18 @@ function renderCurriculumPreview() {
             subjectSelect.appendChild(option);
         });
 
-        subjectSelect.value = row.createSubject
-            ? "__create__"
-            : row.subjectId?.toString() ?? "";
+        subjectSelect.value =
+            row.createSubject
+                ? "__create__"
+                : row.subjectId?.toString() ?? "";
 
         const teacherCell = document.createElement("td");
         const teacherSelect = document.createElement("select");
 
         const emptyTeacher = document.createElement("option");
         emptyTeacher.value = "";
-        emptyTeacher.textContent = text.curriculumMissingTeacher;
+        emptyTeacher.textContent =
+            text.curriculumMissingTeacher;
         teacherSelect.appendChild(emptyTeacher);
 
         availableTeachers.forEach(teacher => {
@@ -1311,11 +1542,13 @@ function renderCurriculumPreview() {
             if (subjectSelect.value === "__create__") {
                 row.subjectId = null;
                 row.createSubject = true;
+                row.teacherId = null;
                 row.teacherWasAutoAssigned = false;
                 row.hasMultipleDefaultTeachers = false;
             } else {
                 row.subjectId =
                     Number(subjectSelect.value) || null;
+
                 row.createSubject = false;
                 row.teacherId = null;
 
@@ -1325,17 +1558,21 @@ function renderCurriculumPreview() {
                     row.teacherId?.toString() ?? "";
             }
 
+            refreshTeachingPlanRowState(row);
             updateCurriculumRowStatus(tr, row);
+            updateTeachingPlanSummary();
         });
 
         teacherSelect.addEventListener("change", () => {
             row.teacherId =
                 Number(teacherSelect.value) || null;
 
-            // A manual selection always wins over the suggested default.
             row.teacherWasAutoAssigned = false;
+            row.hasMultipleDefaultTeachers = false;
 
+            refreshTeachingPlanRowState(row);
             updateCurriculumRowStatus(tr, row);
+            updateTeachingPlanSummary();
         });
 
         subjectCell.appendChild(subjectSelect);
@@ -1361,6 +1598,12 @@ function updateCurriculumRowStatus(rowElement, row) {
 
     const text = getLessonsPageText();
 
+    if (row.isDuplicate) {
+        statusCell.textContent =
+            text.teachingPlanDuplicate;
+        return;
+    }
+
     if (!row.subjectId && !row.createSubject) {
         statusCell.textContent =
             text.curriculumMissingSubject;
@@ -1381,25 +1624,66 @@ function updateCurriculumRowStatus(rowElement, row) {
         return;
     }
 
-    statusCell.textContent = text.curriculumReady;
+    statusCell.textContent =
+        text.curriculumReady;
+}
+
+function updateTeachingPlanSummary() {
+    const element =
+        document.getElementById("teachingPlanSummary");
+
+    if (!element) return;
+
+    const text = getLessonsPageText();
+
+    curriculumPreviewRows.forEach(
+        refreshTeachingPlanRowState
+    );
+
+    const classCount =
+        new Set(
+            curriculumPreviewRows.map(row => row.classGroupId)
+        ).size;
+
+    const readyCount =
+        curriculumPreviewRows.filter(row => row.isReady).length;
+
+    const issueCount =
+        curriculumPreviewRows.filter(row => row.needsAttention).length;
+
+    const duplicateCount =
+        curriculumPreviewRows.filter(row => row.isDuplicate).length;
+
+    const newSubjectCount =
+        new Set(
+            curriculumPreviewRows
+                .filter(row => row.createSubject)
+                .map(row => normalizeCurriculumName(
+                    row.sourceSubjectName
+                ))
+        ).size;
+
+    element.textContent =
+        `${classCount} class(es) · ` +
+        `${curriculumPreviewRows.length} item(s) · ` +
+        `${text.teachingPlanReadyItems}: ${readyCount} · ` +
+        `${text.teachingPlanNewSubjects}: ${newSubjectCount} · ` +
+        `${text.teachingPlanIssuesCount}: ${issueCount} · ` +
+        `${text.teachingPlanDuplicates}: ${duplicateCount}`;
 }
 
 async function confirmCurriculumImport() {
     const text = getLessonsPageText();
 
-    if (curriculumPreviewRows.length === 0) {
-        return;
-    }
+    const readyRows =
+        curriculumPreviewRows.filter(row => {
+            refreshTeachingPlanRowState(row);
+            return row.isReady;
+        });
 
-    const incomplete =
-        curriculumPreviewRows.find(row =>
-            (!row.subjectId && !row.createSubject) ||
-            !row.teacherId
-        );
-
-    if (incomplete) {
+    if (readyRows.length === 0) {
         showCurriculumImportMessage(
-            `${text.curriculumMissingSubject} / ${text.curriculumMissingTeacher}`,
+            text.teachingPlanNothingReady,
             true
         );
         return;
@@ -1413,70 +1697,78 @@ async function confirmCurriculumImport() {
             "confirmCurriculumImportButton"
         );
 
-    if (button) button.disabled = true;
-
-    let createdCount = 0;
+    if (button) {
+        button.disabled = true;
+    }
 
     try {
-        for (const row of curriculumPreviewRows) {
-            await ensureCurriculumSubject(row);
-
-            const response = await fetch(
-                `/api/requirements?organizationId=${encodeURIComponent(
-                    organizationId
-                )}`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        name: null,
+        const response = await fetch(
+            `/api/requirements/import-teaching-plan?organizationId=${encodeURIComponent(
+                organizationId
+            )}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    items: readyRows.map(row => ({
+                        classGroupId: row.classGroupId,
                         teacherId: row.teacherId,
-                        studentGroupId: row.studentGroupId,
                         subjectId: row.subjectId,
-                        hoursPerWeek: row.hoursPerWeek,
-                        priority: 1,
-                        isAdditional: false
-                    })
-                }
-            );
-
-            const data = await readJsonResponse(response);
-
-            if (!response.ok) {
-                throw new Error(
-                    getApiErrorMessage(
-                        data,
-                        `Could not create lesson. Status: ${response.status}`
-                    )
-                );
+                        subjectName:
+                            row.subjectId
+                                ? null
+                                : row.sourceSubjectName,
+                        hoursPerWeek: row.hoursPerWeek
+                    }))
+                })
             }
+        );
 
-            createdCount++;
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not import teaching plan. Status: ${response.status}`
+                )
+            );
         }
 
         showCurriculumImportMessage(
-            text.curriculumCreated,
+            `${text.teachingPlanImported} ` +
+            `${data?.createdRequirements ?? readyRows.length} lesson(s), ` +
+            `${data?.createdSubjects ?? 0} new subject(s), ` +
+            `${data?.skippedDuplicates ?? 0} duplicate(s) skipped.`,
             false
         );
 
-        await loadRequirements();
+        await refreshPageData();
+
+        curriculumPreviewRows = [];
+        curriculumTeacherAssignments = [];
+
         document.getElementById(
             "curriculumPreviewContainer"
         ).hidden = true;
-        curriculumPreviewRows = [];
     } catch (error) {
-        console.error("Error importing curriculum:", error);
+        console.error(
+            "Error importing teaching plan:",
+            error
+        );
 
         showCurriculumImportMessage(
-            `${text.curriculumPartialError} ` +
-            `${createdCount}/${curriculumPreviewRows.length}. ` +
-            (error instanceof Error ? error.message : ""),
+            error instanceof Error
+                ? error.message
+                : "Could not import teaching plan.",
             true
         );
     } finally {
-        if (button) button.disabled = false;
+        if (button) {
+            button.disabled = false;
+        }
     }
 }
 
@@ -1487,7 +1779,10 @@ function showCurriculumImportMessage(message, isError) {
     if (!element) return;
 
     element.textContent = message;
-    element.classList.toggle("error-message", isError);
+    element.classList.toggle(
+        "error-message",
+        isError
+    );
 }
 
 function handleAdditionalLessonChanged() {

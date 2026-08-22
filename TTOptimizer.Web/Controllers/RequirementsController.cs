@@ -93,6 +93,225 @@ public class RequirementsController : ControllerBase
     }
 
 
+    [HttpPost("import-teaching-plan")]
+    public async Task<IActionResult> ImportTeachingPlan(
+        [FromQuery] int organizationId,
+        [FromBody] ImportTeachingPlanRequest request)
+    {
+        if (organizationId <= 0)
+            return BadRequest(new { message = "Organization ID is required." });
+
+        if (request.Items == null || request.Items.Count == 0)
+            return BadRequest(new { message = "At least one teaching-plan item is required." });
+
+        var organizationExists = await _db.Organizations
+            .AsNoTracking()
+            .AnyAsync(x => x.Id == organizationId);
+
+        if (!organizationExists)
+            return NotFound(new { message = "Organization was not found." });
+
+        await EnsureWholeClassGroupsAsync(organizationId);
+
+        var classIds = request.Items
+            .Select(x => x.ClassGroupId)
+            .Distinct()
+            .ToList();
+
+        var teacherIds = request.Items
+            .Select(x => x.TeacherId)
+            .Distinct()
+            .ToList();
+
+        var classes = await _db.ClassGroups
+            .AsNoTracking()
+            .Where(x =>
+                x.OrganizationId == organizationId &&
+                classIds.Contains(x.Id))
+            .Select(x => x.Id)
+            .ToListAsync();
+
+        if (classes.Count != classIds.Count)
+            return BadRequest(new { message = "One or more classes were not found." });
+
+        var teachers = await _db.Teachers
+            .AsNoTracking()
+            .Where(x =>
+                x.OrganizationId == organizationId &&
+                teacherIds.Contains(x.Id))
+            .Select(x => x.Id)
+            .ToListAsync();
+
+        if (teachers.Count != teacherIds.Count)
+            return BadRequest(new { message = "One or more teachers were not found." });
+
+        var wholeClassGroups = await _db.StudentGroups
+            .AsNoTracking()
+            .Where(x =>
+                x.OrganizationId == organizationId &&
+                x.Type == StudentGroupType.WholeClass &&
+                x.ClassGroupId.HasValue &&
+                classIds.Contains(x.ClassGroupId.Value))
+            .ToDictionaryAsync(
+                x => x.ClassGroupId!.Value,
+                x => x.Id);
+
+        if (wholeClassGroups.Count != classIds.Count)
+            return BadRequest(new { message = "A whole-class student group is missing for one or more classes." });
+
+        var requestedSubjectIds = request.Items
+            .Where(x => x.SubjectId.HasValue && x.SubjectId.Value > 0)
+            .Select(x => x.SubjectId!.Value)
+            .Distinct()
+            .ToList();
+
+        var existingSubjects = await _db.Subjects
+            .Where(x =>
+                x.OrganizationId == organizationId &&
+                requestedSubjectIds.Contains(x.Id))
+            .ToListAsync();
+
+        if (existingSubjects.Count != requestedSubjectIds.Count)
+            return BadRequest(new { message = "One or more subjects were not found." });
+
+        var allOrganizationSubjects = await _db.Subjects
+            .Where(x => x.OrganizationId == organizationId)
+            .ToListAsync();
+
+        var subjectsById =
+            existingSubjects.ToDictionary(x => x.Id);
+
+        var subjectsByName =
+            allOrganizationSubjects.ToDictionary(
+                x => NormalizeTeachingPlanSubjectName(x.Name),
+                StringComparer.OrdinalIgnoreCase);
+
+        await using var transaction =
+            await _db.Database.BeginTransactionAsync();
+
+        try
+        {
+            var createdSubjects = 0;
+
+            foreach (var item in request.Items.Where(x => !x.SubjectId.HasValue || x.SubjectId.Value <= 0))
+            {
+                var subjectName = item.SubjectName?.Trim();
+
+                if (string.IsNullOrWhiteSpace(subjectName))
+                    return BadRequest(new { message = "Subject name is required for a new subject." });
+
+                if (subjectName.Length > 100)
+                    return BadRequest(new { message = $"Subject name '{subjectName}' is too long." });
+
+                var key = NormalizeTeachingPlanSubjectName(subjectName);
+
+                if (!subjectsByName.TryGetValue(key, out var subject))
+                {
+                    subject = new Subject
+                    {
+                        OrganizationId = organizationId,
+                        Name = subjectName,
+                        Info = null
+                    };
+
+                    _db.Subjects.Add(subject);
+                    await _db.SaveChangesAsync();
+
+                    subjectsByName[key] = subject;
+                    createdSubjects++;
+                }
+
+                item.ResolvedSubjectId = subject.Id;
+            }
+
+            foreach (var item in request.Items.Where(x => x.SubjectId.HasValue && x.SubjectId.Value > 0))
+            {
+                item.ResolvedSubjectId = item.SubjectId!.Value;
+            }
+
+            var studentGroupIds =
+                wholeClassGroups.Values.ToList();
+
+            var existingRequirements = await _db.LessonRequirements
+                .AsNoTracking()
+                .Where(x =>
+                    x.OrganizationId == organizationId &&
+                    x.StudentGroupId.HasValue &&
+                    studentGroupIds.Contains(x.StudentGroupId.Value) &&
+                    !x.IsAdditional)
+                .Select(x => new
+                {
+                    StudentGroupId = x.StudentGroupId!.Value,
+                    x.SubjectId
+                })
+                .ToListAsync();
+
+            var existingKeys = existingRequirements
+                .Select(x => (x.StudentGroupId, x.SubjectId))
+                .ToHashSet();
+
+            var createdRequirements = 0;
+            var skippedDuplicates = 0;
+            var requestKeys = new HashSet<(int StudentGroupId, int SubjectId)>();
+
+            foreach (var item in request.Items)
+            {
+                if (item.HoursPerWeek is < 1 or > 40)
+                    return BadRequest(new { message = "Hours per week must be between 1 and 40." });
+
+                var studentGroupId =
+                    wholeClassGroups[item.ClassGroupId];
+
+                var subjectId =
+                    item.ResolvedSubjectId;
+
+                var key = (studentGroupId, subjectId);
+
+                if (existingKeys.Contains(key) || !requestKeys.Add(key))
+                {
+                    skippedDuplicates++;
+                    continue;
+                }
+
+                _db.LessonRequirements.Add(
+                    new LessonRequirement
+                    {
+                        OrganizationId = organizationId,
+                        Name = null,
+                        IsAdditional = false,
+                        TeacherId = item.TeacherId,
+                        StudentGroupId = studentGroupId,
+                        ClassGroupId = item.ClassGroupId,
+                        SubjectId = subjectId,
+                        HoursPerWeek = item.HoursPerWeek,
+                        Priority = LessonPriority.Normal
+                    });
+
+                createdRequirements++;
+            }
+
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return Ok(new
+            {
+                success = true,
+                createdSubjects,
+                createdRequirements,
+                skippedDuplicates
+            });
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    private static string NormalizeTeachingPlanSubjectName(string value) =>
+        value.Trim().ToUpperInvariant();
+
+
     [HttpGet("{id:int}")]
     public async Task<ActionResult<LessonRequirementDTO>> GetRequirement(int id, [FromQuery] int organizationId)
     {
@@ -231,3 +450,24 @@ public class RequirementsController : ControllerBase
         await _db.SaveChangesAsync();
     }
 }
+
+public class ImportTeachingPlanRequest
+{
+    public List<ImportTeachingPlanItemRequest> Items { get; set; } = new();
+}
+
+public class ImportTeachingPlanItemRequest
+{
+    public int ClassGroupId { get; set; }
+
+    public int TeacherId { get; set; }
+
+    public int? SubjectId { get; set; }
+
+    public string? SubjectName { get; set; }
+
+    public int HoursPerWeek { get; set; }
+
+    public int ResolvedSubjectId { get; set; }
+}
+

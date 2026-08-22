@@ -30,7 +30,7 @@
 
 <div class="teachers-header-actions">
 <button class="secondary-button teachers-add-button" id="importCurriculumButton" type="button">
-                    <span id="importCurriculumButtonLabel">Import from curriculum</span>
+                    <span id="importCurriculumButtonLabel">Import teaching plan</span>
                 </button>
                 <button class="primary-button teachers-add-button" id="addRequirementButton" type="button"><span aria-hidden="true">+</span>
                     <span id="addRequirementButtonLabel">Add lesson</span>
@@ -39,31 +39,9 @@
 </div>
 
 <section class="resource-form-section teachers-form-section" hidden id="curriculumImportSection">
-    <h3 id="curriculumImportTitle">Import from curriculum</h3>
+    <h3 id="curriculumImportTitle">Import from teaching plan</h3>
 
     <div class="form-grid teachers-form-grid">
-        <div class="form-field">
-            <label id="curriculumClassLabel" for="curriculumClassId">Class</label>
-            <select id="curriculumClassId">
-                <option value="">Select class</option>
-            </select>
-        </div>
-
-        <div class="form-field">
-            <label id="curriculumGradeLabel" for="curriculumGrade">Grade</label>
-            <select id="curriculumGrade">
-                <option value="">Select grade</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-            </select>
-        </div>
-
         <div class="form-field">
             <label id="curriculumSchoolYearLabel" for="curriculumSchoolYear">School year</label>
             <select id="curriculumSchoolYear">
@@ -72,9 +50,30 @@
         </div>
     </div>
 
+    <div class="teachers-section-description" id="teachingPlanClassSelectionDescription">
+        Select the classes to prepare. Check the grade for every class before creating the preview.
+    </div>
+
+    <div class="table-wrapper teachers-table-wrapper">
+        <table class="data-table teachers-table" id="teachingPlanClassesTable">
+            <thead>
+                <tr>
+                    <th>
+                        <input id="selectAllTeachingPlanClasses"
+                               type="checkbox"
+                               aria-label="Select all classes" />
+                    </th>
+                    <th id="teachingPlanClassHeader">Class</th>
+                    <th id="teachingPlanGradeHeader">Grade</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
     <div class="form-actions teachers-form-actions">
         <button class="primary-button" id="loadCurriculumPreviewButton" type="button">
-            Load preview
+            Prepare import
         </button>
         <button class="secondary-button" id="cancelCurriculumImportButton" type="button">
             Cancel
@@ -85,10 +84,29 @@
     <p aria-live="polite" class="form-message" id="curriculumImportMessage"></p>
 
     <div hidden id="curriculumPreviewContainer">
+        <div class="teachers-table-summary">
+            <strong id="teachingPlanSummaryTitle">Import summary</strong>
+            <div id="teachingPlanSummary"></div>
+        </div>
+
+        <div class="form-actions teachers-form-actions">
+            <button class="secondary-button"
+                    id="showAllTeachingPlanRowsButton"
+                    type="button">
+                All
+            </button>
+            <button class="secondary-button"
+                    id="showTeachingPlanIssuesButton"
+                    type="button">
+                Needs attention
+            </button>
+        </div>
+
         <div class="table-wrapper teachers-table-wrapper">
             <table class="data-table teachers-table" id="curriculumPreviewTable">
                 <thead>
                     <tr>
+                        <th id="teachingPlanPreviewClassHeader">Class</th>
                         <th id="curriculumPreviewSubjectHeader">Subject</th>
                         <th id="curriculumPreviewHoursHeader">Hours/week</th>
                         <th id="curriculumPreviewMappedSubjectHeader">ClassFlow subject</th>
@@ -102,7 +120,7 @@
 
         <div class="form-actions teachers-form-actions">
             <button class="primary-button" id="confirmCurriculumImportButton" type="button">
-                Create lessons
+                Import ready items
             </button>
         </div>
     </div>
