@@ -1,4 +1,4 @@
-﻿using TTOptimizer.Web.Models.Domain;
+using TTOptimizer.Web.Models.Domain;
 
 public class Teacher
 {
@@ -15,6 +15,9 @@ public class Teacher
     public string? Info { get; set; }
 
     public Organization Organization { get; set; } = null!;
+
+    public ICollection<TeacherSubject> Subjects { get; set; }
+        = new List<TeacherSubject>();
 
     public ICollection<TeacherAssignment> Assignments { get; set; }
         = new List<TeacherAssignment>();
