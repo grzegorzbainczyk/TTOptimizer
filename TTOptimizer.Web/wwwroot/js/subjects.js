@@ -1,8 +1,11 @@
 import { initializeI18n, t } from "./i18n.js";
 import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
+import { initializeSubjectSetupMode } from "./main/subjects-setup.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     await initializeI18n();
+    const setupHandled = await initializeSubjectSetupMode();
+    if (setupHandled) return;
     document.title = t("subjects.pageTitle", "ClassFlow - Subjects");
     const backToMainButton =
         document.getElementById("backToMainButton");

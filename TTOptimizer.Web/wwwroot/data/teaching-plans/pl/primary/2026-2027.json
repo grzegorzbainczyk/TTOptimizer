@@ -1,0 +1,160 @@
+{
+  "country": "PL",
+  "schoolType": "primary",
+  "schoolYear": "2026/2027",
+  "version": "2026-08-24",
+  "title": "Szkoła podstawowa - lista przedmiotów 2026/2027",
+  "source": {
+    "legalAct": "Rozporządzenie Ministra Edukacji z dnia 22 lipca 2026 r. w sprawie ramowych planów nauczania dla publicznych szkół (Dz.U. 2026 poz. 1028)",
+    "legalActUrl": "https://eli.gov.pl/eli/DU/2026/1028/ogl",
+    "transitionAct": "Rozporządzenie Ministra Edukacji z dnia 12 marca 2026 r. zmieniające rozporządzenie w sprawie ramowych planów nauczania dla publicznych szkół (Dz.U. 2026 poz. 380)",
+    "transitionActUrl": "https://eli.gov.pl/eli/DU/2026/380/ogl"
+  },
+  "transitionNote": "W roku szkolnym 2026/2027 nowy ramowy plan stosuje się w klasach I i IV. W klasach II, III oraz V-VIII obowiązuje plan przejściowy. Lista poniżej jest sumą nazw zajęć potrzebnych do obsługi zwykłej szkoły podstawowej w tym roku.",
+  "subjects": [
+    {
+      "name": "Edukacja wczesnoszkolna",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Język polski",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VIII"
+    },
+    {
+      "name": "Język obcy nowożytny",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-VIII"
+    },
+    {
+      "name": "Drugi język obcy nowożytny albo język łaciński",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "VII-VIII"
+    },
+    {
+      "name": "Muzyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VII"
+    },
+    {
+      "name": "Plastyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VII"
+    },
+    {
+      "name": "Historia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VIII"
+    },
+    {
+      "name": "Wiedza o społeczeństwie",
+      "selectedByDefault": true,
+      "category": "przejściowe",
+      "appliesTo": "VIII"
+    },
+    {
+      "name": "Edukacja obywatelska",
+      "selectedByDefault": true,
+      "category": "nowe",
+      "appliesTo": "VI-VII docelowo"
+    },
+    {
+      "name": "Przyroda",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VI docelowo"
+    },
+    {
+      "name": "Geografia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "V-VIII / VII-VIII docelowo"
+    },
+    {
+      "name": "Biologia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "V-VIII / VII-VIII docelowo"
+    },
+    {
+      "name": "Chemia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "VII-VIII"
+    },
+    {
+      "name": "Fizyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "VII-VIII"
+    },
+    {
+      "name": "Matematyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VIII"
+    },
+    {
+      "name": "Informatyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VIII"
+    },
+    {
+      "name": "Technika",
+      "selectedByDefault": true,
+      "category": "przejściowe",
+      "appliesTo": "V-VI w planie przejściowym"
+    },
+    {
+      "name": "Zajęcia praktyczno-techniczne",
+      "selectedByDefault": true,
+      "category": "nowe",
+      "appliesTo": "IV-VI docelowo"
+    },
+    {
+      "name": "Wychowanie fizyczne",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-VIII"
+    },
+    {
+      "name": "Edukacja dla bezpieczeństwa",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "VIII"
+    },
+    {
+      "name": "Zajęcia z wychowawcą",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VIII"
+    },
+    {
+      "name": "Edukacja zdrowotna",
+      "selectedByDefault": true,
+      "category": "pozostałe",
+      "appliesTo": "zgodnie z odrębnymi przepisami"
+    },
+    {
+      "name": "Religia",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "I-VIII"
+    },
+    {
+      "name": "Etyka",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "I-VIII"
+    }
+  ]
+}

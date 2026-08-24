@@ -63,6 +63,12 @@ function wireSetupEvents() {
         .forEach(input => {
             input.addEventListener("change", renderSetupPreview);
         });
+
+    document.getElementById("roomSetupMode")
+        ?.addEventListener("input", clearBlockingValidation);
+
+    document.getElementById("roomSetupMode")
+        ?.addEventListener("change", clearBlockingValidation);
 }
 
 async function loadSetupData() {
@@ -548,9 +554,9 @@ async function saveSetupRooms() {
     renderSetupPreview();
 
     if (setupPreviewRooms.length === 0) {
-        showSetupMessage(
-            "Dodaj co najmniej jedną salę.",
-            true
+        showBlockingValidation(
+            "Nie można przejść dalej",
+            "Dodaj co najmniej jedną salę, a następnie spróbuj ponownie."
         );
         return;
     }
@@ -561,10 +567,12 @@ async function saveSetupRooms() {
         );
 
     if (new Set(normalizedNames).size !== normalizedNames.length) {
-        showSetupMessage(
-            "Usuń powtarzające się nazwy sal przed zapisem.",
-            true
+        showBlockingValidation(
+            "Nie można przejść dalej",
+            "Na stronie są powtarzające się nazwy sal. Popraw zaznaczone dane i spróbuj ponownie."
         );
+
+        highlightDuplicateRooms();
         return;
     }
 
@@ -612,7 +620,7 @@ async function saveSetupRooms() {
         );
 
         window.setTimeout(() => {
-            window.location.href = "teachers.html?setup=1";
+            window.location.href = "subjects.html?setup=1";
         }, 500);
     } catch (error) {
         console.error("Error saving setup rooms:", error);
@@ -625,6 +633,124 @@ async function saveSetupRooms() {
         );
     } finally {
         setSetupBusy(false);
+    }
+}
+
+
+function showBlockingValidation(title, message) {
+    let alert =
+        document.getElementById("roomSetupBlockingValidation");
+
+    if (!alert) {
+        alert = document.createElement("div");
+        alert.id = "roomSetupBlockingValidation";
+        alert.className = "room-setup-blocking-validation";
+        alert.setAttribute("role", "alert");
+        alert.setAttribute("aria-live", "assertive");
+
+        const actions =
+            document.querySelector(".room-setup-actions");
+
+        if (actions?.parentElement) {
+            actions.parentElement.insertBefore(alert, actions);
+        } else {
+            document.getElementById("roomSetupMode")
+                ?.prepend(alert);
+        }
+    }
+
+    alert.innerHTML = `
+        <div class="room-setup-blocking-validation-icon" aria-hidden="true">!</div>
+        <div>
+            <strong>${escapeHtml(title)}</strong>
+            <p>${escapeHtml(message)}</p>
+        </div>
+    `;
+
+    alert.hidden = false;
+
+    showSetupMessage(
+        "Popraw dane oznaczone ostrzeżeniem przed przejściem do następnego kroku.",
+        true
+    );
+
+    const saveButton =
+        document.getElementById("saveGeneratedRoomsButton");
+
+    if (saveButton) {
+        saveButton.classList.add("needs-attention");
+        saveButton.textContent = "Popraw dane przed przejściem →";
+
+        window.setTimeout(() => {
+            saveButton.classList.remove("needs-attention");
+            saveButton.textContent = "Zapisz sale i przejdź dalej →";
+        }, 2200);
+    }
+
+    alert.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+}
+
+function clearBlockingValidation() {
+    const alert =
+        document.getElementById("roomSetupBlockingValidation");
+
+    if (alert) {
+        alert.hidden = true;
+    }
+
+    document.getElementById("saveGeneratedRoomsButton")
+        ?.classList.remove("needs-attention");
+}
+
+function highlightDuplicateRooms() {
+    const names = new Map();
+
+    setupPreviewRooms.forEach(room => {
+        const key =
+            room.name.toLocaleLowerCase("pl");
+
+        names.set(
+            key,
+            (names.get(key) ?? 0) + 1
+        );
+    });
+
+    const duplicateKeys =
+        new Set(
+            [...names.entries()]
+                .filter(([, count]) => count > 1)
+                .map(([key]) => key)
+        );
+
+    document.querySelectorAll(".room-preview-chip")
+        .forEach(chip => {
+            const cleanName =
+                chip.textContent
+                    .replace(" · istnieje", "")
+                    .trim()
+                    .toLocaleLowerCase("pl");
+
+            chip.classList.toggle(
+                "is-duplicate",
+                duplicateKeys.has(cleanName)
+            );
+        });
+
+    const firstDuplicate =
+        document.querySelector(
+            ".room-preview-chip.is-duplicate"
+        );
+
+    if (firstDuplicate) {
+        window.setTimeout(() => {
+            firstDuplicate.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }, 350);
     }
 }
 
