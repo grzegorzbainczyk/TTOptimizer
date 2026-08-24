@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassFlow - Konfiguracja szkoły</title>
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="css/setup.css" rel="stylesheet" />
+</head>
+
+<body class="setup-page">
+    <main class="setup-shell">
+        <div class="setup-container">
+
+            <header class="setup-header">
+                <div>
+                    <span class="setup-eyebrow">Pierwsza konfiguracja</span>
+                    <h1>Przygotuj szkołę do układania planu</h1>
+                    <p>
+                        Przejdziemy przez najważniejsze dane krok po kroku.
+                        Wszystko będzie można później edytować.
+                    </p>
+                </div>
+
+                <button id="exitSetupButton"
+                        class="secondary-button"
+                        type="button">
+                    Wróć do ClassFlow
+                </button>
+            </header>
+
+            <nav class="setup-progress" aria-label="Postęp konfiguracji">
+                <div class="setup-progress-item is-active">
+                    <span>1</span>
+                    <small>Szkoła</small>
+                </div>
+                <div class="setup-progress-line"></div>
+                <div class="setup-progress-item">
+                    <span>2</span>
+                    <small>Sale</small>
+                </div>
+                <div class="setup-progress-line"></div>
+                <div class="setup-progress-item">
+                    <span>3</span>
+                    <small>Przedmioty</small>
+                </div>
+                <div class="setup-progress-line"></div>
+                <div class="setup-progress-item">
+                    <span>4</span>
+                    <small>Nauczyciele</small>
+                </div>
+                <div class="setup-progress-line"></div>
+                <div class="setup-progress-item">
+                    <span>5</span>
+                    <small>Klasy</small>
+                </div>
+                <div class="setup-progress-line"></div>
+                <div class="setup-progress-item">
+                    <span>6</span>
+                    <small>Lekcje</small>
+                </div>
+                <div class="setup-progress-line"></div>
+                <div class="setup-progress-item">
+                    <span>7</span>
+                    <small>Gotowe</small>
+                </div>
+            </nav>
+
+            <section class="setup-card">
+                <div class="setup-step-heading">
+                    <span class="setup-step-label">Krok 1 z 7</span>
+                    <h2>Szkoła i budynki</h2>
+                    <p>
+                        Najpierw podaj podstawowe informacje o szkole i określ,
+                        z ilu budynków korzysta. Te dane będą później używane
+                        podczas definiowania sal i ograniczeń planu.
+                    </p>
+                </div>
+
+                <div class="setup-section">
+                    <div class="setup-section-title">
+                        <span class="setup-section-icon">🏫</span>
+                        <div>
+                            <h3>Informacje o szkole</h3>
+                            <p>Podstawowe dane możesz zmienić w dowolnym momencie.</p>
+                        </div>
+                    </div>
+
+                    <div class="setup-form-grid">
+                        <div class="form-field form-field-full-width">
+                            <label for="schoolName">Nazwa szkoły</label>
+                            <input id="schoolName"
+                                   type="text"
+                                   maxlength="200"
+                                   required
+                                   placeholder="np. Szkoła Podstawowa w Wilkowie" />
+                        </div>
+
+                        <div class="form-field form-field-full-width">
+                            <label for="schoolAddress">Adres szkoły</label>
+                            <textarea id="schoolAddress"
+                                      rows="2"
+                                      maxlength="500"
+                                      placeholder="Adres jest opcjonalny"></textarea>
+                        </div>
+
+                        <div class="form-field form-field-full-width">
+                            <label for="directorName">Dyrektor</label>
+                            <input id="directorName"
+                                   type="text"
+                                   maxlength="200"
+                                   placeholder="Opcjonalnie" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setup-section">
+                    <div class="setup-section-title">
+                        <span class="setup-section-icon">🏢</span>
+                        <div>
+                            <h3>Budynki szkoły</h3>
+                            <p>
+                                Niektóre szkoły mieszczą się w jednym budynku,
+                                inne korzystają z kilku lokalizacji.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="building-choice" role="radiogroup" aria-label="Liczba budynków">
+                        <label class="choice-card">
+                            <input id="singleBuildingOption"
+                                   name="buildingMode"
+                                   type="radio"
+                                   value="single"
+                                   checked />
+                            <span>
+                                <strong>Jeden budynek</strong>
+                                <small>Najprostszy wariant. Utworzymy budynek główny.</small>
+                            </span>
+                        </label>
+
+                        <label class="choice-card">
+                            <input id="multipleBuildingsOption"
+                                   name="buildingMode"
+                                   type="radio"
+                                   value="multiple" />
+                            <span>
+                                <strong>Więcej niż jeden budynek</strong>
+                                <small>Dodaj wszystkie budynki używane przez szkołę.</small>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div id="singleBuildingPanel" class="building-panel">
+                        <div class="setup-form-grid">
+                            <div class="form-field">
+                                <label for="singleBuildingName">Nazwa budynku</label>
+                                <input id="singleBuildingName"
+                                       type="text"
+                                       maxlength="150"
+                                       value="Budynek główny" />
+                            </div>
+
+                            <div class="form-field">
+                                <label for="singleBuildingAddress">Adres budynku</label>
+                                <input id="singleBuildingAddress"
+                                       type="text"
+                                       maxlength="500"
+                                       placeholder="Może być taki sam jak adres szkoły" />
+                            </div>
+                        </div>
+
+                        <label class="inline-checkbox">
+                            <input id="useSchoolAddressForBuilding"
+                                   type="checkbox"
+                                   checked />
+                            <span>Użyj adresu szkoły</span>
+                        </label>
+                    </div>
+
+                    <div id="multipleBuildingsPanel"
+                         class="building-panel"
+                         hidden>
+                        <div class="building-list-header">
+                            <div>
+                                <strong>Budynki</strong>
+                                <small>Dodaj tyle lokalizacji, ile faktycznie wykorzystuje szkoła.</small>
+                            </div>
+
+                            <button id="addBuildingRowButton"
+                                    class="secondary-button"
+                                    type="button">
+                                + Dodaj budynek
+                            </button>
+                        </div>
+
+                        <div id="buildingRows" class="building-rows"></div>
+                    </div>
+                </div>
+
+                <div class="setup-tip">
+                    <span>💡</span>
+                    <p>
+                        W następnym kroku przypiszemy sale do budynków.
+                        Dla jednej lokalizacji będzie to praktycznie automatyczne.
+                    </p>
+                </div>
+
+                <p id="setupMessage"
+                   class="form-message"
+                   aria-live="polite"></p>
+
+                <div class="setup-actions">
+                    <button id="saveAndContinueButton"
+                            class="main-action-button"
+                            type="button">
+                        Zapisz i przejdź dalej →
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/appContext.js"></script>
+    <script type="module" src="js/setup.js"></script>
+</body>
+</html>

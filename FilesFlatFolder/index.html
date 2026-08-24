@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ClassFlow</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+</head>
+
+<body class="auth-page">
+
+    <main class="auth-container">
+
+        <section class="auth-panel">
+
+            <header class="auth-header">
+                <h1>ClassFlow</h1>
+
+                <p>
+                    Organize and optimize school timetables
+                    with a C++ engine and ASP.NET.
+                </p>
+            </header>
+
+            <div class="auth-form">
+
+                <div class="form-group">
+                    <label for="emailInput">
+                        Email
+                    </label>
+
+                    <input id="emailInput"
+                           name="email"
+                           type="email"
+                           placeholder="user@example.com"
+                           autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordInput">
+                        Password
+                    </label>
+
+                    <input id="passwordInput"
+                           name="password"
+                           type="password"
+                           placeholder="Password"
+                           autocomplete="current-password">
+                </div>
+
+                <div class="auth-actions">
+                    <button id="loginButton"
+                            type="button"
+                            class="auth-button auth-button-primary">
+                        Log in
+                    </button>
+
+                    <button id="registerButton"
+                            type="button"
+                            class="auth-button auth-button-secondary">
+                        Register
+                    </button>
+                </div>
+
+                <div class="auth-separator">
+                    <span>or use demo mode</span>
+                </div>
+
+                <div class="demo-buttons">
+
+                    <button id="demoEasyButton"
+                            type="button"
+                            class="demo-button">
+
+                        <span class="demo-button-title">
+                            Easy demo
+                        </span>
+
+                        <span class="demo-button-description">
+                            Small dataset
+                        </span>
+                    </button>
+
+                    <button id="demoMediumButton"
+                            type="button"
+                            class="demo-button">
+
+                        <span class="demo-button-title">
+                            Medium demo
+                        </span>
+
+                        <span class="demo-button-description">
+                            Typical school
+                        </span>
+                    </button>
+
+                    <button id="demoHardButton"
+                            type="button"
+                            class="demo-button">
+
+                        <span class="demo-button-title">
+                            Hard demo
+                        </span>
+
+                        <span class="demo-button-description">
+                            Large dataset
+                        </span>
+                    </button>
+
+                </div>
+
+                <p class="demo-info">
+                    Demo data is available without registration.
+                </p>
+
+                <p id="authMessage"
+                   class="auth-message"
+                   aria-live="polite">
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="js/appContext.js"></script>
+    <script src="js/login.js"></script>
+
+</body>
+</html>

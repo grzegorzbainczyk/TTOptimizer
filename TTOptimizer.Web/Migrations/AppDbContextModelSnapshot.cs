@@ -919,35 +919,6 @@ namespace TTOptimizer.Web.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.TeacherSubject", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("SubjectId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TeacherId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubjectId");
-
-                    b.HasIndex("TeacherId");
-
-                    b.HasIndex("OrganizationId", "TeacherId", "SubjectId")
-                        .IsUnique();
-
-                    b.ToTable("TeacherSubjects");
-                });
-
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.TeacherTimeSlotPreference", b =>
                 {
                     b.Property<int>("Id")
@@ -1424,33 +1395,6 @@ namespace TTOptimizer.Web.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("TTOptimizer.Web.Models.Domain.TeacherSubject", b =>
-                {
-                    b.HasOne("TTOptimizer.Web.Models.Domain.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Subject", "Subject")
-                        .WithMany("Teachers")
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Teacher", "Teacher")
-                        .WithMany("Subjects")
-                        .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("Subject");
-
-                    b.Navigation("Teacher");
-                });
-
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.TeacherTimeSlotPreference", b =>
                 {
                     b.HasOne("Teacher", "Teacher")
@@ -1485,11 +1429,6 @@ namespace TTOptimizer.Web.Migrations
             modelBuilder.Entity("OptimizationRun", b =>
                 {
                     b.Navigation("ScheduledLessons");
-                });
-
-            modelBuilder.Entity("Subject", b =>
-                {
-                    b.Navigation("Teachers");
                 });
 
             modelBuilder.Entity("TTOptimizer.Web.Models.Domain.AppUser", b =>
@@ -1552,8 +1491,6 @@ namespace TTOptimizer.Web.Migrations
             modelBuilder.Entity("Teacher", b =>
                 {
                     b.Navigation("Assignments");
-
-                    b.Navigation("Subjects");
                 });
 #pragma warning restore 612, 618
         }

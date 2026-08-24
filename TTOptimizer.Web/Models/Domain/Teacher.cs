@@ -16,9 +16,6 @@ public class Teacher
 
     public Organization Organization { get; set; } = null!;
 
-    public ICollection<TeacherSubject> Subjects { get; set; }
-        = new List<TeacherSubject>();
-
-    public ICollection<TeacherAssignment> Assignments { get; set; }
+public ICollection<TeacherAssignment> Assignments { get; set; }
         = new List<TeacherAssignment>();
 }

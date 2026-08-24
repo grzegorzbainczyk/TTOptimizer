@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClassFlow - Lessons</title>
+<link href="css/style.css" rel="stylesheet"/>
+</head>
+<body class="teachers-page">
+<div class="page-container">
+<header class="app-header teachers-header">
+
+
+<div class="teachers-header-content"><div class="teachers-title-group">
+<span id="requirementsPageLabel" class="teachers-page-label">Timetable input</span><h1 id="requirementsPageTitle">Lessons</h1>
+<p id="requirementsPageSubtitle" class="page-subtitle">
+                    Define the lessons that should be scheduled for your organization
+                </p>
+</div><nav class="header-actions">
+<button class="secondary-button teachers-header-button" id="backToMainButton" type="button">
+                    Back
+                </button>
+<button class="secondary-button teachers-header-button" id="refreshRequirementsButton" type="button">
+                    Refresh
+                </button>
+</nav></div></header>
+<main class="content-card teachers-card">
+<div class="section-header teachers-section-header"><div><h2 id="requirementsListTitle">Lessons list</h2><p id="requirementsListDescription" class="teachers-section-description">Define student groups, subjects, teachers and the number of lessons per week.</p></div>
+
+<div class="teachers-header-actions">
+<button class="secondary-button teachers-add-button" id="importCurriculumButton" type="button">
+                    <span id="importCurriculumButtonLabel">Import teaching plan</span>
+                </button>
+                <button class="primary-button teachers-add-button" id="addRequirementButton" type="button"><span aria-hidden="true">+</span>
+                    <span id="addRequirementButtonLabel">Add lesson</span>
+                </button>
+</div>
+</div>
+
+<section class="resource-form-section teachers-form-section" hidden id="curriculumImportSection">
+    <h3 id="curriculumImportTitle">Import from teaching plan</h3>
+
+    <div class="form-grid teachers-form-grid">
+        <div class="form-field">
+            <label id="curriculumSchoolYearLabel" for="curriculumSchoolYear">School year</label>
+            <select id="curriculumSchoolYear">
+                <option value="2026/2027">2026/2027</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="teachers-section-description" id="teachingPlanClassSelectionDescription">
+        Select the classes to prepare. Check the grade for every class before creating the preview.
+    </div>
+
+    <div class="table-wrapper teachers-table-wrapper">
+        <table class="data-table teachers-table" id="teachingPlanClassesTable">
+            <thead>
+                <tr>
+                    <th>
+                        <input id="selectAllTeachingPlanClasses"
+                               type="checkbox"
+                               aria-label="Select all classes" />
+                    </th>
+                    <th id="teachingPlanClassHeader">Class</th>
+                    <th id="teachingPlanGradeHeader">Grade</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="form-actions teachers-form-actions">
+        <button class="primary-button" id="loadCurriculumPreviewButton" type="button">
+            Prepare import
+        </button>
+        <button class="secondary-button" id="cancelCurriculumImportButton" type="button">
+            Cancel
+        </button>
+    </div>
+
+    <p class="teachers-section-description" id="curriculumSourceInfo"></p>
+    <p aria-live="polite" class="form-message" id="curriculumImportMessage"></p>
+
+    <div hidden id="curriculumPreviewContainer">
+        <div class="teachers-table-summary">
+            <strong id="teachingPlanSummaryTitle">Import summary</strong>
+            <div id="teachingPlanSummary"></div>
+        </div>
+
+        <div class="form-actions teachers-form-actions">
+            <button class="secondary-button"
+                    id="showAllTeachingPlanRowsButton"
+                    type="button">
+                All
+            </button>
+            <button class="secondary-button"
+                    id="showTeachingPlanIssuesButton"
+                    type="button">
+                Needs attention
+            </button>
+        </div>
+
+        <div class="table-wrapper teachers-table-wrapper">
+            <table class="data-table teachers-table" id="curriculumPreviewTable">
+                <thead>
+                    <tr>
+                        <th id="teachingPlanPreviewClassHeader">Class</th>
+                        <th id="curriculumPreviewSubjectHeader">Subject</th>
+                        <th id="curriculumPreviewHoursHeader">Hours/week</th>
+                        <th id="curriculumPreviewMappedSubjectHeader">ClassFlow subject</th>
+                        <th id="curriculumPreviewTeacherHeader">Teacher</th>
+                        <th id="curriculumPreviewStatusHeader">Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="form-actions teachers-form-actions">
+            <button class="primary-button" id="confirmCurriculumImportButton" type="button">
+                Import ready items
+            </button>
+        </div>
+    </div>
+</section>
+
+<section class="resource-form-section teachers-form-section" hidden="" id="requirementFormSection">
+<h3 id="requirementFormTitle">
+                    Add lesson
+                </h3>
+<input id="requirementId" type="hidden"/>
+<div class="form-grid teachers-form-grid">
+<div class="form-field">
+<label for="requirementName">
+                            Name
+                        </label>
+<input id="requirementName" maxlength="200" type="text" placeholder="Optional for regular lessons"/>
+</div>
+<div class="form-field">
+<label for="requirementStudentGroupId">
+                            Student group
+                        </label>
+<div class="resource-select-with-action">
+<select id="requirementStudentGroupId" required="">
+<option value="">
+                                Select student group
+                            </option>
+</select>
+<button class="secondary-button small-button" id="newStudentGroupButton" type="button">
+    + New
+</button>
+</div>
+<div class="quick-create-panel" hidden id="newStudentGroupPanel">
+    <label for="newStudentGroupClassId">Class</label>
+    <select id="newStudentGroupClassId">
+        <option value="">Select class</option>
+    </select>
+
+    <label for="newStudentGroupName">Student name / group name</label>
+    <input id="newStudentGroupName"
+           maxlength="100"
+           placeholder="e.g. Jaś Kowalski"
+           type="text"/>
+
+    <div class="form-actions teachers-form-actions">
+        <button class="primary-button small-button"
+                id="saveNewStudentGroupButton"
+                type="button">
+            Add student group
+        </button>
+        <button class="secondary-button small-button"
+                id="cancelNewStudentGroupButton"
+                type="button">
+            Cancel
+        </button>
+    </div>
+    <p aria-live="polite"
+       class="form-message"
+       id="newStudentGroupMessage"></p>
+</div>
+</div>
+<div class="form-field">
+<label for="requirementSubjectId">
+                            Subject
+                        </label>
+<div class="resource-select-with-action">
+<select id="requirementSubjectId" required="">
+<option value="">
+                                Select subject
+                            </option>
+</select>
+<button class="secondary-button small-button" id="newSubjectButton" type="button">
+    + New
+</button>
+</div>
+<div class="quick-create-panel" hidden id="newSubjectPanel">
+    <label for="newSubjectName">Subject name</label>
+    <input id="newSubjectName"
+           maxlength="100"
+           placeholder="e.g. Photography club"
+           type="text"/>
+
+    <div class="form-actions teachers-form-actions">
+        <button class="primary-button small-button"
+                id="saveNewSubjectButton"
+                type="button">
+            Add subject
+        </button>
+        <button class="secondary-button small-button"
+                id="cancelNewSubjectButton"
+                type="button">
+            Cancel
+        </button>
+    </div>
+    <p aria-live="polite"
+       class="form-message"
+       id="newSubjectMessage"></p>
+</div>
+</div>
+<div class="form-field">
+<label for="requirementTeacherId">
+                            Teacher
+                        </label>
+<select id="requirementTeacherId" required="">
+<option value="">
+                                Select teacher
+                            </option>
+</select>
+</div>
+<div class="form-field">
+<label for="requirementHoursPerWeek">
+                            Hours per week
+                        </label>
+<input id="requirementHoursPerWeek" max="40" min="1" required="" type="number" value="1"/>
+</div>
+<div class="form-field">
+<label class="checkbox-field" for="requirementIsAdditional">
+    <input id="requirementIsAdditional" type="checkbox"/>
+    <span id="requirementIsAdditionalLabel">Additional lesson</span>
+</label>
+<small id="requirementIsAdditionalHelp">
+    Additional lessons start with Low priority.
+</small>
+</div>
+<div class="form-field">
+<label for="requirementPriority">
+                            Priority
+                        </label>
+<select id="requirementPriority" required="">
+<option value="0">Low</option>
+<option selected="" value="1">Normal</option>
+<option value="2">High</option>
+</select>
+</div>
+</div>
+<div class="form-actions teachers-form-actions">
+<button class="primary-button" id="saveRequirementButton" type="button">
+                        Save
+                    </button>
+<button class="secondary-button" id="cancelRequirementButton" type="button">
+                        Cancel
+                    </button>
+</div>
+<p aria-live="polite" class="form-message" id="requirementFormMessage">
+</p>
+</section>
+<div class="teachers-table-summary"><span id="requirementsCount">Loading requirements...</span></div><div class="table-wrapper teachers-table-wrapper">
+<table class="data-table teachers-table" id="requirementsTable">
+<thead>
+<tr>
+<th>Name</th>
+<th>Student group</th>
+<th>Subject</th>
+<th>Teacher</th>
+<th>Hours/week</th>
+<th>Priority</th>
+<th class="table-actions-column">
+                                Actions
+                            </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="teachers-table-state" colspan="7">
+                                Loading requirements...
+                            </td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+</div>
+<script src="js/appContext.js"></script>
+<script src="js/requirements.js"></script>
+</body>
+</html>

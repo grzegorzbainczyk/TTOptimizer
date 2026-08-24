@@ -11,7 +11,4 @@ public class Subject
     public string? Info { get; set; }
 
     public Organization Organization { get; set; } = null!;
-
-    public ICollection<TeacherSubject> Teachers { get; set; }
-        = new List<TeacherSubject>();
 }

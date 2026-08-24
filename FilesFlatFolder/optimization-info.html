@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>ClassFlow - Optimization Info</title>
+
+    <link rel="stylesheet"
+          href="css/style.css" />
+</head>
+
+<body>
+    <main class="app-shell">
+        <div class="app-container">
+
+            <header class="app-header app-hero">
+                <div class="hero-title-row">
+
+                    <img src="images/logos/logo.png"
+                         alt="ClassFlow logo"
+                         class="app-logo" />
+
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            Optimization guide
+                        </div>
+
+                        <h1>How optimization works</h1>
+
+                        <p class="hero-subtitle">
+                            Learn how ClassFlow creates timetables and
+                            calculates penalty values.
+                        </p>
+
+                        <p class="hero-tech">
+                            Genetic algorithm, constraints and penalty function
+                        </p>
+                    </div>
+
+                    <button id="backToMainButton"
+                            class="settings-button"
+                            type="button">
+                        Back to dashboard
+                    </button>
+                </div>
+            </header>
+
+            <section class="app-card app-panel">
+                <h2>Optimization process</h2>
+
+                <p>
+                    ClassFlow creates many possible timetable solutions and
+                    compares them using a penalty function.
+                </p>
+
+                <div class="summary-grid">
+                    <div class="summary-box">
+                        <span>Step 1</span>
+                        <strong>Input data</strong>
+                        <p>
+                            Teachers, classes, rooms, subjects,
+                            requirements and availability.
+                        </p>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>Step 2</span>
+                        <strong>Validation</strong>
+                        <p>
+                            The application checks whether the input data
+                            is complete enough to start optimization.
+                        </p>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>Step 3</span>
+                        <strong>Population</strong>
+                        <p>
+                            The optimizer creates a collection of candidate
+                            timetables called chromosomes.
+                        </p>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>Step 4</span>
+                        <strong>Evaluation</strong>
+                        <p>
+                            Every candidate timetable receives a penalty value.
+                        </p>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>Step 5</span>
+                        <strong>Evolution</strong>
+                        <p>
+                            Selection, crossover and mutation are used to create
+                            new timetable generations.
+                        </p>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>Step 6</span>
+                        <strong>Best result</strong>
+                        <p>
+                            The timetable with the lowest penalty is returned
+                            as the optimization result.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="app-card app-panel">
+                <h2>What is a penalty?</h2>
+
+                <p>
+                    Penalty is a numeric score describing how many timetable
+                    rules or preferences were violated.
+                </p>
+
+                <div class="result-message result-message-neutral">
+                    <div class="result-message-icon" aria-hidden="true">
+                        i
+                    </div>
+
+                    <div>
+                        <strong>Lower penalty means a better timetable.</strong>
+
+                        <p>
+                            A penalty equal to zero means that the current
+                            penalty function did not detect any violations.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="app-card app-panel">
+                <h2>Penalty levels</h2>
+
+                <div class="summary-grid">
+                    <div class="summary-box">
+                        <span>Low</span>
+                        <strong>10</strong>
+                        <p>
+                            A small inconvenience or preference that was not met.
+                        </p>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>Medium</span>
+                        <strong>100</strong>
+                        <p>
+                            A noticeable issue that reduces timetable quality.
+                        </p>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>High</span>
+                        <strong>1,000</strong>
+                        <p>
+                            A serious issue that should usually be avoided.
+                        </p>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>Hard</span>
+                        <strong>1,000,000</strong>
+                        <p>
+                            A conflict that should not occur in a valid timetable.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="app-card app-panel">
+                <h2>Example penalty calculation</h2>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Violation</th>
+                                <th>Count</th>
+                                <th>Weight</th>
+                                <th>Penalty</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>Teacher gaps</td>
+                                <td>2</td>
+                                <td>100</td>
+                                <td>200</td>
+                            </tr>
+
+                            <tr>
+                                <td>Late lessons</td>
+                                <td>3</td>
+                                <td>10</td>
+                                <td>30</td>
+                            </tr>
+
+                            <tr>
+                                <td>Room conflict</td>
+                                <td>1</td>
+                                <td>1,000,000</td>
+                                <td>1,000,000</td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="3">
+                                    <strong>Total penalty</strong>
+                                </td>
+                                <td>
+                                    <strong>1,000,230</strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    One hard conflict dominates many smaller soft penalties.
+                    This ensures that invalid timetables are ranked worse than
+                    feasible timetables with minor inconveniences.
+                </p>
+            </section>
+
+            <section class="app-card app-panel">
+                <div class="section-header-row">
+                    <h2>Hard and soft constraints</h2>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-box">
+                        <span>Hard constraints</span>
+                        <strong>Required rules</strong>
+
+                        <p>
+                            Hard constraints represent conflicts that should
+                            make a timetable invalid.
+                        </p>
+
+                        <ul class="feature-list">
+                            <li>
+                                A teacher cannot teach two lessons at the same time.
+                            </li>
+                            <li>
+                                A class cannot attend two lessons at the same time.
+                            </li>
+                            <li>
+                                A room cannot host two lessons at the same time.
+                            </li>
+                            <li>
+                                Unavailable resources should not be scheduled.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>Soft constraints</span>
+                        <strong>Quality preferences</strong>
+
+                        <p>
+                            Soft constraints describe preferences that improve
+                            the timetable but do not always make it invalid.
+                        </p>
+
+                        <ul class="feature-list">
+                            <li>
+                                Reducing gaps between lessons.
+                            </li>
+                            <li>
+                                Avoiding very late lessons.
+                            </li>
+                            <li>
+                                Using preferred rooms.
+                            </li>
+                            <li>
+                                Distributing lessons more evenly.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="app-card app-panel">
+                <h2>How to interpret the result</h2>
+
+                <div class="summary-grid">
+                    <div class="summary-box">
+                        <span>Penalty = 0</span>
+                        <strong>No detected violations</strong>
+                        <p>
+                            The timetable satisfies all rules currently checked
+                            by the penalty function.
+                        </p>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>Penalty &gt; 0</span>
+                        <strong>Some preferences were not met</strong>
+                        <p>
+                            The timetable may still be usable if it contains
+                            only soft violations.
+                        </p>
+                    </div>
+
+                    <div class="summary-box">
+                        <span>Hard violations</span>
+                        <strong>Timetable requires correction</strong>
+                        <p>
+                            The result contains conflicts and should not be
+                            treated as final.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="app-footer">
+                ClassFlow optimization guide
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        document
+            .getElementById("backToMainButton")
+            ?.addEventListener("click", () => {
+                window.location.href = "main.html";
+            });
+    </script>
+</body>
+</html>

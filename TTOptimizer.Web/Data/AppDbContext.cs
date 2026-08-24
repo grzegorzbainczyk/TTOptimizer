@@ -15,7 +15,6 @@ namespace TTOptimizer.Web.Data
         public DbSet<AppUserOrganization> AppUserOrganizations => Set<AppUserOrganization>();
 
         public DbSet<Teacher> Teachers => Set<Teacher>();
-        public DbSet<TeacherSubject> TeacherSubjects => Set<TeacherSubject>();
         public DbSet<TeacherAssignment> TeacherAssignments => Set<TeacherAssignment>();
         public DbSet<ClassGroup> ClassGroups => Set<ClassGroup>();
         public DbSet<Subject> Subjects => Set<Subject>();
@@ -94,33 +93,6 @@ namespace TTOptimizer.Web.Data
                 entity.HasIndex(t => new { t.OrganizationId, t.TeacherNumber }).IsUnique();
                 entity.HasIndex(t => new { t.OrganizationId, t.Alias }).IsUnique();
             });
-
-            modelBuilder.Entity<TeacherSubject>(entity =>
-            {
-                entity.HasIndex(x => new
-                {
-                    x.OrganizationId,
-                    x.TeacherId,
-                    x.SubjectId
-                })
-                .IsUnique();
-
-                entity.HasOne(x => x.Organization)
-                    .WithMany()
-                    .HasForeignKey(x => x.OrganizationId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(x => x.Teacher)
-                    .WithMany(x => x.Subjects)
-                    .HasForeignKey(x => x.TeacherId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(x => x.Subject)
-                    .WithMany(x => x.Teachers)
-                    .HasForeignKey(x => x.SubjectId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
-
             modelBuilder.Entity<TeacherAssignment>(entity =>
             {
                 entity.HasIndex(x => new

@@ -1,0 +1,74 @@
+/* =========================================================
+   ClassFlow — Classic Ink
+   Single application theme
+   ========================================================= */
+
+:root,
+html[data-theme="classic-ink"] {
+color-scheme: light;
+
+    --font-body: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+    --font-heading: "Merriweather", Georgia, "Times New Roman", serif;
+
+    --color-page-fallback: #eee9df;
+    --color-page-overlay: rgba(246, 242, 234, 0.90);
+
+    --color-surface: #fffdf8;
+    --color-surface-strong: #fffefb;
+    --color-surface-elevated: #ffffff;
+    --color-surface-soft: #faf7f1;
+    --color-surface-muted: #f2ede4;
+    --color-surface-dark: #10273d;
+
+    --color-primary: #102a43;
+    --color-primary-hover: #0a2034;
+    --color-primary-accent: #183e5e;
+    --color-primary-soft: rgba(16, 42, 67, 0.10);
+    --color-primary-softer: rgba(16, 42, 67, 0.05);
+    --color-primary-border: rgba(16, 42, 67, 0.42);
+    --color-primary-border-strong: #102a43;
+
+    --color-secondary: #b68a32;
+    --color-secondary-hover: #946f27;
+    --color-secondary-soft: rgba(182, 138, 50, 0.13);
+
+    --color-text: #10263b;
+    --color-text-muted: #5f6872;
+    --color-text-light: #fffdf8;
+    --color-heading-accent: #102a43;
+
+    --color-border: #193750;
+    --color-border-neutral: #c8c0b3;
+    --color-divider: #d9d2c7;
+
+    --color-header-start: #fffefb;
+    --color-header-end: #faf6ee;
+
+    --color-panel-start: #fffefb;
+    --color-panel-end: #fffdf8;
+    --color-sidebar-end: #faf7f1;
+
+    --color-tile-start: #fffefb;
+    --color-tile-end: #faf7f1;
+    --color-tile-hover-start: #fffaf0;
+    --color-tile-hover-end: #f6eddb;
+
+    --color-input-background: #ffffff;
+    --color-input-focus-background: #ffffff;
+
+    --color-warning: #b68a32;
+    --color-danger: #b42318;
+    --color-success: #2f6f4e;
+    --accent-warm: #b68a32;
+    --accent-warm-hover: #946f27;
+    --accent-warm-soft: rgba(182, 138, 50, 0.14);
+    --success: #2f6f4e;
+    --success-soft: rgba(47, 111, 78, 0.12);
+    --danger: #b42318;
+    --danger-soft: rgba(180, 35, 24, 0.10);
+
+    --shadow-primary: rgba(16, 42, 67, 0.20);
+    --shadow-soft: 0 4px 12px rgba(16, 42, 67, 0.08);
+    --shadow-medium: 0 8px 22px rgba(16, 42, 67, 0.13);
+    --shadow-card-hover: 0 8px 20px rgba(16, 42, 67, 0.15);
+}

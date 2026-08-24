@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title data-i18n="subjects.pageTitle">ClassFlow - Subjects</title>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="css/subjects-setup.css" rel="stylesheet"/>
+</head>
+<body class="teachers-page">
+
+<section id="subjectSetupMode" class="subject-setup-shell" hidden>
+    <div class="subject-setup-container">
+        <header class="subject-setup-header">
+            <div>
+                <span class="subject-setup-eyebrow">Konfiguracja szkoły</span>
+                <h1>Przedmioty</h1>
+                <p>
+                    ClassFlow może przygotować listę przedmiotów na podstawie oficjalnego
+                    ramowego planu nauczania. Ty wybierasz, co faktycznie dodać do szkoły.
+                </p>
+            </div>
+
+            <button id="exitSubjectSetupButton"
+                    class="secondary-button"
+                    type="button">
+                Wróć do ClassFlow
+            </button>
+        </header>
+
+        <nav class="subject-setup-progress" aria-label="Postęp konfiguracji">
+            <div class="subject-setup-progress-item is-complete"><span>✓</span><small>Szkoła</small></div>
+            <div class="subject-setup-progress-line is-complete"></div>
+            <div class="subject-setup-progress-item is-complete"><span>✓</span><small>Sale</small></div>
+            <div class="subject-setup-progress-line is-complete"></div>
+            <div class="subject-setup-progress-item is-active"><span>3</span><small>Przedmioty</small></div>
+            <div class="subject-setup-progress-line"></div>
+            <div class="subject-setup-progress-item"><span>4</span><small>Nauczyciele</small></div>
+            <div class="subject-setup-progress-line"></div>
+            <div class="subject-setup-progress-item"><span>5</span><small>Klasy</small></div>
+            <div class="subject-setup-progress-line"></div>
+            <div class="subject-setup-progress-item"><span>6</span><small>Lekcje</small></div>
+            <div class="subject-setup-progress-line"></div>
+            <div class="subject-setup-progress-item"><span>7</span><small>Gotowe</small></div>
+        </nav>
+
+        <section class="subject-setup-card">
+            <div class="subject-setup-step-heading">
+                <span>Krok 3 z 7</span>
+                <h2>Przygotuj listę przedmiotów</h2>
+                <p>
+                    Na tym etapie zapisujemy wyłącznie nazwy przedmiotów.
+                    Liczby godzin dla poszczególnych klas wykorzystamy później,
+                    przy tworzeniu lekcji.
+                </p>
+            </div>
+
+            <div class="subject-plan-toolbar">
+                <div class="subject-plan-field">
+                    <label>Typ szkoły</label>
+                    <select id="subjectSetupSchoolType" disabled>
+                        <option selected>Szkoła podstawowa</option>
+                    </select>
+                </div>
+
+                <div class="subject-plan-field">
+                    <label>Rok szkolny</label>
+                    <select id="subjectSetupSchoolYear">
+                        <option value="2026/2027" selected>2026/2027</option>
+                    </select>
+                </div>
+
+                <button id="prepareOfficialSubjectsButton"
+                        class="main-action-button"
+                        type="button">
+                    Przygotuj listę przedmiotów
+                </button>
+            </div>
+
+            <div id="subjectPlanInfo"
+                 class="subject-plan-info"
+                 hidden>
+                <div>
+                    <strong>Oficjalne źródło</strong>
+                    <p id="subjectPlanLegalAct"></p>
+                    <p id="subjectPlanTransitionNote"></p>
+                </div>
+                <a id="subjectPlanSourceLink"
+                   href="#"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    Otwórz źródło
+                </a>
+            </div>
+
+            <section id="subjectSetupPreviewSection"
+                     class="subject-preview-section"
+                     hidden>
+                <div class="subject-preview-header">
+                    <div>
+                        <h3>Lista do zatwierdzenia</h3>
+                        <p id="subjectSetupSummary"></p>
+                    </div>
+
+                    <div class="subject-preview-actions">
+                        <button id="selectAllSubjectsButton"
+                                class="secondary-button"
+                                type="button">
+                            Zaznacz wszystkie
+                        </button>
+                        <button id="clearSubjectSelectionButton"
+                                class="secondary-button"
+                                type="button">
+                            Odznacz wszystkie
+                        </button>
+                    </div>
+                </div>
+
+                <div id="subjectSetupExistingInfo"
+                     class="subject-existing-info"
+                     hidden></div>
+
+                <div id="subjectSetupList"
+                     class="subject-setup-list"></div>
+
+                <div class="subject-add-custom">
+                    <div>
+                        <strong>Brakuje przedmiotu?</strong>
+                        <p>Możesz dodać własną nazwę przed zatwierdzeniem.</p>
+                    </div>
+
+                    <div class="subject-add-custom-controls">
+                        <input id="customSubjectName"
+                               type="text"
+                               maxlength="100"
+                               placeholder="np. Szachy" />
+                        <button id="addCustomSubjectButton"
+                                class="secondary-button"
+                                type="button">
+                            + Dodaj
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <p id="subjectSetupMessage"
+               class="form-message"
+               aria-live="polite"></p>
+
+            <div class="subject-setup-actions">
+                <button id="backToRoomSetupButton"
+                        class="secondary-button"
+                        type="button">
+                    ← Wstecz
+                </button>
+
+                <button id="saveSetupSubjectsButton"
+                        class="main-action-button"
+                        type="button"
+                        disabled>
+                    Dodaj wybrane przedmioty →
+                </button>
+            </div>
+        </section>
+    </div>
+</section>
+
+<div id="normalSubjectsPage" class="page-container">
+<header class="app-header teachers-header">
+
+
+<div class="teachers-header-content"><div class="teachers-title-group">
+<span class="teachers-page-label" data-i18n="common.organizationResources">Organization resources</span><h1 data-i18n="subjects.title">Subjects</h1>
+<p class="page-subtitle">
+                    <span data-i18n="subjects.subtitle">Subjects assigned to your organization</span>
+                </p>
+</div><nav class="header-actions">
+<button class="secondary-button teachers-header-button" id="backToMainButton" type="button" data-i18n="common.back">
+                    Back
+                </button>
+<button class="secondary-button teachers-header-button" id="refreshSubjectsButton" type="button" data-i18n="common.refresh">
+                    Refresh
+                </button>
+</nav></div></header>
+<main class="content-card teachers-card">
+<div class="section-header teachers-section-header"><div><h2 data-i18n="subjects.listTitle">Subjects list</h2><p class="teachers-section-description"><span data-i18n="subjects.listDescription">Manage subjects and optional information used by the timetable.</span></p></div>
+
+<div class="teachers-header-actions">
+<button class="secondary-button" id="importSubjectsButton" type="button" data-i18n="common.importXlsx">Import XLSX</button>
+<input id="subjectImportFileInput" type="file" accept=".xlsx" hidden />
+<button class="primary-button teachers-add-button" id="addSubjectButton" type="button"><span aria-hidden="true">+</span>
+                    <span data-i18n="subjects.add">Add subject</span>
+                </button>
+</div>
+</div>
+<section class="resource-form-section teachers-form-section" hidden="" id="subjectFormSection">
+<h3 id="subjectFormTitle">
+                    <span data-i18n="subjects.add">Add subject</span>
+                </h3>
+<input id="subjectId" type="hidden"/>
+<div class="form-grid teachers-form-grid">
+<div class="form-field">
+<label for="subjectName">
+                            <span data-i18n="common.name">Name</span>
+                        </label>
+<input id="subjectName" maxlength="100" required="" type="text"/>
+</div>
+<div class="form-field form-field-full-width">
+<label for="subjectInfo">
+                            <span data-i18n="common.info">Info</span>
+                        </label>
+<textarea id="subjectInfo" maxlength="2000" placeholder="Optional information about the subject" data-i18n-placeholder="subjects.infoPlaceholder" rows="4"></textarea>
+</div>
+</div>
+<div class="form-actions teachers-form-actions">
+<button class="primary-button" id="saveSubjectButton" type="button" data-i18n="common.save">
+                        Save
+                    </button>
+<button class="secondary-button" id="cancelSubjectButton" type="button" data-i18n="common.cancel">
+                        Cancel
+                    </button>
+</div>
+<p aria-live="polite" class="form-message" id="subjectFormMessage">
+</p>
+</section>
+
+<section id="subjectImportPreviewSection"
+         class="resource-form-section"
+         hidden>
+    <div class="section-header teachers-section-header">
+        <div>
+            <h3 data-i18n="common.importPreview">Import preview</h3>
+            <p><span data-i18n="subjects.importDescription">Review data read from the XLSX file. Nothing has been saved yet.</span></p>
+        </div>
+        <div class="teachers-header-actions">
+            <button id="confirmSubjectsImportButton"
+                    class="primary-button"
+                    type="button"
+                    disabled>
+                <span data-i18n="subjects.importConfirm">Import subjects</span>
+            </button>
+            <button id="closeSubjectsImportPreviewButton"
+                    class="secondary-button"
+                    type="button">
+                Close
+            </button>
+        </div>
+    </div>
+    <p id="subjectImportMessage"
+       class="form-message"
+       aria-live="polite"></p>
+    <div class="table-wrapper">
+        <table class="data-table" id="subjectImportPreviewTable">
+            <thead>
+                <tr>
+                    <th data-i18n="common.row">Row</th>
+                    <th data-i18n="common.name">Name</th>
+                    <th data-i18n="common.status">Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</section>
+<div class="teachers-table-summary"><span id="subjectsCount">Loading subjects...</span></div><div class="table-wrapper teachers-table-wrapper">
+<table class="data-table teachers-table" id="subjectsTable">
+<thead>
+<tr>
+<th data-i18n="common.name">Name</th>
+<th data-i18n="common.info">Info</th>
+<th class="table-actions-column">
+                                <span data-i18n="common.actions">Actions</span>
+                            </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="teachers-table-state" colspan="3">
+                                Loading subjects...
+                            </td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+</div>
+<script src="js/appContext.js"></script>
+<script type="module" src="js/subjects.js"></script>
+</body>
+</html>
