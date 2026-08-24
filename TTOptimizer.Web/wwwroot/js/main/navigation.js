@@ -1,4 +1,5 @@
 const NAVIGATION_TARGETS = {
+    setupButton: "setup.html",
     teachersButton: "teachers.html",
     classesButton: "classes.html",
     roomsButton: "rooms.html",

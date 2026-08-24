@@ -1,3 +1,5 @@
+import { t } from "../i18n.js";
+
 let setupBuildings = [];
 let setupExistingRooms = [];
 let setupPreviewRooms = [];
@@ -22,7 +24,7 @@ export async function initializeRoomSetupMode() {
         normalPage.hidden = true;
     }
 
-    document.title = "ClassFlow - Konfiguracja sal";
+    document.title = t("roomSetup.pageTitle");
 
     wireSetupEvents();
     await loadSetupData();
@@ -67,7 +69,7 @@ function wireSetupEvents() {
 
 async function loadSetupData() {
     setSetupBusy(true);
-    showSetupMessage("Wczytywanie budynków i istniejących sal...", false);
+    showSetupMessage(t("roomSetup.loading"), false);
 
     try {
         const organizationId =
@@ -112,7 +114,7 @@ async function loadSetupData() {
 
         if (setupBuildings.length === 0) {
             throw new Error(
-                "Najpierw dodaj co najmniej jeden budynek."
+                t("roomSetup.needBuilding")
             );
         }
 
@@ -129,7 +131,7 @@ async function loadSetupData() {
         showSetupMessage(
             error instanceof Error
                 ? error.message
-                : "Nie udało się wczytać danych konfiguracji sal.",
+                : t("roomSetup.loadFailed"),
             true
         );
     } finally {
@@ -448,8 +450,8 @@ function renderSetupPreview() {
 
     if (duplicateNames.size > 0) {
         warningMessages.push(
-            `Powtarzające się nazwy w podglądzie: ${[...duplicateNames].join(", ")}. ` +
-            "Nazwy sal muszą być unikalne w całej szkole. Użyj prefiksu budynku, np. A-101."
+            t("roomSetup.duplicateTitle").replace("{names}", [...duplicateNames].join(", ")) +
+            t("roomSetup.duplicateHelp")
         );
     }
 
@@ -466,7 +468,7 @@ function renderSetupPreview() {
 
     if (setupPreviewRooms.length === 0) {
         summary.textContent =
-            "Nie wybrano żadnych nowych sal.";
+            t("roomSetup.emptySummary");
 
         preview.innerHTML =
             `<p class="room-preview-empty">
@@ -477,7 +479,7 @@ function renderSetupPreview() {
             document.getElementById("saveGeneratedRoomsButton");
 
         if (saveButton) {
-            saveButton.textContent = "Pomiń i przejdź dalej →";
+            saveButton.textContent = t("roomSetup.skip");
         }
 
         return;
@@ -487,13 +489,13 @@ function renderSetupPreview() {
         document.getElementById("saveGeneratedRoomsButton");
 
     if (saveButton) {
-        saveButton.textContent = "Zapisz sale i przejdź dalej →";
+        saveButton.textContent = t("roomSetup.saveContinue");
     }
 
     summary.textContent =
-        `${setupPreviewRooms.length} sal w podglądzie` +
+        t("roomSetup.previewCount").replace("{count}", setupPreviewRooms.length) +
         (existingInPreview.length > 0
-            ? ` · ${existingInPreview.length} już istnieje`
+            ? ` · ${t("roomSetup.existing").replace("{count}", existingInPreview.length)}`
             : "");
 
     const byBuilding =
@@ -573,7 +575,7 @@ async function saveSetupRooms() {
 
     if (new Set(normalizedNames).size !== normalizedNames.length) {
         showSetupMessage(
-            "Usuń powtarzające się nazwy sal przed zapisem.",
+            t("roomSetup.fixDuplicates"),
             true
         );
         return;
@@ -607,7 +609,7 @@ async function saveSetupRooms() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Nie udało się zapisać sal. Status: ${response.status}`
+                    `${t("roomSetup.saveFailed")} Status: ${response.status}`
                 )
             );
         }
@@ -631,7 +633,7 @@ async function saveSetupRooms() {
         showSetupMessage(
             error instanceof Error
                 ? error.message
-                : "Nie udało się zapisać sal.",
+                : t("roomSetup.saveFailed"),
             true
         );
     } finally {

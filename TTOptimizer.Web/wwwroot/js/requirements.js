@@ -1,3 +1,5 @@
+import { initializeI18n, getCurrentLanguage } from "./i18n.js";
+
 let availableTeachers = [];
 let availableStudentGroups = [];
 let availableSubjects = [];
@@ -10,6 +12,7 @@ let teachingPlanRowFilter = "all";
 let teachingPlanClassSelections = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
+    await initializeI18n();
     configureLessonsPageLanguage();
 
     const backToMainButton =
@@ -98,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function getLessonsPageText() {
     const language =
-        localStorage.getItem("classFlowLanguage") === "pl"
+        getCurrentLanguage() === "pl"
             ? "pl"
             : "en";
 

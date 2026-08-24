@@ -1,4 +1,7 @@
+import { initializeI18n, t } from "./i18n.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
+    await initializeI18n();
     document.getElementById("exitSetupButton")
         ?.addEventListener("click", () => {
             window.location.href = "main.html";
@@ -30,7 +33,7 @@ let existingBuildings = [];
 
 async function loadSetupData() {
     setBusy(true);
-    showMessage("Wczytywanie danych szkoły...", false);
+    showMessage(t("setup.loadingSchool"), false);
 
     try {
         const organizationId =
@@ -48,14 +51,14 @@ async function loadSetupData() {
         if (!schoolResponse.ok) {
             throw new Error(getApiErrorMessage(
                 school,
-                `Nie udało się wczytać danych szkoły. Status: ${schoolResponse.status}`
+                `${t("setup.loadSchoolFailed")} Status: ${schoolResponse.status}`
             ));
         }
 
         if (!buildingsResponse.ok) {
             throw new Error(getApiErrorMessage(
                 buildingsData,
-                `Nie udało się wczytać budynków. Status: ${buildingsResponse.status}`
+                `${t("setup.loadBuildingsFailed")} Status: ${buildingsResponse.status}`
             ));
         }
 
@@ -75,7 +78,7 @@ async function loadSetupData() {
         showMessage(
             error instanceof Error
                 ? error.message
-                : "Nie udało się wczytać konfiguracji.",
+                : t("setup.loadFailed"),
             true
         );
     } finally {
@@ -92,7 +95,7 @@ function applyExistingBuildings() {
 
         if (building) {
             document.getElementById("singleBuildingName").value =
-                building.name ?? "Budynek główny";
+                building.name ?? t("setup.mainBuilding");
 
             const schoolAddress =
                 document.getElementById("schoolAddress").value.trim();
@@ -142,7 +145,7 @@ function updateBuildingMode() {
                     addBuildingRow(building);
                 }
             } else {
-                addBuildingRow({ name: "Budynek główny" });
+                addBuildingRow({ name: t("setup.mainBuilding") });
                 addBuildingRow({ name: "Budynek B" });
             }
         }
@@ -218,7 +221,7 @@ function addBuildingRow(building = {}) {
         .addEventListener("click", () => {
             if (container.children.length <= 1) {
                 showMessage(
-                    "Szkoła musi mieć co najmniej jeden budynek.",
+                    t("setup.buildingRequired"),
                     true
                 );
                 return;
@@ -235,7 +238,7 @@ async function saveAndContinue() {
         document.getElementById("schoolName").value.trim();
 
     if (!schoolName) {
-        showMessage("Podaj nazwę szkoły.", true);
+        showMessage(t("setup.schoolNameRequired"), true);
         document.getElementById("schoolName").focus();
         return;
     }
@@ -270,7 +273,7 @@ async function saveAndContinue() {
         showMessage(
             error instanceof Error
                 ? error.message
-                : "Nie udało się zapisać konfiguracji.",
+                : t("setup.saveFailed"),
             true
         );
     } finally {
@@ -287,7 +290,7 @@ function collectBuildings() {
             document.getElementById("singleBuildingName").value.trim();
 
         if (!name) {
-            showMessage("Podaj nazwę budynku.", true);
+            showMessage(t("setup.buildingNameRequired"), true);
             document.getElementById("singleBuildingName").focus();
             return [];
         }
@@ -315,7 +318,7 @@ function collectBuildings() {
 
         if (!name) {
             showMessage(
-                "Każdy budynek musi mieć nazwę.",
+                t("setup.everyBuildingNameRequired"),
                 true
             );
 
@@ -361,7 +364,7 @@ async function saveSchool(organizationId) {
         throw new Error(
             getApiErrorMessage(
                 data,
-                `Nie udało się zapisać danych szkoły. Status: ${response.status}`
+                `${t("setup.saveSchoolFailed")} Status: ${response.status}`
             )
         );
     }
@@ -401,7 +404,7 @@ async function saveBuildings(organizationId, buildings) {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Nie udało się zapisać budynku '${building.name}'.`
+                    t("setup.saveBuildingFailed").replace("{name}", building.name)
                 )
             );
         }

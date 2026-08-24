@@ -7,293 +7,239 @@
 <title data-i18n="rooms.pageTitle">ClassFlow - Rooms</title>
 <link href="css/style.css" rel="stylesheet"/>
 <link href="css/rooms-setup.css" rel="stylesheet"/>
-</head>
+<link href="css/setup-language.css" rel="stylesheet"/></head>
 <body class="teachers-page">
-
-<section id="roomSetupMode" class="room-setup-shell" hidden>
-    <div class="room-setup-container">
-
-        <header class="room-setup-header">
-            <div>
-                <span class="room-setup-eyebrow">Konfiguracja szkoły</span>
-                <h1>Sale</h1>
-                <p>
+<section class="room-setup-shell" hidden="" id="roomSetupMode">
+<div class="room-setup-container">
+<header class="room-setup-header">
+<div>
+<span class="room-setup-eyebrow" data-i18n="roomSetup.eyebrow">Konfiguracja szkoły</span>
+<h1 data-i18n="setup.step.rooms">Sale</h1>
+<p>
                     Wygeneruj listę sal automatycznie albo dodaj pojedyncze sale ręcznie.
                     Przed zapisem zobaczysz pełny podgląd.
                 </p>
-            </div>
-
-            <button id="exitRoomSetupButton"
-                    class="secondary-button"
-                    type="button">
+</div>
+<button class="secondary-button" data-i18n="setup.exit" id="exitRoomSetupButton" type="button">
                 Wróć do ClassFlow
             </button>
-        </header>
-
-        <nav class="room-setup-progress" aria-label="Postęp konfiguracji">
-            <div class="room-setup-progress-item is-complete">
-                <span>✓</span><small>Szkoła</small>
-            </div>
-            <div class="room-setup-progress-line is-complete"></div>
-            <div class="room-setup-progress-item is-active">
-                <span>2</span><small>Sale</small>
-            </div>
-            <div class="room-setup-progress-line"></div>
-            <div class="room-setup-progress-item">
-                <span>3</span><small>Przedmioty</small>
-            </div>
-            <div class="room-setup-progress-line"></div>
-            <div class="room-setup-progress-item">
-                <span>4</span><small>Nauczyciele</small>
-            </div>
-            <div class="room-setup-progress-line"></div>
-            <div class="room-setup-progress-item">
-                <span>5</span><small>Klasy</small>
-            </div>
-            <div class="room-setup-progress-line"></div>
-            <div class="room-setup-progress-item">
-                <span>6</span><small>Lekcje</small>
-            </div>
-            <div class="room-setup-progress-line"></div>
-            <div class="room-setup-progress-item">
-                <span>7</span><small>Gotowe</small>
-            </div>
-        </nav>
-
-        <section class="room-setup-card">
-            <div class="room-setup-step-heading">
-                <span>Krok 2 z 7</span>
-                <h2>Dodaj sale</h2>
-                <p>
+<div class="setup-language-switcher"><label class="visually-hidden" data-i18n="language.label" for="languageSelector">Language</label><select aria-label="Language" data-i18n-aria-label="language.label" id="languageSelector"><option value="en">English</option><option value="pl">Polski</option></select></div></header>
+<nav aria-label="Postęp konfiguracji" class="room-setup-progress" data-i18n-aria-label="setup.progressAria">
+<div class="room-setup-progress-item is-complete">
+<span>✓</span><small data-i18n="setup.step.school">Szkoła</small>
+</div>
+<div class="room-setup-progress-line is-complete"></div>
+<div class="room-setup-progress-item is-active">
+<span>2</span><small data-i18n="setup.step.rooms">Sale</small>
+</div>
+<div class="room-setup-progress-line"></div>
+<div class="room-setup-progress-item">
+<span>3</span><small data-i18n="setup.step.subjects">Przedmioty</small>
+</div>
+<div class="room-setup-progress-line"></div>
+<div class="room-setup-progress-item">
+<span>4</span><small data-i18n="setup.step.teachers">Nauczyciele</small>
+</div>
+<div class="room-setup-progress-line"></div>
+<div class="room-setup-progress-item">
+<span>5</span><small data-i18n="setup.step.classes">Klasy</small>
+</div>
+<div class="room-setup-progress-line"></div>
+<div class="room-setup-progress-item">
+<span>6</span><small data-i18n="setup.step.lessons">Lekcje</small>
+</div>
+<div class="room-setup-progress-line"></div>
+<div class="room-setup-progress-item">
+<span>7</span><small data-i18n="setup.step.done">Gotowe</small>
+</div>
+</nav>
+<section class="room-setup-card">
+<div class="room-setup-step-heading">
+<span data-i18n="roomSetup.stepLabel">Krok 2 z 7</span>
+<h2 data-i18n="roomSetup.heading">Dodaj sale</h2>
+<p>
                     Najszybciej utworzysz je z zakresów numerów.
                     Możesz użyć kilku zakresów dla każdego budynku.
                 </p>
-            </div>
-
-            <div class="room-setup-mode-choice">
-                <label class="room-setup-choice-card">
-                    <input type="radio"
-                           name="roomSetupMode"
-                           value="generate"
-                           checked />
-                    <span>
-                        <strong>Wygeneruj automatycznie</strong>
-                        <small>np. 1–20 albo 1–5, 11–15, 21–25</small>
-                    </span>
-                </label>
-
-                <label class="room-setup-choice-card">
-                    <input type="radio"
-                           name="roomSetupMode"
-                           value="manual" />
-                    <span>
-                        <strong>Dodaj ręcznie</strong>
-                        <small>Dla pojedynczych lub nietypowych nazw sal</small>
-                    </span>
-                </label>
-            </div>
-
-            <div id="roomGeneratorPanel">
-                <div id="roomGeneratorBuildings"
-                     class="room-generator-buildings"></div>
-
-                <div class="room-special-section">
-                    <div>
-                        <h3>Sale specjalne</h3>
-                        <p>Opcjonalnie dodaj typowe pomieszczenia. Nic nie jest zaznaczone domyślnie.</p>
-                    </div>
-
-                    <div class="room-special-grid">
-                        <label><input type="checkbox" value="Sala gimnastyczna" /> Sala gimnastyczna</label>
-                        <label><input type="checkbox" value="Biblioteka" /> Biblioteka</label>
-                        <label><input type="checkbox" value="Świetlica" /> Świetlica</label>
-                        <label><input type="checkbox" value="Pracownia komputerowa" /> Pracownia komputerowa</label>
-                    </div>
-                </div>
-            </div>
-
-            <div id="roomManualPanel" hidden>
-                <div class="room-manual-toolbar">
-                    <p>Dodaj nazwę sali i wybierz budynek.</p>
-                    <button id="addManualRoomButton"
-                            class="secondary-button"
-                            type="button">
+</div>
+<div class="room-setup-mode-choice">
+<label class="room-setup-choice-card">
+<input checked="" name="roomSetupMode" type="radio" value="generate"/>
+<span>
+<strong>Wygeneruj automatycznie</strong>
+<small>np. 1–20 albo 1–5, 11–15, 21–25</small>
+</span>
+</label>
+<label class="room-setup-choice-card">
+<input name="roomSetupMode" type="radio" value="manual"/>
+<span>
+<strong>Dodaj ręcznie</strong>
+<small>Dla pojedynczych lub nietypowych nazw sal</small>
+</span>
+</label>
+</div>
+<div id="roomGeneratorPanel">
+<div class="room-generator-buildings" id="roomGeneratorBuildings"></div>
+<div class="room-special-section">
+<div>
+<h3>Sale specjalne</h3>
+<p>Opcjonalnie dodaj typowe pomieszczenia. Nic nie jest zaznaczone domyślnie.</p>
+</div>
+<div class="room-special-grid">
+<label><input type="checkbox" value="Sala gimnastyczna"/> Sala gimnastyczna</label>
+<label><input type="checkbox" value="Biblioteka"/> Biblioteka</label>
+<label><input type="checkbox" value="Świetlica"/> Świetlica</label>
+<label><input type="checkbox" value="Pracownia komputerowa"/> Pracownia komputerowa</label>
+</div>
+</div>
+</div>
+<div hidden="" id="roomManualPanel">
+<div class="room-manual-toolbar">
+<p>Dodaj nazwę sali i wybierz budynek.</p>
+<button class="secondary-button" id="addManualRoomButton" type="button">
                         + Dodaj salę
                     </button>
-                </div>
-
-                <div id="manualRoomRows" class="manual-room-rows"></div>
-            </div>
-
-            <div class="room-preview-section">
-                <div class="room-preview-header">
-                    <div>
-                        <h3>Podgląd</h3>
-                        <p id="roomSetupPreviewSummary">Jeszcze nic nie wygenerowano.</p>
-                    </div>
-
-                    <button id="refreshRoomPreviewButton"
-                            class="secondary-button"
-                            type="button">
+</div>
+<div class="manual-room-rows" id="manualRoomRows"></div>
+</div>
+<div class="room-preview-section">
+<div class="room-preview-header">
+<div>
+<h3>Podgląd</h3>
+<p id="roomSetupPreviewSummary">Jeszcze nic nie wygenerowano.</p>
+</div>
+<button class="secondary-button" id="refreshRoomPreviewButton" type="button">
                         Odśwież podgląd
                     </button>
-                </div>
-
-                <div id="roomSetupWarnings"
-                     class="room-setup-warnings"
-                     hidden></div>
-
-                <div id="roomSetupPreview"
-                     class="room-preview-groups"></div>
-            </div>
-
-            <p id="roomSetupMessage"
-               class="form-message"
-               aria-live="polite"></p>
-
-            <div class="room-setup-actions">
-                <button id="backToSchoolSetupButton"
-                        class="secondary-button"
-                        type="button">
+</div>
+<div class="room-setup-warnings" hidden="" id="roomSetupWarnings"></div>
+<div class="room-preview-groups" id="roomSetupPreview"></div>
+</div>
+<p aria-live="polite" class="form-message" id="roomSetupMessage"></p>
+<div class="room-setup-actions">
+<button class="secondary-button" id="backToSchoolSetupButton" type="button">
                     ← Wstecz
                 </button>
-
-                <button id="saveGeneratedRoomsButton"
-                        class="main-action-button"
-                        type="button">
+<button class="main-action-button" id="saveGeneratedRoomsButton" type="button">
                     Zapisz sale i przejdź dalej →
                 </button>
-            </div>
-        </section>
-    </div>
+</div>
 </section>
-
-<div id="normalRoomsPage" class="page-container">
+</div>
+</section>
+<div class="page-container" id="normalRoomsPage">
 <header class="app-header teachers-header">
-
-
 <div class="teachers-header-content"><div class="teachers-title-group">
 <span class="teachers-page-label" data-i18n="common.organizationResources">Organization resources</span><h1 data-i18n="rooms.title">Rooms</h1>
 <p class="page-subtitle">
-                    <span data-i18n="rooms.subtitle">Rooms assigned to your organization</span>
-                </p>
+<span data-i18n="rooms.subtitle">Rooms assigned to your organization</span>
+</p>
 </div><nav class="header-actions">
-<button class="secondary-button teachers-header-button" id="backToMainButton" type="button" data-i18n="common.back">
+<button class="secondary-button teachers-header-button" data-i18n="common.back" id="backToMainButton" type="button">
                     Back
                 </button>
-<button class="secondary-button teachers-header-button" id="refreshRoomsButton" type="button" data-i18n="common.refresh">
+<button class="secondary-button teachers-header-button" data-i18n="common.refresh" id="refreshRoomsButton" type="button">
                     Refresh
                 </button>
 </nav></div></header>
 <main class="content-card teachers-card">
 <div class="section-header teachers-section-header"><div><h2 data-i18n="rooms.listTitle">Rooms list</h2><p class="teachers-section-description"><span data-i18n="rooms.listDescription">Manage rooms, subject restrictions and room availability.</span></p></div>
-
 <div class="teachers-header-actions">
-<button class="secondary-button" id="importRoomsButton" type="button" data-i18n="common.importXlsx">Import XLSX</button>
-<input id="roomImportFileInput" type="file" accept=".xlsx" hidden />
+<button class="secondary-button" data-i18n="common.importXlsx" id="importRoomsButton" type="button">Import XLSX</button>
+<input accept=".xlsx" hidden="" id="roomImportFileInput" type="file"/>
 <button class="primary-button teachers-add-button" id="addRoomButton" type="button"><span aria-hidden="true">+</span>
-                    <span data-i18n="rooms.add">Add room</span>
-                </button>
+<span data-i18n="rooms.add">Add room</span>
+</button>
 </div>
 </div>
 <section class="resource-form-section teachers-form-section" hidden="" id="roomFormSection">
 <h3 id="roomFormTitle">
-                    <span data-i18n="rooms.add">Add room</span>
-                </h3>
+<span data-i18n="rooms.add">Add room</span>
+</h3>
 <input id="roomId" type="hidden"/>
 <div class="form-grid teachers-form-grid">
 <div class="form-field">
 <label for="roomName">
-                            <span data-i18n="common.name">Name</span>
-                        </label>
+<span data-i18n="common.name">Name</span>
+</label>
 <input id="roomName" maxlength="100" required="" type="text"/>
 </div>
 <div class="form-field">
-<label for="room<span data-i18n="rooms.building">Building</span>Id">
+<label for="room&lt;span data-i18n=" rooms.building"="">BuildingId"&gt;
                             <span data-i18n="rooms.building">Building</span>
-                        </label>
-<select id="room<span data-i18n="rooms.building">Building</span>Id">
+</label>
+<select id="room&lt;span data-i18n=" rooms.building"="">BuildingId"&gt;
 <option value="">
-                                <span data-i18n="rooms.noBuilding">No building assigned</span>
-                            </option>
+<span data-i18n="rooms.noBuilding">No building assigned</span>
+</option>
 </select>
 </div>
 <div class="form-field">
 <label for="restrictedToSubjectId">
-                            <span data-i18n="rooms.restrictedToSubject">Restricted to subject</span>
-                        </label>
+<span data-i18n="rooms.restrictedToSubject">Restricted to subject</span>
+</label>
 <select id="restrictedToSubjectId">
 <option value="">
-                                <span data-i18n="rooms.noRestriction">No restriction</span>
-                            </option>
+<span data-i18n="rooms.noRestriction">No restriction</span>
+</option>
 </select>
 </div>
 <div class="form-field">
 <label for="preferredSubjectId">
-                            <span data-i18n="rooms.preferredSubject">Preferred subject</span>
-                        </label>
+<span data-i18n="rooms.preferredSubject">Preferred subject</span>
+</label>
 <select id="preferredSubjectId">
 <option value="">
-                                <span data-i18n="rooms.noPreference">No preference</span>
-                            </option>
+<span data-i18n="rooms.noPreference">No preference</span>
+</option>
 </select>
 </div>
 <div class="form-field form-field-full-width">
 <label for="roomInfo">
-                            <span data-i18n="common.info">Info</span>
-                        </label>
-<textarea id="roomInfo" maxlength="2000" placeholder="Optional information about the room" data-i18n-placeholder="rooms.infoPlaceholder" rows="4"></textarea>
+<span data-i18n="common.info">Info</span>
+</label>
+<textarea data-i18n-placeholder="rooms.infoPlaceholder" id="roomInfo" maxlength="2000" placeholder="Optional information about the room" rows="4"></textarea>
 </div>
 </div>
 <div class="form-actions teachers-form-actions">
-<button class="primary-button" id="saveRoomButton" type="button" data-i18n="common.save">
+<button class="primary-button" data-i18n="common.save" id="saveRoomButton" type="button">
                         Save
                     </button>
-<button class="secondary-button" id="cancelRoomButton" type="button" data-i18n="common.cancel">
+<button class="secondary-button" data-i18n="common.cancel" id="cancelRoomButton" type="button">
                         Cancel
                     </button>
 </div>
 <p aria-live="polite" class="form-message" id="roomFormMessage">
 </p>
 </section>
-
-<section id="roomImportPreviewSection"
-         class="resource-form-section"
-         hidden>
-    <div class="section-header teachers-section-header">
-        <div>
-            <h3 data-i18n="common.importPreview">Import preview</h3>
-            <p><span data-i18n="rooms.importDescription">Review data read from the XLSX file. Nothing has been saved yet.</span></p>
-        </div>
-        <div class="teachers-header-actions">
-            <button id="confirmRoomsImportButton"
-                    class="primary-button"
-                    type="button"
-                    disabled>
-                <span data-i18n="rooms.importConfirm">Import rooms</span>
-            </button>
-            <button id="closeRoomsImportPreviewButton"
-                    class="secondary-button"
-                    type="button">
+<section class="resource-form-section" hidden="" id="roomImportPreviewSection">
+<div class="section-header teachers-section-header">
+<div>
+<h3 data-i18n="common.importPreview">Import preview</h3>
+<p><span data-i18n="rooms.importDescription">Review data read from the XLSX file. Nothing has been saved yet.</span></p>
+</div>
+<div class="teachers-header-actions">
+<button class="primary-button" disabled="" id="confirmRoomsImportButton" type="button">
+<span data-i18n="rooms.importConfirm">Import rooms</span>
+</button>
+<button class="secondary-button" id="closeRoomsImportPreviewButton" type="button">
                 Close
             </button>
-        </div>
-    </div>
-    <p id="roomImportMessage"
-       class="form-message"
-       aria-live="polite"></p>
-    <div class="table-wrapper">
-        <table class="data-table" id="roomImportPreviewTable">
-            <thead>
-                <tr>
-                    <th data-i18n="common.row">Row</th>
-                    <th data-i18n="common.name">Name</th>
-                    <th data-i18n="common.status">Status</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+</div>
+</div>
+<p aria-live="polite" class="form-message" id="roomImportMessage"></p>
+<div class="table-wrapper">
+<table class="data-table" id="roomImportPreviewTable">
+<thead>
+<tr>
+<th data-i18n="common.row">Row</th>
+<th data-i18n="common.name">Name</th>
+<th data-i18n="common.status">Status</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
 </section>
 <div class="teachers-table-summary"><span id="roomsCount">Loading rooms...</span></div><div class="table-wrapper teachers-table-wrapper">
 <table class="data-table teachers-table" id="roomsTable">
@@ -305,8 +251,8 @@
 <th><span data-i18n="rooms.preferredSubject">Preferred subject</span></th>
 <th data-i18n="common.info">Info</th>
 <th class="table-actions-column">
-                                <span data-i18n="common.actions">Actions</span>
-                            </th>
+<span data-i18n="common.actions">Actions</span>
+</th>
 </tr>
 </thead>
 <tbody>
@@ -321,6 +267,6 @@
 </main>
 </div>
 <script src="js/appContext.js"></script>
-<script type="module" src="js/rooms.js"></script>
+<script src="js/rooms.js" type="module"></script>
 </body>
 </html>

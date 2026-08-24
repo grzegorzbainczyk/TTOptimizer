@@ -362,5 +362,7 @@
   "subjects.pageTitle": "ClassFlow - Subjects",
   "rooms.pageTitle": "ClassFlow - Rooms",
   "buildings.pageTitle": "ClassFlow - Buildings",
-  "studentGroups.pageTitle": "ClassFlow - Student Groups"
+  "studentGroups.pageTitle": "ClassFlow - Student Groups",
+  "setup.dashboardButton": "School setup",
+  "setup.dashboardTitle": "Open school setup"
 }

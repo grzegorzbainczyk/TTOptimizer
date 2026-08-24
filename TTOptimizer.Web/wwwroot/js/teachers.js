@@ -1,9 +1,20 @@
+import { initializeI18n, t } from "./i18n.js";
+
 let currentTeacherImportRows = [];
 let availableAssignmentSubjects = [];
 let availableAssignmentClasses = [];
 let currentAssignmentTeacher = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
+    const isSetupMode =
+        new URLSearchParams(window.location.search).get("setup") === "1";
+
+    if (isSetupMode) {
+        document.body.classList.add("setup-language-enabled");
+    }
+
+    await initializeI18n();
+    document.title = t("teachers.pageTitle", "ClassFlow - Teachers");
     const backToMainButton =
         document.getElementById("backToMainButton");
 
@@ -115,7 +126,7 @@ async function loadTeachers() {
         if (!response.ok) {
             throw new Error(
                 data?.message ??
-                `Could not load teachers. Status: ${response.status}`
+                `${t("teachers.loadFailed")} Status: ${response.status}`
             );
         }
 
@@ -198,7 +209,7 @@ function renderTeachers(teachers) {
 
         editButton.type = "button";
         editButton.className = "small-button teacher-action-button teacher-edit-button";
-        editButton.textContent = "Edit";
+        editButton.textContent = t("common.edit");
 
         editButton.addEventListener("click", () => {
             openEditTeacherForm(teacher);
@@ -210,7 +221,7 @@ function renderTeachers(teachers) {
         assignmentsButton.type = "button";
         assignmentsButton.className =
             "small-button teacher-action-button teacher-assignments-button";
-        assignmentsButton.textContent = "Assignments";
+        assignmentsButton.textContent = t("teachers.assignments");
 
         assignmentsButton.addEventListener("click", async () => {
             await openTeacherAssignments(teacher);
@@ -221,7 +232,7 @@ function renderTeachers(teachers) {
 
         availabilityButton.type = "button";
         availabilityButton.className = "small-button teacher-action-button teacher-availability-button";
-        availabilityButton.textContent = "Availability";
+        availabilityButton.textContent = t("common.availability");
 
         availabilityButton.addEventListener("click", () => {
             const url =
@@ -237,7 +248,7 @@ function renderTeachers(teachers) {
 
         preferencesButton.type = "button";
         preferencesButton.className = "small-button teacher-action-button teacher-preferences-button";
-        preferencesButton.textContent = "Preferences";
+        preferencesButton.textContent = t("common.preferences");
 
         preferencesButton.addEventListener("click", () => {
             const url =
@@ -253,7 +264,7 @@ function renderTeachers(teachers) {
 
         deleteButton.type = "button";
         deleteButton.className = "small-button teacher-action-button teacher-delete-button";
-        deleteButton.textContent = "Delete";
+        deleteButton.textContent = t("common.delete");
 
         deleteButton.addEventListener("click", async () => {
             await deleteTeacher(teacher);
@@ -288,13 +299,13 @@ function updateTeachersCount(count) {
     }
 
     if (!Number.isInteger(count)) {
-        element.textContent = "Could not determine the number of teachers.";
+        element.textContent = t("teachers.countUnknown");
         return;
     }
 
     element.textContent = count === 1
-        ? "1 teacher"
-        : `${count} teachers`;
+        ? t("teachers.countOne")
+        : t("teachers.countMany").replace("{count}", count);
 }
 
 function createTableCell(value) {
@@ -321,7 +332,7 @@ async function openTeacherAssignments(teacher) {
         teacher.id;
 
     document.getElementById("teacherAssignmentsTitle").textContent =
-        `Teaching assignments: ${teacher.name}`;
+        t("teachers.assignmentTitleFor").replace("{name}", teacher.name ?? "");
 
     clearTeacherAssignmentsMessage();
     section.hidden = false;
@@ -339,7 +350,7 @@ async function openTeacherAssignments(teacher) {
         showTeacherAssignmentsMessage(
             error instanceof Error
                 ? error.message
-                : "Could not load teaching assignments.",
+                : t("teachers.assignmentLoadFailed"),
             true
         );
     }
@@ -373,7 +384,7 @@ async function loadAssignmentSubjects() {
         throw new Error(
             getApiErrorMessage(
                 data,
-                `Could not load subjects. Status: ${response.status}`
+                `${t("subjects.loadFailed")} Status: ${response.status}`
             )
         );
     }
@@ -389,7 +400,7 @@ async function loadAssignmentSubjects() {
         return;
     }
 
-    select.innerHTML = '<option value="">Select subject</option>';
+    select.innerHTML = `<option value="">${t("teachers.selectSubject")}</option>`;
 
     availableAssignmentSubjects.forEach(subject => {
         const option = document.createElement("option");
@@ -415,7 +426,7 @@ async function loadAssignmentClasses() {
         throw new Error(
             getApiErrorMessage(
                 data,
-                `Could not load classes. Status: ${response.status}`
+                `${t("classes.loadFailed")} Status: ${response.status}`
             )
         );
     }
@@ -431,7 +442,7 @@ async function loadAssignmentClasses() {
         return;
     }
 
-    select.innerHTML = '<option value="">Select class</option>';
+    select.innerHTML = `<option value="">${t("teachers.selectClass")}</option>`;
 
     availableAssignmentClasses.forEach(classGroup => {
         const option = document.createElement("option");
@@ -459,7 +470,7 @@ async function loadTeacherAssignments(teacherId) {
         throw new Error(
             getApiErrorMessage(
                 data,
-                `Could not load assignments. Status: ${response.status}`
+                `${t("teachers.assignmentLoadFailed")} Status: ${response.status}`
             )
         );
     }
@@ -510,7 +521,7 @@ function renderTeacherAssignments(assignments) {
         removeButton.type = "button";
         removeButton.className =
             "small-button teacher-action-button teacher-delete-button";
-        removeButton.textContent = "Remove";
+        removeButton.textContent = t("teachers.removeAssignment");
 
         removeButton.addEventListener("click", async () => {
             await deleteTeacherAssignment(assignment.id);
@@ -534,7 +545,7 @@ async function addTeacherAssignment() {
 
     if (teacherId <= 0) {
         showTeacherAssignmentsMessage(
-            "Teacher is required.",
+            t("teachers.assignmentTeacherRequired"),
             true
         );
         return;
@@ -542,7 +553,7 @@ async function addTeacherAssignment() {
 
     if (subjectId <= 0) {
         showTeacherAssignmentsMessage(
-            "Subject is required.",
+            t("teachers.assignmentSubjectRequired"),
             true
         );
         return;
@@ -550,7 +561,7 @@ async function addTeacherAssignment() {
 
     if (classGroupId <= 0) {
         showTeacherAssignmentsMessage(
-            "Class is required.",
+            t("teachers.assignmentClassRequired"),
             true
         );
         return;
@@ -584,7 +595,7 @@ async function addTeacherAssignment() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not add assignment. Status: ${response.status}`
+                    `${t("teachers.assignmentAddFailed")} Status: ${response.status}`
                 )
             );
         }
@@ -593,7 +604,7 @@ async function addTeacherAssignment() {
         document.getElementById("assignmentClassGroupId").value = "";
 
         showTeacherAssignmentsMessage(
-            "Teaching assignment added.",
+            t("teachers.assignmentAdded"),
             false
         );
 
@@ -604,7 +615,7 @@ async function addTeacherAssignment() {
         showTeacherAssignmentsMessage(
             error instanceof Error
                 ? error.message
-                : "Could not add assignment.",
+                : t("teachers.assignmentAddFailed"),
             true
         );
     }
@@ -638,7 +649,7 @@ async function deleteTeacherAssignment(assignmentId) {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not remove assignment. Status: ${response.status}`
+                    `${t("teachers.assignmentRemoveFailed")} Status: ${response.status}`
                 )
             );
         }
@@ -657,7 +668,7 @@ async function deleteTeacherAssignment(assignmentId) {
         showTeacherAssignmentsMessage(
             error instanceof Error
                 ? error.message
-                : "Could not remove assignment.",
+                : t("teachers.assignmentRemoveFailed"),
             true
         );
     }
@@ -710,7 +721,7 @@ function openAddTeacherForm() {
     teacherAlias.value = "";
     teacherInfo.value = "";
 
-    formTitle.textContent = "Add teacher";
+    formTitle.textContent = t("teachers.add");
     formSection.hidden = false;
 
     teacherName.focus();
@@ -779,7 +790,7 @@ async function saveTeacher() {
 
     if (!name) {
         showTeacherFormMessage(
-            "Teacher name is required.",
+            t("teachers.nameRequired"),
             true
         );
 
@@ -844,7 +855,7 @@ async function saveTeacher() {
         showTeacherFormMessage(
             error instanceof Error
                 ? error.message
-                : "Could not save teacher.",
+                : t("teachers.saveFailed"),
             true
         );
     }
@@ -893,7 +904,7 @@ async function deleteTeacher(teacher) {
         window.alert(
             error instanceof Error
                 ? error.message
-                : "Could not delete teacher."
+                : t("teachers.deleteFailed")
         );
     }
 }
@@ -1012,7 +1023,7 @@ async function handleTeacherImportFileSelected(event) {
         showTeacherImportMessage(
             error instanceof Error
                 ? error.message
-                : "Could not read XLSX file.",
+                : t("teachers.importReadFailed"),
             true
         );
     } finally {
@@ -1040,7 +1051,7 @@ function renderTeacherImportPreview(rows) {
         const cell = document.createElement("td");
 
         cell.colSpan = 3;
-        cell.textContent = "No teacher rows found.";
+        cell.textContent = t("teachers.importNoRows");
 
         row.appendChild(cell);
         tbody.appendChild(row);
@@ -1205,7 +1216,7 @@ async function confirmTeacherImport() {
         showTeacherImportMessage(
             error instanceof Error
                 ? error.message
-                : "Could not import teachers.",
+                : t("teachers.importFailed"),
             true
         );
 

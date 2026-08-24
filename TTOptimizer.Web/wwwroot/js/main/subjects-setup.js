@@ -1,3 +1,5 @@
+import { t } from "../i18n.js";
+
 let setupPlan = null;
 let existingSubjects = [];
 let preparedSubjects = [];
@@ -16,7 +18,7 @@ export async function initializeSubjectSetupMode() {
         normalPage.hidden = true;
     }
 
-    document.title = "ClassFlow - Konfiguracja przedmiotów";
+    document.title = t("subjectSetup.pageTitle");
 
     wireEvents();
     await loadExistingSubjects();
@@ -89,7 +91,7 @@ async function loadExistingSubjects() {
         showMessage(
             error instanceof Error
                 ? error.message
-                : "Nie udało się wczytać istniejących przedmiotów.",
+                : t("subjectSetup.loadExistingFailed"),
             true
         );
     }
@@ -97,7 +99,7 @@ async function loadExistingSubjects() {
 
 async function prepareOfficialSubjects() {
     setBusy(true);
-    showMessage("Przygotowywanie listy przedmiotów...", false);
+    showMessage(t("subjectSetup.loading"), false);
 
     try {
         const response = await fetch(
@@ -144,7 +146,7 @@ async function prepareOfficialSubjects() {
         showMessage(
             error instanceof Error
                 ? error.message
-                : "Nie udało się przygotować listy przedmiotów.",
+                : t("subjectSetup.prepareFailed"),
             true
         );
     } finally {
@@ -173,11 +175,11 @@ function renderSubjectList() {
     container.innerHTML = "";
 
     const categoryLabels = {
-        podstawowe: "Podstawowe",
-        nowe: "Nowy plan",
-        przejściowe: "Plan przejściowy",
-        pozostałe: "Pozostałe zajęcia",
-        opcjonalne: "Opcjonalne"
+        podstawowe: t("subjectSetup.category.basic"),
+        nowe: t("subjectSetup.category.new"),
+        przejściowe: t("subjectSetup.category.transition"),
+        pozostałe: t("subjectSetup.category.other"),
+        opcjonalne: t("subjectSetup.category.optional")
     };
 
     const categoryOrder = [
@@ -206,7 +208,7 @@ function renderSubjectList() {
 
         const title =
             category === "własne"
-                ? "Dodane ręcznie"
+                ? t("subjectSetup.category.custom")
                 : categoryLabels[category] ?? category;
 
         group.innerHTML = `
@@ -257,10 +259,10 @@ function renderSubjectList() {
 
             meta.textContent =
                 item.alreadyExists
-                    ? "Już istnieje w ClassFlow"
+                    ? t("subjectSetup.alreadyExists")
                     : item.appliesTo
                         ? `Klasy: ${item.appliesTo}`
-                        : "Przedmiot własny";
+                        : t("subjectSetup.customSubject");
 
             text.appendChild(meta);
 
@@ -272,7 +274,7 @@ function renderSubjectList() {
 
                 remove.type = "button";
                 remove.className = "subject-custom-remove";
-                remove.textContent = "Usuń";
+                remove.textContent = t("common.delete");
 
                 remove.addEventListener("click", event => {
                     event.preventDefault();
@@ -310,9 +312,9 @@ function updateSummary() {
         document.getElementById("subjectSetupSummary");
 
     summary.textContent =
-        `${selectedCount} wybranych do dodania` +
+        t("subjectSetup.selectedCount").replace("{count}", selectedCount) +
         (existingCount > 0
-            ? ` · ${existingCount} już istnieje`
+            ? ` · ${t("subjectSetup.existingCount").replace("{count}", existingCount)}`
             : "");
 
     const existingInfo =
@@ -323,8 +325,7 @@ function updateSummary() {
 
     if (existingCount > 0) {
         existingInfo.textContent =
-            `${existingCount} przedmiotów z oficjalnej listy jest już w bazie. ` +
-            "Nie będą tworzone ponownie.";
+            t("subjectSetup.existingInfo").replace("{count}", existingCount);
     }
 
     const saveButton =
@@ -334,8 +335,8 @@ function updateSummary() {
 
     saveButton.textContent =
         selectedCount === 0
-            ? "Pomiń i przejdź dalej →"
-            : `Dodaj ${selectedCount} przedmiotów →`;
+            ? t("subjectSetup.skip")
+            : t("subjectSetup.addCount").replace("{count}", selectedCount);
 }
 
 function setAllSelections(selected) {
@@ -372,7 +373,7 @@ function addCustomSubject() {
 
     if (duplicate) {
         showMessage(
-            `Przedmiot "${name}" już znajduje się na liście.`,
+            t("subjectSetup.duplicateCustom").replace("{name}", name),
             true
         );
         return;
@@ -407,7 +408,7 @@ async function saveSelectedSubjects() {
     }
 
     setBusy(true);
-    showMessage("Dodawanie przedmiotów...", false);
+    showMessage(t("subjectSetup.saving"), false);
 
     try {
         const organizationId =
@@ -431,7 +432,7 @@ async function saveSelectedSubjects() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Nie udało się dodać przedmiotów. Status: ${response.status}`
+                    `${t("subjectSetup.saveFailed")} Status: ${response.status}`
                 )
             );
         }
@@ -455,7 +456,7 @@ async function saveSelectedSubjects() {
         showMessage(
             error instanceof Error
                 ? error.message
-                : "Nie udało się dodać przedmiotów.",
+                : t("subjectSetup.saveFailed"),
             true
         );
     } finally {

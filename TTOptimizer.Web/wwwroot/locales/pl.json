@@ -362,5 +362,7 @@
   "subjects.pageTitle": "ClassFlow - Przedmioty",
   "rooms.pageTitle": "ClassFlow - Sale",
   "buildings.pageTitle": "ClassFlow - Budynki",
-  "studentGroups.pageTitle": "ClassFlow - Grupy uczniów"
+  "studentGroups.pageTitle": "ClassFlow - Grupy uczniów",
+  "setup.dashboardButton": "Konfiguracja szkoły",
+  "setup.dashboardTitle": "Otwórz konfigurację szkoły"
 }
