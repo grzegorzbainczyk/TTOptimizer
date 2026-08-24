@@ -330,12 +330,11 @@ function updateSummary() {
     const saveButton =
         document.getElementById("saveSetupSubjectsButton");
 
-    saveButton.disabled =
-        selectedCount === 0;
+    saveButton.disabled = false;
 
     saveButton.textContent =
         selectedCount === 0
-            ? "Wybierz przedmioty"
+            ? "Pomiń i przejdź dalej →"
             : `Dodaj ${selectedCount} przedmiotów →`;
 }
 
@@ -403,10 +402,7 @@ async function saveSelectedSubjects() {
             .map(item => item.name);
 
     if (names.length === 0) {
-        showMessage(
-            "Wybierz co najmniej jeden przedmiot.",
-            true
-        );
+        window.location.href = "teachers.html?setup=1";
         return;
     }
 
