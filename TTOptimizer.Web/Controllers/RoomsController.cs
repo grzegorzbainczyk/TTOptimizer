@@ -420,6 +420,168 @@ public class RoomsController : ControllerBase
         });
     }
 
+
+    [HttpPost("setup-import")]
+    public async Task<IActionResult> SetupImportRooms(
+        [FromQuery] int organizationId,
+        [FromBody] SetupRoomImportRequest request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        if (request.Rooms == null || request.Rooms.Count == 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "At least one room is required."
+            });
+        }
+
+        var organizationExists =
+            await _db.Organizations.AnyAsync(item =>
+                item.Id == organizationId);
+
+        if (!organizationExists)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Organization was not found."
+            });
+        }
+
+        var normalizedRooms = request.Rooms
+            .Select(item => new
+            {
+                Name = item.Name?.Trim() ?? string.Empty,
+                item.BuildingId
+            })
+            .ToList();
+
+        if (normalizedRooms.Any(item =>
+            string.IsNullOrWhiteSpace(item.Name) ||
+            item.Name.Length > 100))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Every room must have a name between 1 and 100 characters."
+            });
+        }
+
+        var duplicateInputName = normalizedRooms
+            .GroupBy(
+                item => item.Name,
+                StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault(group => group.Count() > 1);
+
+        if (duplicateInputName != null)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message =
+                    $"Room name '{duplicateInputName.Key}' appears more than once in the import."
+            });
+        }
+
+        var buildingIds = normalizedRooms
+            .Where(item => item.BuildingId.HasValue)
+            .Select(item => item.BuildingId!.Value)
+            .Distinct()
+            .ToList();
+
+        var validBuildingIds = await _db.Buildings
+            .Where(item =>
+                item.OrganizationId == organizationId &&
+                buildingIds.Contains(item.Id))
+            .Select(item => item.Id)
+            .ToListAsync();
+
+        var invalidBuildingId = buildingIds
+            .FirstOrDefault(id => !validBuildingIds.Contains(id));
+
+        if (invalidBuildingId != 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "One of the selected buildings does not exist."
+            });
+        }
+
+        var existingRooms = await _db.Rooms
+            .Where(item => item.OrganizationId == organizationId)
+            .Select(item => new
+            {
+                item.Id,
+                item.Name,
+                item.BuildingId
+            })
+            .ToListAsync();
+
+        var existingByName = existingRooms
+            .ToDictionary(
+                item => item.Name,
+                StringComparer.OrdinalIgnoreCase);
+
+        var roomsToAdd = new List<Room>();
+        var skippedExisting = new List<string>();
+
+        foreach (var item in normalizedRooms)
+        {
+            if (existingByName.ContainsKey(item.Name))
+            {
+                skippedExisting.Add(item.Name);
+                continue;
+            }
+
+            roomsToAdd.Add(new Room
+            {
+                OrganizationId = organizationId,
+                Name = item.Name,
+                BuildingId = item.BuildingId,
+                Info = null,
+                RestrictedToSubjectId = null,
+                PreferredSubjectId = null
+            });
+        }
+
+        await using var transaction =
+            await _db.Database.BeginTransactionAsync();
+
+        try
+        {
+            if (roomsToAdd.Count > 0)
+            {
+                _db.Rooms.AddRange(roomsToAdd);
+                await _db.SaveChangesAsync();
+            }
+
+            await transaction.CommitAsync();
+
+            return Ok(new
+            {
+                success = true,
+                createdCount = roomsToAdd.Count,
+                skippedExistingCount = skippedExisting.Count,
+                skippedExisting
+            });
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
     [HttpGet("{id:int}/time-slot-preferences")]
     public async Task<IActionResult> GetTimeSlotPreferences(
         int id,
@@ -779,4 +941,16 @@ public class RoomsController : ControllerBase
             ? null
             : value.Trim();
     }
+}
+
+public class SetupRoomImportRequest
+{
+    public List<SetupRoomImportItemRequest> Rooms { get; set; } = new();
+}
+
+public class SetupRoomImportItemRequest
+{
+    public string Name { get; set; } = string.Empty;
+
+    public int? BuildingId { get; set; }
 }

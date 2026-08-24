@@ -1,5 +1,6 @@
 import { initializeI18n, t } from "./i18n.js";
 import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
+import { initializeRoomSetupMode } from "./main/rooms-setup.js";
 
 let availableBuildings = [];
 let availableSubjects = [];
@@ -8,6 +9,8 @@ document.addEventListener(
     "DOMContentLoaded",
     async () => {
     await initializeI18n();
+    const setupHandled = await initializeRoomSetupMode();
+    if (setupHandled) return;
     document.title = t("rooms.pageTitle", "ClassFlow - Rooms");
         const backToMainButton =
             document.getElementById(

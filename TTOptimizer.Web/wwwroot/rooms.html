@@ -6,9 +6,169 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title data-i18n="rooms.pageTitle">ClassFlow - Rooms</title>
 <link href="css/style.css" rel="stylesheet"/>
+<link href="css/rooms-setup.css" rel="stylesheet"/>
 </head>
 <body class="teachers-page">
-<div class="page-container">
+
+<section id="roomSetupMode" class="room-setup-shell" hidden>
+    <div class="room-setup-container">
+
+        <header class="room-setup-header">
+            <div>
+                <span class="room-setup-eyebrow">Konfiguracja szkoły</span>
+                <h1>Sale</h1>
+                <p>
+                    Wygeneruj listę sal automatycznie albo dodaj pojedyncze sale ręcznie.
+                    Przed zapisem zobaczysz pełny podgląd.
+                </p>
+            </div>
+
+            <button id="exitRoomSetupButton"
+                    class="secondary-button"
+                    type="button">
+                Wróć do ClassFlow
+            </button>
+        </header>
+
+        <nav class="room-setup-progress" aria-label="Postęp konfiguracji">
+            <div class="room-setup-progress-item is-complete">
+                <span>✓</span><small>Szkoła</small>
+            </div>
+            <div class="room-setup-progress-line is-complete"></div>
+            <div class="room-setup-progress-item is-active">
+                <span>2</span><small>Sale</small>
+            </div>
+            <div class="room-setup-progress-line"></div>
+            <div class="room-setup-progress-item">
+                <span>3</span><small>Nauczyciele</small>
+            </div>
+            <div class="room-setup-progress-line"></div>
+            <div class="room-setup-progress-item">
+                <span>4</span><small>Klasy</small>
+            </div>
+            <div class="room-setup-progress-line"></div>
+            <div class="room-setup-progress-item">
+                <span>5</span><small>Przedmioty</small>
+            </div>
+            <div class="room-setup-progress-line"></div>
+            <div class="room-setup-progress-item">
+                <span>6</span><small>Lekcje</small>
+            </div>
+            <div class="room-setup-progress-line"></div>
+            <div class="room-setup-progress-item">
+                <span>7</span><small>Gotowe</small>
+            </div>
+        </nav>
+
+        <section class="room-setup-card">
+            <div class="room-setup-step-heading">
+                <span>Krok 2 z 7</span>
+                <h2>Dodaj sale</h2>
+                <p>
+                    Najszybciej utworzysz je z zakresów numerów.
+                    Możesz użyć kilku zakresów dla każdego budynku.
+                </p>
+            </div>
+
+            <div class="room-setup-mode-choice">
+                <label class="room-setup-choice-card">
+                    <input type="radio"
+                           name="roomSetupMode"
+                           value="generate"
+                           checked />
+                    <span>
+                        <strong>Wygeneruj automatycznie</strong>
+                        <small>np. 1–20 albo 1–5, 11–15, 21–25</small>
+                    </span>
+                </label>
+
+                <label class="room-setup-choice-card">
+                    <input type="radio"
+                           name="roomSetupMode"
+                           value="manual" />
+                    <span>
+                        <strong>Dodaj ręcznie</strong>
+                        <small>Dla pojedynczych lub nietypowych nazw sal</small>
+                    </span>
+                </label>
+            </div>
+
+            <div id="roomGeneratorPanel">
+                <div id="roomGeneratorBuildings"
+                     class="room-generator-buildings"></div>
+
+                <div class="room-special-section">
+                    <div>
+                        <h3>Sale specjalne</h3>
+                        <p>Opcjonalnie dodaj typowe pomieszczenia. Nic nie jest zaznaczone domyślnie.</p>
+                    </div>
+
+                    <div class="room-special-grid">
+                        <label><input type="checkbox" value="Sala gimnastyczna" /> Sala gimnastyczna</label>
+                        <label><input type="checkbox" value="Biblioteka" /> Biblioteka</label>
+                        <label><input type="checkbox" value="Świetlica" /> Świetlica</label>
+                        <label><input type="checkbox" value="Pracownia komputerowa" /> Pracownia komputerowa</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="roomManualPanel" hidden>
+                <div class="room-manual-toolbar">
+                    <p>Dodaj nazwę sali i wybierz budynek.</p>
+                    <button id="addManualRoomButton"
+                            class="secondary-button"
+                            type="button">
+                        + Dodaj salę
+                    </button>
+                </div>
+
+                <div id="manualRoomRows" class="manual-room-rows"></div>
+            </div>
+
+            <div class="room-preview-section">
+                <div class="room-preview-header">
+                    <div>
+                        <h3>Podgląd</h3>
+                        <p id="roomSetupPreviewSummary">Jeszcze nic nie wygenerowano.</p>
+                    </div>
+
+                    <button id="refreshRoomPreviewButton"
+                            class="secondary-button"
+                            type="button">
+                        Odśwież podgląd
+                    </button>
+                </div>
+
+                <div id="roomSetupWarnings"
+                     class="room-setup-warnings"
+                     hidden></div>
+
+                <div id="roomSetupPreview"
+                     class="room-preview-groups"></div>
+            </div>
+
+            <p id="roomSetupMessage"
+               class="form-message"
+               aria-live="polite"></p>
+
+            <div class="room-setup-actions">
+                <button id="backToSchoolSetupButton"
+                        class="secondary-button"
+                        type="button">
+                    ← Wstecz
+                </button>
+
+                <button id="saveGeneratedRoomsButton"
+                        class="main-action-button"
+                        type="button">
+                    Zapisz sale i przejdź dalej →
+                </button>
+            </div>
+        </section>
+    </div>
+</section>
+
+<div id="normalRoomsPage" class="page-container">
 <header class="app-header teachers-header">
 
 

@@ -1,20 +1,11 @@
 const storageKey = "classFlowWelcomeGuideHidden";
 
 function hideWelcomeGuide() {
-    const overlay = document.getElementById("welcomeGuideOverlay");
+    const overlay =
+        document.getElementById("welcomeGuideOverlay");
+
     overlay?.classList.add("hidden");
     document.body.classList.remove("welcome-guide-open");
-}
-
-function showWelcomeGuide() {
-    const overlay = document.getElementById("welcomeGuideOverlay");
-
-    if (!overlay) {
-        return;
-    }
-
-    overlay.classList.remove("hidden");
-    document.body.classList.add("welcome-guide-open");
 }
 
 function persistPreferenceIfNeeded() {
@@ -27,7 +18,8 @@ function persistPreferenceIfNeeded() {
 }
 
 export function initializeWelcomeGuide() {
-    const overlay = document.getElementById("welcomeGuideOverlay");
+    const overlay =
+        document.getElementById("welcomeGuideOverlay");
 
     if (!overlay) {
         return;
@@ -46,7 +38,9 @@ export function initializeWelcomeGuide() {
 
     startButton?.addEventListener("click", () => {
         persistPreferenceIfNeeded();
-        hideWelcomeGuide();
+
+        // Start the guided first-run setup.
+        window.location.href = "setup.html";
     });
 
     overlay.addEventListener("click", event => {
@@ -70,6 +64,7 @@ export function initializeWelcomeGuide() {
         localStorage.getItem(storageKey) === "true";
 
     if (!isHidden) {
-        showWelcomeGuide();
+        overlay.classList.remove("hidden");
+        document.body.classList.add("welcome-guide-open");
     }
 }
