@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="app.pageTitle">ClassFlow - Dashboard</title>
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/setup-status.css" />
+    <link rel="stylesheet" href="css/welcome-guide.css" />
 </head>
 
 <body>
@@ -147,39 +147,6 @@
                 </aside>
 
                 <div class="dashboard-content">
-
-
-                    <section class="app-card app-panel setup-status-panel">
-                        <div class="setup-status-header">
-                            <div>
-                                <h2 id="setupStatusTitle">School setup</h2>
-                                <p id="setupStatusSubtitle">
-                                    Check whether the data required to build the timetable is complete.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div id="setupStatusList"
-                             class="setup-status-list"
-                             aria-live="polite">
-                            <p class="setup-status-loading">
-                                Checking setup...
-                            </p>
-                        </div>
-
-                        <div class="setup-next-step">
-                            <p id="setupNextStepText"
-                               class="setup-next-step-text">
-                                Determining the next step...
-                            </p>
-
-                            <button id="setupNextStepButton"
-                                    class="app-button app-button-secondary"
-                                    type="button">
-                                Go
-                            </button>
-                        </div>
-                    </section>
 
                     <section class="app-card app-panel optimization-panel">
                         <div class="optimization-heading">
@@ -389,6 +356,159 @@
 
         </div>
     </main>
+
+    
+    <div id="welcomeGuideOverlay"
+         class="welcome-guide-overlay hidden"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="welcomeGuideTitle">
+
+        <section class="welcome-guide-modal">
+            <button id="welcomeGuideCloseButton"
+                    class="welcome-guide-close"
+                    type="button"
+                    aria-label="Zamknij">
+                ×
+            </button>
+
+            <div class="welcome-guide-header">
+                <div class="welcome-guide-badge">Pierwsze uruchomienie</div>
+
+                <h2 id="welcomeGuideTitle">Witaj w ClassFlow</h2>
+
+                <p class="welcome-guide-lead">
+                    Dane szkoły możesz zawsze wprowadzać i edytować ręcznie.
+                    Żeby jednak oszczędzić Ci pracy, ClassFlow będzie próbował
+                    przygotować jak najwięcej informacji automatycznie.
+                </p>
+
+                <p class="welcome-guide-note">
+                    Najlepszy efekt uzyskamy, jeśli dane zostaną przygotowane
+                    w poniższej kolejności. Dzięki temu informacje wprowadzone
+                    wcześniej mogą być wykorzystane w kolejnych krokach.
+                </p>
+            </div>
+
+            <div class="welcome-guide-steps">
+                <article class="welcome-guide-step">
+                    <div class="welcome-guide-step-number">1</div>
+                    <div>
+                        <h3>Szkoła i budynki</h3>
+                        <p>
+                            Zacznij od podstawowych informacji o szkole.
+                            Niektóre szkoły korzystają z jednego budynku,
+                            inne z kilku, dlatego każdy budynek może być
+                            opisany osobno.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="welcome-guide-step">
+                    <div class="welcome-guide-step-number">2</div>
+                    <div>
+                        <h3>Sale</h3>
+                        <p>
+                            Dodaj sale znajdujące się w poszczególnych budynkach.
+                            Później pomożemy tworzyć je szybciej, np. z zakresów
+                            numerów, zamiast wpisywać każdą salę oddzielnie.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="welcome-guide-step">
+                    <div class="welcome-guide-step-number">3</div>
+                    <div>
+                        <h3>Nauczyciele</h3>
+                        <p>
+                            Listę nauczycieli można wpisać ręcznie albo
+                            zaimportować z pliku Excel. Informacja o nauczanych
+                            przedmiotach pomoże później automatycznie proponować
+                            właściwe przypisania.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="welcome-guide-step">
+                    <div class="welcome-guide-step-number">4</div>
+                    <div>
+                        <h3>Klasy</h3>
+                        <p>
+                            Dodaj klasy i ich podstawowe informacje.
+                            Dane o klasach będą później używane podczas
+                            przygotowywania planu nauczania i przypisań nauczycieli.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="welcome-guide-step welcome-guide-step-highlight">
+                    <div class="welcome-guide-step-number">5</div>
+                    <div>
+                        <h3>Przedmioty i ramowy plan nauczania</h3>
+                        <p>
+                            Dla polskiej szkoły podstawowej ClassFlow będzie mógł
+                            przygotować listę przedmiotów oraz liczbę godzin
+                            dla poszczególnych roczników na podstawie oficjalnego
+                            ramowego planu nauczania.
+                        </p>
+
+                        <div class="welcome-guide-source">
+                            <strong>Źródło danych:</strong>
+                            Rozporządzenie Ministra Edukacji z 22 lipca 2026 r.
+                            w sprawie ramowych planów nauczania dla publicznych szkół
+                            (Dz.U. 2026 poz. 1028), z uwzględnieniem przepisów
+                            przejściowych właściwych dla danego rocznika.
+                        </div>
+
+                        <p class="welcome-guide-muted">
+                            Przed dodaniem danych zobaczysz podgląd i zdecydujesz,
+                            czy je zaakceptować. Później wszystko nadal będzie
+                            można ręcznie zmienić, dodać lub usunąć.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="welcome-guide-step">
+                    <div class="welcome-guide-step-number">6</div>
+                    <div>
+                        <h3>Przypisania i lekcje</h3>
+                        <p>
+                            Na podstawie klas, przedmiotów i nauczycieli ClassFlow
+                            spróbuje przygotować możliwie dużo danych automatycznie.
+                            Ty zajmiesz się głównie wyjątkami i niejednoznacznymi
+                            przypadkami.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="welcome-guide-step">
+                    <div class="welcome-guide-step-number">7</div>
+                    <div>
+                        <h3>Dostępność, reguły i optymalizacja</h3>
+                        <p>
+                            Na końcu dodasz ograniczenia, preferencje i dostępność.
+                            Kiedy dane będą gotowe, ClassFlow będzie mógł wygenerować
+                            plan lekcji.
+                        </p>
+                    </div>
+                </article>
+            </div>
+
+            <div class="welcome-guide-footer">
+                <label class="welcome-guide-checkbox">
+                    <input id="welcomeGuideDontShowAgain" type="checkbox" />
+                    <span>Nie pokazuj tego przewodnika ponownie</span>
+                </label>
+
+                <button id="welcomeGuideStartButton"
+                        class="app-button"
+                        type="button">
+                    Rozpocznij konfigurację
+                </button>
+            </div>
+        </section>
+    </div>
+
 
     <script src="/js/appContext.js"></script>
     <script src="/js/signalr/dist/browser/signalr.min.js"></script>
