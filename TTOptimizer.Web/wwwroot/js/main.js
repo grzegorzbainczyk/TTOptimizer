@@ -4,6 +4,7 @@ import { initializeOptimization } from "./main/optimization-service.js";
 import { initializeTimetable } from "./main/timetable.js";
 import { initializeCsvExport } from "./main/csv-export.js";
 import { initializeSchoolSummary } from "./main/school-summary.js";
+import { initializeSetupStatus } from "./main/setup-status.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     await initializeI18n();
@@ -11,5 +12,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     initializeTimetable();
     initializeCsvExport();
     await initializeSchoolSummary();
+    await initializeSetupStatus();
     await initializeOptimization();
 });

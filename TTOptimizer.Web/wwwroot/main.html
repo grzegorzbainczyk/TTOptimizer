@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="app.pageTitle">ClassFlow - Dashboard</title>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/setup-status.css" />
 </head>
 
 <body>
@@ -146,6 +147,39 @@
                 </aside>
 
                 <div class="dashboard-content">
+
+
+                    <section class="app-card app-panel setup-status-panel">
+                        <div class="setup-status-header">
+                            <div>
+                                <h2 id="setupStatusTitle">School setup</h2>
+                                <p id="setupStatusSubtitle">
+                                    Check whether the data required to build the timetable is complete.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div id="setupStatusList"
+                             class="setup-status-list"
+                             aria-live="polite">
+                            <p class="setup-status-loading">
+                                Checking setup...
+                            </p>
+                        </div>
+
+                        <div class="setup-next-step">
+                            <p id="setupNextStepText"
+                               class="setup-next-step-text">
+                                Determining the next step...
+                            </p>
+
+                            <button id="setupNextStepButton"
+                                    class="app-button app-button-secondary"
+                                    type="button">
+                                Go
+                            </button>
+                        </div>
+                    </section>
 
                     <section class="app-card app-panel optimization-panel">
                         <div class="optimization-heading">
