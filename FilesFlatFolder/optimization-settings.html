@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="settings.pageTitle">ClassFlow - Optimization settings</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/optimization-settings.css" />
+</head>
+<body>
+    <main class="app-shell">
+        <div class="app-container">
+            <header class="app-header app-hero">
+                <div class="hero-title-row">
+                    <img src="images/logos/logo.png" alt="ClassFlow logo" class="app-logo">
+                    <div class="hero-content">
+                        <div class="hero-badge" data-i18n="settings.developerConfiguration">Developer configuration</div>
+                        <h1 data-i18n="settings.title">Optimization settings</h1>
+                        <p class="hero-subtitle" data-i18n="settings.subtitle">Configure parameters used by the genetic optimization engine.</p>
+                        <p class="hero-tech" data-i18n="settings.storageInfo">These settings are stored locally in this browser.</p>
+                    </div>
+                </div>
+            </header>
+
+            <section class="app-card app-panel settings-page">
+                <div class="settings-page-header">
+                    <div>
+                        <h2 data-i18n="settings.configurationTitle">Genetic algorithm configuration</h2>
+                        <p data-i18n="settings.configurationInfo">Values saved here are intended for development and testing.</p>
+                    </div>
+                    <button id="backToMainButton" class="app-button app-button-secondary" type="button"><span data-i18n="settings.backToMain">Back to main</span></button>
+                </div>
+
+                <form id="optimizationSettingsForm">
+                    <section class="settings-section">
+                        <h3 data-i18n="settings.ga.title">Genetic algorithm</h3>
+                        <div class="settings-grid">
+                            <label class="settings-field" for="populationSize">
+                                <span data-i18n="settings.ga.populationSize">Population size</span>
+                                <input id="populationSize" name="populationSize" type="number" min="1" step="1" required />
+                                <small data-i18n="settings.ga.populationSizeHelp">Number of chromosomes in each generation.</small>
+                            </label>
+                            <label class="settings-field" for="generations">
+                                <span data-i18n="settings.ga.generations">Generations</span>
+                                <input id="generations" name="generations" type="number" min="1" step="1" required />
+                                <small data-i18n="settings.ga.generationsHelp">Maximum number of generations.</small>
+                            </label>
+                            <label class="settings-field" for="eliteCount">
+                                <span data-i18n="settings.ga.eliteCount">Elite count</span>
+                                <input id="eliteCount" name="eliteCount" type="number" min="0" step="1" required />
+                                <small data-i18n="settings.ga.eliteCountHelp">Best chromosomes copied unchanged.</small>
+                            </label>
+                            <label class="settings-field" for="tournamentSize">
+                                <span data-i18n="settings.ga.tournamentSize">Tournament size</span>
+                                <input id="tournamentSize" name="tournamentSize" type="number" min="1" step="1" required />
+                                <small data-i18n="settings.ga.tournamentSizeHelp">Number of candidates used during parent selection.</small>
+                            </label>
+                            <label class="settings-field" for="mutationAttempts">
+                                <span data-i18n="settings.ga.mutationAttempts">Mutation attempts</span>
+                                <input id="mutationAttempts" name="mutationAttempts" type="number" min="0" step="1" required />
+                                <small data-i18n="settings.ga.mutationAttemptsHelp">Mutated candidates tested for each child.</small>
+                            </label>
+                            <label class="settings-field" for="mutationProbability">
+                                <span data-i18n="settings.ga.mutationProbability">Mutation probability</span>
+                                <input id="mutationProbability" name="mutationProbability" type="number" min="0" max="1" step="0.01" required />
+                                <small data-i18n="settings.ga.mutationProbabilityHelp">Value from 0.0 to 1.0.</small>
+                            </label>
+                            <label class="settings-field" for="randomSeed">
+                                <span data-i18n="settings.ga.randomSeed">Random seed</span>
+                                <input id="randomSeed" name="randomSeed" type="number" min="0" step="1" required />
+                                <small data-i18n="settings.ga.randomSeedHelp">Allows an optimization run to be reproduced.</small>
+                            </label>
+                            <label class="settings-field" for="threadCount">
+                                <span data-i18n="settings.ga.threadCount">Thread count</span>
+                                <input id="threadCount" name="threadCount" type="number" min="1" step="1" required />
+                                <small data-i18n="settings.ga.threadCountHelp">Reserved for parallel evaluation.</small>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="settings-section">
+                        <h3 data-i18n="settings.stop.title">Stopping conditions</h3>
+                        <div class="settings-grid">
+                            <label class="settings-field settings-checkbox-field" for="stopWhenPerfect">
+                                <span data-i18n="settings.stop.whenPerfect">Stop when perfect</span>
+                                <span class="checkbox-row"><input id="stopWhenPerfect" name="stopWhenPerfect" type="checkbox" /> <span data-i18n="settings.stop.whenPerfectHelp">Stop after finding a feasible timetable with zero soft penalty.</span></span>
+                            </label>
+                            <label class="settings-field" for="stagnationGenerationLimit">
+                                <span data-i18n="settings.stop.stagnationLimit">Stagnation generation limit</span>
+                                <input id="stagnationGenerationLimit" name="stagnationGenerationLimit" type="number" min="0" step="1" required />
+                                <small data-i18n="settings.stop.stagnationLimitHelp">Zero disables this condition.</small>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="settings-section">
+                        <h3 data-i18n="settings.diagnostics.title">Diagnostics</h3>
+                        <div class="settings-grid">
+                            <label class="settings-field settings-checkbox-field" for="enableProgressLogging">
+                                <span data-i18n="settings.diagnostics.enableLogging">Enable progress logging</span>
+                                <span class="checkbox-row"><input id="enableProgressLogging" name="enableProgressLogging" type="checkbox" /> <span data-i18n="settings.diagnostics.enableLoggingHelp">Write progress information to the engine console.</span></span>
+                            </label>
+                            <label class="settings-field" for="progressLogInterval">
+                                <span data-i18n="settings.diagnostics.interval">Progress log interval</span>
+                                <input id="progressLogInterval" name="progressLogInterval" type="number" min="1" step="1" required />
+                                <small data-i18n="settings.diagnostics.intervalHelp">Number of generations between progress messages.</small>
+                            </label>
+                        </div>
+                    </section>
+                    <section class="settings-section">
+                        <h3 data-i18n="settings.ai.title">AI connection test</h3>
+
+                        <div class="settings-grid">
+                            <label class="settings-field" for="aiTestPrompt">
+                                <span data-i18n="settings.ai.prompt">Test prompt</span>
+                                <textarea id="aiTestPrompt"
+                                          rows="3"
+                                          placeholder="Example: Say hello from ClassFlow." data-i18n-placeholder="settings.ai.promptPlaceholder"></textarea>
+                                <small>
+                                    Sends a simple prompt to the configured LLM service.
+                                    Nothing is saved to the database.
+                                </small>
+                            </label>
+
+                            <label class="settings-field" for="aiTestResponse">
+                                <span data-i18n="settings.ai.response">AI response</span>
+                                <textarea id="aiTestResponse"
+                                          rows="5"
+                                          readonly
+                                          placeholder="The response from the LLM will appear here." data-i18n-placeholder="settings.ai.responsePlaceholder"></textarea>
+                            </label>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button id="testAIButton"
+                                    class="app-button app-button-secondary"
+                                    type="button">
+                                Test AI
+                            </button>
+                        </div>
+
+                        <p id="aiTestStatus"
+                           class="settings-status"
+                           role="status"
+                           aria-live="polite">
+                        </p>
+                    </section>
+
+                    <section class="settings-section">
+                        <h3 data-i18n="settings.penalties.title">Penalty settings</h3>
+                        <div class="settings-grid settings-grid-penalties">
+                            <label class="settings-field" for="penaltyLow"><span data-i18n="settings.penalties.low">Low</span><input id="penaltyLow" name="penaltyLow" type="number" min="0" step="1" required /></label>
+                            <label class="settings-field" for="penaltyMedium"><span data-i18n="settings.penalties.medium">Medium</span><input id="penaltyMedium" name="penaltyMedium" type="number" min="0" step="1" required /></label>
+                            <label class="settings-field" for="penaltyHigh"><span data-i18n="settings.penalties.high">High</span><input id="penaltyHigh" name="penaltyHigh" type="number" min="0" step="1" required /></label>
+                            <label class="settings-field" for="penaltyHard"><span data-i18n="settings.penalties.hard">Hard</span><input id="penaltyHard" name="penaltyHard" type="number" min="0" step="1" required /></label>
+                        </div>
+                    </section>
+
+                    <div class="settings-actions">
+                        <button class="app-button app-button-primary-warm" type="submit" data-i18n="settings.save">Save settings</button>
+                        <button id="resetSettingsButton" class="app-button app-button-secondary" type="button" data-i18n="settings.reset">Reset defaults</button>
+                    </div>
+                    <p id="settingsStatus" class="settings-status" role="status" aria-live="polite"></p>
+                </form>
+            </section>
+
+            <footer class="app-footer" data-i18n="app.createdBy">Created by Grzegorz Bainczyk</footer>
+        </div>
+    </main>
+    <script src="js/optimization-settings.js"></script>
+    <script type="module">
+        import { initializeI18n } from "/js/i18n.js";
+        document.addEventListener("DOMContentLoaded", initializeI18n);
+    </script>
+</body>
+</html>

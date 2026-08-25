@@ -62,6 +62,7 @@ async function loadSetupData() {
             ));
         }
 
+        document.getElementById("schoolType").value = String(school.schoolType ?? 0);
         document.getElementById("schoolName").value = school.name ?? "";
         document.getElementById("schoolAddress").value = school.address ?? "";
         document.getElementById("directorName").value = school.directorName ?? "";
@@ -234,6 +235,15 @@ function addBuildingRow(building = {}) {
 }
 
 async function saveAndContinue() {
+    const schoolType =
+        Number(document.getElementById("schoolType").value);
+
+    if (!Number.isInteger(schoolType) || schoolType <= 0) {
+        showMessage(t("setup.schoolType.required"), true);
+        document.getElementById("schoolType").focus();
+        return;
+    }
+
     const schoolName =
         document.getElementById("schoolName").value.trim();
 
@@ -349,6 +359,8 @@ async function saveSchool(organizationId) {
             body: JSON.stringify({
                 name:
                     document.getElementById("schoolName").value.trim(),
+                schoolType:
+                    Number(document.getElementById("schoolType").value),
                 address:
                     document.getElementById("schoolAddress").value.trim() || null,
                 directorName:
@@ -421,6 +433,7 @@ async function saveBuildings(organizationId, buildings) {
 
 function setBusy(disabled) {
     for (const selector of [
+        "#schoolType",
         "#schoolName",
         "#schoolAddress",
         "#directorName",

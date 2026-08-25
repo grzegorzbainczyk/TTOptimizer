@@ -77,6 +77,7 @@ namespace TTOptimizer.Web.Data
                 entity.Property(x => x.Name).IsRequired().HasMaxLength(200);
                 entity.Property(x => x.Address).HasMaxLength(500);
                 entity.Property(x => x.DirectorName).HasMaxLength(200);
+                entity.Property(x => x.SchoolType).HasDefaultValue(SchoolType.Unknown);
             });
 
             modelBuilder.Entity<AppUserOrganization>()

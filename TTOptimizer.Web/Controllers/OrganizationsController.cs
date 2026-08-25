@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Models.DTO.Organizations;
+using TTOptimizer.Web.Models.Domain;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -36,7 +37,8 @@ public class OrganizationsController : ControllerBase
                 Id = item.Id,
                 Name = item.Name,
                 Address = item.Address,
-                DirectorName = item.DirectorName
+                DirectorName = item.DirectorName,
+                SchoolType = item.SchoolType
             })
             .FirstOrDefaultAsync();
 
@@ -86,6 +88,16 @@ public class OrganizationsController : ControllerBase
             });
         }
 
+        if (request.SchoolType == SchoolType.Unknown ||
+            !Enum.IsDefined(request.SchoolType))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "School type is required."
+            });
+        }
+
         var address = NormalizeOptional(request.Address);
         var directorName = NormalizeOptional(request.DirectorName);
 
@@ -122,6 +134,7 @@ public class OrganizationsController : ControllerBase
         organization.Name = name;
         organization.Address = address;
         organization.DirectorName = directorName;
+        organization.SchoolType = request.SchoolType;
 
         await _dbContext.SaveChangesAsync();
 
@@ -130,7 +143,8 @@ public class OrganizationsController : ControllerBase
             Id = organization.Id,
             Name = organization.Name,
             Address = organization.Address,
-            DirectorName = organization.DirectorName
+            DirectorName = organization.DirectorName,
+            SchoolType = organization.SchoolType
         });
     }
 

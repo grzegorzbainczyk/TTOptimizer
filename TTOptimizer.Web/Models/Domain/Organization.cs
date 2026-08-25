@@ -10,6 +10,8 @@ namespace TTOptimizer.Web.Models.Domain
 
         public string? DirectorName { get; set; }
 
+        public SchoolType SchoolType { get; set; } = SchoolType.Unknown;
+
         public List<AppUserOrganization> AppUserOrganizations { get; set; } = new();
 
         public List<Teacher> Teachers { get; set; } = new();
