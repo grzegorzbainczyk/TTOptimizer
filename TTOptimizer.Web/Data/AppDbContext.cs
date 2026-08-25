@@ -20,6 +20,7 @@ namespace TTOptimizer.Web.Data
         public DbSet<Subject> Subjects => Set<Subject>();
         public DbSet<Room> Rooms => Set<Room>();
         public DbSet<Building> Buildings => Set<Building>();
+        public DbSet<SchoolUnit> SchoolUnits => Set<SchoolUnit>();
 
         public DbSet<LessonRequirement> LessonRequirements => Set<LessonRequirement>();
 
@@ -77,7 +78,6 @@ namespace TTOptimizer.Web.Data
                 entity.Property(x => x.Name).IsRequired().HasMaxLength(200);
                 entity.Property(x => x.Address).HasMaxLength(500);
                 entity.Property(x => x.DirectorName).HasMaxLength(200);
-                entity.Property(x => x.SchoolType).HasDefaultValue(SchoolType.Unknown);
             });
 
             modelBuilder.Entity<AppUserOrganization>()
@@ -126,6 +126,29 @@ namespace TTOptimizer.Web.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
+
+            modelBuilder.Entity<SchoolUnit>(entity =>
+            {
+                entity.Property(item => item.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(item => item.SchoolType)
+                    .HasDefaultValue(SchoolType.Unknown);
+
+                entity.HasIndex(item => new
+                {
+                    item.OrganizationId,
+                    item.Name
+                })
+                .IsUnique();
+
+                entity.HasOne(item => item.Organization)
+                    .WithMany(item => item.SchoolUnits)
+                    .HasForeignKey(item => item.OrganizationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
             modelBuilder.Entity<ClassGroup>(entity =>
             {
                 entity.Property(classGroup => classGroup.Name).IsRequired().HasMaxLength(50);
@@ -133,6 +156,11 @@ namespace TTOptimizer.Web.Data
 
                 entity.HasIndex(classGroup => new { classGroup.OrganizationId, classGroup.Name })
                     .IsUnique();
+
+                entity.HasOne(classGroup => classGroup.SchoolUnit)
+                    .WithMany(schoolUnit => schoolUnit.ClassGroups)
+                    .HasForeignKey(classGroup => classGroup.SchoolUnitId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(classGroup => classGroup.HomeroomTeacher)
                     .WithMany()

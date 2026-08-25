@@ -3,6 +3,7 @@ import { t } from "../i18n.js";
 let setupPlan = null;
 let existingSubjects = [];
 let preparedSubjects = [];
+let setupSchoolType = 0;
 
 export async function initializeSubjectSetupMode() {
     const params = new URLSearchParams(window.location.search);
@@ -21,6 +22,7 @@ export async function initializeSubjectSetupMode() {
     document.title = t("subjectSetup.pageTitle");
 
     wireEvents();
+    await loadSchoolType();
     await loadExistingSubjects();
 
     return true;
@@ -59,6 +61,50 @@ function wireEvents() {
 
     document.getElementById("saveSetupSubjectsButton")
         ?.addEventListener("click", saveSelectedSubjects);
+}
+
+async function loadSchoolType() {
+    const organizationId =
+        window.appContext.requireOrganizationId();
+
+    const response = await fetch(
+        `/api/organizations/${encodeURIComponent(organizationId)}`
+    );
+
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+        throw new Error(
+            getApiErrorMessage(
+                data,
+                `${t("subjectSetup.schoolTypeLoadFailed")} Status: ${response.status}`
+            )
+        );
+    }
+
+    setupSchoolType = Number(data?.schoolType ?? 0);
+}
+
+function getTeachingPlanUrl() {
+    switch (setupSchoolType) {
+        case 1:
+            return "data/teaching-plans/pl/primary/2026-2027.json";
+
+        case 2:
+            return "data/teaching-plans/pl/general-secondary/2026-2027.json";
+
+        case 3:
+            return "data/teaching-plans/pl/technical-secondary/2026-2027.json";
+
+        case 4:
+            return "data/teaching-plans/pl/vocational-first/2026-2027.json";
+
+        case 5:
+            return "data/teaching-plans/pl/vocational-second/2026-2027.json";
+
+        default:
+            return null;
+    }
 }
 
 async function loadExistingSubjects() {
@@ -102,8 +148,16 @@ async function prepareOfficialSubjects() {
     showMessage(t("subjectSetup.loading"), false);
 
     try {
+        const teachingPlanUrl = getTeachingPlanUrl();
+
+        if (!teachingPlanUrl) {
+            throw new Error(
+                t("subjectSetup.schoolTypeUnsupported")
+            );
+        }
+
         const response = await fetch(
-            "data/teaching-plans/pl/primary/2026-2027.json",
+            teachingPlanUrl,
             { cache: "no-store" }
         );
 
@@ -179,7 +233,9 @@ function renderSubjectList() {
         nowe: t("subjectSetup.category.new"),
         przejściowe: t("subjectSetup.category.transition"),
         pozostałe: t("subjectSetup.category.other"),
-        opcjonalne: t("subjectSetup.category.optional")
+        opcjonalne: t("subjectSetup.category.optional"),
+        rozszerzone: t("subjectSetup.category.extended"),
+        zawodowe: t("subjectSetup.category.vocational")
     };
 
     const categoryOrder = [
@@ -188,6 +244,8 @@ function renderSubjectList() {
         "przejściowe",
         "pozostałe",
         "opcjonalne",
+        "rozszerzone",
+        "zawodowe",
         "własne"
     ];
 

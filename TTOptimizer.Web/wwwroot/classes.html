@@ -29,6 +29,10 @@
 <div class="section-header teachers-section-header"><div><h2 data-i18n="classes.listTitle">Classes list</h2><p class="teachers-section-description"><span data-i18n="classes.listDescription">Manage class groups, homeroom teachers and default rooms.</span></p></div>
 
 <div class="teachers-header-actions">
+<div id="classImportSchoolUnitField" class="form-field" style="margin:0;">
+<label for="classImportSchoolUnitId">School for imported classes</label>
+<select id="classImportSchoolUnitId"></select>
+</div>
 <button class="secondary-button" id="importClassesButton" type="button" data-i18n="common.importXlsx">Import XLSX</button>
 <input id="classImportFileInput" type="file" accept=".xlsx" hidden />
 <button class="main-action-button teachers-add-button" id="addClassButton" type="button"><span aria-hidden="true">+</span>
@@ -43,6 +47,10 @@
 <div class="form-field">
 <label for="className" data-i18n="common.name">Name</label>
 <input id="className" maxlength="50" required="" type="text"/>
+</div>
+<div class="form-field" id="schoolUnitField">
+<label for="schoolUnitId">School</label>
+<select id="schoolUnitId" required></select>
 </div>
 <div class="form-field">
 <label for="homeroomTeacherId">
@@ -105,6 +113,7 @@
 <thead>
 <tr>
 <th data-i18n="common.name">Name</th>
+<th id="schoolUnitColumnHeader">School</th>
 <th><span data-i18n="classes.homeroomTeacher">Homeroom teacher</span></th>
 <th><span data-i18n="classes.defaultRoom">Default room</span></th>
 <th data-i18n="common.info">Info</th>
@@ -115,7 +124,7 @@
 </thead>
 <tbody>
 <tr>
-<td class="teachers-table-state" colspan="5">
+<td class="teachers-table-state" colspan="6">
                                 Loading classes...
                             </td>
 </tr>

@@ -1,0 +1,122 @@
+{
+  "country": "PL",
+  "schoolType": "vocational-first",
+  "schoolYear": "2026/2027",
+  "version": "2026-08-25",
+  "title": "Branżowa szkoła I stopnia - lista przedmiotów 2026/2027",
+  "source": {
+    "legalAct": "Rozporządzenie Ministra Edukacji z dnia 22 lipca 2026 r. w sprawie ramowych planów nauczania dla publicznych szkół (Dz.U. 2026 poz. 1028)",
+    "legalActUrl": "https://eli.gov.pl/eli/DU/2026/1028/ogl"
+  },
+  "transitionNote": "Załącznik nr 7 stosuje się w roku 2026/2027 w klasach I i II oraz w klasie III, w której kształcenie rozpoczęło się 1 września 2026 r. Dla klasy III rozpoczętej 1 lutego 2026 r. obowiązuje załącznik nr 24.",
+  "subjects": [
+    {
+      "name": "Język polski",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Język obcy nowożytny",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Historia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Edukacja obywatelska",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "II-III"
+    },
+    {
+      "name": "Biznes i zarządzanie",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I"
+    },
+    {
+      "name": "Geografia",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "dyrektor wybiera 2 z: geografia, biologia, chemia, fizyka"
+    },
+    {
+      "name": "Biologia",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "dyrektor wybiera 2 z: geografia, biologia, chemia, fizyka"
+    },
+    {
+      "name": "Chemia",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "dyrektor wybiera 2 z: geografia, biologia, chemia, fizyka"
+    },
+    {
+      "name": "Fizyka",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "dyrektor wybiera 2 z: geografia, biologia, chemia, fizyka"
+    },
+    {
+      "name": "Matematyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Informatyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I"
+    },
+    {
+      "name": "Wychowanie fizyczne",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Edukacja dla bezpieczeństwa",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I"
+    },
+    {
+      "name": "Edukacja zdrowotna",
+      "selectedByDefault": true,
+      "category": "pozostałe",
+      "appliesTo": "2 godziny łącznie, klasy ustala dyrektor"
+    },
+    {
+      "name": "Kształcenie zawodowe",
+      "selectedByDefault": false,
+      "category": "zawodowe",
+      "appliesTo": "50 godzin tygodniowych łącznie w trzyletnim okresie; podział zależy od zawodu"
+    },
+    {
+      "name": "Zajęcia z wychowawcą",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Religia",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Etyka",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "I-III"
+    }
+  ]
+}

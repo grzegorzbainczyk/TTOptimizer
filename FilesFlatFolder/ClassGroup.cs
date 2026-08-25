@@ -6,6 +6,8 @@ public class ClassGroup
 
     public int OrganizationId { get; set; }
 
+    public int SchoolUnitId { get; set; }
+
     public string Name { get; set; } = string.Empty;
 
     public string? Info { get; set; }
@@ -15,6 +17,8 @@ public class ClassGroup
     public int? DefaultRoomId { get; set; }
 
     public Organization Organization { get; set; } = null!;
+
+    public SchoolUnit SchoolUnit { get; set; } = null!;
 
     public Teacher? HomeroomTeacher { get; set; }
 

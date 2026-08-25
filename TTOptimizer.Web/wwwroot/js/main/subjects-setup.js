@@ -90,6 +90,18 @@ function getTeachingPlanUrl() {
         case 1:
             return "data/teaching-plans/pl/primary/2026-2027.json";
 
+        case 2:
+            return "data/teaching-plans/pl/general-secondary/2026-2027.json";
+
+        case 3:
+            return "data/teaching-plans/pl/technical-secondary/2026-2027.json";
+
+        case 4:
+            return "data/teaching-plans/pl/vocational-first/2026-2027.json";
+
+        case 5:
+            return "data/teaching-plans/pl/vocational-second/2026-2027.json";
+
         default:
             return null;
     }
@@ -221,7 +233,9 @@ function renderSubjectList() {
         nowe: t("subjectSetup.category.new"),
         przejściowe: t("subjectSetup.category.transition"),
         pozostałe: t("subjectSetup.category.other"),
-        opcjonalne: t("subjectSetup.category.optional")
+        opcjonalne: t("subjectSetup.category.optional"),
+        rozszerzone: t("subjectSetup.category.extended"),
+        zawodowe: t("subjectSetup.category.vocational")
     };
 
     const categoryOrder = [
@@ -230,6 +244,8 @@ function renderSubjectList() {
         "przejściowe",
         "pozostałe",
         "opcjonalne",
+        "rozszerzone",
+        "zawodowe",
         "własne"
     ];
 

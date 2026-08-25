@@ -43,6 +43,12 @@ public class SetupController : ControllerBase
             });
         }
 
+        var schoolUnitCount =
+            await _db.SchoolUnits
+                .AsNoTracking()
+                .CountAsync(item =>
+                    item.OrganizationId == organizationId);
+
         var buildingCount =
             await _db.Buildings
                 .AsNoTracking()
@@ -161,6 +167,9 @@ public class SetupController : ControllerBase
                 .CountAsync(item =>
                     item.OrganizationId == organizationId);
 
+        var schoolUnitsReady =
+            schoolUnitCount > 0;
+
         var buildingsReady =
             buildingCount > 0 &&
             roomCount > 0;
@@ -189,6 +198,7 @@ public class SetupController : ControllerBase
         var availabilityReady = true;
 
         var dataReadyForOptimization =
+            schoolUnitsReady &&
             buildingsReady &&
             classesReady &&
             subjectsReady &&
@@ -197,8 +207,10 @@ public class SetupController : ControllerBase
             lessonsReady;
 
         var nextStep =
-            !buildingsReady
-                ? "rooms"
+            !schoolUnitsReady
+                ? "school"
+                : !buildingsReady
+                    ? "rooms"
                 : !classesReady
                     ? "classes"
                     : !subjectsReady
@@ -214,6 +226,12 @@ public class SetupController : ControllerBase
         return Ok(new
         {
             success = true,
+
+            schoolUnits = new
+            {
+                ready = schoolUnitsReady,
+                count = schoolUnitCount
+            },
 
             buildingsAndRooms = new
             {

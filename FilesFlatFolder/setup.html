@@ -63,7 +63,7 @@
 <section class="setup-card">
 <div class="setup-step-heading">
 <span class="setup-step-label" data-i18n="setup.step1.label">Krok 1 z 7</span>
-<h2 data-i18n="setup.step1.title">Szkoła i budynki</h2>
+<h2 data-i18n="setup.step1.title">Podstawowe informacje o szkole</h2>
 <p>
                         Najpierw podaj podstawowe informacje o szkole i określ,
                         z ilu budynków korzysta. Te dane będą później używane
@@ -80,6 +80,19 @@
 </div>
 <div class="setup-form-grid">
 <div class="form-field form-field-full-width">
+<label data-i18n="setup.schoolType" for="schoolType">Typ szkoły</label>
+<select id="schoolType" required="">
+<option data-i18n="setup.schoolType.select" value="0">Wybierz typ szkoły</option>
+<option data-i18n="setup.schoolType.primary" value="1">Szkoła podstawowa</option>
+<option data-i18n="setup.schoolType.generalSecondary" value="2">Liceum ogólnokształcące</option>
+<option data-i18n="setup.schoolType.technicalSecondary" value="3">Technikum</option>
+<option data-i18n="setup.schoolType.vocationalFirst" value="4">Branżowa szkoła I stopnia</option>
+<option data-i18n="setup.schoolType.vocationalSecond" value="5">Branżowa szkoła II stopnia</option>
+</select>
+<small data-i18n="setup.schoolType.help">
+    Typ szkoły będzie używany do wyboru właściwego ramowego planu nauczania.
+  </small>
+</div><div class="form-field form-field-full-width">
 <label data-i18n="setup.schoolName" for="schoolName">Nazwa szkoły</label>
 <input id="schoolName" maxlength="200" placeholder="np. Szkoła Podstawowa w Wilkowie" required="" type="text"/>
 </div>

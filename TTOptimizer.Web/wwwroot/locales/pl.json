@@ -489,5 +489,7 @@
   "setup.schoolType.help": "Typ szkoły będzie używany do wyboru właściwego ramowego planu nauczania.",
   "setup.schoolType.required": "Wybierz typ szkoły.",
   "subjectSetup.schoolTypeLoadFailed": "Nie udało się wczytać typu szkoły.",
-  "subjectSetup.schoolTypeUnsupported": "Definicja ramowego planu nauczania dla tego typu szkoły nie została jeszcze dodana do ClassFlow. Możesz pominąć ten krok albo dodać przedmioty ręcznie."
+  "subjectSetup.schoolTypeUnsupported": "Definicja ramowego planu nauczania dla tego typu szkoły nie została jeszcze dodana do ClassFlow. Możesz pominąć ten krok albo dodać przedmioty ręcznie.",
+  "subjectSetup.category.extended": "Przedmioty rozszerzone",
+  "subjectSetup.category.vocational": "Kształcenie zawodowe"
 }

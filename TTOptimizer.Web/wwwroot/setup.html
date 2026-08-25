@@ -7,7 +7,8 @@
 <title>ClassFlow - Konfiguracja szkoły</title>
 <link href="css/style.css" rel="stylesheet"/>
 <link href="css/setup.css" rel="stylesheet"/>
-<link href="css/setup-language.css" rel="stylesheet"/></head>
+<link href="css/setup-language.css" rel="stylesheet"/>
+<link href="css/school-units-setup.css" rel="stylesheet"/></head>
 <body class="setup-page">
 <main class="setup-shell">
 <div class="setup-container">
@@ -80,19 +81,6 @@
 </div>
 <div class="setup-form-grid">
 <div class="form-field form-field-full-width">
-<label data-i18n="setup.schoolType" for="schoolType">Typ szkoły</label>
-<select id="schoolType" required="">
-<option data-i18n="setup.schoolType.select" value="0">Wybierz typ szkoły</option>
-<option data-i18n="setup.schoolType.primary" value="1">Szkoła podstawowa</option>
-<option data-i18n="setup.schoolType.generalSecondary" value="2">Liceum ogólnokształcące</option>
-<option data-i18n="setup.schoolType.technicalSecondary" value="3">Technikum</option>
-<option data-i18n="setup.schoolType.vocationalFirst" value="4">Branżowa szkoła I stopnia</option>
-<option data-i18n="setup.schoolType.vocationalSecond" value="5">Branżowa szkoła II stopnia</option>
-</select>
-<small data-i18n="setup.schoolType.help">
-    Typ szkoły będzie używany do wyboru właściwego ramowego planu nauczania.
-  </small>
-</div><div class="form-field form-field-full-width">
 <label data-i18n="setup.schoolName" for="schoolName">Nazwa szkoły</label>
 <input id="schoolName" maxlength="200" placeholder="np. Szkoła Podstawowa w Wilkowie" required="" type="text"/>
 </div>
@@ -106,6 +94,26 @@
 </div>
 </div>
 </div>
+<div class="setup-section">
+<div class="setup-section-title">
+<span class="setup-section-icon">🏫</span>
+<div>
+<h3>Szkoły w placówce</h3>
+<p>Dodaj wszystkie szkoły działające w ramach tej placówki. Zwykła szkoła będzie miała tu tylko jedną pozycję.</p>
+</div>
+</div>
+
+<div class="school-unit-list-header">
+<div>
+<strong>Szkoły</strong>
+<small>Każda szkoła ma własny typ, a więc także właściwy ramowy plan nauczania.</small>
+</div>
+<button class="secondary-button" id="addSchoolUnitRowButton" type="button">+ Dodaj szkołę</button>
+</div>
+
+<div class="school-unit-rows" id="schoolUnitRows"></div>
+</div>
+
 <div class="setup-section">
 <div class="setup-section-title">
 <span class="setup-section-icon">🏢</span>

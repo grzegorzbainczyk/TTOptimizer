@@ -22,6 +22,8 @@ namespace TTOptimizer.Web.Models.Domain
 
         public List<Building> Buildings { get; set; } = new();
 
+        public List<SchoolUnit> SchoolUnits { get; set; } = new();
+
         public List<LessonRequirement> LessonRequirements { get; set; } = new();
 
         public List<StudentGroup> StudentGroups { get; set; } = new();

@@ -1,7 +1,9 @@
-﻿namespace TTOptimizer.Web.Models.DTO.ClassGroups;
+namespace TTOptimizer.Web.Models.DTO.ClassGroups;
 
 public class UpdateClassGroupRequest
 {
+    public int SchoolUnitId { get; set; }
+
     public string Name { get; set; } = string.Empty;
 
     public string? Info { get; set; }

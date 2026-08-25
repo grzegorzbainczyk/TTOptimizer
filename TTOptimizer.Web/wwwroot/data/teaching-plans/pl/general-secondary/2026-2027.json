@@ -1,0 +1,176 @@
+{
+  "country": "PL",
+  "schoolType": "general-secondary",
+  "schoolYear": "2026/2027",
+  "version": "2026-08-25",
+  "title": "Liceum ogólnokształcące - lista przedmiotów 2026/2027",
+  "source": {
+    "legalAct": "Rozporządzenie Ministra Edukacji z dnia 22 lipca 2026 r. w sprawie ramowych planów nauczania dla publicznych szkół (Dz.U. 2026 poz. 1028)",
+    "legalActUrl": "https://eli.gov.pl/eli/DU/2026/1028/ogl"
+  },
+  "transitionNote": "W roku szkolnym 2026/2027 załącznik nr 4 stosuje się w klasach I i II, załącznik nr 19 w klasie III, a załącznik nr 20 w klasie IV. Lista jest sumą nazw zajęć potrzebnych do obsługi liceum w tym roku.",
+  "subjects": [
+    {
+      "name": "Język polski",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-IV"
+    },
+    {
+      "name": "Język obcy nowożytny",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-IV"
+    },
+    {
+      "name": "Drugi język obcy nowożytny albo język łaciński",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-IV"
+    },
+    {
+      "name": "Filozofia",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "do wyboru / rozszerzenie"
+    },
+    {
+      "name": "Plastyka",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "do wyboru w klasie I"
+    },
+    {
+      "name": "Muzyka",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "do wyboru w klasie I"
+    },
+    {
+      "name": "Język łaciński i kultura antyczna",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "do wyboru / rozszerzenie"
+    },
+    {
+      "name": "Historia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-IV"
+    },
+    {
+      "name": "Edukacja obywatelska",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III zgodnie z planem"
+    },
+    {
+      "name": "Historia i teraźniejszość",
+      "selectedByDefault": true,
+      "category": "przejściowe",
+      "appliesTo": "IV w roku 2026/2027"
+    },
+    {
+      "name": "Biznes i zarządzanie",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "zgodnie z planem"
+    },
+    {
+      "name": "Geografia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Biologia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Chemia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Fizyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Matematyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-IV"
+    },
+    {
+      "name": "Informatyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
+    },
+    {
+      "name": "Wychowanie fizyczne",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-IV"
+    },
+    {
+      "name": "Edukacja dla bezpieczeństwa",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I"
+    },
+    {
+      "name": "Edukacja zdrowotna",
+      "selectedByDefault": true,
+      "category": "pozostałe",
+      "appliesTo": "zgodnie z decyzją dyrektora"
+    },
+    {
+      "name": "Zajęcia z wychowawcą",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-IV"
+    },
+    {
+      "name": "Wiedza o społeczeństwie",
+      "selectedByDefault": false,
+      "category": "rozszerzone",
+      "appliesTo": "możliwy przedmiot rozszerzony"
+    },
+    {
+      "name": "Historia muzyki",
+      "selectedByDefault": false,
+      "category": "rozszerzone",
+      "appliesTo": "możliwy przedmiot rozszerzony"
+    },
+    {
+      "name": "Historia tańca",
+      "selectedByDefault": false,
+      "category": "rozszerzone",
+      "appliesTo": "możliwy przedmiot rozszerzony"
+    },
+    {
+      "name": "Historia sztuki",
+      "selectedByDefault": false,
+      "category": "rozszerzone",
+      "appliesTo": "możliwy przedmiot rozszerzony"
+    },
+    {
+      "name": "Religia",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "I-IV"
+    },
+    {
+      "name": "Etyka",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "I-IV"
+    }
+  ]
+}

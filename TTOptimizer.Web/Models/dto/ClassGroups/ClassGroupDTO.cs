@@ -1,8 +1,12 @@
-﻿namespace TTOptimizer.Web.Models.DTO.ClassGroups;
+namespace TTOptimizer.Web.Models.DTO.ClassGroups;
 
 public class ClassGroupDTO
 {
     public int Id { get; set; }
+
+    public int SchoolUnitId { get; set; }
+
+    public string SchoolUnitName { get; set; } = string.Empty;
 
     public string Name { get; set; } = string.Empty;
 

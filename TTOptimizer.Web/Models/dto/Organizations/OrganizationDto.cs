@@ -1,5 +1,3 @@
-using TTOptimizer.Web.Models.Domain;
-
 namespace TTOptimizer.Web.Models.DTO.Organizations;
 
 public class OrganizationDto
@@ -11,8 +9,6 @@ public class OrganizationDto
     public string? Address { get; set; }
 
     public string? DirectorName { get; set; }
-
-    public SchoolType SchoolType { get; set; }
 }
 
 public class UpdateOrganizationRequest
@@ -22,6 +18,4 @@ public class UpdateOrganizationRequest
     public string? Address { get; set; }
 
     public string? DirectorName { get; set; }
-
-    public SchoolType SchoolType { get; set; }
 }

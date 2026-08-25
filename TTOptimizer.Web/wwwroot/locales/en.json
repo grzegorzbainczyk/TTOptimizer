@@ -489,5 +489,7 @@
   "setup.schoolType.help": "The school type is used to select the correct official teaching plan.",
   "setup.schoolType.required": "Select the school type.",
   "subjectSetup.schoolTypeLoadFailed": "Could not load the school type.",
-  "subjectSetup.schoolTypeUnsupported": "An official teaching-plan definition for this school type has not been added to ClassFlow yet. You can skip this step or add subjects manually."
+  "subjectSetup.schoolTypeUnsupported": "An official teaching-plan definition for this school type has not been added to ClassFlow yet. You can skip this step or add subjects manually.",
+  "subjectSetup.category.extended": "Extended subjects",
+  "subjectSetup.category.vocational": "Vocational education"
 }
