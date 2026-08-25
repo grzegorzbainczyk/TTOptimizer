@@ -7,7 +7,8 @@
 <title data-i18n="subjects.pageTitle">ClassFlow - Subjects</title>
 <link href="css/style.css" rel="stylesheet"/>
 <link href="css/subjects-setup.css" rel="stylesheet"/>
-<link href="css/setup-language.css" rel="stylesheet"/></head>
+<link href="css/setup-language.css" rel="stylesheet"/>
+<link href="css/subjects-school-types.css" rel="stylesheet"/></head>
 <body class="teachers-page">
 <section class="subject-setup-shell" hidden="" id="subjectSetupMode">
 <div class="subject-setup-container">
@@ -50,11 +51,11 @@
                 </p>
 </div>
 <div class="subject-plan-toolbar">
-<div class="subject-plan-field">
-<label>Typ szkoły</label>
-<select disabled="" id="subjectSetupSchoolType">
-<option selected="">Szkoła podstawowa</option>
-</select>
+<div class="subject-plan-field subject-plan-schools-field">
+<label>Szkoły w placówce</label>
+<div class="subject-plan-school-units" id="subjectSetupSchoolUnits">
+<span>Wczytywanie typów szkół z konfiguracji placówki...</span>
+</div>
 </div>
 <div class="subject-plan-field">
 <label>Rok szkolny</label>

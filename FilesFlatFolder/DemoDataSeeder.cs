@@ -106,6 +106,37 @@ public class DemoDataSeeder
         return organization.Id;
     }
 
+    private async Task<SchoolUnit> GetOrCreateDemoSchoolUnitAsync(
+        int organizationId)
+    {
+        var schoolUnit = await _context.SchoolUnits
+            .Where(x => x.OrganizationId == organizationId)
+            .OrderBy(x => x.Id)
+            .FirstOrDefaultAsync();
+
+        if (schoolUnit != null)
+        {
+            return schoolUnit;
+        }
+
+        var organizationName = await _context.Organizations
+            .Where(x => x.Id == organizationId)
+            .Select(x => x.Name)
+            .SingleAsync();
+
+        schoolUnit = new SchoolUnit
+        {
+            OrganizationId = organizationId,
+            Name = organizationName,
+            SchoolType = SchoolType.PrimarySchool
+        };
+
+        _context.SchoolUnits.Add(schoolUnit);
+        await _context.SaveChangesAsync();
+
+        return schoolUnit;
+    }
+
     private async Task ClearDemoDataAsync(int organizationId)
     {
         var lessonRequirements =
@@ -149,6 +180,9 @@ public class DemoDataSeeder
     private async Task CreateEasyDemoDataAsync(
         int organizationId)
     {
+        var schoolUnit =
+            await GetOrCreateDemoSchoolUnitAsync(organizationId);
+
         var anna = new Teacher
         {
             TeacherNumber = 1,
@@ -202,7 +236,8 @@ public class DemoDataSeeder
             Info = "Main classroom for group 1A.",
             HomeroomTeacher = anna,
             DefaultRoom = room101,
-            OrganizationId = organizationId
+            OrganizationId = organizationId,
+            SchoolUnitId = schoolUnit.Id
         };
 
         var class1B = new ClassGroup
@@ -211,7 +246,8 @@ public class DemoDataSeeder
             Info = "Main classroom for group 1B.",
             HomeroomTeacher = jan,
             DefaultRoom = room102,
-            OrganizationId = organizationId
+            OrganizationId = organizationId,
+            SchoolUnitId = schoolUnit.Id
         };
 
         var mathematics = new Subject
@@ -314,6 +350,9 @@ public class DemoDataSeeder
     private async Task CreateHardDemoDataAsync(
         int organizationId)
     {
+        var schoolUnit =
+            await GetOrCreateDemoSchoolUnitAsync(organizationId);
+
         var teachers = CreateTeachers(
             organizationId,
             new[]
@@ -334,6 +373,7 @@ public class DemoDataSeeder
 
         var classGroups = CreateClassGroups(
             organizationId,
+            schoolUnit.Id,
             new[]
             {
                 "1A",
@@ -675,6 +715,7 @@ public class DemoDataSeeder
     private static Dictionary<string, ClassGroup>
         CreateClassGroups(
             int organizationId,
+            int schoolUnitId,
             IEnumerable<string> names)
     {
         return names.ToDictionary(
@@ -682,7 +723,8 @@ public class DemoDataSeeder
             name => new ClassGroup
             {
                 Name = name,
-                OrganizationId = organizationId
+                OrganizationId = organizationId,
+                SchoolUnitId = schoolUnitId
             });
     }
 

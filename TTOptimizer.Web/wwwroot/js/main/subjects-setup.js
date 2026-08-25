@@ -1,9 +1,9 @@
 import { t } from "../i18n.js";
 
-let setupPlan = null;
+let setupPlans = [];
+let setupSchoolUnits = [];
 let existingSubjects = [];
 let preparedSubjects = [];
-let setupSchoolType = 0;
 
 export async function initializeSubjectSetupMode() {
     const params = new URLSearchParams(window.location.search);
@@ -22,7 +22,7 @@ export async function initializeSubjectSetupMode() {
     document.title = t("subjectSetup.pageTitle");
 
     wireEvents();
-    await loadSchoolType();
+    await loadSchoolUnits();
     await loadExistingSubjects();
 
     return true;
@@ -63,12 +63,12 @@ function wireEvents() {
         ?.addEventListener("click", saveSelectedSubjects);
 }
 
-async function loadSchoolType() {
+async function loadSchoolUnits() {
     const organizationId =
         window.appContext.requireOrganizationId();
 
     const response = await fetch(
-        `/api/organizations/${encodeURIComponent(organizationId)}`
+        `/api/schoolunits?organizationId=${encodeURIComponent(organizationId)}`
     );
 
     const data = await readJsonResponse(response);
@@ -82,11 +82,77 @@ async function loadSchoolType() {
         );
     }
 
-    setupSchoolType = Number(data?.schoolType ?? 0);
+    setupSchoolUnits =
+        Array.isArray(data)
+            ? data
+            : data?.schoolUnits ?? [];
+
+    renderSchoolTypesSummary();
+
+    if (setupSchoolUnits.length === 0) {
+        showMessage(
+            "Nie zdefiniowano jeszcze żadnej szkoły w placówce. " +
+            "Możesz pominąć ten krok albo wrócić do konfiguracji placówki.",
+            false
+        );
+    }
 }
 
-function getTeachingPlanUrl() {
-    switch (setupSchoolType) {
+function renderSchoolTypesSummary() {
+    const container =
+        document.getElementById("subjectSetupSchoolUnits");
+
+    if (!container) {
+        return;
+    }
+
+    const schoolTypeNames = {
+        1: "Szkoła podstawowa",
+        2: "Liceum ogólnokształcące",
+        3: "Technikum",
+        4: "Branżowa szkoła I stopnia",
+        5: "Branżowa szkoła II stopnia"
+    };
+
+    const schoolTypes =
+        [
+            ...new Set(
+                setupSchoolUnits
+                    .map(unit => Number(unit.schoolType ?? 0))
+                    .filter(schoolType => schoolType > 0)
+            )
+        ];
+
+    if (schoolTypes.length === 0) {
+        container.innerHTML = `
+            <span>
+                Nie określono jeszcze typów szkół w placówce.
+            </span>
+        `;
+        return;
+    }
+
+    const items =
+        schoolTypes
+            .map(schoolType =>
+                schoolTypeNames[schoolType] ??
+                `Nieznany typ (${schoolType})`
+            )
+            .map(name =>
+                `<li>${escapeHtml(name)}</li>`
+            )
+            .join("");
+
+    container.innerHTML = `
+        <span>
+            Lista przedmiotów zostanie przygotowana dla następujących typów szkół:
+        </span>
+        <ul>${items}</ul>
+    `;
+}
+
+function getTeachingPlanUrl(schoolType) {
+    switch (Number(schoolType)) {
         case 1:
             return "data/teaching-plans/pl/primary/2026-2027.json";
 
@@ -105,6 +171,16 @@ function getTeachingPlanUrl() {
         default:
             return null;
     }
+}
+
+function getDistinctSchoolTypes() {
+    return [
+        ...new Set(
+            setupSchoolUnits
+                .map(unit => Number(unit.schoolType ?? 0))
+                .filter(schoolType => schoolType > 0)
+        )
+    ];
 }
 
 async function loadExistingSubjects() {
@@ -148,26 +224,49 @@ async function prepareOfficialSubjects() {
     showMessage(t("subjectSetup.loading"), false);
 
     try {
-        const teachingPlanUrl = getTeachingPlanUrl();
+        const schoolTypes = getDistinctSchoolTypes();
 
-        if (!teachingPlanUrl) {
+        if (schoolTypes.length === 0) {
+            throw new Error(
+                "Nie znaleziono typu szkoły. Najpierw skonfiguruj szkoły w placówce."
+            );
+        }
+
+        const planUrls =
+            schoolTypes
+                .map(schoolType => ({
+                    schoolType,
+                    url: getTeachingPlanUrl(schoolType)
+                }))
+                .filter(item => Boolean(item.url));
+
+        if (planUrls.length !== schoolTypes.length) {
             throw new Error(
                 t("subjectSetup.schoolTypeUnsupported")
             );
         }
 
-        const response = await fetch(
-            teachingPlanUrl,
-            { cache: "no-store" }
+        setupPlans = await Promise.all(
+            planUrls.map(async item => {
+                const response = await fetch(
+                    item.url,
+                    { cache: "no-store" }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Nie udało się wczytać danych ramowego planu. Status: ${response.status}`
+                    );
+                }
+
+                const plan = await response.json();
+
+                return {
+                    ...plan,
+                    schoolTypeValue: item.schoolType
+                };
+            })
         );
-
-        if (!response.ok) {
-            throw new Error(
-                `Nie udało się wczytać danych ramowego planu. Status: ${response.status}`
-            );
-        }
-
-        setupPlan = await response.json();
 
         const existingNameSet =
             new Set(
@@ -176,18 +275,76 @@ async function prepareOfficialSubjects() {
                 )
             );
 
-        preparedSubjects = setupPlan.subjects.map((item, index) => ({
-            id: `official-${index}`,
-            name: item.name,
-            category: item.category ?? "podstawowe",
-            appliesTo: item.appliesTo ?? "",
-            selected:
-                Boolean(item.selectedByDefault) &&
-                !existingNameSet.has(normalize(item.name)),
-            alreadyExists:
-                existingNameSet.has(normalize(item.name)),
-            isCustom: false
-        }));
+        const mergedByName = new Map();
+
+        for (const plan of setupPlans) {
+            for (const subject of plan.subjects ?? []) {
+                const key = normalize(subject.name);
+
+                if (!key) {
+                    continue;
+                }
+
+                const existing = mergedByName.get(key);
+
+                if (!existing) {
+                    mergedByName.set(key, {
+                        name: subject.name,
+                        category: subject.category ?? "podstawowe",
+                        appliesTo: subject.appliesTo ?? "",
+                        selectedByDefault: Boolean(subject.selectedByDefault),
+                        planTitles: [plan.title]
+                    });
+
+                    continue;
+                }
+
+                existing.selectedByDefault =
+                    existing.selectedByDefault ||
+                    Boolean(subject.selectedByDefault);
+
+                if (
+                    subject.appliesTo &&
+                    !existing.appliesTo.includes(subject.appliesTo)
+                ) {
+                    existing.appliesTo =
+                        existing.appliesTo
+                            ? `${existing.appliesTo}; ${subject.appliesTo}`
+                            : subject.appliesTo;
+                }
+
+                if (!existing.planTitles.includes(plan.title)) {
+                    existing.planTitles.push(plan.title);
+                }
+
+                if (
+                    existing.category === "opcjonalne" &&
+                    subject.category &&
+                    subject.category !== "opcjonalne"
+                ) {
+                    existing.category = subject.category;
+                }
+            }
+        }
+
+        preparedSubjects =
+            [...mergedByName.values()]
+                .sort((a, b) =>
+                    a.name.localeCompare(b.name, "pl")
+                )
+                .map((item, index) => ({
+                    id: `official-${index}`,
+                    name: item.name,
+                    category: item.category,
+                    appliesTo: item.appliesTo,
+                    selected:
+                        item.selectedByDefault &&
+                        !existingNameSet.has(normalize(item.name)),
+                    alreadyExists:
+                        existingNameSet.has(normalize(item.name)),
+                    isCustom: false,
+                    planTitles: item.planTitles
+                }));
 
         renderPlanInfo();
         renderSubjectList();
@@ -212,14 +369,49 @@ function renderPlanInfo() {
     const info = document.getElementById("subjectPlanInfo");
     info.hidden = false;
 
+    const legalActs =
+        [...new Set(
+            setupPlans
+                .map(plan => plan.source?.legalAct)
+                .filter(Boolean)
+        )];
+
     document.getElementById("subjectPlanLegalAct").textContent =
-        setupPlan.source?.legalAct ?? "";
+        legalActs.join(" · ");
+
+    const transitionNotes =
+        setupPlans
+            .map(plan => {
+                if (!plan.transitionNote) {
+                    return null;
+                }
+
+                return setupPlans.length > 1
+                    ? `${plan.title}: ${plan.transitionNote}`
+                    : plan.transitionNote;
+            })
+            .filter(Boolean);
 
     document.getElementById("subjectPlanTransitionNote").textContent =
-        setupPlan.transitionNote ?? "";
+        transitionNotes.join(" ");
 
     const link = document.getElementById("subjectPlanSourceLink");
-    link.href = setupPlan.source?.legalActUrl ?? "#";
+
+    const sourceUrls =
+        [...new Set(
+            setupPlans
+                .map(plan => plan.source?.legalActUrl)
+                .filter(Boolean)
+        )];
+
+    link.href = sourceUrls[0] ?? "#";
+
+    if (setupPlans.length > 1) {
+        link.title =
+            `Wykorzystano ${setupPlans.length} ramowych planów nauczania.`;
+    } else {
+        link.removeAttribute("title");
+    }
 }
 
 function renderSubjectList() {
