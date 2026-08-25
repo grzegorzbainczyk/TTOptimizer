@@ -37,30 +37,39 @@
                         </p>
                     </div>
 
-                    <div class="header-actions">
-                        <label for="languageSelector" class="visually-hidden" data-i18n="language.label">Language</label>
-                        <select id="languageSelector" aria-label="Language" data-i18n-aria-label="language.label">
-                            <option value="en">English</option>
-                            <option value="pl">Polski</option>
-                        </select>
+                    <div class="header-actions dashboard-header-actions">
+                        <button id="setupButton"
+                                class="dashboard-setup-button"
+                                type="button"
+                                title="Konfigurator szkoły"
+                                data-i18n-title="setup.dashboardTitle">
+                            <span class="dashboard-setup-button-icon" aria-hidden="true">🛠️</span>
+                            <span class="dashboard-setup-button-text"
+                                  data-i18n="setup.dashboardButton">Konfigurator szkoły</span>
+                        </button>
 
-                    <button id="setupButton"
-                            class="settings-button"
-                            type="button"
-                            title="School setup"
-                            data-i18n-title="setup.dashboardTitle">
-                        <span class="settings-button-icon">🛠️</span>
-                        <span data-i18n="setup.dashboardButton">School setup</span>
-                    </button>
+                        <div class="dashboard-utility-actions">
+                            <label for="languageSelector"
+                                   class="visually-hidden"
+                                   data-i18n="language.label">Language</label>
 
-                    <button id="optimizationSettingsButton"
-                            class="settings-button"
-                            type="button"
-                            title="Optimization settings"
-                            data-i18n-title="settings.title">
-                        <span class="settings-button-icon">⚙️</span>
-                        <span data-i18n="settings.button">Settings</span>
-                    </button>
+                            <select id="languageSelector"
+                                    class="dashboard-language-selector"
+                                    aria-label="Language"
+                                    data-i18n-aria-label="language.label">
+                                <option value="en">English</option>
+                                <option value="pl">Polski</option>
+                            </select>
+
+                            <button id="optimizationSettingsButton"
+                                    class="dashboard-utility-button"
+                                    type="button"
+                                    title="Optimization settings"
+                                    data-i18n-title="settings.title">
+                                <span class="dashboard-utility-button-icon" aria-hidden="true">⚙️</span>
+                                <span data-i18n="settings.button">Ustawienia</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>
