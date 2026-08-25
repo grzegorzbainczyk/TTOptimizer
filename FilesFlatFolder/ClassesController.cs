@@ -41,6 +41,8 @@ public class ClassesController : ControllerBase
             .Select(classGroup => new ClassGroupDTO
             {
                 Id = classGroup.Id,
+                SchoolUnitId = classGroup.SchoolUnitId,
+                SchoolUnitName = classGroup.SchoolUnit.Name,
                 Name = classGroup.Name,
                 Info = classGroup.Info,
 
@@ -80,6 +82,7 @@ public class ClassesController : ControllerBase
 
         var validationResult = await ValidateRequestAsync(
             organizationId,
+            request.SchoolUnitId,
             request.Name,
             request.HomeroomTeacherId,
             request.DefaultRoomId
@@ -111,6 +114,7 @@ public class ClassesController : ControllerBase
         var classGroup = new ClassGroup
         {
             OrganizationId = organizationId,
+            SchoolUnitId = request.SchoolUnitId,
             Name = normalizedName,
             Info = NormalizeOptionalText(request.Info),
             HomeroomTeacherId = request.HomeroomTeacherId,
@@ -207,6 +211,7 @@ public class ClassesController : ControllerBase
 
         var validationResult = await ValidateRequestAsync(
             organizationId,
+            request.SchoolUnitId,
             request.Name,
             request.HomeroomTeacherId,
             request.DefaultRoomId
@@ -237,6 +242,7 @@ public class ClassesController : ControllerBase
             });
         }
 
+        classGroup.SchoolUnitId = request.SchoolUnitId;
         classGroup.Name = normalizedName;
         classGroup.Info =
             NormalizeOptionalText(request.Info);
@@ -324,6 +330,7 @@ public class ClassesController : ControllerBase
     [HttpPost("import")]
     public async Task<IActionResult> ImportClasses(
         [FromQuery] int organizationId,
+        [FromQuery] int schoolUnitId,
         [FromBody] SimpleNameImportRequestDto request)
     {
         if (organizationId <= 0)
@@ -344,6 +351,20 @@ public class ClassesController : ControllerBase
             {
                 success = false,
                 message = "Organization was not found."
+            });
+        }
+
+        var schoolUnitExists = await _db.SchoolUnits.AnyAsync(
+            schoolUnit =>
+                schoolUnit.Id == schoolUnitId &&
+                schoolUnit.OrganizationId == organizationId);
+
+        if (!schoolUnitExists)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "A valid school is required for class import."
             });
         }
 
@@ -397,6 +418,7 @@ public class ClassesController : ControllerBase
                 var classGroup = new ClassGroup
                 {
                     OrganizationId = organizationId,
+                    SchoolUnitId = schoolUnitId,
                     Name = name,
                     Info = null,
                     HomeroomTeacherId = null,
@@ -893,10 +915,24 @@ public class ClassesController : ControllerBase
 
     private async Task<ActionResult?> ValidateRequestAsync(
         int organizationId,
+        int schoolUnitId,
         string? name,
         int? homeroomTeacherId,
         int? defaultRoomId)
     {
+        var schoolUnitExists = await _db.SchoolUnits
+            .AnyAsync(schoolUnit =>
+                schoolUnit.Id == schoolUnitId &&
+                schoolUnit.OrganizationId == organizationId);
+
+        if (!schoolUnitExists)
+        {
+            return BadRequest(new
+            {
+                message = "The selected school does not exist."
+            });
+        }
+
         if (string.IsNullOrWhiteSpace(name))
         {
             return BadRequest(new
@@ -965,6 +1001,8 @@ public class ClassesController : ControllerBase
             .Select(classGroup => new ClassGroupDTO
             {
                 Id = classGroup.Id,
+                SchoolUnitId = classGroup.SchoolUnitId,
+                SchoolUnitName = classGroup.SchoolUnit.Name,
                 Name = classGroup.Name,
                 Info = classGroup.Info,
 

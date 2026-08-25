@@ -7,7 +7,8 @@
 <title data-i18n="rooms.pageTitle">ClassFlow - Rooms</title>
 <link href="css/style.css" rel="stylesheet"/>
 <link href="css/rooms-setup.css" rel="stylesheet"/>
-<link href="css/setup-language.css" rel="stylesheet"/></head>
+<link href="css/setup-language.css" rel="stylesheet"/>
+<link href="css/setup-editor.css" rel="stylesheet"/></head>
 <body class="teachers-page">
 <section class="room-setup-shell" hidden="" id="roomSetupMode">
 <div class="room-setup-container">
@@ -56,12 +57,21 @@
 <section class="room-setup-card">
 <div class="room-setup-step-heading">
 <span data-i18n="roomSetup.stepLabel">Krok 2 z 7</span>
-<h2 data-i18n="roomSetup.heading">Dodaj sale</h2>
+<h2 data-i18n="roomSetup.heading">Sale w placówce</h2>
 <p>
-                    Najszybciej utworzysz je z zakresów numerów.
-                    Możesz użyć kilku zakresów dla każdego budynku.
+                    Najpierw widzisz sale, które już istnieją.
+                    Generator poniżej służy wyłącznie do dodawania nowych.
                 </p>
 </div>
+<section class="room-existing-section">
+<div class="room-preview-header">
+<div>
+<h3>Aktualne sale</h3>
+<p id="roomExistingSummary">Wczytywanie istniejących sal...</p>
+</div>
+</div>
+<div class="room-preview-groups" id="roomExistingGroups"></div>
+</section>
 <div class="room-setup-mode-choice">
 <label class="room-setup-choice-card">
 <input checked="" name="roomSetupMode" type="radio" value="generate"/>
@@ -105,7 +115,7 @@
 <div class="room-preview-section">
 <div class="room-preview-header">
 <div>
-<h3>Podgląd</h3>
+<h3>Nowe sale do dodania</h3>
 <p id="roomSetupPreviewSummary">Jeszcze nic nie wygenerowano.</p>
 </div>
 <button class="secondary-button" id="refreshRoomPreviewButton" type="button">
@@ -120,8 +130,11 @@
 <button class="secondary-button" id="backToSchoolSetupButton" type="button">
                     ← Wstecz
                 </button>
+<button class="secondary-button" id="skipRoomSetupButton" type="button">
+                    Dalej bez zmian →
+                </button>
 <button class="main-action-button" id="saveGeneratedRoomsButton" type="button">
-                    Zapisz sale i przejdź dalej →
+                    Zapisz nowe sale i przejdź dalej →
                 </button>
 </div>
 </section>

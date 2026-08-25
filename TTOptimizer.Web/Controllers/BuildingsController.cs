@@ -181,29 +181,47 @@ public class BuildingsController : ControllerBase
             return BadRequest(new { message = "Organization ID is required." });
         }
 
-        var building = await _db.Buildings.FirstOrDefaultAsync(item =>
-            item.Id == id && item.OrganizationId == organizationId);
+        var buildingExists = await _db.Buildings
+            .AsNoTracking()
+            .AnyAsync(item =>
+                item.Id == id &&
+                item.OrganizationId == organizationId);
 
-        if (building == null)
+        if (!buildingExists)
         {
             return NotFound(new { message = "Building not found." });
         }
 
-        var hasRooms = await _db.Rooms.AnyAsync(room =>
-            room.OrganizationId == organizationId && room.BuildingId == id);
+        await using var transaction =
+            await _db.Database.BeginTransactionAsync();
 
-        if (hasRooms)
+        try
         {
-            return Conflict(new
-            {
-                message = "The building cannot be deleted while rooms are assigned to it. Reassign or clear those rooms first."
-            });
+            // Delete directly in the database instead of loading Room entities
+            // into EF's change tracker. Database FK rules will then handle
+            // dependent data such as ClassGroup.DefaultRoomId (SET NULL),
+            // ScheduledLessons (CASCADE) and RoomTimeSlotPreferences (CASCADE).
+            await _db.Rooms
+                .Where(room =>
+                    room.OrganizationId == organizationId &&
+                    room.BuildingId == id)
+                .ExecuteDeleteAsync();
+
+            await _db.Buildings
+                .Where(building =>
+                    building.Id == id &&
+                    building.OrganizationId == organizationId)
+                .ExecuteDeleteAsync();
+
+            await transaction.CommitAsync();
+
+            return NoContent();
         }
-
-        _db.Buildings.Remove(building);
-        await _db.SaveChangesAsync();
-
-        return NoContent();
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     private static ActionResult? ValidateRequest(

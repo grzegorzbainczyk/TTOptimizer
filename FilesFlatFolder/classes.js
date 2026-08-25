@@ -3,6 +3,7 @@ import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
 
 let availableTeachers = [];
 let availableRooms = [];
+let availableSchoolUnits = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
     await initializeI18n();
@@ -52,7 +53,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         previewUrl: "/api/classes/import/preview",
         importUrlFactory: () => {
             const organizationId = window.appContext.requireOrganizationId();
-            return `/api/classes/import?organizationId=${encodeURIComponent(organizationId)}`;
+            const schoolUnitId = getSelectedImportSchoolUnitId();
+
+            if (!schoolUnitId) {
+                throw new Error("Select a school for imported classes.");
+            }
+
+            return `/api/classes/import?organizationId=${encodeURIComponent(organizationId)}&schoolUnitId=${encodeURIComponent(schoolUnitId)}`;
         },
         importButtonId: "importClassesButton",
         fileInputId: "classImportFileInput",
@@ -70,10 +77,95 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function refreshPageData() {
     await Promise.all([
         loadTeachers(),
-        loadRooms()
+        loadRooms(),
+        loadSchoolUnits()
     ]);
 
     await loadClasses();
+}
+
+async function loadSchoolUnits() {
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/schoolunits?organizationId=${encodeURIComponent(organizationId)}`
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not load schools. Status: ${response.status}`
+                )
+            );
+        }
+
+        availableSchoolUnits = Array.isArray(data)
+            ? data
+            : data?.schoolUnits ?? [];
+
+        populateSchoolUnitOptions();
+    } catch (error) {
+        console.error("Error loading schools:", error);
+        availableSchoolUnits = [];
+        populateSchoolUnitOptions();
+    }
+}
+
+function populateSchoolUnitOptions() {
+    const formSelect =
+        document.getElementById("schoolUnitId");
+
+    const importSelect =
+        document.getElementById("classImportSchoolUnitId");
+
+    for (const select of [formSelect, importSelect]) {
+        if (!select) {
+            continue;
+        }
+
+        const selectedValue = select.value;
+        select.innerHTML = "";
+
+        for (const schoolUnit of availableSchoolUnits) {
+            const option = document.createElement("option");
+            option.value = String(schoolUnit.id);
+            option.textContent = schoolUnit.name;
+            select.appendChild(option);
+        }
+
+        if (selectedValue &&
+            availableSchoolUnits.some(
+                item => String(item.id) === selectedValue
+            )) {
+            select.value = selectedValue;
+        } else if (availableSchoolUnits.length === 1) {
+            select.value = String(availableSchoolUnits[0].id);
+        }
+    }
+
+    const hideSelector = availableSchoolUnits.length === 1;
+
+    document.getElementById("schoolUnitField")
+        ?.toggleAttribute("hidden", hideSelector);
+
+    document.getElementById("classImportSchoolUnitField")
+        ?.toggleAttribute("hidden", hideSelector);
+}
+
+function getSelectedImportSchoolUnitId() {
+    if (availableSchoolUnits.length === 1) {
+        return availableSchoolUnits[0].id;
+    }
+
+    const value =
+        document.getElementById("classImportSchoolUnitId")?.value;
+
+    return value ? Number(value) : null;
 }
 
 async function loadTeachers() {
@@ -156,7 +248,7 @@ async function loadClasses() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="5" class="teachers-table-state">Loading classes...</td>
+            <td colspan="6" class="teachers-table-state">Loading classes...</td>
         </tr>
     `;
 
@@ -213,7 +305,7 @@ function renderClasses(classes) {
     if (!Array.isArray(classes) || classes.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="teachers-table-state">No classes found.</td>
+                <td colspan="6" class="teachers-table-state">No classes found.</td>
             </tr>
         `;
 
@@ -228,6 +320,10 @@ function renderClasses(classes) {
 
         row.appendChild(
             createTableCell(classGroup.name)
+        );
+
+        row.appendChild(
+            createTableCell(classGroup.schoolUnitName ?? "")
         );
 
         row.appendChild(
@@ -447,6 +543,11 @@ function openAddClassForm() {
     document.getElementById("className").value =
         "";
 
+    if (availableSchoolUnits.length > 0) {
+        document.getElementById("schoolUnitId").value =
+            String(availableSchoolUnits[0].id);
+    }
+
     document.getElementById(
         "homeroomTeacherId"
     ).value = "";
@@ -479,6 +580,9 @@ function openEditClassForm(classGroup) {
 
     document.getElementById("className").value =
         classGroup.name ?? "";
+
+    document.getElementById("schoolUnitId").value =
+        classGroup.schoolUnitId?.toString() ?? "";
 
     document.getElementById(
         "homeroomTeacherId"
@@ -534,6 +638,9 @@ async function saveClass() {
             "className"
         ).value.trim();
 
+    const schoolUnitValue =
+        document.getElementById("schoolUnitId").value;
+
     const homeroomTeacherValue =
         document.getElementById(
             "homeroomTeacherId"
@@ -558,7 +665,16 @@ async function saveClass() {
         return;
     }
 
+    if (!schoolUnitValue) {
+        showClassFormMessage(
+            "Select a school for the class.",
+            true
+        );
+        return;
+    }
+
     const requestBody = {
+        schoolUnitId: Number(schoolUnitValue),
         name,
         info: info || null,
 
@@ -703,7 +819,7 @@ function showClassesError(message) {
     const cell =
         document.createElement("td");
 
-    cell.colSpan = 5;
+    cell.colSpan = 6;
     cell.textContent = message;
 
     row.appendChild(cell);

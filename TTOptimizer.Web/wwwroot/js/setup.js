@@ -7,18 +7,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.location.href = "main.html";
         });
 
-    document.getElementById("singleBuildingOption")
-        ?.addEventListener("change", updateBuildingMode);
-
-    document.getElementById("multipleBuildingsOption")
-        ?.addEventListener("change", updateBuildingMode);
-
-    document.getElementById("useSchoolAddressForBuilding")
-        ?.addEventListener("change", syncBuildingAddressState);
-
-    document.getElementById("schoolAddress")
-        ?.addEventListener("input", syncBuildingAddressValue);
-
     document.getElementById("addBuildingRowButton")
         ?.addEventListener("click", () => addBuildingRow());
 
@@ -28,7 +16,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("saveAndContinueButton")
         ?.addEventListener("click", saveAndContinue);
 
-    updateBuildingMode();
+    document.getElementById("skipSetupStepButton")
+        ?.addEventListener("click", () => {
+            window.location.href = "rooms.html?setup=1";
+        });
+
     await loadSetupData();
 });
 
@@ -106,99 +98,18 @@ async function loadSetupData() {
 }
 
 function applyExistingBuildings() {
-    if (existingBuildings.length <= 1) {
-        document.getElementById("singleBuildingOption").checked = true;
-        document.getElementById("multipleBuildingsOption").checked = false;
+    const container =
+        document.getElementById("buildingRows");
 
-        const building = existingBuildings[0];
-
-        if (building) {
-            document.getElementById("singleBuildingName").value =
-                building.name ?? t("setup.mainBuilding");
-
-            const schoolAddress =
-                document.getElementById("schoolAddress").value.trim();
-
-            const sameAddress =
-                Boolean(schoolAddress) &&
-                normalize(building.address) === normalize(schoolAddress);
-
-            document.getElementById("useSchoolAddressForBuilding").checked =
-                sameAddress || !building.address;
-
-            document.getElementById("singleBuildingAddress").value =
-                building.address ?? schoolAddress;
-        }
-    } else {
-        document.getElementById("singleBuildingOption").checked = false;
-        document.getElementById("multipleBuildingsOption").checked = true;
-
-        const container =
-            document.getElementById("buildingRows");
-
-        container.innerHTML = "";
-
-        for (const building of existingBuildings) {
-            addBuildingRow(building);
-        }
-    }
-
-    updateBuildingMode();
-    syncBuildingAddressState();
-}
-
-function updateBuildingMode() {
-    const single =
-        document.getElementById("singleBuildingOption").checked;
-
-    document.getElementById("singleBuildingPanel").hidden = !single;
-    document.getElementById("multipleBuildingsPanel").hidden = single;
-
-    if (!single) {
-        const container =
-            document.getElementById("buildingRows");
-
-        if (container.children.length === 0) {
-            if (existingBuildings.length > 0) {
-                for (const building of existingBuildings) {
-                    addBuildingRow(building);
-                }
-            } else {
-                addBuildingRow({ name: t("setup.mainBuilding") });
-                addBuildingRow({ name: "Budynek B" });
-            }
-        }
-    }
-}
-
-function syncBuildingAddressState() {
-    const checkbox =
-        document.getElementById("useSchoolAddressForBuilding");
-
-    const input =
-        document.getElementById("singleBuildingAddress");
-
-    if (!checkbox || !input) {
+    if (!container) {
         return;
     }
 
-    input.disabled = checkbox.checked;
+    container.innerHTML = "";
 
-    if (checkbox.checked) {
-        syncBuildingAddressValue();
+    for (const building of existingBuildings) {
+        addBuildingRow(building);
     }
-}
-
-function syncBuildingAddressValue() {
-    const checkbox =
-        document.getElementById("useSchoolAddressForBuilding");
-
-    if (!checkbox?.checked) {
-        return;
-    }
-
-    document.getElementById("singleBuildingAddress").value =
-        document.getElementById("schoolAddress").value;
 }
 
 function addBuildingRow(building = {}) {
@@ -237,16 +148,75 @@ function addBuildingRow(building = {}) {
     `;
 
     row.querySelector(".building-row-remove")
-        .addEventListener("click", () => {
-            if (container.children.length <= 1) {
-                showMessage(
-                    t("setup.buildingRequired"),
-                    true
-                );
+        .addEventListener("click", async () => {
+            const buildingId =
+                row.dataset.buildingId
+                    ? Number(row.dataset.buildingId)
+                    : null;
+
+            const buildingName =
+                row.querySelector(".setup-building-name")?.value.trim() ||
+                "ten budynek";
+
+            if (!buildingId) {
+                row.remove();
                 return;
             }
 
-            row.remove();
+            const confirmed = window.confirm(
+                `Usunąć budynek „${buildingName}”?\n\n` +
+                "Wszystkie sale przypisane do tego budynku również zostaną usunięte."
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                setBusy(true);
+
+                const organizationId =
+                    window.appContext.requireOrganizationId();
+
+                const response = await fetch(
+                    `/api/buildings/${encodeURIComponent(buildingId)}?organizationId=${encodeURIComponent(organizationId)}`,
+                    { method: "DELETE" }
+                );
+
+                const data = await readJsonResponse(response);
+
+                if (!response.ok) {
+                    throw new Error(
+                        getApiErrorMessage(
+                            data,
+                            `Nie udało się usunąć budynku „${buildingName}”.`
+                        )
+                    );
+                }
+
+                existingBuildings =
+                    existingBuildings.filter(item =>
+                        Number(item.id) !== buildingId
+                    );
+
+                row.remove();
+
+                showMessage(
+                    `Usunięto budynek „${buildingName}” wraz z przypisanymi salami.`,
+                    false
+                );
+            } catch (error) {
+                console.error("Error deleting building:", error);
+
+                showMessage(
+                    error instanceof Error
+                        ? error.message
+                        : "Nie udało się usunąć budynku.",
+                    true
+                );
+            } finally {
+                setBusy(false);
+            }
         });
 
     container.appendChild(row);
@@ -270,7 +240,7 @@ async function saveAndContinue() {
 
     const buildings = collectBuildings();
 
-    if (buildings.length === 0) {
+    if (buildings == null) {
         return;
     }
 
@@ -507,32 +477,8 @@ async function saveSchoolUnits(organizationId, schoolUnits) {
 }
 
 function collectBuildings() {
-    const single =
-        document.getElementById("singleBuildingOption").checked;
-
-    if (single) {
-        const name =
-            document.getElementById("singleBuildingName").value.trim();
-
-        if (!name) {
-            showMessage(t("setup.buildingNameRequired"), true);
-            document.getElementById("singleBuildingName").focus();
-            return [];
-        }
-
-        const address =
-            document.getElementById("singleBuildingAddress").value.trim();
-
-        return [{
-            id: existingBuildings.length === 1
-                ? existingBuildings[0].id
-                : null,
-            name,
-            address: address || null
-        }];
-    }
-
     const result = [];
+    const names = new Set();
 
     for (const row of document.querySelectorAll(".building-row")) {
         const name =
@@ -543,13 +489,25 @@ function collectBuildings() {
 
         if (!name) {
             showMessage(
-                t("setup.everyBuildingNameRequired"),
+                "Podaj nazwę budynku albo usuń pusty wiersz.",
                 true
             );
-
             row.querySelector(".setup-building-name").focus();
-            return [];
+            return null;
         }
+
+        const normalizedName = normalize(name);
+
+        if (names.has(normalizedName)) {
+            showMessage(
+                `Budynek „${name}” został dodany więcej niż raz.`,
+                true
+            );
+            row.querySelector(".setup-building-name").focus();
+            return null;
+        }
+
+        names.add(normalizedName);
 
         result.push({
             id: row.dataset.buildingId
@@ -598,16 +556,42 @@ async function saveSchool(organizationId) {
 async function saveBuildings(organizationId, buildings) {
     const existingById =
         new Map(
-            existingBuildings.map(item => [item.id, item])
+            existingBuildings.map(item => [Number(item.id), item])
+        );
+
+    const existingByName =
+        new Map(
+            existingBuildings.map(item => [
+                normalize(item.name),
+                item
+            ])
         );
 
     for (const building of buildings) {
+        // Re-running setup must be idempotent. Prefer the persisted ID,
+        // but if the UI row lost it for any reason, fall back to matching
+        // an already existing building by normalized name.
+        let existingBuilding = null;
+
+        if (building.id) {
+            existingBuilding =
+                existingById.get(Number(building.id)) ?? null;
+        }
+
+        if (!existingBuilding) {
+            existingBuilding =
+                existingByName.get(normalize(building.name)) ?? null;
+        }
+
+        const buildingId =
+            existingBuilding?.id ?? null;
+
         const isExisting =
-            building.id && existingById.has(building.id);
+            Boolean(buildingId);
 
         const url =
             isExisting
-                ? `/api/buildings/${encodeURIComponent(building.id)}?organizationId=${encodeURIComponent(organizationId)}`
+                ? `/api/buildings/${encodeURIComponent(buildingId)}?organizationId=${encodeURIComponent(organizationId)}`
                 : `/api/buildings?organizationId=${encodeURIComponent(organizationId)}`;
 
         const response = await fetch(url, {
@@ -618,7 +602,7 @@ async function saveBuildings(organizationId, buildings) {
             body: JSON.stringify({
                 name: building.name,
                 address: building.address,
-                info: null
+                info: existingBuilding?.info ?? null
             })
         });
 
@@ -635,13 +619,14 @@ async function saveBuildings(organizationId, buildings) {
         }
 
         if (isExisting) {
-            existingById.delete(building.id);
+            existingById.delete(Number(buildingId));
+            existingByName.delete(normalize(existingBuilding.name));
         }
     }
 
-    // Celowo nie usuwamy automatycznie istniejących budynków pominiętych
-    // w konfiguratorze. Mogą już mieć przypisane sale. Użytkownik może
-    // bezpiecznie usunąć je później na stronie Budynki.
+    // Existing buildings omitted from setup are intentionally preserved.
+    // They may already contain rooms and setup must never silently destroy
+    // previously configured data.
 }
 
 function setBusy(disabled) {
@@ -649,14 +634,10 @@ function setBusy(disabled) {
         "#schoolName",
         "#schoolAddress",
         "#directorName",
-        "#singleBuildingOption",
-        "#multipleBuildingsOption",
-        "#singleBuildingName",
-        "#singleBuildingAddress",
-        "#useSchoolAddressForBuilding",
         "#addBuildingRowButton",
         "#addSchoolUnitRowButton",
-        "#saveAndContinueButton"
+        "#saveAndContinueButton",
+        "#skipSetupStepButton"
     ]) {
         const element =
             document.querySelector(selector);

@@ -1,5 +1,3 @@
-import { t } from "../i18n.js";
-
 let setupBuildings = [];
 let setupExistingRooms = [];
 let setupPreviewRooms = [];
@@ -24,7 +22,7 @@ export async function initializeRoomSetupMode() {
         normalPage.hidden = true;
     }
 
-    document.title = t("roomSetup.pageTitle");
+    document.title = "ClassFlow - Konfiguracja sal";
 
     wireSetupEvents();
     await loadSetupData();
@@ -61,6 +59,9 @@ function wireSetupEvents() {
     document.getElementById("saveGeneratedRoomsButton")
         ?.addEventListener("click", saveSetupRooms);
 
+    document.getElementById("skipRoomSetupButton")
+        ?.addEventListener("click", goToSubjects);
+
     document.querySelectorAll(".room-special-grid input[type='checkbox']")
         .forEach(input => {
             input.addEventListener("change", renderSetupPreview);
@@ -69,7 +70,7 @@ function wireSetupEvents() {
 
 async function loadSetupData() {
     setSetupBusy(true);
-    showSetupMessage(t("roomSetup.loading"), false);
+    showSetupMessage("Wczytywanie budynków i istniejących sal...", false);
 
     try {
         const organizationId =
@@ -112,30 +113,106 @@ async function loadSetupData() {
                 ? roomsData
                 : roomsData?.rooms ?? [];
 
-        if (setupBuildings.length === 0) {
-            throw new Error(
-                t("roomSetup.needBuilding")
-            );
-        }
-
+        renderExistingRooms();
         renderBuildingGenerators();
 
-        if (document.getElementById("manualRoomRows")?.children.length === 0) {
+        if (
+            setupBuildings.length > 0 &&
+            document.getElementById("manualRoomRows")?.children.length === 0
+        ) {
             addManualRoomRow();
         }
 
-        showSetupMessage("", false);
+        if (setupBuildings.length === 0) {
+            showSetupMessage(
+                "Nie ma jeszcze budynków. Możesz pominąć ten krok i wrócić do niego później.",
+                false
+            );
+        } else {
+            showSetupMessage("", false);
+        }
     } catch (error) {
         console.error("Error loading room setup:", error);
 
         showSetupMessage(
             error instanceof Error
                 ? error.message
-                : t("roomSetup.loadFailed"),
+                : "Nie udało się wczytać danych konfiguracji sal.",
             true
         );
     } finally {
         setSetupBusy(false);
+    }
+}
+
+function renderExistingRooms() {
+    const container =
+        document.getElementById("roomExistingGroups");
+
+    const summary =
+        document.getElementById("roomExistingSummary");
+
+    if (!container || !summary) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if (setupExistingRooms.length === 0) {
+        summary.textContent = "Nie ma jeszcze żadnych sal.";
+        container.innerHTML = `
+            <p class="room-preview-empty">
+                Możesz dodać sale teraz albo przejść dalej i wrócić później.
+            </p>
+        `;
+        return;
+    }
+
+    summary.textContent =
+        `${setupExistingRooms.length} istniejących sal. Nie musisz ich dodawać ponownie.`;
+
+    const byBuilding = new Map();
+
+    for (const room of setupExistingRooms) {
+        const key = room.buildingId ?? 0;
+
+        if (!byBuilding.has(key)) {
+            byBuilding.set(key, []);
+        }
+
+        byBuilding.get(key).push(room);
+    }
+
+    for (const [buildingId, rooms] of byBuilding) {
+        const building =
+            setupBuildings.find(item =>
+                Number(item.id) === Number(buildingId)
+            );
+
+        const group =
+            document.createElement("section");
+
+        group.className = "room-preview-group";
+
+        group.innerHTML = `
+            <div class="room-preview-group-header">
+                <strong>${escapeHtml(building?.name ?? "Bez budynku")}</strong>
+                <span>${rooms.length}</span>
+            </div>
+            <div class="room-preview-chips"></div>
+        `;
+
+        const chips =
+            group.querySelector(".room-preview-chips");
+
+        for (const room of rooms) {
+            const chip = document.createElement("span");
+            chip.className = "room-preview-chip is-existing";
+            chip.textContent = room.name;
+            chips.appendChild(chip);
+        }
+
+        container.appendChild(group);
     }
 }
 
@@ -198,13 +275,6 @@ function renderBuildingGenerators() {
             .addEventListener("input", renderSetupPreview);
 
         container.appendChild(card);
-
-        addRangeRow(
-            rangeList,
-            index === 0
-                ? { start: 1, end: 20 }
-                : { start: 1, end: 10 }
-        );
     });
 }
 
@@ -403,7 +473,21 @@ function collectPreviewRooms() {
 }
 
 function renderSetupPreview() {
-    setupPreviewRooms = collectPreviewRooms();
+    const allCandidates = collectPreviewRooms();
+
+    const existingNameSet =
+        new Set(
+            setupExistingRooms.map(room =>
+                room.name.toLocaleLowerCase("pl")
+            )
+        );
+
+    setupPreviewRooms =
+        allCandidates.filter(room =>
+            !existingNameSet.has(
+                room.name.toLocaleLowerCase("pl")
+            )
+        );
 
     const preview =
         document.getElementById("roomSetupPreview");
@@ -430,34 +514,12 @@ function renderSetupPreview() {
         names.set(key, true);
     });
 
-    const existingNameSet =
-        new Set(
-            setupExistingRooms.map(room =>
-                room.name.toLocaleLowerCase("pl")
-            )
-        );
-
-    const existingInPreview =
-        setupPreviewRooms
-            .filter(room =>
-                existingNameSet.has(
-                    room.name.toLocaleLowerCase("pl")
-                )
-            )
-            .map(room => room.name);
-
     const warningMessages = [];
 
     if (duplicateNames.size > 0) {
         warningMessages.push(
-            t("roomSetup.duplicateTitle").replace("{names}", [...duplicateNames].join(", ")) +
-            t("roomSetup.duplicateHelp")
-        );
-    }
-
-    if (existingInPreview.length > 0) {
-        warningMessages.push(
-            `${existingInPreview.length} sal już istnieje i zostanie pominiętych przy zapisie.`
+            `Powtarzające się nowe nazwy: ${[...duplicateNames].join(", ")}. ` +
+            "Nazwy sal muszą być unikalne w całej placówce."
         );
     }
 
@@ -468,35 +530,18 @@ function renderSetupPreview() {
 
     if (setupPreviewRooms.length === 0) {
         summary.textContent =
-            t("roomSetup.emptySummary");
+            "Brak nowych sal do dodania.";
 
         preview.innerHTML =
             `<p class="room-preview-empty">
-                Możesz dodać sale teraz albo pominąć ten krok i zrobić to później.
+                To jest poprawny stan. Możesz przejść dalej bez zmian.
              </p>`;
-
-        const saveButton =
-            document.getElementById("saveGeneratedRoomsButton");
-
-        if (saveButton) {
-            saveButton.textContent = t("roomSetup.skip");
-        }
 
         return;
     }
 
-    const saveButton =
-        document.getElementById("saveGeneratedRoomsButton");
-
-    if (saveButton) {
-        saveButton.textContent = t("roomSetup.saveContinue");
-    }
-
     summary.textContent =
-        t("roomSetup.previewCount").replace("{count}", setupPreviewRooms.length) +
-        (existingInPreview.length > 0
-            ? ` · ${t("roomSetup.existing").replace("{count}", existingInPreview.length)}`
-            : "");
+        `${setupPreviewRooms.length} nowych sal do dodania`;
 
     const byBuilding =
         new Map();
@@ -538,20 +583,8 @@ function renderSetupPreview() {
             const chip =
                 document.createElement("span");
 
-            const alreadyExists =
-                existingNameSet.has(
-                    room.name.toLocaleLowerCase("pl")
-                );
-
-            chip.className =
-                alreadyExists
-                    ? "room-preview-chip is-existing"
-                    : "room-preview-chip";
-
-            chip.textContent =
-                alreadyExists
-                    ? `${room.name} · istnieje`
-                    : room.name;
+            chip.className = "room-preview-chip";
+            chip.textContent = room.name;
 
             chips.appendChild(chip);
         });
@@ -564,7 +597,7 @@ async function saveSetupRooms() {
     renderSetupPreview();
 
     if (setupPreviewRooms.length === 0) {
-        window.location.href = "subjects.html?setup=1";
+        goToSubjects();
         return;
     }
 
@@ -575,7 +608,7 @@ async function saveSetupRooms() {
 
     if (new Set(normalizedNames).size !== normalizedNames.length) {
         showSetupMessage(
-            t("roomSetup.fixDuplicates"),
+            "Usuń powtarzające się nazwy sal przed zapisem.",
             true
         );
         return;
@@ -609,7 +642,7 @@ async function saveSetupRooms() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `${t("roomSetup.saveFailed")} Status: ${response.status}`
+                    `Nie udało się zapisać sal. Status: ${response.status}`
                 )
             );
         }
@@ -624,21 +657,23 @@ async function saveSetupRooms() {
             false
         );
 
-        window.setTimeout(() => {
-            window.location.href = "subjects.html?setup=1";
-        }, 500);
+        window.setTimeout(goToSubjects, 350);
     } catch (error) {
         console.error("Error saving setup rooms:", error);
 
         showSetupMessage(
             error instanceof Error
                 ? error.message
-                : t("roomSetup.saveFailed"),
+                : "Nie udało się zapisać sal.",
             true
         );
     } finally {
         setSetupBusy(false);
     }
+}
+
+function goToSubjects() {
+    window.location.href = "subjects.html?setup=1";
 }
 
 function setSetupBusy(disabled) {

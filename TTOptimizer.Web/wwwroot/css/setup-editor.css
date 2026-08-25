@@ -1,0 +1,37 @@
+/* Guided setup behaves as an editor of the current school state. */
+
+.setup-section .building-list-header {
+    margin-bottom: 1rem;
+}
+
+.building-row {
+    position: relative;
+}
+
+.building-row-remove {
+    white-space: nowrap;
+}
+
+.room-existing-section {
+    margin: 1rem 0 1.25rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color, #d8dee9);
+    border-radius: 12px;
+    background: var(--surface-muted, #f7f8fa);
+}
+
+.room-existing-section .room-preview-header {
+    margin-bottom: 0.8rem;
+}
+
+.setup-actions,
+.room-setup-actions {
+    flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+    .setup-actions > button,
+    .room-setup-actions > button {
+        width: 100%;
+    }
+}

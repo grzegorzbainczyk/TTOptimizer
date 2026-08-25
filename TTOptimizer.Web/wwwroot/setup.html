@@ -8,7 +8,8 @@
 <link href="css/style.css" rel="stylesheet"/>
 <link href="css/setup.css" rel="stylesheet"/>
 <link href="css/setup-language.css" rel="stylesheet"/>
-<link href="css/school-units-setup.css" rel="stylesheet"/></head>
+<link href="css/school-units-setup.css" rel="stylesheet"/>
+<link href="css/setup-editor.css" rel="stylesheet"/></head>
 <body class="setup-page">
 <main class="setup-shell">
 <div class="setup-container">
@@ -125,50 +126,16 @@
                             </p>
 </div>
 </div>
-<div aria-label="Liczba budynków" class="building-choice" role="radiogroup">
-<label class="choice-card">
-<input checked="" id="singleBuildingOption" name="buildingMode" type="radio" value="single"/>
-<span>
-<strong data-i18n="setup.singleBuilding">Jeden budynek</strong>
-<small>Najprostszy wariant. Utworzymy budynek główny.</small>
-</span>
-</label>
-<label class="choice-card">
-<input id="multipleBuildingsOption" name="buildingMode" type="radio" value="multiple"/>
-<span>
-<strong data-i18n="setup.multipleBuildings">Więcej niż jeden budynek</strong>
-<small>Dodaj wszystkie budynki używane przez szkołę.</small>
-</span>
-</label>
-</div>
-<div class="building-panel" id="singleBuildingPanel">
-<div class="setup-form-grid">
-<div class="form-field">
-<label for="singleBuildingName">Nazwa budynku</label>
-<input id="singleBuildingName" maxlength="150" type="text" value="Budynek główny"/>
-</div>
-<div class="form-field">
-<label for="singleBuildingAddress">Adres budynku</label>
-<input id="singleBuildingAddress" maxlength="500" placeholder="Może być taki sam jak adres szkoły" type="text"/>
-</div>
-</div>
-<label class="inline-checkbox">
-<input checked="" id="useSchoolAddressForBuilding" type="checkbox"/>
-<span data-i18n="setup.useSchoolAddress">Użyj adresu szkoły</span>
-</label>
-</div>
-<div class="building-panel" hidden="" id="multipleBuildingsPanel">
 <div class="building-list-header">
 <div>
 <strong>Budynki</strong>
-<small>Dodaj tyle lokalizacji, ile faktycznie wykorzystuje szkoła.</small>
+<small>To jest aktualny stan. Możesz edytować, dodać albo usunąć budynek.</small>
 </div>
 <button class="secondary-button" id="addBuildingRowButton" type="button">
-                                + Dodaj budynek
-                            </button>
+    + Dodaj budynek
+</button>
 </div>
 <div class="building-rows" id="buildingRows"></div>
-</div>
 </div>
 <div class="setup-tip">
 <span>💡</span>
@@ -179,6 +146,9 @@
 </div>
 <p aria-live="polite" class="form-message" id="setupMessage"></p>
 <div class="setup-actions">
+<button class="secondary-button" id="skipSetupStepButton" type="button">
+                        Pomiń na razie
+                    </button>
 <button class="main-action-button" data-i18n="setup.continue" id="saveAndContinueButton" type="button">
                         Zapisz i przejdź dalej →
                     </button>

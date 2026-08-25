@@ -22,6 +22,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("addBuildingRowButton")
         ?.addEventListener("click", () => addBuildingRow());
 
+    document.getElementById("addSchoolUnitRowButton")
+        ?.addEventListener("click", () => addSchoolUnitRow());
+
     document.getElementById("saveAndContinueButton")
         ?.addEventListener("click", saveAndContinue);
 
@@ -30,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 let existingBuildings = [];
+let existingSchoolUnits = [];
 
 async function loadSetupData() {
     setBusy(true);
@@ -39,14 +43,16 @@ async function loadSetupData() {
         const organizationId =
             window.appContext.requireOrganizationId();
 
-        const [schoolResponse, buildingsResponse] =
+        const [schoolResponse, buildingsResponse, schoolUnitsResponse] =
             await Promise.all([
                 fetch(`/api/organizations/${encodeURIComponent(organizationId)}`),
-                fetch(`/api/buildings?organizationId=${encodeURIComponent(organizationId)}`)
+                fetch(`/api/buildings?organizationId=${encodeURIComponent(organizationId)}`),
+                fetch(`/api/schoolunits?organizationId=${encodeURIComponent(organizationId)}`)
             ]);
 
         const school = await readJsonResponse(schoolResponse);
         const buildingsData = await readJsonResponse(buildingsResponse);
+        const schoolUnitsData = await readJsonResponse(schoolUnitsResponse);
 
         if (!schoolResponse.ok) {
             throw new Error(getApiErrorMessage(
@@ -62,7 +68,13 @@ async function loadSetupData() {
             ));
         }
 
-        document.getElementById("schoolType").value = String(school.schoolType ?? 0);
+        if (!schoolUnitsResponse.ok) {
+            throw new Error(getApiErrorMessage(
+                schoolUnitsData,
+                `Could not load schools. Status: ${schoolUnitsResponse.status}`
+            ));
+        }
+
         document.getElementById("schoolName").value = school.name ?? "";
         document.getElementById("schoolAddress").value = school.address ?? "";
         document.getElementById("directorName").value = school.directorName ?? "";
@@ -72,6 +84,12 @@ async function loadSetupData() {
                 ? buildingsData
                 : buildingsData?.buildings ?? [];
 
+        existingSchoolUnits =
+            Array.isArray(schoolUnitsData)
+                ? schoolUnitsData
+                : schoolUnitsData?.schoolUnits ?? [];
+
+        renderSchoolUnits();
         applyExistingBuildings();
         showMessage("", false);
     } catch (error) {
@@ -235,21 +253,18 @@ function addBuildingRow(building = {}) {
 }
 
 async function saveAndContinue() {
-    const schoolType =
-        Number(document.getElementById("schoolType").value);
-
-    if (!Number.isInteger(schoolType) || schoolType <= 0) {
-        showMessage(t("setup.schoolType.required"), true);
-        document.getElementById("schoolType").focus();
-        return;
-    }
-
     const schoolName =
         document.getElementById("schoolName").value.trim();
 
     if (!schoolName) {
         showMessage(t("setup.schoolNameRequired"), true);
         document.getElementById("schoolName").focus();
+        return;
+    }
+
+    const schoolUnits = collectSchoolUnits();
+
+    if (schoolUnits.length === 0) {
         return;
     }
 
@@ -267,6 +282,7 @@ async function saveAndContinue() {
             window.appContext.requireOrganizationId();
 
         await saveSchool(organizationId);
+        await saveSchoolUnits(organizationId, schoolUnits);
         await saveBuildings(organizationId, buildings);
 
         showMessage(
@@ -291,6 +307,205 @@ async function saveAndContinue() {
     }
 }
 
+
+function renderSchoolUnits() {
+    const container =
+        document.getElementById("schoolUnitRows");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if (existingSchoolUnits.length === 0) {
+        addSchoolUnitRow();
+        return;
+    }
+
+    for (const schoolUnit of existingSchoolUnits) {
+        addSchoolUnitRow(schoolUnit);
+    }
+}
+
+function addSchoolUnitRow(schoolUnit = {}) {
+    const container =
+        document.getElementById("schoolUnitRows");
+
+    if (!container) {
+        return;
+    }
+
+    const row =
+        document.createElement("div");
+
+    row.className = "school-unit-row";
+    row.dataset.schoolUnitId = schoolUnit.id ?? "";
+
+    row.innerHTML = `
+        <div class="form-field">
+            <label>Nazwa szkoły</label>
+            <input class="setup-school-unit-name"
+                   type="text"
+                   maxlength="200"
+                   value="${escapeAttribute(schoolUnit.name ?? "")}"
+                   placeholder="np. Technikum nr 1" />
+        </div>
+
+        <div class="form-field">
+            <label>Typ szkoły</label>
+            <select class="setup-school-unit-type">
+                <option value="0">Wybierz typ szkoły</option>
+                <option value="1">Szkoła podstawowa</option>
+                <option value="2">Liceum ogólnokształcące</option>
+                <option value="3">Technikum</option>
+                <option value="4">Branżowa szkoła I stopnia</option>
+                <option value="5">Branżowa szkoła II stopnia</option>
+            </select>
+        </div>
+
+        <button class="secondary-button school-unit-row-remove"
+                type="button">
+            Usuń
+        </button>
+    `;
+
+    row.querySelector(".setup-school-unit-type").value =
+        String(schoolUnit.schoolType ?? 0);
+
+    row.querySelector(".school-unit-row-remove")
+        .addEventListener("click", () => {
+            if (container.children.length <= 1) {
+                showMessage(
+                    "Placówka musi zawierać co najmniej jedną szkołę.",
+                    true
+                );
+                return;
+            }
+
+            row.remove();
+        });
+
+    container.appendChild(row);
+}
+
+function collectSchoolUnits() {
+    const result = [];
+    const names = new Set();
+
+    for (const row of document.querySelectorAll(".school-unit-row")) {
+        const name =
+            row.querySelector(".setup-school-unit-name").value.trim();
+
+        const schoolType =
+            Number(row.querySelector(".setup-school-unit-type").value);
+
+        if (!name) {
+            showMessage("Podaj nazwę każdej szkoły.", true);
+            row.querySelector(".setup-school-unit-name").focus();
+            return [];
+        }
+
+        if (!Number.isInteger(schoolType) || schoolType <= 0) {
+            showMessage(
+                `Wybierz typ szkoły dla „${name}”.`,
+                true
+            );
+            row.querySelector(".setup-school-unit-type").focus();
+            return [];
+        }
+
+        const normalizedName = normalize(name);
+
+        if (names.has(normalizedName)) {
+            showMessage(
+                `Szkoła „${name}” została dodana więcej niż raz.`,
+                true
+            );
+            row.querySelector(".setup-school-unit-name").focus();
+            return [];
+        }
+
+        names.add(normalizedName);
+
+        result.push({
+            id: row.dataset.schoolUnitId
+                ? Number(row.dataset.schoolUnitId)
+                : null,
+            name,
+            schoolType
+        });
+    }
+
+    return result;
+}
+
+async function saveSchoolUnits(organizationId, schoolUnits) {
+    const existingById =
+        new Map(
+            existingSchoolUnits.map(item => [item.id, item])
+        );
+
+    for (const schoolUnit of schoolUnits) {
+        const isExisting =
+            schoolUnit.id && existingById.has(schoolUnit.id);
+
+        const url =
+            isExisting
+                ? `/api/schoolunits/${encodeURIComponent(schoolUnit.id)}?organizationId=${encodeURIComponent(organizationId)}`
+                : `/api/schoolunits?organizationId=${encodeURIComponent(organizationId)}`;
+
+        const response = await fetch(url, {
+            method: isExisting ? "PUT" : "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: schoolUnit.name,
+                schoolType: schoolUnit.schoolType
+            })
+        });
+
+        const data =
+            await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not save school '${schoolUnit.name}'.`
+                )
+            );
+        }
+
+        if (isExisting) {
+            existingById.delete(schoolUnit.id);
+        }
+    }
+
+    // Unlike buildings, omitted SchoolUnits should represent an explicit
+    // removal from the setup screen. The API blocks deletion when classes
+    // are already assigned, so no data can silently become orphaned.
+    for (const removedSchoolUnit of existingById.values()) {
+        const response = await fetch(
+            `/api/schoolunits/${encodeURIComponent(removedSchoolUnit.id)}?organizationId=${encodeURIComponent(organizationId)}`,
+            { method: "DELETE" }
+        );
+
+        const data =
+            await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not remove school '${removedSchoolUnit.name}'.`
+                )
+            );
+        }
+    }
+}
+
 function collectBuildings() {
     const single =
         document.getElementById("singleBuildingOption").checked;
@@ -308,10 +523,16 @@ function collectBuildings() {
         const address =
             document.getElementById("singleBuildingAddress").value.trim();
 
+        const matchingExistingBuilding =
+            existingBuildings.find(item =>
+                normalize(item.name) === normalize(name)
+            ) ??
+            (existingBuildings.length === 1
+                ? existingBuildings[0]
+                : null);
+
         return [{
-            id: existingBuildings.length === 1
-                ? existingBuildings[0].id
-                : null,
+            id: matchingExistingBuilding?.id ?? null,
             name,
             address: address || null
         }];
@@ -359,8 +580,6 @@ async function saveSchool(organizationId) {
             body: JSON.stringify({
                 name:
                     document.getElementById("schoolName").value.trim(),
-                schoolType:
-                    Number(document.getElementById("schoolType").value),
                 address:
                     document.getElementById("schoolAddress").value.trim() || null,
                 directorName:
@@ -385,16 +604,42 @@ async function saveSchool(organizationId) {
 async function saveBuildings(organizationId, buildings) {
     const existingById =
         new Map(
-            existingBuildings.map(item => [item.id, item])
+            existingBuildings.map(item => [Number(item.id), item])
+        );
+
+    const existingByName =
+        new Map(
+            existingBuildings.map(item => [
+                normalize(item.name),
+                item
+            ])
         );
 
     for (const building of buildings) {
+        // Re-running setup must be idempotent. Prefer the persisted ID,
+        // but if the UI row lost it for any reason, fall back to matching
+        // an already existing building by normalized name.
+        let existingBuilding = null;
+
+        if (building.id) {
+            existingBuilding =
+                existingById.get(Number(building.id)) ?? null;
+        }
+
+        if (!existingBuilding) {
+            existingBuilding =
+                existingByName.get(normalize(building.name)) ?? null;
+        }
+
+        const buildingId =
+            existingBuilding?.id ?? null;
+
         const isExisting =
-            building.id && existingById.has(building.id);
+            Boolean(buildingId);
 
         const url =
             isExisting
-                ? `/api/buildings/${encodeURIComponent(building.id)}?organizationId=${encodeURIComponent(organizationId)}`
+                ? `/api/buildings/${encodeURIComponent(buildingId)}?organizationId=${encodeURIComponent(organizationId)}`
                 : `/api/buildings?organizationId=${encodeURIComponent(organizationId)}`;
 
         const response = await fetch(url, {
@@ -405,7 +650,7 @@ async function saveBuildings(organizationId, buildings) {
             body: JSON.stringify({
                 name: building.name,
                 address: building.address,
-                info: null
+                info: existingBuilding?.info ?? null
             })
         });
 
@@ -422,18 +667,18 @@ async function saveBuildings(organizationId, buildings) {
         }
 
         if (isExisting) {
-            existingById.delete(building.id);
+            existingById.delete(Number(buildingId));
+            existingByName.delete(normalize(existingBuilding.name));
         }
     }
 
-    // Celowo nie usuwamy automatycznie istniejących budynków pominiętych
-    // w konfiguratorze. Mogą już mieć przypisane sale. Użytkownik może
-    // bezpiecznie usunąć je później na stronie Budynki.
+    // Existing buildings omitted from setup are intentionally preserved.
+    // They may already contain rooms and setup must never silently destroy
+    // previously configured data.
 }
 
 function setBusy(disabled) {
     for (const selector of [
-        "#schoolType",
         "#schoolName",
         "#schoolAddress",
         "#directorName",
@@ -443,6 +688,7 @@ function setBusy(disabled) {
         "#singleBuildingAddress",
         "#useSchoolAddressForBuilding",
         "#addBuildingRowButton",
+        "#addSchoolUnitRowButton",
         "#saveAndContinueButton"
     ]) {
         const element =
@@ -454,7 +700,8 @@ function setBusy(disabled) {
     }
 
     for (const element of document.querySelectorAll(
-        ".setup-building-name, .setup-building-address, .building-row-remove"
+        ".setup-building-name, .setup-building-address, .building-row-remove, " +
+        ".setup-school-unit-name, .setup-school-unit-type, .school-unit-row-remove"
     )) {
         element.disabled = disabled;
     }
