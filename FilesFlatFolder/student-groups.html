@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="studentGroups.pageTitle">ClassFlow - Student Groups</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="teachers-page">
+<div class="page-container">
+    <header class="app-header teachers-header">
+        <div class="teachers-header-content">
+            <div class="teachers-title-group">
+                <span class="teachers-page-label" data-i18n="common.timetableInput">Timetable input</span>
+                <h1 data-i18n="studentGroups.title">Student groups</h1>
+                <p class="page-subtitle"><span data-i18n="studentGroups.subtitle">Define class divisions, individual groups and groups combined across classes.</span></p>
+            </div>
+            <nav class="header-actions">
+                <button class="secondary-button teachers-header-button" id="backToMainButton" data-i18n="common.back">Back</button>
+                <button class="secondary-button teachers-header-button" id="refreshStudentGroupsButton" data-i18n="common.refresh">Refresh</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="content-card teachers-card student-groups-card">
+        <div class="section-header teachers-section-header">
+            <div><h2 data-i18n="studentGroups.structureTitle">Group structure</h2><p class="teachers-section-description"><span data-i18n="studentGroups.structureDescription">Whole-class groups are created automatically. Add divisions only when a class is split.</span></p></div>
+        </div>
+
+        <section class="student-group-actions-grid">
+            <form id="divisionForm" class="student-group-form-card">
+                <h3 data-i18n="studentGroups.createDivision">Create class division</h3>
+                <label><span data-i18n="studentGroups.class">Class</span><select id="divisionClassId" required></select></label>
+                <label><span data-i18n="studentGroups.divisionName">Division name</span><input id="divisionName" placeholder="English" required /></label>
+                <label><span data-i18n="studentGroups.groupNames">Group names</span><textarea id="divisionGroupNames" rows="3" placeholder="1A English G1, 1A English G2" required></textarea></label>
+                <small data-i18n="studentGroups.groupNamesHelp">Separate group names with commas or new lines.</small>
+                <button class="main-action-button" type="submit" data-i18n="studentGroups.createDivisionButton">Create division</button>
+            </form>
+
+            <form id="individualForm" class="student-group-form-card">
+                <h3 data-i18n="studentGroups.createIndividual" data-i18n="studentGroups.createIndividualButton">Create individual group</h3>
+                <label><span data-i18n="studentGroups.class">Class</span><select id="individualClassId" required></select></label>
+                <label><span data-i18n="common.name">Name</span><input id="individualName" placeholder="1A / Individual - Jan Kowalski" required /></label>
+                <button class="main-action-button" type="submit" data-i18n="studentGroups.createIndividualButton">Create individual group</button>
+            </form>
+
+            <form id="combinedForm" class="student-group-form-card">
+                <h3 data-i18n="studentGroups.createCombined" data-i18n="studentGroups.createCombinedButton">Create combined group</h3>
+                <label><span data-i18n="common.name">Name</span><input id="combinedName" placeholder="Boys PE" required /></label>
+                <div id="combinedMembers" class="student-group-member-list"></div>
+                <button class="main-action-button" type="submit" data-i18n="studentGroups.createCombinedButton">Create combined group</button>
+            </form>
+        </section>
+
+        <p id="studentGroupsMessage" class="form-message" aria-live="polite"></p>
+        <section id="studentGroupsTree" class="student-groups-tree"></section>
+    </main>
+</div>
+<script src="js/appContext.js"></script>
+<script type="module" src="js/student-groups.js"></script>
+</body>
+</html>

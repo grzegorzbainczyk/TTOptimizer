@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>ClassFlow - Rules</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <main class="app-shell">
+        <div class="app-container">
+
+            <header class="app-header app-hero">
+                <div class="hero-title-row">
+                    <img src="images/logos/logo.png" alt="ClassFlow logo" class="app-logo">
+
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            Timetable rules
+                        </div>
+
+                        <h1>Rules</h1>
+
+                        <p class="hero-subtitle">
+                            Define availability and scheduling constraints used by the optimizer.
+                        </p>
+
+                        <p class="hero-tech">
+                            Hard rules block invalid schedules. Soft rules add penalty when violated.
+                        </p>
+                    </div>
+                </div>
+            </header>
+
+            <section class="app-card app-panel">
+                <div class="section-header-row">
+                    <h2>Rule editor</h2>
+
+                    <div class="section-actions">
+                        <button id="backToMainButton" class="app-button app-button-secondary">
+                            Back to dashboard
+                        </button>
+
+                        <button id="newRuleButton" class="app-button app-button-secondary">
+                            New rule
+                        </button>
+                    </div>
+                </div>
+
+                <p>
+                    Create or edit constraints such as teacher availability, room availability,
+                    avoided time slots or class limits.
+                </p>
+
+                <form id="ruleForm" class="rule-form">
+                    <input type="hidden" id="constraintId" />
+
+                    <div class="form-grid">
+                        <label>
+                            Name
+                            <input id="nameInput" type="text" placeholder="Example: Anna unavailable Monday first lesson" />
+                        </label>
+
+                        <label>
+                            Constraint type
+                            <select id="constraintTypeSelect">
+                                <option value="UnavailableSlot">Unavailable slot</option>
+                                <option value="AvoidSlot">Avoid slot</option>
+                                <option value="MaxLessonsPerDay">Max lessons per day</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Target type
+                            <select id="targetTypeSelect">
+                                <option value="Teacher">Teacher</option>
+                                <option value="Room">Room</option>
+                                <option value="ClassGroup">Class group</option>
+                                <option value="Subject">Subject</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Target
+                            <select id="targetIdSelect">
+                                <option value="">Loading...</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Day
+                            <select id="dayOfWeekSelect">
+                                <option value="">Not applicable</option>
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Slot
+                            <select id="slotNumberSelect">
+                                <option value="">Not applicable</option>
+                                <option value="1">Lesson 1</option>
+                                <option value="2">Lesson 2</option>
+                                <option value="3">Lesson 3</option>
+                                <option value="4">Lesson 4</option>
+                                <option value="5">Lesson 5</option>
+                                <option value="6">Lesson 6</option>
+                                <option value="7">Lesson 7</option>
+                                <option value="8">Lesson 8</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Value
+                            <input id="valueInput" type="text" placeholder="Example: 7 for max lessons per day" />
+                        </label>
+
+                        <label>
+                            Weight
+                            <input id="weightInput" type="number" min="0" max="100" value="100" />
+                        </label>
+                    </div>
+
+                    <label class="checkbox-row">
+                        <input id="isHardInput" type="checkbox" checked />
+                        Hard rule
+                    </label>
+
+                    <label class="checkbox-row">
+                        <input id="isActiveInput" type="checkbox" checked />
+                        Active
+                    </label>
+
+                    <label>
+                        Description
+                        <textarea id="descriptionInput" rows="3" placeholder="Optional description"></textarea>
+                    </label>
+
+                    <div class="toolbar">
+                        <button type="submit" class="app-button app-button-primary-warm">
+                            Save rule
+                        </button>
+
+                        <button id="resetFormButton" type="button" class="app-button app-button-secondary">
+                            Reset form
+                        </button>
+                    </div>
+                </form>
+
+                <p id="statusText">Ready.</p>
+            </section>
+
+            <section class="app-card app-panel">
+                <div class="section-header-row">
+                    <h2>Existing rules</h2>
+
+                    <div class="section-actions">
+                        <button id="refreshRulesButton" class="app-button app-button-secondary">
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Target</th>
+                            <th>Day</th>
+                            <th>Slot</th>
+                            <th>Hard</th>
+                            <th>Weight</th>
+                            <th>Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="rulesTableBody">
+                        <tr>
+                            <td colspan="9">No rules loaded yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <footer class="app-footer">
+                Created by Grzegorz Bainczyk
+            </footer>
+
+        </div>
+    </main>
+    
+    <script src="js/appContext.js"></script>
+    <script src="js/rules.js"></script>
+</body>
+</html>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClassFlow - School information</title>
+    <title>ClassFlow - Szkoła</title>
     <link href="css/style.css" rel="stylesheet" />
 </head>
 <body class="teachers-page school-page">
@@ -11,10 +11,10 @@
         <header class="app-header teachers-header">
             <div class="teachers-header-content">
                 <div class="teachers-title-group">
-                    <span class="teachers-page-label">Organization</span>
-                    <h1>School information</h1>
+                    <span class="teachers-page-label">Podstawowe dane</span>
+                    <h1>Szkoła</h1>
                     <p class="page-subtitle">
-                        General information about the current school.
+                        Dane organizacji oraz szkoły działające w jej ramach.
                     </p>
                 </div>
 
@@ -22,49 +22,47 @@
                     <button id="backToMainButton"
                             class="secondary-button teachers-header-button"
                             type="button">
-                        Back
+                        Wstecz
                     </button>
                 </nav>
             </div>
         </header>
 
         <main class="content-card teachers-card school-card">
-            <div class="section-header teachers-section-header">
-                <div>
-                    <h2>General information</h2>
-                    <p class="teachers-section-description">
-                        These details describe the school and can be changed later.
-                    </p>
-                </div>
-            </div>
 
             <section class="resource-form-section school-form-section">
+                <div class="section-header teachers-section-header">
+                    <div>
+                        <h2>Dane organizacji</h2>
+                        <p class="teachers-section-description">
+                            Nazwa, adres i dyrektor całej organizacji szkolnej.
+                        </p>
+                    </div>
+                </div>
+
                 <div class="school-form-grid">
                     <div class="form-field form-field-full-width">
-                        <label for="schoolName">School name</label>
+                        <label for="schoolName">Nazwa organizacji</label>
                         <input id="schoolName"
                                type="text"
                                maxlength="200"
                                required />
-                        <p class="school-help-text">
-                            This name is also shown on the ClassFlow dashboard.
-                        </p>
                     </div>
 
                     <div class="form-field form-field-full-width">
-                        <label for="schoolAddress">Address</label>
+                        <label for="schoolAddress">Adres</label>
                         <textarea id="schoolAddress"
                                   rows="3"
                                   maxlength="500"
-                                  placeholder="Optional school address"></textarea>
+                                  placeholder="Opcjonalny adres"></textarea>
                     </div>
 
                     <div class="form-field form-field-full-width">
-                        <label for="directorName">Director</label>
+                        <label for="directorName">Dyrektor</label>
                         <input id="directorName"
                                type="text"
                                maxlength="200"
-                               placeholder="Optional director name" />
+                               placeholder="Opcjonalnie" />
                     </div>
                 </div>
 
@@ -72,17 +70,115 @@
                     <button id="saveSchoolButton"
                             class="main-action-button"
                             type="button">
-                        Save changes
+                        Zapisz dane
                     </button>
 
                     <button id="reloadSchoolButton"
                             class="secondary-button"
                             type="button">
-                        Reload
+                        Odśwież
                     </button>
                 </div>
 
                 <p id="schoolFormMessage"
+                   class="form-message"
+                   aria-live="polite"></p>
+            </section>
+
+            <section class="resource-form-section school-form-section">
+                <div class="section-header teachers-section-header">
+                    <div>
+                        <h2>Szkoły w organizacji</h2>
+                        <p class="teachers-section-description">
+                            Dodaj np. szkołę podstawową, liceum lub technikum.
+                            Klasy są później przypisywane do jednej z tych szkół.
+                        </p>
+                    </div>
+
+                    <div class="teachers-header-actions">
+                        <button id="addSchoolUnitButton"
+                                class="main-action-button"
+                                type="button">
+                            + Dodaj szkołę
+                        </button>
+                    </div>
+                </div>
+
+                <section id="schoolUnitFormSection"
+                         class="resource-form-section teachers-form-section"
+                         hidden>
+                    <h3 id="schoolUnitFormTitle">Dodaj szkołę</h3>
+
+                    <input id="schoolUnitId" type="hidden" />
+
+                    <div class="form-grid teachers-form-grid">
+                        <div class="form-field">
+                            <label for="schoolUnitName">Nazwa szkoły</label>
+                            <input id="schoolUnitName"
+                                   type="text"
+                                   maxlength="200"
+                                   placeholder="np. Technikum nr 2"
+                                   required />
+                        </div>
+
+                        <div class="form-field">
+                            <label for="schoolUnitType">Typ szkoły</label>
+                            <select id="schoolUnitType" required>
+                                <option value="">Wybierz typ</option>
+                                <option value="1">Szkoła podstawowa</option>
+                                <option value="2">Liceum ogólnokształcące</option>
+                                <option value="3">Technikum</option>
+                                <option value="4">Branżowa szkoła I stopnia</option>
+                                <option value="5">Branżowa szkoła II stopnia</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions teachers-form-actions">
+                        <button id="saveSchoolUnitButton"
+                                class="main-action-button"
+                                type="button">
+                            Zapisz
+                        </button>
+
+                        <button id="cancelSchoolUnitButton"
+                                class="secondary-button"
+                                type="button">
+                            Anuluj
+                        </button>
+                    </div>
+
+                    <p id="schoolUnitFormMessage"
+                       class="form-message"
+                       aria-live="polite"></p>
+                </section>
+
+                <div class="teachers-table-summary">
+                    <span id="schoolUnitsCount">Ładowanie szkół...</span>
+                </div>
+
+                <div class="table-wrapper teachers-table-wrapper">
+                    <table class="data-table teachers-table"
+                           id="schoolUnitsTable">
+                        <thead>
+                            <tr>
+                                <th>Nazwa</th>
+                                <th>Typ szkoły</th>
+                                <th class="table-actions-column">Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="3"
+                                    class="teachers-table-state">
+                                    Ładowanie szkół...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p id="schoolUnitsMessage"
                    class="form-message"
                    aria-live="polite"></p>
             </section>

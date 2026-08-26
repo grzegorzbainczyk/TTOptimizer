@@ -1,0 +1,582 @@
+.room-setup-shell {
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+    background:
+        radial-gradient(circle at top left, rgba(91, 135, 193, 0.12), transparent 32rem),
+        #f5f1e8;
+}
+
+.room-setup-container {
+    width: min(1080px, 100%);
+    margin: 0 auto;
+}
+
+.room-setup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.room-setup-header h1 {
+    margin: 0.25rem 0 0.45rem;
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+}
+
+.room-setup-header p {
+    max-width: 760px;
+    margin: 0;
+    color: #646b76;
+    line-height: 1.6;
+}
+
+.room-setup-eyebrow,
+.room-setup-step-heading > span,
+.room-generator-label {
+    color: #456d9f;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.room-setup-progress {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid #ddd6c8;
+    border-radius: 16px;
+    background: rgba(255, 253, 248, 0.88);
+}
+
+.room-setup-progress-item {
+    min-width: 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    color: #8a8f98;
+}
+
+.room-setup-progress-item span {
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #ebe7df;
+    font-weight: 800;
+}
+
+.room-setup-progress-item small {
+    font-size: 0.76rem;
+    text-align: center;
+}
+
+.room-setup-progress-item.is-active {
+    color: #315f99;
+}
+
+.room-setup-progress-item.is-active span {
+    background: #dce9fa;
+    box-shadow: inset 0 0 0 2px #5b84b8;
+}
+
+.room-setup-progress-item.is-complete {
+    color: #397049;
+}
+
+.room-setup-progress-item.is-complete span {
+    background: #e4f3e8;
+}
+
+.room-setup-progress-line {
+    flex: 1;
+    min-width: 12px;
+    height: 2px;
+    margin-top: 1rem;
+    background: #ddd7cd;
+}
+
+.room-setup-progress-line.is-complete {
+    background: #9dc9aa;
+}
+
+.room-setup-card {
+    padding: clamp(1.25rem, 3vw, 2.3rem);
+    border: 1px solid #ded6c8;
+    border-radius: 20px;
+    background: #fffdf8;
+    box-shadow: 0 18px 55px rgba(46, 52, 64, 0.09);
+}
+
+.room-setup-step-heading {
+    padding-bottom: 1.4rem;
+    border-bottom: 1px solid #e9e3d8;
+}
+
+.room-setup-step-heading h2 {
+    margin: 0.35rem 0 0.45rem;
+}
+
+.room-setup-step-heading p {
+    max-width: 780px;
+    margin: 0;
+    color: #626975;
+    line-height: 1.6;
+}
+
+.room-setup-mode-choice {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    padding: 1.5rem 0;
+}
+
+.room-setup-choice-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 1rem;
+    border: 1px solid #dad4c9;
+    border-radius: 14px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.room-setup-choice-card:has(input:checked) {
+    border-color: #6d91bd;
+    background: #f6faff;
+    box-shadow: 0 0 0 2px rgba(88, 130, 183, 0.12);
+}
+
+.room-setup-choice-card span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.room-setup-choice-card small {
+    color: #747b86;
+}
+
+.room-generator-buildings {
+    display: grid;
+    gap: 1rem;
+}
+
+.room-generator-card {
+    padding: 1rem;
+    border: 1px solid #e1dacf;
+    border-radius: 14px;
+    background: #faf8f3;
+}
+
+.room-generator-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.room-generator-card-header h3,
+.room-generator-card-header p {
+    margin: 0;
+}
+
+.room-generator-card-header p {
+    margin-top: 0.2rem;
+    color: #727985;
+}
+
+.room-range-list {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.room-range-row {
+    display: grid;
+    grid-template-columns: minmax(90px, 140px) auto minmax(90px, 140px) auto;
+    align-items: end;
+    gap: 0.65rem;
+}
+
+.room-range-row label,
+.room-prefix-row label,
+.manual-room-row label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.room-range-separator {
+    padding-bottom: 0.7rem;
+    font-weight: 700;
+}
+
+.room-prefix-row {
+    display: grid;
+    grid-template-columns: minmax(220px, 340px) 1fr;
+    align-items: end;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5dfd5;
+}
+
+.room-prefix-row small {
+    padding-bottom: 0.7rem;
+    color: #747b86;
+    line-height: 1.4;
+}
+
+.room-special-section {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    border: 1px solid #e1dacf;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.room-special-section h3,
+.room-special-section p {
+    margin: 0;
+}
+
+.room-special-section p {
+    margin-top: 0.25rem;
+    color: #747b86;
+}
+
+.room-special-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem 1rem;
+    margin-top: 1rem;
+}
+
+.room-special-grid label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.room-manual-toolbar,
+.room-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.manual-room-rows {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 1rem;
+}
+
+.manual-room-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 0.75rem;
+    align-items: end;
+}
+
+.room-preview-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e8e2d8;
+}
+
+.room-preview-header h3,
+.room-preview-header p {
+    margin: 0;
+}
+
+.room-preview-header p {
+    margin-top: 0.25rem;
+    color: #747b86;
+}
+
+.room-setup-warnings {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    background: #fff3da;
+    color: #755211;
+}
+
+.room-setup-warnings p {
+    margin: 0.35rem 0;
+}
+
+.room-preview-groups {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 1rem;
+}
+
+.room-preview-group {
+    padding: 0.85rem 1rem;
+    border: 1px solid #e0dbd1;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.room-preview-group-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.7rem;
+}
+
+.room-preview-group-header span {
+    min-width: 2rem;
+    padding: 0.18rem 0.5rem;
+    border-radius: 999px;
+    background: #edf3fb;
+    text-align: center;
+    color: #456d9f;
+    font-weight: 700;
+}
+
+.room-preview-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.room-preview-chip {
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    background: #eef5ff;
+    color: #355e91;
+    font-size: 0.9rem;
+}
+
+.room-preview-chip.is-existing {
+    background: #f0eee9;
+    color: #79736b;
+    text-decoration: line-through;
+}
+
+.room-preview-empty {
+    margin: 0;
+    color: #7a8089;
+}
+
+.room-setup-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+
+@media (max-width: 760px) {
+    .room-setup-header,
+    .room-generator-card-header,
+    .room-manual-toolbar,
+    .room-preview-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .room-setup-progress {
+        overflow-x: auto;
+    }
+
+    .room-setup-progress-item {
+        min-width: 70px;
+    }
+
+    .room-setup-progress-line {
+        min-width: 26px;
+    }
+
+    .room-setup-mode-choice,
+    .room-special-grid,
+    .room-range-row,
+    .room-prefix-row,
+    .manual-room-row {
+        grid-template-columns: 1fr;
+    }
+
+    .room-range-separator {
+        display: none;
+    }
+
+    .room-setup-actions {
+        flex-direction: column-reverse;
+    }
+
+    .room-setup-actions button {
+        width: 100%;
+    }
+}
+
+
+/* Blocking validation shown after the user tries to continue. */
+.room-setup-blocking-validation {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    gap: 0.85rem;
+    align-items: start;
+    margin: 1.25rem 0 0;
+    padding: 1rem 1.1rem;
+    border: 2px solid #b85b4c;
+    border-radius: 14px;
+    background: #fff5f2;
+    box-shadow: 0 10px 28px rgba(72, 40, 34, 0.10);
+}
+
+.room-setup-blocking-validation[hidden] {
+    display: none;
+}
+
+.room-setup-blocking-validation-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #b85b4c;
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+.room-setup-blocking-validation strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.room-setup-blocking-validation p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.room-preview-chip.is-duplicate {
+    outline: 2px solid #b85b4c;
+    outline-offset: 2px;
+    background: #fff0ec;
+}
+
+#saveGeneratedRoomsButton.needs-attention {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 4px rgba(184, 91, 76, 0.18);
+}
+
+
+/* =========================================================
+   Existing room editor in guided setup
+   ========================================================= */
+
+.room-existing-header {
+    align-items: flex-start;
+}
+
+.room-existing-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.6rem;
+}
+
+.room-delete-selected-button:not(:disabled) {
+    border-color: var(--color-danger, #b42318);
+    color: var(--color-danger, #b42318);
+}
+
+.room-existing-groups {
+    display: grid;
+    gap: 1rem;
+}
+
+.room-existing-group {
+    border: 1px solid #ddd6c8;
+    border-radius: 14px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.room-existing-group-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.room-existing-select-group {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #456d9f;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.room-existing-select-group:hover {
+    text-decoration: underline;
+}
+
+.room-existing-room-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+    gap: 0.55rem;
+    padding: 0.9rem;
+}
+
+.room-existing-room-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 40px;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #ded8ce;
+    border-radius: 9px;
+    background: #fffdf8;
+    cursor: pointer;
+    user-select: none;
+}
+
+.room-existing-room-item:has(input:checked) {
+    border-color: #5b84b8;
+    background: #edf3fb;
+}
+
+.room-existing-room-item input {
+    margin: 0;
+}
+
+.room-add-new-heading {
+    padding: 1.4rem 0 0.2rem;
+}
+
+.room-add-new-heading h3 {
+    margin: 0 0 0.3rem;
+}
+
+.room-add-new-heading p {
+    margin: 0;
+    color: #707782;
+}
+
+@media (max-width: 700px) {
+    .room-existing-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .room-existing-actions {
+        justify-content: flex-start;
+    }
+
+    .room-existing-actions > button {
+        flex: 1 1 180px;
+    }
+}
