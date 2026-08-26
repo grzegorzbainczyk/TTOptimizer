@@ -1761,3 +1761,164 @@ border: var(--border-thin) solid var(--color-border-neutral);
         grid-column: auto;
     }
 }
+
+
+/* =========================================================
+   Teacher XLSX import modal
+   ========================================================= */
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.teacher-import-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(16, 42, 67, 0.48);
+    backdrop-filter: blur(3px);
+}
+
+.teacher-import-modal-backdrop[hidden] {
+    display: none;
+}
+
+.teacher-import-dialog {
+    width: min(980px, 100%);
+    max-height: min(82vh, 820px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: var(--border-emphasis) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-elevated);
+    box-shadow: 0 24px 70px rgba(16, 42, 67, 0.30);
+}
+
+.teacher-import-modal-header {
+    padding: 22px 26px 18px;
+    border-bottom: var(--border-thin) solid var(--color-divider);
+    background: var(--color-surface-soft);
+}
+
+.teacher-import-modal-header h3 {
+    margin: 0 0 6px;
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+}
+
+.teacher-import-modal-header p {
+    margin: 0;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+.teacher-import-modal-body {
+    min-height: 0;
+    padding: 18px 26px;
+    overflow: hidden;
+}
+
+.teacher-import-message {
+    min-height: 22px;
+    margin: 0 0 12px;
+}
+
+.teacher-import-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 64px;
+    margin-bottom: 14px;
+    padding: 14px 18px;
+    border: var(--border-thin) solid var(--color-divider);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-soft);
+    color: var(--color-primary);
+}
+
+.teacher-import-loading[hidden] {
+    display: none;
+}
+
+.teacher-import-spinner {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    border: 3px solid var(--color-primary-soft);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: teacher-import-spin 0.8s linear infinite;
+}
+
+@keyframes teacher-import-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.teacher-import-table-wrapper {
+    max-height: 52vh;
+    overflow: auto;
+    border: var(--border-strong) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-elevated);
+    transition: opacity var(--transition-fast);
+}
+
+.teacher-import-table-wrapper[hidden] {
+    display: none;
+}
+
+.teacher-import-table-wrapper .data-table {
+    border: 0;
+    border-radius: 0;
+}
+
+.teacher-import-table-wrapper thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.teacher-import-modal-backdrop.is-busy .teacher-import-table-wrapper {
+    opacity: 0.48;
+}
+
+.teacher-import-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 26px 20px;
+    border-top: var(--border-thin) solid var(--color-divider);
+    background: var(--color-surface-soft);
+}
+
+@media (max-width: 720px) {
+    .teacher-import-modal-backdrop {
+        align-items: stretch;
+        padding: 10px;
+    }
+
+    .teacher-import-dialog {
+        max-height: 100%;
+    }
+
+    .teacher-import-modal-header,
+    .teacher-import-modal-body,
+    .teacher-import-modal-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .teacher-import-modal-footer .secondary-button,
+    .teacher-import-modal-footer .main-action-button {
+        flex: 1 1 0;
+    }
+}

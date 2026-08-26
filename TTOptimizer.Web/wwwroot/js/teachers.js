@@ -107,7 +107,7 @@ async function loadTeachers() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="5">Loading teachers...</td>
+            <td colspan="5">${t("teachers.loading")}</td>
         </tr>
     `;
 
@@ -168,7 +168,7 @@ function renderTeachers(teachers) {
     if (!Array.isArray(teachers) || teachers.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5">No teachers found.</td>
+                <td colspan="5">${t("teachers.noneFound")}</td>
             </tr>
         `;
 
@@ -758,7 +758,7 @@ function openEditTeacherForm(teacher) {
     teacherAlias.value = teacher.alias ?? "";
     teacherInfo.value = teacher.info ?? "";
 
-    formTitle.textContent = "Edit teacher";
+    formTitle.textContent = t("teachers.edit");
     formSection.hidden = false;
 
     teacherName.focus();
@@ -966,17 +966,20 @@ async function handleTeacherImportFileSelected(event) {
     }
 
     if (!file.name.toLowerCase().endsWith(".xlsx")) {
-        window.alert("Please select an XLSX file.");
+        window.alert(t("teachers.selectXlsx"));
         input.value = "";
         return;
     }
 
-    try {
-        showTeacherImportMessage(
-            `Reading ${file.name}...`,
-            false
-        );
+    openTeacherImportPreview();
+    clearTeacherImportMessage();
+    setTeacherImportLoading(
+        true,
+        t("teachers.importReading").replace("{file}", file.name),
+        true
+    );
 
+    try {
         const formData = new FormData();
         formData.append("file", file);
 
@@ -993,7 +996,8 @@ async function handleTeacherImportFileSelected(event) {
         if (!response.ok) {
             throw new Error(
                 data?.message ??
-                `Could not read XLSX file. Status: ${response.status}`
+                t("teachers.importReadFailedStatus")
+                    .replace("{status}", response.status)
             );
         }
 
@@ -1007,7 +1011,8 @@ async function handleTeacherImportFileSelected(event) {
         updateConfirmTeacherImportButton();
 
         showTeacherImportMessage(
-            `${rows.length} row(s) read from the file.`,
+            t("teachers.importRowsRead")
+                .replace("{count}", rows.length),
             false
         );
     } catch (error) {
@@ -1027,20 +1032,31 @@ async function handleTeacherImportFileSelected(event) {
             true
         );
     } finally {
+        setTeacherImportLoading(false);
+        updateConfirmTeacherImportButton();
         input.value = "";
     }
 }
 
-function renderTeacherImportPreview(rows) {
+function openTeacherImportPreview() {
     const previewSection =
         document.getElementById("teacherImportPreviewSection");
 
+    if (!previewSection) {
+        return;
+    }
+
+    previewSection.hidden = false;
+    document.body.classList.add("modal-open");
+}
+
+function renderTeacherImportPreview(rows) {
     const tbody =
         document.querySelector(
             "#teacherImportPreviewTable tbody"
         );
 
-    if (!previewSection || !tbody) {
+    if (!tbody) {
         return;
     }
 
@@ -1055,8 +1071,6 @@ function renderTeacherImportPreview(rows) {
 
         row.appendChild(cell);
         tbody.appendChild(row);
-
-        previewSection.hidden = false;
         return;
     }
 
@@ -1073,7 +1087,7 @@ function renderTeacherImportPreview(rows) {
 
         const statusText = item.isValid
             ? "OK"
-            : item.message || "Invalid row";
+            : item.message || t("teachers.importInvalidRow");
 
         const statusCell =
             createTableCell(statusText);
@@ -1085,8 +1099,6 @@ function renderTeacherImportPreview(rows) {
         row.appendChild(statusCell);
         tbody.appendChild(row);
     }
-
-    previewSection.hidden = false;
 }
 
 function closeTeacherImportPreview() {
@@ -1095,13 +1107,56 @@ function closeTeacherImportPreview() {
 
     if (previewSection) {
         previewSection.hidden = true;
+        previewSection.classList.remove("is-busy");
     }
 
+    document.body.classList.remove("modal-open");
     currentTeacherImportRows = [];
+    setTeacherImportLoading(false);
     updateConfirmTeacherImportButton();
     clearTeacherImportMessage();
 }
 
+function setTeacherImportLoading(isLoading, message = "", hideTable = false) {
+    const previewSection =
+        document.getElementById("teacherImportPreviewSection");
+
+    const loading =
+        document.getElementById("teacherImportLoading");
+
+    const loadingText =
+        document.getElementById("teacherImportLoadingText");
+
+    const tableWrapper =
+        document.getElementById("teacherImportTableWrapper");
+
+    const closeButton =
+        document.getElementById("closeTeacherImportPreviewButton");
+
+    if (previewSection) {
+        previewSection.classList.toggle("is-busy", isLoading);
+    }
+
+    if (loading) {
+        loading.hidden = !isLoading;
+    }
+
+    if (loadingText) {
+        loadingText.textContent = isLoading ? message : "";
+    }
+
+    if (tableWrapper) {
+        tableWrapper.hidden = isLoading && hideTable;
+    }
+
+    if (closeButton) {
+        closeButton.disabled = isLoading;
+    }
+
+    if (!isLoading && tableWrapper) {
+        tableWrapper.hidden = false;
+    }
+}
 
 function updateConfirmTeacherImportButton() {
     const button =
@@ -1111,11 +1166,16 @@ function updateConfirmTeacherImportButton() {
         return;
     }
 
+    const previewSection =
+        document.getElementById("teacherImportPreviewSection");
+
     const validRows = currentTeacherImportRows.filter(
         row => row?.isValid === true
     );
 
-    button.disabled = validRows.length === 0;
+    button.disabled =
+        validRows.length === 0 ||
+        previewSection?.classList.contains("is-busy") === true;
 }
 
 async function confirmTeacherImport() {
@@ -1128,33 +1188,29 @@ async function confirmTeacherImport() {
 
     if (validRows.length === 0) {
         showTeacherImportMessage(
-            "There are no valid teachers to import.",
+            t("teachers.importNoValidRows"),
             true
         );
         return;
     }
 
     const confirmed = window.confirm(
-        `Import ${validRows.length} teacher(s) into ClassFlow?`
+        t("teachers.importConfirmQuestion")
+            .replace("{count}", validRows.length)
     );
 
     if (!confirmed) {
         return;
     }
 
-    const button =
-        document.getElementById("confirmTeacherImportButton");
-
-    if (button) {
-        button.disabled = true;
-    }
+    setTeacherImportLoading(
+        true,
+        t("teachers.importing"),
+        false
+    );
+    updateConfirmTeacherImportButton();
 
     try {
-        showTeacherImportMessage(
-            "Importing teachers...",
-            false
-        );
-
         const organizationId =
             window.appContext.requireOrganizationId();
 
@@ -1180,7 +1236,8 @@ async function confirmTeacherImport() {
         if (!response.ok) {
             throw new Error(
                 data?.message ??
-                `Could not import teachers. Status: ${response.status}`
+                t("teachers.importFailedStatus")
+                    .replace("{status}", response.status)
             );
         }
 
@@ -1191,22 +1248,19 @@ async function confirmTeacherImport() {
             Number(data?.skippedExistingCount ?? 0);
 
         let message =
-            `Imported ${importedCount} teacher(s).`;
+            t("teachers.importSuccess")
+                .replace("{count}", importedCount);
 
         if (skippedExistingCount > 0) {
-            message +=
-                ` ${skippedExistingCount} existing teacher(s) were skipped.`;
+            message += " " +
+                t("teachers.importSkippedExisting")
+                    .replace("{count}", skippedExistingCount);
         }
 
-        showTeacherImportMessage(
-            message,
-            false
-        );
-
-        currentTeacherImportRows = [];
-        updateConfirmTeacherImportButton();
+        showTeacherImportMessage(message, false);
 
         await loadTeachers();
+        closeTeacherImportPreview();
     } catch (error) {
         console.error(
             "Error importing teachers:",
@@ -1220,6 +1274,7 @@ async function confirmTeacherImport() {
             true
         );
 
+        setTeacherImportLoading(false);
         updateConfirmTeacherImportButton();
     }
 }

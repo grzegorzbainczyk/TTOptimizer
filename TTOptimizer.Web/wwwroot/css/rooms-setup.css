@@ -469,3 +469,114 @@
     transform: translateY(-1px);
     box-shadow: 0 0 0 4px rgba(184, 91, 76, 0.18);
 }
+
+
+/* =========================================================
+   Existing room editor in guided setup
+   ========================================================= */
+
+.room-existing-header {
+    align-items: flex-start;
+}
+
+.room-existing-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.6rem;
+}
+
+.room-delete-selected-button:not(:disabled) {
+    border-color: var(--color-danger, #b42318);
+    color: var(--color-danger, #b42318);
+}
+
+.room-existing-groups {
+    display: grid;
+    gap: 1rem;
+}
+
+.room-existing-group {
+    border: 1px solid #ddd6c8;
+    border-radius: 14px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.room-existing-group-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.room-existing-select-group {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #456d9f;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.room-existing-select-group:hover {
+    text-decoration: underline;
+}
+
+.room-existing-room-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+    gap: 0.55rem;
+    padding: 0.9rem;
+}
+
+.room-existing-room-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 40px;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #ded8ce;
+    border-radius: 9px;
+    background: #fffdf8;
+    cursor: pointer;
+    user-select: none;
+}
+
+.room-existing-room-item:has(input:checked) {
+    border-color: #5b84b8;
+    background: #edf3fb;
+}
+
+.room-existing-room-item input {
+    margin: 0;
+}
+
+.room-add-new-heading {
+    padding: 1.4rem 0 0.2rem;
+}
+
+.room-add-new-heading h3 {
+    margin: 0 0 0.3rem;
+}
+
+.room-add-new-heading p {
+    margin: 0;
+    color: #707782;
+}
+
+@media (max-width: 700px) {
+    .room-existing-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .room-existing-actions {
+        justify-content: flex-start;
+    }
+
+    .room-existing-actions > button {
+        flex: 1 1 180px;
+    }
+}

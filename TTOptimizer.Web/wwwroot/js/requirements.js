@@ -1,4 +1,4 @@
-import { initializeI18n, getCurrentLanguage } from "./i18n.js";
+import { initializeI18n, t } from "./i18n.js";
 
 let availableTeachers = [];
 let availableStudentGroups = [];
@@ -100,135 +100,62 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function getLessonsPageText() {
-    const language =
-        getCurrentLanguage() === "pl"
-            ? "pl"
-            : "en";
-
-    if (language === "pl") {
-        return {
-            pageLabel: "Dane planu lekcji",
-            pageTitle: "Lekcje",
-            pageSubtitle:
-                "Zdefiniuj lekcje, które mają zostać uwzględnione w planie.",
-            listTitle: "Lista lekcji",
-            listDescription:
-                "Określ grupę uczniów, przedmiot, nauczyciela i liczbę lekcji w tygodniu.",
-            addLesson: "Dodaj lekcję",
-            importCurriculum: "Importuj plan nauczania",
-            curriculumTitle: "Import z ramowego planu nauczania",
-            curriculumClass: "Klasa",
-            curriculumGrade: "Poziom klasy",
-            curriculumSchoolYear: "Rok szkolny",
-            curriculumLoadPreview: "Przygotuj import",
-            curriculumCreateLessons: "Importuj gotowe pozycje",
-            curriculumSubject: "Przedmiot",
-            curriculumHours: "Godziny/tydzień",
-            curriculumMappedSubject: "Przedmiot w ClassFlow",
-            curriculumTeacher: "Nauczyciel",
-            curriculumStatus: "Status",
-        teachingPlanClassSelectionDescription:
-            "Select the classes to prepare. Check the grade for every selected class before creating the preview.",
-        teachingPlanClassHeader: "Class",
-        teachingPlanGradeHeader: "Grade",
-        teachingPlanSummaryTitle: "Import summary",
-        teachingPlanPreviewClassHeader: "Class",
-        teachingPlanAll: "All",
-        teachingPlanIssues: "Needs attention",
-        teachingPlanReadyItems: "Ready",
-        teachingPlanNewSubjects: "New subjects",
-        teachingPlanIssuesCount: "Needs attention",
-        teachingPlanDuplicates: "Already exists",
-        teachingPlanDuplicate: "Already exists",
-        teachingPlanSelectAtLeastOneClass: "Select at least one class.",
-        teachingPlanMissingGrade: "Choose a grade for every selected class.",
-        teachingPlanImported: "Import completed.",
-        teachingPlanNothingReady: "There are no ready items to import.",
-            teachingPlanClassSelectionDescription:
-                "Wybierz klasy do przygotowania. Przed podglądem sprawdź poziom każdej klasy.",
-            teachingPlanClassHeader: "Klasa",
-            teachingPlanGradeHeader: "Poziom",
-            teachingPlanSummaryTitle: "Podsumowanie importu",
-            teachingPlanPreviewClassHeader: "Klasa",
-            teachingPlanAll: "Wszystko",
-            teachingPlanIssues: "Wymaga uwagi",
-            teachingPlanReadyItems: "Gotowe",
-            teachingPlanNewSubjects: "Nowe przedmioty",
-            teachingPlanIssuesCount: "Wymaga uwagi",
-            teachingPlanDuplicates: "Już istnieje",
-            teachingPlanDuplicate: "Już istnieje",
-            teachingPlanSelectAtLeastOneClass: "Wybierz co najmniej jedną klasę.",
-            teachingPlanMissingGrade: "Uzupełnij poziom dla każdej wybranej klasy.",
-            teachingPlanImported: "Import zakończony.",
-            teachingPlanNothingReady: "Nie ma gotowych pozycji do importu.",
-            curriculumReady: "Gotowe",
-            curriculumMissingSubject: "Wybierz przedmiot",
-            curriculumMissingTeacher: "Wybierz nauczyciela",
-            curriculumSelectClass: "Wybierz klasę",
-            curriculumSelectGrade: "Wybierz poziom",
-            curriculumCreated: "Lekcje zostały utworzone.",
-            curriculumPartialError: "Nie udało się utworzyć wszystkich lekcji.",
-            curriculumCreateSubject: "Utwórz przedmiot",
-            curriculumCreateSubjectStatus: "Przedmiot zostanie utworzony",
-            curriculumMultipleTeachers: "Kilku przypisanych nauczycieli",
-            curriculumContextError: "Nie udało się wczytać domyślnych przypisań nauczycieli.",
-            addLessonForm: "Dodaj lekcję",
-            editLessonForm: "Edytuj lekcję",
-            additionalLesson: "Zajęcia dodatkowe",
-            additionalLessonHelp:
-                "Zajęcia dodatkowe otrzymują domyślnie niski priorytet.",
-            newItem: "+ Nowy",
-            addStudentGroup: "Dodaj grupę uczniów",
-            addSubject: "Dodaj przedmiot",
-            cancel: "Anuluj",
-            back: "Powrót",
-            refresh: "Odśwież"
-        };
-    }
-
     return {
-        pageLabel: "Timetable input",
-        pageTitle: "Lessons",
-        pageSubtitle:
-            "Define the lessons that should be included in the timetable.",
-        listTitle: "Lessons list",
-        listDescription:
-            "Choose the student group, subject, teacher and number of lessons per week.",
-        addLesson: "Add lesson",
-        importCurriculum: "Import teaching plan",
-        curriculumTitle: "Import from teaching plan",
-        curriculumClass: "Class",
-        curriculumGrade: "Grade",
-        curriculumSchoolYear: "School year",
-        curriculumLoadPreview: "Prepare import",
-        curriculumCreateLessons: "Import ready items",
-        curriculumSubject: "Subject",
-        curriculumHours: "Hours/week",
-        curriculumMappedSubject: "ClassFlow subject",
-        curriculumTeacher: "Teacher",
-        curriculumStatus: "Status",
-        curriculumReady: "Ready",
-        curriculumMissingSubject: "Select subject",
-        curriculumMissingTeacher: "Select teacher",
-        curriculumSelectClass: "Select class",
-        curriculumSelectGrade: "Select grade",
-        curriculumCreated: "Lessons were created.",
-        curriculumPartialError: "Not all lessons could be created.",
-        curriculumCreateSubject: "Create subject",
-        curriculumCreateSubjectStatus: "Subject will be created",
-        curriculumMultipleTeachers: "Multiple assigned teachers",
-        curriculumContextError: "Could not load default teacher assignments.",
-        addLessonForm: "Add lesson",
-        editLessonForm: "Edit lesson",
-        additionalLesson: "Additional lesson",
-        additionalLessonHelp:
-            "Additional lessons start with Low priority.",
-        newItem: "+ New",
-        addStudentGroup: "Add student group",
-        addSubject: "Add subject",
-        cancel: "Cancel",
-        back: "Back",
-        refresh: "Refresh"
+        pageLabel: t("lessons.pageLabel"),
+        pageTitle: t("lessons.title"),
+        pageSubtitle: t("lessons.subtitle"),
+        listTitle: t("lessons.listTitle"),
+        listDescription: t("lessons.listDescription"),
+        addLesson: t("lessons.add"),
+        importCurriculum: t("lessons.importCurriculum"),
+        curriculumTitle: t("lessons.curriculumTitle"),
+        curriculumClass: t("lessons.curriculumClass"),
+        curriculumGrade: t("lessons.curriculumGrade"),
+        curriculumSchoolYear: t("lessons.curriculumSchoolYear"),
+        curriculumLoadPreview: t("lessons.curriculumLoadPreview"),
+        curriculumCreateLessons: t("lessons.curriculumCreateLessons"),
+        curriculumSubject: t("lessons.curriculumSubject"),
+        curriculumHours: t("lessons.curriculumHours"),
+        curriculumMappedSubject: t("lessons.curriculumMappedSubject"),
+        curriculumTeacher: t("lessons.curriculumTeacher"),
+        curriculumStatus: t("lessons.curriculumStatus"),
+        teachingPlanClassSelectionDescription: t("lessons.teachingPlanClassSelectionDescription"),
+        teachingPlanClassHeader: t("lessons.teachingPlanClassHeader"),
+        teachingPlanGradeHeader: t("lessons.teachingPlanGradeHeader"),
+        teachingPlanSummaryTitle: t("lessons.teachingPlanSummaryTitle"),
+        teachingPlanPreviewClassHeader: t("lessons.teachingPlanPreviewClassHeader"),
+        teachingPlanAll: t("lessons.teachingPlanAll"),
+        teachingPlanIssues: t("lessons.teachingPlanIssues"),
+        teachingPlanReadyItems: t("lessons.teachingPlanReadyItems"),
+        teachingPlanNewSubjects: t("lessons.teachingPlanNewSubjects"),
+        teachingPlanIssuesCount: t("lessons.teachingPlanIssuesCount"),
+        teachingPlanDuplicates: t("lessons.teachingPlanDuplicates"),
+        teachingPlanDuplicate: t("lessons.teachingPlanDuplicate"),
+        teachingPlanSelectAtLeastOneClass: t("lessons.teachingPlanSelectAtLeastOneClass"),
+        teachingPlanMissingGrade: t("lessons.teachingPlanMissingGrade"),
+        teachingPlanImported: t("lessons.teachingPlanImported"),
+        teachingPlanNothingReady: t("lessons.teachingPlanNothingReady"),
+        curriculumReady: t("lessons.curriculumReady"),
+        curriculumMissingSubject: t("lessons.curriculumMissingSubject"),
+        curriculumMissingTeacher: t("lessons.curriculumMissingTeacher"),
+        curriculumSelectClass: t("lessons.curriculumSelectClass"),
+        curriculumSelectGrade: t("lessons.curriculumSelectGrade"),
+        curriculumCreated: t("lessons.curriculumCreated"),
+        curriculumPartialError: t("lessons.curriculumPartialError"),
+        curriculumCreateSubject: t("lessons.curriculumCreateSubject"),
+        curriculumCreateSubjectStatus: t("lessons.curriculumCreateSubjectStatus"),
+        curriculumMultipleTeachers: t("lessons.curriculumMultipleTeachers"),
+        curriculumContextError: t("lessons.curriculumContextError"),
+        addLessonForm: t("lessons.addForm"),
+        editLessonForm: t("lessons.editForm"),
+        additionalLesson: t("lessons.additional"),
+        additionalLessonHelp: t("lessons.additionalHelp"),
+        newItem: t("common.new"),
+        addStudentGroup: t("lessons.addStudentGroup"),
+        addSubject: t("lessons.addSubject"),
+        cancel: t("common.cancel"),
+        back: t("common.back"),
+        refresh: t("common.refresh")
     };
 }
 
@@ -445,7 +372,7 @@ async function loadRequirements() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="7" class="teachers-table-state">Loading requirements...</td>
+            <td colspan="7" class="teachers-table-state">${t("lessons.loading")}</td>
         </tr>
     `;
 
@@ -509,7 +436,7 @@ function renderRequirements(requirements) {
     ) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="teachers-table-state">No requirements found.</td>
+                <td colspan="7" class="teachers-table-state">${t("lessons.noneFound")}</td>
             </tr>
         `;
 
@@ -558,7 +485,7 @@ function renderRequirements(requirements) {
         editButton.type = "button";
         editButton.className =
             "small-button teacher-action-button teacher-edit-button";
-        editButton.textContent = "Edit";
+        editButton.textContent = t("common.edit");
 
         editButton.addEventListener("click", () => {
             openEditRequirementForm(requirement);
@@ -570,7 +497,7 @@ function renderRequirements(requirements) {
         deleteButton.type = "button";
         deleteButton.className =
             "small-button teacher-action-button teacher-delete-button";
-        deleteButton.textContent = "Delete";
+        deleteButton.textContent = t("common.delete");
 
         deleteButton.addEventListener(
             "click",
@@ -607,25 +534,25 @@ function updateRequirementsCount(count) {
 
     if (!Number.isInteger(count)) {
         countElement.textContent =
-            "Could not determine the number of lessons.";
+            t("lessons.countUnknown");
         return;
     }
 
     countElement.textContent =
         count === 1
-            ? "1 lesson"
-            : `${count} lessons`;
+            ? t("lessons.countOne")
+            : t("lessons.countMany").replace("{count}", count);
 }
 
 function formatPriority(priority) {
     switch (Number(priority)) {
         case 0:
-            return "Low";
+            return t("lessons.priorityLow");
         case 2:
-            return "High";
+            return t("lessons.priorityHigh");
         case 1:
         default:
-            return "Normal";
+            return t("lessons.priorityNormal");
     }
 }
 
@@ -656,7 +583,7 @@ function populateTeacherOptions() {
         document.createElement("option");
 
     emptyOption.value = "";
-    emptyOption.textContent = "Select teacher";
+    emptyOption.textContent = t("lessons.selectTeacher");
 
     select.appendChild(emptyOption);
 
@@ -695,7 +622,7 @@ function populateStudentGroupOptions() {
         document.createElement("option");
 
     emptyOption.value = "";
-    emptyOption.textContent = "Select student group";
+    emptyOption.textContent = t("lessons.selectStudentGroup");
 
     select.appendChild(emptyOption);
 
@@ -730,7 +657,7 @@ function populateSubjectOptions() {
         document.createElement("option");
 
     emptyOption.value = "";
-    emptyOption.textContent = "Select subject";
+    emptyOption.textContent = t("lessons.selectSubject");
 
     select.appendChild(emptyOption);
 

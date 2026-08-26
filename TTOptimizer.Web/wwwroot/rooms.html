@@ -64,14 +64,29 @@
                 </p>
 </div>
 <section class="room-existing-section">
-<div class="room-preview-header">
+<div class="room-preview-header room-existing-header">
 <div>
 <h3>Aktualne sale</h3>
 <p id="roomExistingSummary">Wczytywanie istniejących sal...</p>
 </div>
+<div class="room-existing-actions">
+<button class="secondary-button" id="selectAllExistingRoomsButton" type="button">
+    Zaznacz wszystkie
+</button>
+<button class="secondary-button room-delete-selected-button"
+        disabled
+        id="deleteSelectedRoomsButton"
+        type="button">
+    Usuń zaznaczone
+</button>
 </div>
-<div class="room-preview-groups" id="roomExistingGroups"></div>
+</div>
+<div class="room-preview-groups room-existing-groups" id="roomExistingGroups"></div>
 </section>
+<div class="room-add-new-heading">
+<h3>Dodaj nowe sale</h3>
+<p>Generator i tryb ręczny służą tylko do dodawania nowych pozycji.</p>
+</div>
 <div class="room-setup-mode-choice">
 <label class="room-setup-choice-card">
 <input checked="" name="roomSetupMode" type="radio" value="generate"/>
@@ -178,10 +193,10 @@
 <input id="roomName" maxlength="100" required="" type="text"/>
 </div>
 <div class="form-field">
-<label for="room&lt;span data-i18n=" rooms.building"="">BuildingId"&gt;
-                            <span data-i18n="rooms.building">Building</span>
+<label for="roomBuildingId">
+<span data-i18n="rooms.building">Building</span>
 </label>
-<select id="room&lt;span data-i18n=" rooms.building"="">BuildingId"&gt;
+<select id="roomBuildingId">
 <option value="">
 <span data-i18n="rooms.noBuilding">No building assigned</span>
 </option>

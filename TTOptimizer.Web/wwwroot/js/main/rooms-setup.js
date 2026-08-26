@@ -62,6 +62,12 @@ function wireSetupEvents() {
     document.getElementById("skipRoomSetupButton")
         ?.addEventListener("click", goToSubjects);
 
+    document.getElementById("selectAllExistingRoomsButton")
+        ?.addEventListener("click", toggleAllExistingRooms);
+
+    document.getElementById("deleteSelectedRoomsButton")
+        ?.addEventListener("click", deleteSelectedExistingRooms);
+
     document.querySelectorAll(".room-special-grid input[type='checkbox']")
         .forEach(input => {
             input.addEventListener("change", renderSetupPreview);
@@ -165,11 +171,14 @@ function renderExistingRooms() {
                 Możesz dodać sale teraz albo przejść dalej i wrócić później.
             </p>
         `;
+
+        updateExistingRoomSelectionState();
         return;
     }
 
     summary.textContent =
-        `${setupExistingRooms.length} istniejących sal. Nie musisz ich dodawać ponownie.`;
+        `${setupExistingRooms.length} sal w placówce. ` +
+        "Możesz je zaznaczyć i usunąć albo pozostawić bez zmian.";
 
     const byBuilding = new Map();
 
@@ -192,27 +201,209 @@ function renderExistingRooms() {
         const group =
             document.createElement("section");
 
-        group.className = "room-preview-group";
+        group.className = "room-preview-group room-existing-group";
 
         group.innerHTML = `
             <div class="room-preview-group-header">
                 <strong>${escapeHtml(building?.name ?? "Bez budynku")}</strong>
-                <span>${rooms.length}</span>
+                <div class="room-existing-group-actions">
+                    <span>${rooms.length}</span>
+                    <button class="room-existing-select-group"
+                            type="button">
+                        Zaznacz
+                    </button>
+                </div>
             </div>
-            <div class="room-preview-chips"></div>
+            <div class="room-existing-room-list"></div>
         `;
 
-        const chips =
-            group.querySelector(".room-preview-chips");
+        const list =
+            group.querySelector(".room-existing-room-list");
 
         for (const room of rooms) {
-            const chip = document.createElement("span");
-            chip.className = "room-preview-chip is-existing";
-            chip.textContent = room.name;
-            chips.appendChild(chip);
+            const item =
+                document.createElement("label");
+
+            item.className = "room-existing-room-item";
+
+            item.innerHTML = `
+                <input class="room-existing-checkbox"
+                       type="checkbox"
+                       value="${room.id}" />
+                <span>${escapeHtml(room.name)}</span>
+            `;
+
+            item.querySelector("input")
+                .addEventListener(
+                    "change",
+                    updateExistingRoomSelectionState
+                );
+
+            list.appendChild(item);
         }
 
+        group.querySelector(".room-existing-select-group")
+            .addEventListener("click", () => {
+                const checkboxes =
+                    [...group.querySelectorAll(
+                        ".room-existing-checkbox"
+                    )];
+
+                const shouldSelect =
+                    checkboxes.some(input => !input.checked);
+
+                checkboxes.forEach(input => {
+                    input.checked = shouldSelect;
+                });
+
+                updateExistingRoomSelectionState();
+            });
+
         container.appendChild(group);
+    }
+
+    updateExistingRoomSelectionState();
+}
+
+function getSelectedExistingRoomIds() {
+    return [
+        ...document.querySelectorAll(
+            ".room-existing-checkbox:checked"
+        )
+    ]
+        .map(input => Number(input.value))
+        .filter(id => Number.isInteger(id) && id > 0);
+}
+
+function updateExistingRoomSelectionState() {
+    const selectedIds =
+        getSelectedExistingRoomIds();
+
+    const deleteButton =
+        document.getElementById("deleteSelectedRoomsButton");
+
+    const selectAllButton =
+        document.getElementById("selectAllExistingRoomsButton");
+
+    if (deleteButton) {
+        deleteButton.disabled = selectedIds.length === 0;
+        deleteButton.textContent =
+            selectedIds.length === 0
+                ? "Usuń zaznaczone"
+                : `Usuń zaznaczone (${selectedIds.length})`;
+    }
+
+    if (selectAllButton) {
+        const allCheckboxes =
+            [...document.querySelectorAll(
+                ".room-existing-checkbox"
+            )];
+
+        const allSelected =
+            allCheckboxes.length > 0 &&
+            allCheckboxes.every(input => input.checked);
+
+        selectAllButton.textContent =
+            allSelected
+                ? "Odznacz wszystkie"
+                : "Zaznacz wszystkie";
+    }
+}
+
+function toggleAllExistingRooms() {
+    const checkboxes =
+        [...document.querySelectorAll(
+            ".room-existing-checkbox"
+        )];
+
+    if (checkboxes.length === 0) {
+        return;
+    }
+
+    const shouldSelect =
+        checkboxes.some(input => !input.checked);
+
+    checkboxes.forEach(input => {
+        input.checked = shouldSelect;
+    });
+
+    updateExistingRoomSelectionState();
+}
+
+async function deleteSelectedExistingRooms() {
+    const roomIds =
+        getSelectedExistingRoomIds();
+
+    if (roomIds.length === 0) {
+        return;
+    }
+
+    const confirmed = window.confirm(
+        roomIds.length === 1
+            ? "Usunąć zaznaczoną salę?"
+            : `Usunąć ${roomIds.length} zaznaczonych sal?`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    setSetupBusy(true);
+    showSetupMessage("Usuwanie zaznaczonych sal...", false);
+
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/rooms/setup-delete?organizationId=${encodeURIComponent(organizationId)}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ roomIds })
+            }
+        );
+
+        const data =
+            await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Nie udało się usunąć sal. Status: ${response.status}`
+                )
+            );
+        }
+
+        const deletedIdSet =
+            new Set(roomIds);
+
+        setupExistingRooms =
+            setupExistingRooms.filter(room =>
+                !deletedIdSet.has(Number(room.id))
+            );
+
+        renderExistingRooms();
+        renderSetupPreview();
+
+        showSetupMessage(
+            `Usunięto ${data?.deletedCount ?? roomIds.length} sal.`,
+            false
+        );
+    } catch (error) {
+        console.error("Error deleting setup rooms:", error);
+
+        showSetupMessage(
+            error instanceof Error
+                ? error.message
+                : "Nie udało się usunąć zaznaczonych sal.",
+            true
+        );
+    } finally {
+        setSetupBusy(false);
     }
 }
 

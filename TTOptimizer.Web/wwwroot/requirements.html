@@ -136,7 +136,7 @@
 <label for="requirementName">
                             Name
                         </label>
-<input id="requirementName" maxlength="200" type="text" placeholder="Optional for regular lessons"/>
+<input data-i18n-placeholder="lessons.namePlaceholder" id="requirementName" maxlength="200" type="text" placeholder="Optional for regular lessons"/>
 </div>
 <div class="form-field">
 <label for="requirementStudentGroupId">
@@ -153,12 +153,12 @@
 </button>
 </div>
 <div class="quick-create-panel" hidden id="newStudentGroupPanel">
-    <label for="newStudentGroupClassId">Class</label>
+    <label data-i18n="lessons.curriculumClass" for="newStudentGroupClassId">Class</label>
     <select id="newStudentGroupClassId">
         <option value="">Select class</option>
     </select>
 
-    <label for="newStudentGroupName">Student name / group name</label>
+    <label data-i18n="lessons.studentGroupName" for="newStudentGroupName">Student name / group name</label>
     <input id="newStudentGroupName"
            maxlength="100"
            placeholder="e.g. Jaś Kowalski"
@@ -196,7 +196,7 @@
 </button>
 </div>
 <div class="quick-create-panel" hidden id="newSubjectPanel">
-    <label for="newSubjectName">Subject name</label>
+    <label data-i18n="lessons.subjectName" for="newSubjectName">Subject name</label>
     <input id="newSubjectName"
            maxlength="100"
            placeholder="e.g. Photography club"
@@ -249,9 +249,9 @@
                             Priority
                         </label>
 <select id="requirementPriority" required="">
-<option value="0">Low</option>
-<option selected="" value="1">Normal</option>
-<option value="2">High</option>
+<option data-i18n="lessons.priorityLow" value="0">Low</option>
+<option data-i18n="lessons.priorityNormal" selected="" value="1">Normal</option>
+<option data-i18n="lessons.priorityHigh" value="2">High</option>
 </select>
 </div>
 </div>
@@ -270,12 +270,12 @@
 <table class="data-table teachers-table" id="requirementsTable">
 <thead>
 <tr>
-<th>Name</th>
-<th>Student group</th>
-<th>Subject</th>
-<th>Teacher</th>
-<th>Hours/week</th>
-<th>Priority</th>
+<th data-i18n="common.name">Name</th>
+<th data-i18n="lessons.studentGroup">Student group</th>
+<th data-i18n="lessons.curriculumSubject">Subject</th>
+<th data-i18n="lessons.curriculumTeacher">Teacher</th>
+<th data-i18n="lessons.curriculumHours">Hours/week</th>
+<th data-i18n="lessons.priority">Priority</th>
 <th class="table-actions-column">
                                 Actions
                             </th>
@@ -293,6 +293,6 @@
 </main>
 </div>
 <script src="js/appContext.js"></script>
-<script src="js/requirements.js"></script>
+<script src="js/requirements.js" type="module"></script>
 </body>
 </html>

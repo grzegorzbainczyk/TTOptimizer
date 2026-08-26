@@ -5,6 +5,8 @@ using TTOptimizer.Web.Models.Domain;
 using TTOptimizer.Web.Models.DTO.ResourceTimeSlotPreferences;
 using TTOptimizer.Web.Models.DTO.Teachers;
 using TTOptimizer.Web.Models.DTO.SchedulingPreferences;
+using TTOptimizer.Web.Models.DTO.Import;
+using TTOptimizer.Web.Services;
 
 namespace TTOptimizer.Web.Controllers;
 
@@ -319,6 +321,196 @@ public class TeachersController : ControllerBase
             success = true,
             message = "Teacher was deleted."
         });
+    }
+
+
+    [HttpPost("import/preview")]
+    public IActionResult PreviewImport(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "File is required."
+            });
+        }
+
+        var extension = Path.GetExtension(file.FileName);
+
+        if (!string.Equals(
+            extension,
+            ".xlsx",
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Only .xlsx files are supported."
+            });
+        }
+
+        try
+        {
+            using var stream = file.OpenReadStream();
+
+            var preview =
+                XlsxImportService.ReadSingleNameColumnPreview(
+                    stream,
+                    expectedHeader: "Name",
+                    maxNameLength: 200);
+
+            if (!preview.Success)
+            {
+                return BadRequest(preview);
+            }
+
+            return Ok(preview);
+        }
+        catch (Exception error)
+        {
+            Console.Error.WriteLine(
+                $"Could not read teacher import file: {error}");
+
+            return BadRequest(new
+            {
+                success = false,
+                message =
+                    "The XLSX file could not be read. " +
+                    "Make sure it is a valid spreadsheet."
+            });
+        }
+    }
+
+    [HttpPost("import")]
+    public async Task<IActionResult> ImportTeachers(
+        [FromQuery] int organizationId,
+        [FromBody] SimpleNameImportRequestDto request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        var organizationExists =
+            await _dbContext.Organizations.AnyAsync(
+                organization =>
+                    organization.Id == organizationId);
+
+        if (!organizationExists)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Organization was not found."
+            });
+        }
+
+        var requestedNames = request.Names
+            .Select(name => name?.Trim() ?? string.Empty)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Where(name => name.Length <= 200)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (requestedNames.Count == 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message =
+                    "There are no valid teacher names to import."
+            });
+        }
+
+        var existingNames =
+            await _dbContext.Teachers
+                .Where(teacher =>
+                    teacher.OrganizationId == organizationId)
+                .Select(teacher => teacher.Name)
+                .ToListAsync();
+
+        var existingNameSet = new HashSet<string>(
+            existingNames,
+            StringComparer.OrdinalIgnoreCase);
+
+        var namesToImport = requestedNames
+            .Where(name => !existingNameSet.Contains(name))
+            .ToList();
+
+        var skippedExistingCount =
+            requestedNames.Count - namesToImport.Count;
+
+        if (namesToImport.Count == 0)
+        {
+            return Ok(new
+            {
+                success = true,
+                importedCount = 0,
+                skippedExistingCount
+            });
+        }
+
+        var nextTeacherNumber =
+            (await _dbContext.Teachers
+                .Where(teacher =>
+                    teacher.OrganizationId == organizationId)
+                .MaxAsync(teacher =>
+                    (int?)teacher.TeacherNumber) ?? 0) + 1;
+
+        await using var transaction =
+            await _dbContext.Database.BeginTransactionAsync();
+
+        try
+        {
+            foreach (var name in namesToImport)
+            {
+                var alias =
+                    await GenerateUniqueAliasAsync(
+                        organizationId,
+                        name);
+
+                var teacher = new Teacher
+                {
+                    OrganizationId = organizationId,
+                    TeacherNumber = nextTeacherNumber++,
+                    Name = name,
+                    Alias = alias,
+                    Info = null
+                };
+
+                _dbContext.Teachers.Add(teacher);
+
+                // Save in the loop so the next generated alias also sees
+                // aliases created earlier in this same import.
+                await _dbContext.SaveChangesAsync();
+            }
+
+            await transaction.CommitAsync();
+
+            return Ok(new
+            {
+                success = true,
+                importedCount = namesToImport.Count,
+                skippedExistingCount
+            });
+        }
+        catch (DbUpdateException)
+        {
+            await transaction.RollbackAsync();
+
+            return Conflict(new
+            {
+                success = false,
+                message =
+                    "One or more teachers could not be imported " +
+                    "because of conflicting data."
+            });
+        }
     }
 
 

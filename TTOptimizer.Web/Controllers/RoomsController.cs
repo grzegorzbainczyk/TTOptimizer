@@ -421,6 +421,83 @@ public class RoomsController : ControllerBase
     }
 
 
+    [HttpPost("setup-delete")]
+    public async Task<IActionResult> SetupDeleteRooms(
+        [FromQuery] int organizationId,
+        [FromBody] SetupRoomDeleteRequest request)
+    {
+        if (organizationId <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Organization ID is required."
+            });
+        }
+
+        var roomIds = request.RoomIds
+            .Where(id => id > 0)
+            .Distinct()
+            .ToList();
+
+        if (roomIds.Count == 0)
+        {
+            return Ok(new
+            {
+                success = true,
+                deletedCount = 0
+            });
+        }
+
+        var existingRoomIds = await _db.Rooms
+            .AsNoTracking()
+            .Where(room =>
+                room.OrganizationId == organizationId &&
+                roomIds.Contains(room.Id))
+            .Select(room => room.Id)
+            .ToListAsync();
+
+        if (existingRoomIds.Count == 0)
+        {
+            return Ok(new
+            {
+                success = true,
+                deletedCount = 0
+            });
+        }
+
+        await using var transaction =
+            await _db.Database.BeginTransactionAsync();
+
+        try
+        {
+            // ExecuteDeleteAsync intentionally bypasses EF change tracking.
+            // Database FK rules handle dependent rows:
+            // - ClassGroup.DefaultRoomId -> SET NULL
+            // - ScheduledLessons -> CASCADE
+            // - RoomTimeSlotPreferences -> CASCADE
+            var deletedCount = await _db.Rooms
+                .Where(room =>
+                    room.OrganizationId == organizationId &&
+                    existingRoomIds.Contains(room.Id))
+                .ExecuteDeleteAsync();
+
+            await transaction.CommitAsync();
+
+            return Ok(new
+            {
+                success = true,
+                deletedCount
+            });
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+
     [HttpPost("setup-import")]
     public async Task<IActionResult> SetupImportRooms(
         [FromQuery] int organizationId,
@@ -941,6 +1018,11 @@ public class RoomsController : ControllerBase
             ? null
             : value.Trim();
     }
+}
+
+public class SetupRoomDeleteRequest
+{
+    public List<int> RoomIds { get; set; } = new();
 }
 
 public class SetupRoomImportRequest

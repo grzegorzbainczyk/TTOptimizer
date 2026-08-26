@@ -28,24 +28,13 @@ public static class XlsxImportService
             return result;
         }
 
-        var header = usedRows[0].Cell(1).GetString().Trim();
-
-        if (!string.Equals(
-            header,
-            expectedHeader,
-            StringComparison.OrdinalIgnoreCase))
-        {
-            result.Success = false;
-            result.Message =
-                $"The first column must have the header '{expectedHeader}'.";
-
-            return result;
-        }
-
+        // Lists imported by ClassFlow do not require a header row.
+        // Keep expectedHeader in the method signature for compatibility
+        // with existing controller calls, but treat every used row as data.
         var namesInFile = new HashSet<string>(
             StringComparer.OrdinalIgnoreCase);
 
-        foreach (var row in usedRows.Skip(1))
+        foreach (var row in usedRows)
         {
             var name = row.Cell(1).GetString().Trim();
 
