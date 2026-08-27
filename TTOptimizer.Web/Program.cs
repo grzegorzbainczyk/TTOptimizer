@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Identity;
+using TTOptimizer.Web.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 using TTOptimizer.Web.Data;
 using TTOptimizer.Web.Hubs;
@@ -8,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
+builder.Services.AddScoped<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
 
 builder.Services.AddScoped<DemoDataSeeder>();
 builder.Services.AddScoped<CppOptimizerService>();

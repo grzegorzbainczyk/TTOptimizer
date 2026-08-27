@@ -44,17 +44,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         openAddRequirementForm
     );
 
-    document.getElementById("importCurriculumButton")
-        ?.addEventListener("click", openCurriculumImport);
-
-    document.getElementById("cancelCurriculumImportButton")
-        ?.addEventListener("click", closeCurriculumImport);
-
     document.getElementById("loadCurriculumPreviewButton")
         ?.addEventListener("click", loadCurriculumPreview);
-
-    document.getElementById("confirmCurriculumImportButton")
-        ?.addEventListener("click", confirmCurriculumImport);
 
     document.getElementById("selectAllTeachingPlanClasses")
         ?.addEventListener("change", handleSelectAllTeachingPlanClasses);
@@ -415,7 +406,7 @@ async function loadRequirements() {
         showRequirementsError(
             error instanceof Error
                 ? error.message
-                : "Could not load requirements."
+                : t("lessons.loadFailed")
         );
     }
 }
@@ -688,7 +679,7 @@ function populateNewStudentGroupClassOptions() {
 
     const emptyOption = document.createElement("option");
     emptyOption.value = "";
-    emptyOption.textContent = "Select class";
+    emptyOption.textContent = t("lessons.curriculumSelectClass");
     select.appendChild(emptyOption);
 
     availableClasses.forEach(classGroup => {
@@ -2195,11 +2186,14 @@ function getApiErrorMessage(
 }
 
 
+
+
 // -----------------------------------------------------------------------------
-// Lesson import wizard v1 - collision-safe implementation
+// Lesson import wizard V2
 // -----------------------------------------------------------------------------
 (() => {
-    const SCHOOL_TYPE = {
+    const SCHOOL_TYPES = {
+        Unknown: 0,
         PrimarySchool: 1,
         GeneralSecondarySchool: 2,
         TechnicalSecondarySchool: 3,
@@ -2207,177 +2201,288 @@ function getApiErrorMessage(
         VocationalSchoolSecondDegree: 5
     };
 
-    let wizardSchoolUnits = [];
+    const SCHOOL_TYPE_SLUG = {
+        1: "primary-school",
+        2: "general-secondary",
+        3: "technical-secondary",
+        4: "vocational-first",
+        5: "vocational-second"
+    };
+
     const state = {
+        schools: [],
         schoolUnitId: null,
         classIndex: 0,
         isSummary: false,
-        classRows: new Map(),
-        classGrades: new Map(),
+        rowsByClassId: new Map(),
+        gradeByClassId: new Map(),
         curriculumCache: new Map()
     };
 
     const byId = id => document.getElementById(id);
 
-    async function loadWizardSchoolUnits() {
-        try {
-            const organizationId =
-                window.appContext.requireOrganizationId();
+    function text(key, fallback) {
+        return t(key, fallback);
+    }
 
-            const response = await fetch(
-                `/api/schoolunits?organizationId=${encodeURIComponent(organizationId)}`
-            );
-
-            const data = await readJsonResponse(response);
-
-            if (!response.ok) {
-                throw new Error(
-                    getApiErrorMessage(
-                        data,
-                        `Could not load schools. Status: ${response.status}`
-                    )
-                );
-            }
-
-            wizardSchoolUnits = Array.isArray(data)
-                ? data
-                : data?.schoolUnits ?? [];
-        } catch (error) {
-            console.error("Error loading schools:", error);
-            wizardSchoolUnits = [];
+    function normalizeSchoolType(value) {
+        if (typeof value === "number" && Number.isInteger(value)) {
+            return value;
         }
+
+        const asText = String(value ?? "").trim();
+
+        if (/^\d+$/.test(asText)) {
+            return Number(asText);
+        }
+
+        if (Object.prototype.hasOwnProperty.call(SCHOOL_TYPES, asText)) {
+            return SCHOOL_TYPES[asText];
+        }
+
+        const aliases = {
+            "primary": 1,
+            "primary-school": 1,
+            "general-secondary": 2,
+            "general-secondary-school": 2,
+            "technical-secondary": 3,
+            "technical-secondary-school": 3,
+            "vocational-first": 4,
+            "vocational-second": 5
+        };
+
+        return aliases[asText.toLowerCase()] ?? 0;
     }
 
-    function getWizardSchools() {
-        return [...wizardSchoolUnits]
-            .filter(school => availableClasses.some(
-                classGroup => Number(classGroup.schoolUnitId) === Number(school.id)
-            ))
-            .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "", "pl"));
+    function getAllSchools() {
+        return [...state.schools].sort((a, b) =>
+            String(a.name ?? "").localeCompare(
+                String(b.name ?? ""),
+                "pl",
+                { numeric: true }
+            )
+        );
     }
 
-    function inferWizardGrade(name) {
-        const match = String(name ?? "").match(/(?:^|\D)([1-8])(?:\D|$)/);
+    function getSelectedSchool() {
+        return state.schools.find(
+            school => Number(school.id) === Number(state.schoolUnitId)
+        ) ?? null;
+    }
+
+    function inferGrade(className) {
+        const match = String(className ?? "").match(/^\s*(\d+)/);
         return match ? Number(match[1]) : null;
     }
 
     function getClassesForSchool(schoolUnitId) {
         return availableClasses
-            .filter(item => Number(item.schoolUnitId) === Number(schoolUnitId))
-            .map(item => ({
-                ...item,
-                wizardInferredGrade: inferWizardGrade(item.name)
+            .filter(classGroup =>
+                Number(classGroup.schoolUnitId) === Number(schoolUnitId)
+            )
+            .map(classGroup => ({
+                ...classGroup,
+                inferredGrade:
+                    Number(classGroup.grade) ||
+                    inferGrade(classGroup.name)
             }))
             .sort((a, b) => {
-                const gradeA = a.wizardInferredGrade ?? 999;
-                const gradeB = b.wizardInferredGrade ?? 999;
-                if (gradeA !== gradeB) return gradeA - gradeB;
-
-                return (a.name ?? "").localeCompare(
-                    b.name ?? "",
+                const ga = a.inferredGrade ?? 999;
+                const gb = b.inferredGrade ?? 999;
+                if (ga !== gb) return ga - gb;
+                return String(a.name ?? "").localeCompare(
+                    String(b.name ?? ""),
                     "pl",
                     { numeric: true }
                 );
             });
     }
 
-    function getSelectedSchool() {
-        return getWizardSchools().find(
-            school => Number(school.id) === Number(state.schoolUnitId)
-        ) ?? null;
-    }
-
     function getCurrentClass() {
         const school = getSelectedSchool();
         if (!school) return null;
-
         return getClassesForSchool(school.id)[state.classIndex] ?? null;
     }
 
-    function maxGradeForType(schoolType) {
-        switch (Number(schoolType)) {
-            case SCHOOL_TYPE.PrimarySchool: return 8;
-            case SCHOOL_TYPE.GeneralSecondarySchool: return 4;
-            case SCHOOL_TYPE.TechnicalSecondarySchool: return 5;
-            case SCHOOL_TYPE.VocationalSchoolFirstDegree: return 3;
-            case SCHOOL_TYPE.VocationalSchoolSecondDegree: return 2;
+    function getMaxGrade(schoolType) {
+        switch (normalizeSchoolType(schoolType)) {
+            case 1: return 8;
+            case 2: return 4;
+            case 3: return 5;
+            case 4: return 3;
+            case 5: return 2;
             default: return 8;
         }
     }
 
-    function getCurriculumCandidates(schoolType, schoolYear) {
-        const fileName = schoolYear.replace("/", "-") + ".json";
+    async function loadSchools() {
+        const organizationId =
+            window.appContext.requireOrganizationId();
 
-        switch (Number(schoolType)) {
-            case SCHOOL_TYPE.PrimarySchool:
-                return [`/data/curricula/pl/primary-school/${fileName}`];
-            case SCHOOL_TYPE.GeneralSecondarySchool:
-                return [
-                    `/data/curricula/pl/general-secondary-school/${fileName}`,
-                    `/data/curricula/pl/general-secondary/${fileName}`
-                ];
-            case SCHOOL_TYPE.TechnicalSecondarySchool:
-                return [
-                    `/data/curricula/pl/technical-secondary-school/${fileName}`,
-                    `/data/curricula/pl/technical-secondary/${fileName}`
-                ];
-            case SCHOOL_TYPE.VocationalSchoolFirstDegree:
-                return [`/data/curricula/pl/vocational-first/${fileName}`];
-            case SCHOOL_TYPE.VocationalSchoolSecondDegree:
-                return [`/data/curricula/pl/vocational-second/${fileName}`];
-            default:
-                return [];
+        const response = await fetch(
+            `/api/schoolunits?organizationId=${encodeURIComponent(organizationId)}`
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Could not load schools. Status: ${response.status}`
+                )
+            );
+        }
+
+        state.schools = Array.isArray(data)
+            ? data
+            : data?.schoolUnits ?? [];
+    }
+
+    async function loadCurriculumForSchool(school) {
+        const schoolYear =
+            byId("curriculumSchoolYear")?.value ?? "2026/2027";
+
+        const schoolType = normalizeSchoolType(school?.schoolType);
+        const slug = SCHOOL_TYPE_SLUG[schoolType];
+
+        if (!slug) {
+            return null;
+        }
+
+        const cacheKey = `${slug}:${schoolYear}`;
+
+        if (state.curriculumCache.has(cacheKey)) {
+            return state.curriculumCache.get(cacheKey);
+        }
+
+        const fileName = schoolYear.replace("/", "-") + ".json";
+        const path = `/data/curricula/pl/${slug}/${fileName}`;
+
+        try {
+            const response = await fetch(path, { cache: "no-cache" });
+
+            if (!response.ok) {
+                state.curriculumCache.set(cacheKey, null);
+                return null;
+            }
+
+            const definition = await response.json();
+            state.curriculumCache.set(cacheKey, definition);
+            return definition;
+        } catch (error) {
+            console.error("Could not load curriculum:", path, error);
+            state.curriculumCache.set(cacheKey, null);
+            return null;
         }
     }
 
-    async function loadWizardCurriculum(schoolType, schoolYear) {
-        const key = `${schoolType}:${schoolYear}`;
+    function romanToNumber(value) {
+        const map = {
+            I: 1,
+            II: 2,
+            III: 3,
+            IV: 4,
+            V: 5,
+            VI: 6,
+            VII: 7,
+            VIII: 8
+        };
+        return map[String(value ?? "").toUpperCase()] ?? null;
+    }
 
-        if (state.curriculumCache.has(key)) {
-            return state.curriculumCache.get(key);
+    function appliesToGrade(appliesTo, grade) {
+        const value = String(appliesTo ?? "").trim().toUpperCase();
+
+        if (!value) {
+            return true;
         }
 
-        for (const path of getCurriculumCandidates(schoolType, schoolYear)) {
-            try {
-                const response = await fetch(path, { cache: "no-cache" });
-                if (!response.ok) continue;
+        const ranges = [...value.matchAll(
+            /\b(VIII|VII|VI|V|IV|III|II|I)\s*-\s*(VIII|VII|VI|V|IV|III|II|I)\b/g
+        )];
 
-                const definition = await response.json();
+        for (const match of ranges) {
+            const from = romanToNumber(match[1]);
+            const to = romanToNumber(match[2]);
 
-                if (Array.isArray(definition?.grades)) {
-                    state.curriculumCache.set(key, definition);
-                    return definition;
-                }
-            } catch {
-                // Try next candidate.
+            if (from && to && grade >= from && grade <= to) {
+                return true;
             }
         }
 
-        state.curriculumCache.set(key, null);
-        return null;
+        const singles = [...value.matchAll(
+            /\b(VIII|VII|VI|V|IV|III|II|I)\b/g
+        )]
+            .map(match => romanToNumber(match[1]))
+            .filter(Boolean);
+
+        return singles.includes(Number(grade));
     }
 
-    function findExistingRequirement(row) {
-        const normalizedSubject = normalizeCurriculumName(
-            row.subjectId
-                ? availableSubjects.find(
-                    subject => Number(subject.id) === Number(row.subjectId)
-                )?.name
-                : row.sourceSubjectName
-        );
+    function getCurriculumLessons(definition, grade) {
+        if (Array.isArray(definition?.grades)) {
+            const gradeDefinition = definition.grades.find(
+                item => Number(item.grade) === Number(grade)
+            );
+
+            return (gradeDefinition?.lessons ?? []).map(item => ({
+                subjectName: item.subject,
+                hoursPerWeek:
+                    Number.isFinite(Number(item.hoursPerWeek))
+                        ? Number(item.hoursPerWeek)
+                        : null,
+                source: "hourly-plan"
+            }));
+        }
+
+        if (Array.isArray(definition?.subjects)) {
+            return definition.subjects
+                .filter(item => item.selectedByDefault !== false)
+                .filter(item => appliesToGrade(item.appliesTo, grade))
+                .map(item => ({
+                    subjectName: item.name,
+                    hoursPerWeek: null,
+                    source: "subject-list"
+                }));
+        }
+
+        return [];
+    }
+
+    function findWholeClassGroup(classGroupId) {
+        return availableStudentGroups.find(group =>
+            Number(group.classGroupId) === Number(classGroupId) &&
+            (
+                Number(group.type) === 0 ||
+                String(group.type).toLowerCase() === "wholeclass"
+            )
+        ) ?? null;
+    }
+
+    function findSubject(subjectName) {
+        const normalized = normalizeCurriculumName(subjectName);
+
+        return availableSubjects.find(subject =>
+            normalizeCurriculumName(subject.name) === normalized
+        ) ?? null;
+    }
+
+    function findExisting(row) {
+        const normalized = normalizeCurriculumName(row.subjectName);
 
         return availableRequirements.find(requirement =>
             Number(requirement.studentGroupId) === Number(row.studentGroupId) &&
-            normalizeCurriculumName(requirement.subjectName) === normalizedSubject &&
+            normalizeCurriculumName(requirement.subjectName) === normalized &&
             !Boolean(requirement.isAdditional)
         ) ?? null;
     }
 
-    function refreshWizardState(row) {
-        const existing = findExistingRequirement(row);
+    function refreshAction(row) {
+        const existing = findExisting(row);
         row.existingRequirementId = existing?.id ?? null;
 
-        if (!row.teacherId) {
+        if (!row.teacherId || !Number(row.hoursPerWeek)) {
             row.action = "attention";
             return;
         }
@@ -2387,98 +2492,86 @@ function getApiErrorMessage(
             return;
         }
 
+        const teacherChanged =
+            Number(existing.teacherId) !== Number(row.teacherId);
+
+        const hoursChanged =
+            Number(existing.hoursPerWeek) !== Number(row.hoursPerWeek);
+
         row.action =
-            Number(existing.teacherId) !== Number(row.teacherId) ||
-            Number(existing.hoursPerWeek) !== Number(row.hoursPerWeek)
+            teacherChanged || hoursChanged
                 ? "update"
                 : "unchanged";
     }
 
-    function statusText(row) {
-        switch (row.action) {
-            case "create": return t("lessonWizard.create");
-            case "update": return t("lessonWizard.update");
-            case "unchanged": return t("lessonWizard.unchanged");
-            default: return t("lessonWizard.missingTeacher");
-        }
-    }
-
-    async function prepareRows(classGroup, grade) {
+    async function buildRowsForClass(classGroup, grade) {
         const classId = Number(classGroup.id);
-        const saved = state.classRows.get(classId);
 
-        if (
-            saved &&
-            Number(state.classGrades.get(classId)) === Number(grade)
-        ) {
-            saved.forEach(refreshWizardState);
-            return saved;
+        const storedRows = state.rowsByClassId.get(classId);
+        const storedGrade = state.gradeByClassId.get(classId);
+
+        if (storedRows && Number(storedGrade) === Number(grade)) {
+            storedRows.forEach(refreshAction);
+            return storedRows;
         }
 
         const school = getSelectedSchool();
-        const schoolYear =
-            byId("curriculumSchoolYear")?.value ?? "2026/2027";
-
-        const definition =
-            await loadWizardCurriculum(
-                school.schoolType,
-                schoolYear
-            );
+        const definition = await loadCurriculumForSchool(school);
 
         if (!definition) {
-            state.classRows.set(classId, []);
-            state.classGrades.set(classId, grade);
+            state.rowsByClassId.set(classId, []);
+            state.gradeByClassId.set(classId, grade);
             return null;
         }
 
-        const gradeDefinition = definition.grades?.find(
-            item => Number(item.grade) === Number(grade)
-        );
-
-        if (!gradeDefinition) {
-            state.classRows.set(classId, []);
-            state.classGrades.set(classId, grade);
-            return [];
-        }
-
-        const wholeClassGroup =
-            findWholeClassStudentGroup(classGroup.id);
+        const wholeClassGroup = findWholeClassGroup(classGroup.id);
 
         if (!wholeClassGroup) {
             throw new Error(
-                `Whole-class student group was not found for ${classGroup.name}.`
+                text(
+                    "lessonWizard.missingWholeClassGroup",
+                    `Brak grupy całej klasy dla ${classGroup.name}.`
+                )
             );
         }
 
-        const rows = (gradeDefinition.lessons ?? []).map(lesson => {
-            const matchedSubject =
-                findMatchingSubject(lesson.subject);
+        const lessons = getCurriculumLessons(definition, grade);
+
+        const rows = lessons.map(item => {
+            const subject = findSubject(item.subjectName);
 
             const row = {
                 classGroupId: classGroup.id,
                 className: classGroup.name,
                 studentGroupId: wholeClassGroup.id,
-                sourceSubjectName: lesson.subject,
-                hoursPerWeek: Number(lesson.hoursPerWeek),
-                subjectId: matchedSubject?.id ?? null,
-                createSubject: !matchedSubject,
+                subjectId: subject?.id ?? null,
+                subjectName: item.subjectName,
                 teacherId: null,
-                existingRequirementId: null,
-                action: "attention"
+                hoursPerWeek: item.hoursPerWeek,
+                source: item.source,
+                action: "attention",
+                existingRequirementId: null
             };
 
-            const existing = findExistingRequirement(row);
+            const existing = findExisting(row);
 
-            if (existing?.teacherId) {
-                row.teacherId = Number(existing.teacherId);
+            if (existing) {
+                row.teacherId = existing.teacherId
+                    ? Number(existing.teacherId)
+                    : null;
+
+                if (!row.hoursPerWeek) {
+                    row.hoursPerWeek =
+                        Number(existing.hoursPerWeek) || null;
+                }
             }
 
-            refreshWizardState(row);
+            refreshAction(row);
             return row;
         });
 
-        state.classRows.set(classId, rows);
-        state.classGrades.set(classId, grade);
+        state.rowsByClassId.set(classId, rows);
+        state.gradeByClassId.set(classId, grade);
 
         return rows;
     }
@@ -2487,23 +2580,27 @@ function getApiErrorMessage(
         const select = byId("lessonWizardSchoolSelect");
         if (!select) return;
 
-        const schools = getWizardSchools();
+        const schools = getAllSchools();
+        const selected = state.schoolUnitId;
 
         select.innerHTML = "";
 
         for (const school of schools) {
             const option = document.createElement("option");
-            option.value = school.id;
+            option.value = String(school.id);
             option.textContent = school.name;
             select.appendChild(option);
         }
 
-        if (!state.schoolUnitId && schools.length > 0) {
+        if (
+            selected &&
+            schools.some(school => Number(school.id) === Number(selected))
+        ) {
+            select.value = String(selected);
+        } else if (schools.length > 0) {
             state.schoolUnitId = Number(schools[0].id);
+            select.value = String(state.schoolUnitId);
         }
-
-        select.value =
-            state.schoolUnitId?.toString() ?? "";
     }
 
     function populateGradeSelect(classGroup, school) {
@@ -2512,23 +2609,38 @@ function getApiErrorMessage(
 
         select.innerHTML = "";
 
-        const maxGrade = maxGradeForType(school.schoolType);
+        const maxGrade = getMaxGrade(school.schoolType);
 
         for (let grade = 1; grade <= maxGrade; grade++) {
             const option = document.createElement("option");
-            option.value = grade;
-            option.textContent = grade.toString();
+            option.value = String(grade);
+            option.textContent = String(grade);
             select.appendChild(option);
         }
 
-        const saved =
-            state.classGrades.get(Number(classGroup.id));
+        const savedGrade =
+            state.gradeByClassId.get(Number(classGroup.id));
 
-        select.value = (
-            saved ??
-            classGroup.wizardInferredGrade ??
-            1
-        ).toString();
+        const selectedGrade =
+            savedGrade ??
+            (Number(classGroup.grade) ||
+                classGroup.inferredGrade ||
+                1);
+
+        select.value = String(selectedGrade);
+    }
+
+    function statusText(row) {
+        switch (row.action) {
+            case "create":
+                return text("lessonWizard.create", "Nowa lekcja");
+            case "update":
+                return text("lessonWizard.update", "Do aktualizacji");
+            case "unchanged":
+                return text("lessonWizard.unchanged", "Bez zmian");
+            default:
+                return text("lessonWizard.attention", "Wymaga uzupełnienia");
+        }
     }
 
     function renderRows(rows) {
@@ -2537,35 +2649,46 @@ function getApiErrorMessage(
 
         tbody.innerHTML = "";
 
-        for (const row of rows ?? []) {
-            refreshWizardState(row);
+        for (const row of rows) {
+            refreshAction(row);
 
             const tr = document.createElement("tr");
 
-            tr.appendChild(createTableCell(row.sourceSubjectName));
-            tr.appendChild(createTableCell(row.hoursPerWeek));
+            tr.appendChild(createTableCell(row.subjectName));
+
+            const hoursCell = document.createElement("td");
+            const hoursInput = document.createElement("input");
+            hoursInput.type = "number";
+            hoursInput.min = "1";
+            hoursInput.max = "40";
+            hoursInput.step = "1";
+            hoursInput.value = row.hoursPerWeek ?? "";
+            hoursInput.className = "lesson-wizard-hours-input";
+            hoursInput.placeholder = "—";
+            hoursCell.appendChild(hoursInput);
+            tr.appendChild(hoursCell);
 
             const teacherCell = document.createElement("td");
             const teacherSelect = document.createElement("select");
 
-            const emptyOption = document.createElement("option");
-            emptyOption.value = "";
-            emptyOption.textContent = t("lessons.selectTeacher");
-            teacherSelect.appendChild(emptyOption);
+            const emptyTeacher = document.createElement("option");
+            emptyTeacher.value = "";
+            emptyTeacher.textContent =
+                text("lessons.selectTeacher", "Wybierz nauczyciela");
+            teacherSelect.appendChild(emptyTeacher);
 
             for (const teacher of availableTeachers) {
                 const option = document.createElement("option");
-                option.value = teacher.id;
+                option.value = String(teacher.id);
                 option.textContent =
                     teacher.alias
                         ? `${teacher.name} (${teacher.alias})`
                         : teacher.name;
-
                 teacherSelect.appendChild(option);
             }
 
             teacherSelect.value =
-                row.teacherId?.toString() ?? "";
+                row.teacherId ? String(row.teacherId) : "";
 
             teacherCell.appendChild(teacherSelect);
             tr.appendChild(teacherCell);
@@ -2575,140 +2698,212 @@ function getApiErrorMessage(
             statusCell.textContent = statusText(row);
             tr.appendChild(statusCell);
 
-            teacherSelect.addEventListener("change", () => {
+            const updateRow = () => {
+                row.hoursPerWeek =
+                    Number(hoursInput.value) || null;
                 row.teacherId =
                     Number(teacherSelect.value) || null;
 
-                refreshWizardState(row);
+                refreshAction(row);
                 statusCell.textContent = statusText(row);
+            };
 
-                renderSummary();
-            });
+            hoursInput.addEventListener("input", updateRow);
+            teacherSelect.addEventListener("change", updateRow);
 
             tbody.appendChild(tr);
         }
     }
 
-    function renderSummary() {
-        const grid = byId("lessonWizardSummaryGrid");
-        const apply = byId("confirmCurriculumImportButton");
+    function setWizardText() {
+        const assignments = [
+            ["lessonWizardStepLabel", "lessonWizard.stepLabel", "Import planu nauczania"],
+            ["lessonWizardTitle", "lessonWizard.title", "Przypisz nauczycieli do lekcji"],
+            ["lessonWizardSubtitle", "lessonWizard.subtitle",
+                "Przechodź po szkołach i klasach. Możesz wracać bez utraty wyborów."],
+            ["lessonWizardSchoolLabel", "lessonWizard.school", "Szkoła"],
+            ["lessonWizardYearLabel", "lessonWizard.schoolYear", "Rok szkolny"],
+            ["lessonWizardGradeLabel", "lessonWizard.grade", "Rocznik"],
+            ["lessonWizardBackButton", "lessonWizard.back", "← Wstecz"],
+            ["lessonWizardCloseButton", "common.cancel", "Anuluj"],
+            ["lessonWizardNextButton", "lessonWizard.nextSimple", "Dalej →"],
+            ["confirmCurriculumImportButton", "lessonWizard.apply", "Zastosuj zmiany"],
+            ["lessonWizardSummaryTitle", "lessonWizard.summary", "Podsumowanie"],
+            ["lessonWizardSummaryHint", "lessonWizard.summaryHint",
+                "Przed zapisem uzupełnij nauczycieli i liczbę godzin."]
+        ];
 
-        if (!grid) return;
+        for (const [id, key, fallback] of assignments) {
+            const element = byId(id);
+            if (element) {
+                element.textContent = text(key, fallback);
+            }
+        }
+    }
 
-        const rows =
-            Array.from(state.classRows.values()).flat();
+    function setEmpty(message) {
+        const empty = byId("lessonWizardEmptyState");
+        const table = byId("lessonWizardTableWrapper");
 
-        rows.forEach(refreshWizardState);
+        if (empty) {
+            empty.textContent = message;
+            empty.hidden = false;
+        }
 
-        const counts = {
-            create: rows.filter(row => row.action === "create").length,
-            update: rows.filter(row => row.action === "update").length,
-            unchanged: rows.filter(row => row.action === "unchanged").length,
-            attention: rows.filter(row => row.action === "attention").length
-        };
-
-        grid.innerHTML = `
-            <div><strong>${counts.create}</strong><span>${t("lessonWizard.created")}</span></div>
-            <div><strong>${counts.update}</strong><span>${t("lessonWizard.updated")}</span></div>
-            <div><strong>${counts.unchanged}</strong><span>${t("lessonWizard.unchangedCount")}</span></div>
-            <div><strong>${counts.attention}</strong><span>${t("lessonWizard.attention")}</span></div>
-        `;
-
-        if (apply) {
-            apply.disabled =
-                counts.attention > 0 ||
-                counts.create + counts.update === 0;
+        if (table) {
+            table.hidden = true;
         }
     }
 
     function updateProgress() {
-        const schools = getWizardSchools();
+        const school = getSelectedSchool();
+        const classes = school ? getClassesForSchool(school.id) : [];
 
-        const total = schools.reduce(
-            (sum, school) =>
-                sum + getClassesForSchool(school.id).length,
-            0
-        );
-
-        const schoolIndex = schools.findIndex(
-            school => Number(school.id) === Number(state.schoolUnitId)
-        );
-
-        let before = 0;
-
-        for (let i = 0; i < schoolIndex; i++) {
-            before += getClassesForSchool(schools[i].id).length;
-        }
-
-        const current = state.isSummary
-            ? total
-            : Math.min(total, before + state.classIndex + 1);
-
-        const text = byId("lessonWizardProgressText");
+        const label = byId("lessonWizardProgressText");
         const bar = byId("lessonWizardProgressValue");
 
-        if (text) {
-            text.textContent = state.isSummary
-                ? t("lessonWizard.summary")
-                : t("lessonWizard.progress")
-                    .replace("{current}", current)
-                    .replace("{total}", total);
+        if (state.isSummary) {
+            if (label) {
+                label.textContent =
+                    text("lessonWizard.summary", "Podsumowanie");
+            }
+            if (bar) {
+                bar.style.width = "100%";
+            }
+            return;
+        }
+
+        const current =
+            classes.length > 0
+                ? Math.min(state.classIndex + 1, classes.length)
+                : 0;
+
+        if (label) {
+            label.textContent =
+                classes.length > 0
+                    ? text("lessonWizard.localProgress", "Klasa {current} z {total}")
+                        .replace("{current}", current)
+                        .replace("{total}", classes.length)
+                    : text("lessonWizard.noClasses", "Brak klas");
         }
 
         if (bar) {
             bar.style.width =
-                total > 0
-                    ? `${Math.round((current / total) * 100)}%`
+                classes.length > 0
+                    ? `${Math.round((current / classes.length) * 100)}%`
                     : "0%";
         }
     }
 
+    function getMissingGradesForSchool(school) {
+        if (!school) {
+            return [];
+        }
+
+        const maxGrade = getMaxGrade(school.schoolType);
+
+        const defined = new Set(
+            getClassesForSchool(school.id)
+                .map(item => Number(item.grade))
+                .filter(Number.isInteger)
+        );
+
+        const missing = [];
+
+        for (let grade = 1; grade <= maxGrade; grade++) {
+            if (!defined.has(grade)) {
+                missing.push(grade);
+            }
+        }
+
+        return missing;
+    }
+
+    function updateSourceInfo(school, definition) {
+        const target = byId("curriculumSourceInfo");
+        if (!target) return;
+
+        const parts = [];
+
+        if (definition?.title) {
+            parts.push(definition.title);
+        } else if (school?.name) {
+            parts.push(school.name);
+        }
+
+        const missingGrades =
+            getMissingGradesForSchool(school);
+
+        if (missingGrades.length > 0) {
+            parts.push(
+                text(
+                    "lessonWizard.missingSchoolGrades",
+                    "Brakuje roczników: {grades}. Możesz kontynuować, ale plan zostanie przygotowany tylko dla istniejących klas."
+                ).replace(
+                    "{grades}",
+                    missingGrades.join(", ")
+                )
+            );
+        }
+
+        target.textContent = parts.join(" · ");
+    }
+
     async function renderWizard() {
+        setWizardText();
         populateSchoolSelect();
 
         const school = getSelectedSchool();
-        const classes = school
-            ? getClassesForSchool(school.id)
-            : [];
+        const classes = school ? getClassesForSchool(school.id) : [];
+        const classGroup = classes[state.classIndex] ?? null;
 
-        const classGroup =
-            classes[state.classIndex] ?? null;
+        byId("lessonWizardSummaryPanel").hidden = !state.isSummary;
+        byId("lessonWizardNextButton").hidden = state.isSummary;
+        byId("confirmCurriculumImportButton").hidden = !state.isSummary;
 
-        byId("lessonWizardSchoolName").textContent =
-            school?.name ?? "";
+        const gradeField =
+            document.querySelector(".lesson-wizard-grade-field");
 
-        byId("lessonWizardSummaryPanel").hidden =
-            !state.isSummary;
-
-        byId("lessonWizardTableWrapper").hidden =
-            state.isSummary;
-
-        document.querySelector(".lesson-wizard-grade-field").hidden =
-            state.isSummary;
-
-        byId("lessonWizardNextButton").hidden =
-            state.isSummary;
-
-        byId("confirmCurriculumImportButton").hidden =
-            !state.isSummary;
+        if (gradeField) {
+            gradeField.hidden = state.isSummary;
+        }
 
         if (state.isSummary) {
+            byId("lessonWizardSchoolName").textContent = "";
             byId("lessonWizardClassName").textContent =
-                t("lessonWizard.summary");
+                text("lessonWizard.summary", "Podsumowanie");
+
+            byId("lessonWizardTableWrapper").hidden = true;
+            byId("lessonWizardEmptyState").hidden = true;
 
             renderSummary();
             updateProgress();
             return;
         }
 
-        if (!school || !classGroup) {
+        byId("lessonWizardSchoolName").textContent =
+            school?.name ?? "";
+
+        if (!school) {
             byId("lessonWizardClassName").textContent = "";
-            byId("lessonWizardTableWrapper").hidden = true;
+            setEmpty(
+                text(
+                    "lessonWizard.noSchools",
+                    "W organizacji nie ma jeszcze żadnej szkoły."
+                )
+            );
+            updateProgress();
+            return;
+        }
 
-            const empty = byId("lessonWizardEmptyState");
-            empty.textContent = t("lessonWizard.noClasses");
-            empty.hidden = false;
-
+        if (!classGroup) {
+            byId("lessonWizardClassName").textContent = "";
+            setEmpty(
+                text(
+                    "lessonWizard.noClassesForSchool",
+                    "Ta szkoła nie ma jeszcze zdefiniowanych klas."
+                )
+            );
             updateProgress();
             return;
         }
@@ -2719,46 +2914,136 @@ function getApiErrorMessage(
         populateGradeSelect(classGroup, school);
 
         const grade =
-            Number(byId("lessonWizardGradeSelect").value);
+            Number(byId("lessonWizardGradeSelect")?.value ?? 1);
 
-        const rows =
-            await prepareRows(classGroup, grade);
+        const definition =
+            await loadCurriculumForSchool(school);
 
-        const empty = byId("lessonWizardEmptyState");
+        updateSourceInfo(school, definition);
 
-        if (rows === null) {
-            byId("lessonWizardTableWrapper").hidden = true;
-            empty.textContent =
-                t("lessonWizard.missingCurriculum");
-            empty.hidden = false;
-        } else {
-            empty.hidden = true;
-            byId("lessonWizardTableWrapper").hidden = false;
-            renderRows(rows);
+        if (!definition) {
+            setEmpty(
+                text(
+                    "lessonWizard.missingCurriculum",
+                    "Nie znaleziono danych planu nauczania dla tego typu szkoły."
+                )
+            );
+            updateProgress();
+            return;
         }
 
+        const rows =
+            await buildRowsForClass(classGroup, grade);
+
+        if (!rows || rows.length === 0) {
+            setEmpty(
+                text(
+                    "lessonWizard.noSubjectsForGrade",
+                    "Nie znaleziono przedmiotów dla tego rocznika."
+                )
+            );
+            updateProgress();
+            return;
+        }
+
+        byId("lessonWizardEmptyState").hidden = true;
+        byId("lessonWizardTableWrapper").hidden = false;
+
+        renderRows(rows);
         updateProgress();
     }
 
-    function nextStep() {
-        const schools = getWizardSchools();
-        const schoolIndex = schools.findIndex(
+    function getAllRows() {
+        return Array.from(state.rowsByClassId.values()).flat();
+    }
+
+    function renderSummary() {
+        const rows = getAllRows();
+        rows.forEach(refreshAction);
+
+        const counts = {
+            create: rows.filter(row => row.action === "create").length,
+            update: rows.filter(row => row.action === "update").length,
+            unchanged: rows.filter(row => row.action === "unchanged").length,
+            attention: rows.filter(row => row.action === "attention").length
+        };
+
+        const grid = byId("lessonWizardSummaryGrid");
+
+        if (grid) {
+            grid.innerHTML = `
+                <div>
+                    <strong>${counts.create}</strong>
+                    <span>${text("lessonWizard.created", "Nowe")}</span>
+                </div>
+                <div>
+                    <strong>${counts.update}</strong>
+                    <span>${text("lessonWizard.updated", "Aktualizacje")}</span>
+                </div>
+                <div>
+                    <strong>${counts.unchanged}</strong>
+                    <span>${text("lessonWizard.unchangedCount", "Bez zmian")}</span>
+                </div>
+                <div>
+                    <strong>${counts.attention}</strong>
+                    <span>${text("lessonWizard.attention", "Wymaga uzupełnienia")}</span>
+                </div>
+            `;
+        }
+
+        const apply = byId("confirmCurriculumImportButton");
+
+        if (apply) {
+            apply.disabled =
+                counts.attention > 0 ||
+                (counts.create + counts.update) === 0;
+        }
+    }
+
+    function moveToNextSchool() {
+        const schools = getAllSchools();
+        const currentIndex = schools.findIndex(
             school => Number(school.id) === Number(state.schoolUnitId)
         );
 
-        const classes =
-            getClassesForSchool(state.schoolUnitId);
+        if (currentIndex >= 0 && currentIndex + 1 < schools.length) {
+            state.schoolUnitId = Number(schools[currentIndex + 1].id);
+            state.classIndex = 0;
+            return true;
+        }
 
-        if (state.classIndex + 1 < classes.length) {
+        return false;
+    }
+
+    function moveToPreviousSchool() {
+        const schools = getAllSchools();
+        const currentIndex = schools.findIndex(
+            school => Number(school.id) === Number(state.schoolUnitId)
+        );
+
+        if (currentIndex > 0) {
+            const previous = schools[currentIndex - 1];
+            state.schoolUnitId = Number(previous.id);
+
+            const classes = getClassesForSchool(previous.id);
+            state.classIndex = Math.max(0, classes.length - 1);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    function nextStep() {
+        const school = getSelectedSchool();
+        const classes = school ? getClassesForSchool(school.id) : [];
+
+        if (classes.length > 0 && state.classIndex + 1 < classes.length) {
             state.classIndex++;
             return;
         }
 
-        if (schoolIndex + 1 < schools.length) {
-            state.schoolUnitId =
-                Number(schools[schoolIndex + 1].id);
-
-            state.classIndex = 0;
+        if (moveToNextSchool()) {
             return;
         }
 
@@ -2769,15 +3054,13 @@ function getApiErrorMessage(
         if (state.isSummary) {
             state.isSummary = false;
 
-            const schools = getWizardSchools();
+            const schools = getAllSchools();
             const lastSchool = schools.at(-1);
 
             if (lastSchool) {
                 state.schoolUnitId = Number(lastSchool.id);
-                state.classIndex = Math.max(
-                    0,
-                    getClassesForSchool(lastSchool.id).length - 1
-                );
+                const classes = getClassesForSchool(lastSchool.id);
+                state.classIndex = Math.max(0, classes.length - 1);
             }
 
             return;
@@ -2788,51 +3071,34 @@ function getApiErrorMessage(
             return;
         }
 
-        const schools = getWizardSchools();
-        const schoolIndex = schools.findIndex(
-            school => Number(school.id) === Number(state.schoolUnitId)
-        );
-
-        if (schoolIndex > 0) {
-            const previousSchool = schools[schoolIndex - 1];
-
-            state.schoolUnitId =
-                Number(previousSchool.id);
-
-            state.classIndex = Math.max(
-                0,
-                getClassesForSchool(previousSchool.id).length - 1
-            );
-        }
+        moveToPreviousSchool();
     }
 
-    async function saveWizard() {
-        const rows =
-            Array.from(state.classRows.values()).flat();
+    async function saveAll() {
+        const rows = getAllRows();
+        rows.forEach(refreshAction);
 
-        rows.forEach(refreshWizardState);
-
-        const attention =
-            rows.filter(row => row.action === "attention");
-
-        if (attention.length > 0) {
+        if (rows.some(row => row.action === "attention")) {
             showCurriculumImportMessage(
-                t("lessonWizard.summaryHint"),
+                text(
+                    "lessonWizard.summaryHint",
+                    "Przed zapisem uzupełnij nauczycieli i liczbę godzin."
+                ),
                 true
             );
             return;
         }
 
-        const actionable =
-            rows.filter(
-                row =>
-                    row.action === "create" ||
-                    row.action === "update"
-            );
+        const actionable = rows.filter(
+            row => row.action === "create" || row.action === "update"
+        );
 
         if (actionable.length === 0) {
             showCurriculumImportMessage(
-                t("lessonWizard.nothingToSave"),
+                text(
+                    "lessonWizard.nothingToSave",
+                    "Nie ma zmian do zapisania."
+                ),
                 true
             );
             return;
@@ -2845,16 +3111,16 @@ function getApiErrorMessage(
             `/api/requirements/import-teaching-plan?organizationId=${encodeURIComponent(organizationId)}`,
             {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({
                     items: actionable.map(row => ({
                         classGroupId: row.classGroupId,
                         teacherId: row.teacherId,
                         subjectId: row.subjectId,
                         subjectName:
-                            row.subjectId
-                                ? null
-                                : row.sourceSubjectName,
+                            row.subjectId ? null : row.subjectName,
                         hoursPerWeek: row.hoursPerWeek
                     }))
                 })
@@ -2879,25 +3145,24 @@ function getApiErrorMessage(
     async function openWizard() {
         closeRequirementForm();
 
+        // Keep these sequential because the current GET endpoints still
+        // contain legacy WholeClass repair/backfill logic.
         await loadRequirements();
         await loadStudentGroups();
-        await loadWizardSchoolUnits();
+        await loadSchools();
+
+        state.schoolUnitId =
+            getAllSchools().length > 0
+                ? Number(getAllSchools()[0].id)
+                : null;
 
         state.classIndex = 0;
         state.isSummary = false;
-        state.classRows.clear();
-        state.classGrades.clear();
+        state.rowsByClassId.clear();
+        state.gradeByClassId.clear();
+        state.curriculumCache.clear();
 
-        const schools = getWizardSchools();
-
-        state.schoolUnitId =
-            schools.length > 0
-                ? Number(schools[0].id)
-                : null;
-
-        const modal = byId("curriculumImportSection");
-        modal.hidden = false;
-
+        byId("curriculumImportSection").hidden = false;
         document.body.classList.add("modal-open");
 
         await renderWizard();
@@ -2906,22 +3171,17 @@ function getApiErrorMessage(
     function closeWizard() {
         const modal = byId("curriculumImportSection");
 
-        if (modal) modal.hidden = true;
+        if (modal) {
+            modal.hidden = true;
+        }
 
         document.body.classList.remove("modal-open");
         state.isSummary = false;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        // Replace old import button behavior with the wizard.
-        const importButton = byId("importCurriculumButton");
-
-        if (importButton) {
-            const clone = importButton.cloneNode(true);
-            importButton.replaceWith(clone);
-
-            clone.addEventListener("click", openWizard);
-        }
+        byId("importCurriculumButton")
+            ?.addEventListener("click", openWizard);
 
         byId("cancelCurriculumImportButton")
             ?.addEventListener("click", closeWizard);
@@ -2943,16 +3203,18 @@ function getApiErrorMessage(
         byId("lessonWizardGradeSelect")
             ?.addEventListener("change", async event => {
                 const classGroup = getCurrentClass();
-                if (!classGroup) return;
 
-                state.classGrades.set(
-                    Number(classGroup.id),
+                if (!classGroup) {
+                    return;
+                }
+
+                const classId = Number(classGroup.id);
+                state.gradeByClassId.set(
+                    classId,
                     Number(event.target.value)
                 );
 
-                state.classRows.delete(
-                    Number(classGroup.id)
-                );
+                state.rowsByClassId.delete(classId);
 
                 await renderWizard();
             });
@@ -2971,20 +3233,29 @@ function getApiErrorMessage(
 
         byId("confirmCurriculumImportButton")
             ?.addEventListener("click", async () => {
+                const button =
+                    byId("confirmCurriculumImportButton");
+
+                if (button) {
+                    button.disabled = true;
+                }
+
                 try {
-                    await saveWizard();
+                    await saveAll();
                 } catch (error) {
                     console.error(
-                        "Error saving lesson wizard:",
+                        "Error saving teaching-plan wizard:",
                         error
                     );
 
                     showCurriculumImportMessage(
                         error instanceof Error
                             ? error.message
-                            : "Could not save lesson changes.",
+                            : "Nie udało się zapisać planu nauczania.",
                         true
                     );
+                } finally {
+                    renderSummary();
                 }
             });
     });

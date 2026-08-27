@@ -30,7 +30,7 @@
 
 <div class="teachers-header-actions">
 <div id="classImportSchoolUnitField" class="form-field" style="margin:0;">
-<label for="classImportSchoolUnitId">School for imported classes</label>
+<label for="classImportSchoolUnitId" data-i18n="classes.importSchool">Szkoła dla importowanych klas</label>
 <select id="classImportSchoolUnitId"></select>
 </div>
 <button class="secondary-button" id="importClassesButton" type="button" data-i18n="common.importXlsx">Import XLSX</button>
@@ -40,6 +40,17 @@
                 </button>
 </div>
 </div>
+<section class="resource-form-section" id="classGradeCompletenessSection">
+<div class="section-header teachers-section-header">
+<div>
+<h3 data-i18n="classes.gradeCompletenessTitle">Kompletność roczników</h3>
+<p class="teachers-section-description" data-i18n="classes.gradeCompletenessDescription">
+ClassFlow podpowiada, których roczników brakuje. Brak rocznika nie blokuje pracy.
+</p>
+</div>
+</div>
+<div id="classGradeCompleteness" class="school-grade-completeness"></div>
+</section>
 <section class="resource-form-section teachers-form-section" hidden="" id="classFormSection">
 <h3 id="classFormTitle" data-i18n="classes.add">Add class</h3>
 <input id="classId" type="hidden"/>
@@ -49,8 +60,13 @@
 <input id="className" maxlength="50" required="" type="text"/>
 </div>
 <div class="form-field" id="schoolUnitField">
-<label for="schoolUnitId">School</label>
+<label for="schoolUnitId" data-i18n="classes.school">Szkoła</label>
 <select id="schoolUnitId" required></select>
+</div>
+<div class="form-field">
+<label for="classGrade" data-i18n="classes.grade">Rocznik</label>
+<select id="classGrade" required></select>
+<small id="classGradeHelp" data-i18n="classes.gradeHelp">Rocznik zależy od typu wybranej szkoły.</small>
 </div>
 <div class="form-field">
 <label for="homeroomTeacherId">
@@ -113,7 +129,8 @@
 <thead>
 <tr>
 <th data-i18n="common.name">Name</th>
-<th id="schoolUnitColumnHeader">School</th>
+<th id="schoolUnitColumnHeader" data-i18n="classes.school">Szkoła</th>
+<th data-i18n="classes.grade">Rocznik</th>
 <th><span data-i18n="classes.homeroomTeacher">Homeroom teacher</span></th>
 <th><span data-i18n="classes.defaultRoom">Default room</span></th>
 <th data-i18n="common.info">Info</th>
@@ -124,7 +141,7 @@
 </thead>
 <tbody>
 <tr>
-<td class="teachers-table-state" colspan="6">
+<td class="teachers-table-state" colspan="7">
                                 Loading classes...
                             </td>
 </tr>

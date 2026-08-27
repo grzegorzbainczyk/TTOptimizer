@@ -44,6 +44,7 @@ public class ClassesController : ControllerBase
                 SchoolUnitId = classGroup.SchoolUnitId,
                 SchoolUnitName = classGroup.SchoolUnit.Name,
                 Name = classGroup.Name,
+                Grade = classGroup.Grade,
                 Info = classGroup.Info,
 
                 HomeroomTeacherId =
@@ -84,6 +85,7 @@ public class ClassesController : ControllerBase
             organizationId,
             request.SchoolUnitId,
             request.Name,
+            request.Grade,
             request.HomeroomTeacherId,
             request.DefaultRoomId
         );
@@ -116,6 +118,7 @@ public class ClassesController : ControllerBase
             OrganizationId = organizationId,
             SchoolUnitId = request.SchoolUnitId,
             Name = normalizedName,
+            Grade = request.Grade,
             Info = NormalizeOptionalText(request.Info),
             HomeroomTeacherId = request.HomeroomTeacherId,
             DefaultRoomId = request.DefaultRoomId
@@ -213,6 +216,7 @@ public class ClassesController : ControllerBase
             organizationId,
             request.SchoolUnitId,
             request.Name,
+            request.Grade,
             request.HomeroomTeacherId,
             request.DefaultRoomId
         );
@@ -244,6 +248,7 @@ public class ClassesController : ControllerBase
 
         classGroup.SchoolUnitId = request.SchoolUnitId;
         classGroup.Name = normalizedName;
+        classGroup.Grade = request.Grade;
         classGroup.Info =
             NormalizeOptionalText(request.Info);
 
@@ -354,12 +359,19 @@ public class ClassesController : ControllerBase
             });
         }
 
-        var schoolUnitExists = await _db.SchoolUnits.AnyAsync(
-            schoolUnit =>
-                schoolUnit.Id == schoolUnitId &&
-                schoolUnit.OrganizationId == organizationId);
+        var schoolUnit = await _db.SchoolUnits
+            .AsNoTracking()
+            .Where(item =>
+                item.Id == schoolUnitId &&
+                item.OrganizationId == organizationId)
+            .Select(item => new
+            {
+                item.Id,
+                item.SchoolType
+            })
+            .FirstOrDefaultAsync();
 
-        if (!schoolUnitExists)
+        if (schoolUnit == null)
         {
             return BadRequest(new
             {
@@ -420,6 +432,7 @@ public class ClassesController : ControllerBase
                     OrganizationId = organizationId,
                     SchoolUnitId = schoolUnitId,
                     Name = name,
+                    Grade = InferGradeFromClassName(name, schoolUnit.SchoolType),
                     Info = null,
                     HomeroomTeacherId = null,
                     DefaultRoomId = null
@@ -917,19 +930,33 @@ public class ClassesController : ControllerBase
         int organizationId,
         int schoolUnitId,
         string? name,
+        int grade,
         int? homeroomTeacherId,
         int? defaultRoomId)
     {
-        var schoolUnitExists = await _db.SchoolUnits
-            .AnyAsync(schoolUnit =>
+        var schoolType = await _db.SchoolUnits
+            .Where(schoolUnit =>
                 schoolUnit.Id == schoolUnitId &&
-                schoolUnit.OrganizationId == organizationId);
+                schoolUnit.OrganizationId == organizationId)
+            .Select(schoolUnit => (SchoolType?)schoolUnit.SchoolType)
+            .FirstOrDefaultAsync();
 
-        if (!schoolUnitExists)
+        if (!schoolType.HasValue)
         {
             return BadRequest(new
             {
                 message = "The selected school does not exist."
+            });
+        }
+
+        var maxGrade = GetMaxGrade(schoolType.Value);
+
+        if (grade < 1 || grade > maxGrade)
+        {
+            return BadRequest(new
+            {
+                message =
+                    $"Grade must be between 1 and {maxGrade} for the selected school type."
             });
         }
 
@@ -1004,6 +1031,7 @@ public class ClassesController : ControllerBase
                 SchoolUnitId = classGroup.SchoolUnitId,
                 SchoolUnitName = classGroup.SchoolUnit.Name,
                 Name = classGroup.Name,
+                Grade = classGroup.Grade,
                 Info = classGroup.Info,
 
                 HomeroomTeacherId =
@@ -1023,6 +1051,44 @@ public class ClassesController : ControllerBase
                         : null
             })
             .FirstOrDefaultAsync();
+    }
+
+    private static int GetMaxGrade(SchoolType schoolType)
+    {
+        return schoolType switch
+        {
+            SchoolType.PrimarySchool => 8,
+            SchoolType.GeneralSecondarySchool => 4,
+            SchoolType.TechnicalSecondarySchool => 5,
+            SchoolType.VocationalSchoolFirstDegree => 3,
+            SchoolType.VocationalSchoolSecondDegree => 2,
+            _ => 1
+        };
+    }
+
+    private static int? InferGradeFromClassName(
+        string? className,
+        SchoolType schoolType)
+    {
+        if (string.IsNullOrWhiteSpace(className))
+        {
+            return null;
+        }
+
+        var trimmed = className.Trim();
+        var digits = new string(
+            trimmed.TakeWhile(char.IsDigit).ToArray());
+
+        if (!int.TryParse(digits, out var grade))
+        {
+            return null;
+        }
+
+        var maxGrade = GetMaxGrade(schoolType);
+
+        return grade >= 1 && grade <= maxGrade
+            ? grade
+            : null;
     }
 
     private static string? NormalizeOptionalText(

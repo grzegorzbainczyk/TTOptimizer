@@ -436,7 +436,7 @@ async function saveSchoolUnit() {
 
 async function deleteSchoolUnit(schoolUnit) {
     const confirmed = window.confirm(
-        `Usunąć szkołę „${schoolUnit.name}”?`
+        `Czy na pewno usunąć szkołę „${schoolUnit.name}”?`
     );
 
     if (!confirmed) {
@@ -446,18 +446,50 @@ async function deleteSchoolUnit(schoolUnit) {
     try {
         const organizationId = requireOrganizationId();
 
-        const response = await fetch(
+        let response = await fetch(
             `/api/schoolunits/${encodeURIComponent(schoolUnit.id)}?organizationId=${encodeURIComponent(organizationId)}`,
             {
                 method: "DELETE"
             }
         );
 
-        const data = await readJsonResponse(response);
+        let data = await readJsonResponse(response);
+
+        if (
+            response.status === 409 &&
+            data?.code === "school_has_classes"
+        ) {
+            const classCount = Number(data?.classCount) || 0;
+
+            const destructiveConfirmed = window.confirm(
+                `Szkoła „${schoolUnit.name}” ma przypisane klasy (${classCount}).\n\n` +
+                "Usunięcie szkoły spowoduje również usunięcie tych klas oraz danych " +
+                "powiązanych z nimi, m.in. lekcji, grup uczniów, przypisań i preferencji.\n\n" +
+                "Tej operacji nie można cofnąć.\n\n" +
+                "Czy mimo to usunąć szkołę razem z klasami?"
+            );
+
+            if (!destructiveConfirmed) {
+                showSchoolUnitsMessage(
+                    "Usuwanie szkoły zostało anulowane.",
+                    false
+                );
+                return;
+            }
+
+            response = await fetch(
+                `/api/schoolunits/${encodeURIComponent(schoolUnit.id)}?organizationId=${encodeURIComponent(organizationId)}&deleteClasses=true`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            data = await readJsonResponse(response);
+        }
 
         if (!response.ok) {
             throw new Error(
-                getApiErrorMessage(
+                getLocalizedSchoolDeleteError(
                     data,
                     `Nie udało się usunąć szkoły. Status: ${response.status}`
                 )
@@ -466,8 +498,13 @@ async function deleteSchoolUnit(schoolUnit) {
 
         await loadSchoolUnits();
 
+        const deletedClasses =
+            Number(data?.deletedClasses) || 0;
+
         showSchoolUnitsMessage(
-            "Szkoła została usunięta.",
+            deletedClasses > 0
+                ? `Szkoła została usunięta razem z ${deletedClasses} klasami.`
+                : "Szkoła została usunięta.",
             false
         );
     } catch (error) {
@@ -480,6 +517,23 @@ async function deleteSchoolUnit(schoolUnit) {
             true
         );
     }
+}
+
+function getLocalizedSchoolDeleteError(data, fallback) {
+    if (data?.code === "school_has_classes") {
+        return "Szkoła ma przypisane klasy.";
+    }
+
+    const message = data?.message;
+
+    if (
+        message ===
+        "The school cannot be deleted because classes are assigned to it."
+    ) {
+        return "Szkoła ma przypisane klasy.";
+    }
+
+    return message || fallback;
 }
 
 function formatSchoolType(schoolType) {

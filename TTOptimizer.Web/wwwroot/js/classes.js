@@ -4,6 +4,162 @@ import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
 let availableTeachers = [];
 let availableRooms = [];
 let availableSchoolUnits = [];
+let availableClasses = [];
+
+const SCHOOL_TYPE_MAX_GRADE = {
+    1: 8,
+    2: 4,
+    3: 5,
+    4: 3,
+    5: 2
+};
+
+const SCHOOL_TYPE_NAME_TO_NUMBER = {
+    PrimarySchool: 1,
+    GeneralSecondarySchool: 2,
+    TechnicalSecondarySchool: 3,
+    VocationalSchoolFirstDegree: 4,
+    VocationalSchoolSecondDegree: 5
+};
+
+function normalizeSchoolType(value) {
+    if (typeof value === "number" && Number.isInteger(value)) {
+        return value;
+    }
+
+    const text = String(value ?? "").trim();
+
+    if (/^\d+$/.test(text)) {
+        return Number(text);
+    }
+
+    return SCHOOL_TYPE_NAME_TO_NUMBER[text] ?? 0;
+}
+
+function getMaxGradeForSchoolUnit(schoolUnitId) {
+    const schoolUnit = availableSchoolUnits.find(
+        item => Number(item.id) === Number(schoolUnitId)
+    );
+
+    const schoolType = normalizeSchoolType(schoolUnit?.schoolType);
+    return SCHOOL_TYPE_MAX_GRADE[schoolType] ?? 8;
+}
+
+function getFirstMissingGrade(schoolUnitId) {
+    const maxGrade = getMaxGradeForSchoolUnit(schoolUnitId);
+
+    const used = new Set(
+        availableClasses
+            .filter(item => Number(item.schoolUnitId) === Number(schoolUnitId))
+            .map(item => Number(item.grade))
+            .filter(Number.isInteger)
+    );
+
+    for (let grade = 1; grade <= maxGrade; grade++) {
+        if (!used.has(grade)) {
+            return grade;
+        }
+    }
+
+    return 1;
+}
+
+function populateGradeOptions(preferredGrade = null) {
+    const schoolSelect = document.getElementById("schoolUnitId");
+    const gradeSelect = document.getElementById("classGrade");
+
+    if (!schoolSelect || !gradeSelect) {
+        return;
+    }
+
+    const schoolUnitId = Number(schoolSelect.value);
+    const maxGrade = getMaxGradeForSchoolUnit(schoolUnitId);
+
+    gradeSelect.innerHTML = "";
+
+    for (let grade = 1; grade <= maxGrade; grade++) {
+        const option = document.createElement("option");
+        option.value = String(grade);
+        option.textContent = String(grade);
+        gradeSelect.appendChild(option);
+    }
+
+    const desired = Number(preferredGrade);
+
+    gradeSelect.value =
+        Number.isInteger(desired) &&
+        desired >= 1 &&
+        desired <= maxGrade
+            ? String(desired)
+            : String(getFirstMissingGrade(schoolUnitId));
+}
+
+function renderGradeCompleteness() {
+    const container =
+        document.getElementById("classGradeCompleteness");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if (availableSchoolUnits.length === 0) {
+        container.textContent =
+            t("classes.noSchools", "Najpierw dodaj szkołę.");
+        return;
+    }
+
+    for (const school of availableSchoolUnits) {
+        const maxGrade =
+            getMaxGradeForSchoolUnit(school.id);
+
+        const defined = new Set(
+            availableClasses
+                .filter(item =>
+                    Number(item.schoolUnitId) === Number(school.id)
+                )
+                .map(item => Number(item.grade))
+                .filter(Number.isInteger)
+        );
+
+        const missing = [];
+
+        for (let grade = 1; grade <= maxGrade; grade++) {
+            if (!defined.has(grade)) {
+                missing.push(grade);
+            }
+        }
+
+        const card = document.createElement("div");
+        card.className = "school-grade-completeness-card";
+
+        const title = document.createElement("strong");
+        title.textContent = school.name;
+
+        const expected = document.createElement("span");
+        expected.textContent =
+            t("classes.expectedGrades", "Oczekiwane roczniki: 1–{max}")
+                .replace("{max}", maxGrade);
+
+        const status = document.createElement("span");
+
+        if (missing.length === 0) {
+            status.textContent =
+                t("classes.allGradesDefined", "Wszystkie roczniki są zdefiniowane.");
+            status.className = "grade-status-complete";
+        } else {
+            status.textContent =
+                t("classes.missingGrades", "Brakuje roczników: {grades}")
+                    .replace("{grades}", missing.join(", "));
+            status.className = "grade-status-warning";
+        }
+
+        card.append(title, expected, status);
+        container.appendChild(card);
+    }
+}
+
 
 document.addEventListener("DOMContentLoaded", async () => {
     await initializeI18n();
@@ -46,6 +202,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         "click",
         closeClassForm
     );
+
+    document.getElementById("schoolUnitId")
+        ?.addEventListener("change", () => {
+            populateGradeOptions();
+        });
 
     initializeSimpleXlsxImport({
         resourceName: "class",
@@ -277,11 +438,15 @@ async function loadClasses() {
             ? data
             : data?.classes ?? data?.classGroups ?? [];
 
+        availableClasses = classes;
         renderClasses(classes);
         updateClassesCount(classes.length);
+        renderGradeCompleteness();
     } catch (error) {
         console.error("Error loading classes:", error);
 
+        availableClasses = [];
+        renderGradeCompleteness();
         updateClassesCount(null);
 
         showClassesError(
@@ -324,6 +489,10 @@ function renderClasses(classes) {
 
         row.appendChild(
             createTableCell(classGroup.schoolUnitName ?? "")
+        );
+
+        row.appendChild(
+            createTableCell(classGroup.grade ?? "")
         );
 
         row.appendChild(
@@ -546,6 +715,7 @@ function openAddClassForm() {
     if (availableSchoolUnits.length > 0) {
         document.getElementById("schoolUnitId").value =
             String(availableSchoolUnits[0].id);
+        populateGradeOptions();
     }
 
     document.getElementById(
@@ -583,6 +753,8 @@ function openEditClassForm(classGroup) {
 
     document.getElementById("schoolUnitId").value =
         classGroup.schoolUnitId?.toString() ?? "";
+
+    populateGradeOptions(classGroup.grade);
 
     document.getElementById(
         "homeroomTeacherId"
@@ -641,6 +813,9 @@ async function saveClass() {
     const schoolUnitValue =
         document.getElementById("schoolUnitId").value;
 
+    const gradeValue =
+        document.getElementById("classGrade").value;
+
     const homeroomTeacherValue =
         document.getElementById(
             "homeroomTeacherId"
@@ -667,7 +842,15 @@ async function saveClass() {
 
     if (!schoolUnitValue) {
         showClassFormMessage(
-            "Select a school for the class.",
+            t("classes.schoolRequired", "Wybierz szkołę dla klasy."),
+            true
+        );
+        return;
+    }
+
+    if (!gradeValue) {
+        showClassFormMessage(
+            t("classes.gradeRequired", "Wybierz rocznik."),
             true
         );
         return;
@@ -675,6 +858,7 @@ async function saveClass() {
 
     const requestBody = {
         schoolUnitId: Number(schoolUnitValue),
+        grade: Number(gradeValue),
         name,
         info: info || null,
 

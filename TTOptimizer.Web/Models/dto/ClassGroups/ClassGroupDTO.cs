@@ -10,6 +10,8 @@ public class ClassGroupDTO
 
     public string Name { get; set; } = string.Empty;
 
+    public int? Grade { get; set; }
+
     public string? Info { get; set; }
 
     public int? HomeroomTeacherId { get; set; }

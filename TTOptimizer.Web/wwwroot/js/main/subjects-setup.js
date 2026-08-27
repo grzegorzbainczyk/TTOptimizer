@@ -151,26 +151,180 @@ function renderSchoolTypesSummary() {
     `;
 }
 
-function getTeachingPlanUrl(schoolType) {
+
+export async function prepareOfficialSubjectCandidates({
+    schoolUnits,
+    existingSubjects = [],
+    schoolYear = "2026/2027"
+}) {
+    const schoolTypes = [
+        ...new Set(
+            (schoolUnits ?? [])
+                .map(unit => Number(unit.schoolType ?? 0))
+                .filter(schoolType => schoolType > 0)
+        )
+    ];
+
+    if (schoolTypes.length === 0) {
+        throw new Error(
+            "Nie znaleziono typu szkoły. Najpierw skonfiguruj szkoły w placówce."
+        );
+    }
+
+    const planUrls = schoolTypes
+        .map(schoolType => ({
+            schoolType,
+            url: getTeachingPlanUrlForYear(
+                schoolType,
+                schoolYear
+            )
+        }))
+        .filter(item => Boolean(item.url));
+
+    if (planUrls.length !== schoolTypes.length) {
+        throw new Error(
+            "Jeden z typów szkół nie ma jeszcze obsługiwanego planu nauczania."
+        );
+    }
+
+    const plans = await Promise.all(
+        planUrls.map(async item => {
+            const response = await fetch(
+                item.url,
+                { cache: "no-store" }
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    `Nie udało się wczytać danych ramowego planu. Status: ${response.status}`
+                );
+            }
+
+            const plan = await response.json();
+
+            return {
+                ...plan,
+                schoolTypeValue: item.schoolType
+            };
+        })
+    );
+
+    const existingNameSet = new Set(
+        (existingSubjects ?? []).map(item =>
+            normalize(item.name)
+        )
+    );
+
+    const mergedByName = new Map();
+
+    for (const plan of plans) {
+        for (const subject of plan.subjects ?? []) {
+            const key = normalize(subject.name);
+
+            if (!key) {
+                continue;
+            }
+
+            const existing = mergedByName.get(key);
+
+            if (!existing) {
+                mergedByName.set(key, {
+                    name: subject.name,
+                    category: subject.category ?? "podstawowe",
+                    appliesTo: subject.appliesTo ?? "",
+                    selectedByDefault: Boolean(subject.selectedByDefault),
+                    planTitles: [plan.title]
+                });
+
+                continue;
+            }
+
+            existing.selectedByDefault =
+                existing.selectedByDefault ||
+                Boolean(subject.selectedByDefault);
+
+            if (
+                subject.appliesTo &&
+                !existing.appliesTo.includes(subject.appliesTo)
+            ) {
+                existing.appliesTo =
+                    existing.appliesTo
+                        ? `${existing.appliesTo}; ${subject.appliesTo}`
+                        : subject.appliesTo;
+            }
+
+            if (!existing.planTitles.includes(plan.title)) {
+                existing.planTitles.push(plan.title);
+            }
+
+            if (
+                existing.category === "opcjonalne" &&
+                subject.category &&
+                subject.category !== "opcjonalne"
+            ) {
+                existing.category = subject.category;
+            }
+        }
+    }
+
+    const candidates =
+        [...mergedByName.values()]
+            .sort((a, b) =>
+                a.name.localeCompare(b.name, "pl")
+            )
+            .map((item, index) => ({
+                id: `official-normal-${index}`,
+                name: item.name,
+                category: item.category,
+                appliesTo: item.appliesTo,
+                selected:
+                    item.selectedByDefault &&
+                    !existingNameSet.has(normalize(item.name)),
+                alreadyExists:
+                    existingNameSet.has(normalize(item.name)),
+                planTitles: item.planTitles
+            }));
+
+    return {
+        plans,
+        candidates
+    };
+}
+
+function getTeachingPlanUrlForYear(
+    schoolType,
+    schoolYear
+) {
+    const fileName =
+        String(schoolYear ?? "2026/2027")
+            .replace("/", "-") + ".json";
+
     switch (Number(schoolType)) {
         case 1:
-            return "data/teaching-plans/pl/primary/2026-2027.json";
+            return `data/teaching-plans/pl/primary/${fileName}`;
 
         case 2:
-            return "data/teaching-plans/pl/general-secondary/2026-2027.json";
+            return `data/teaching-plans/pl/general-secondary/${fileName}`;
 
         case 3:
-            return "data/teaching-plans/pl/technical-secondary/2026-2027.json";
+            return `data/teaching-plans/pl/technical-secondary/${fileName}`;
 
         case 4:
-            return "data/teaching-plans/pl/vocational-first/2026-2027.json";
+            return `data/teaching-plans/pl/vocational-first/${fileName}`;
 
         case 5:
-            return "data/teaching-plans/pl/vocational-second/2026-2027.json";
+            return `data/teaching-plans/pl/vocational-second/${fileName}`;
 
         default:
             return null;
     }
+}
+
+function getTeachingPlanUrl(schoolType) {
+    return getTeachingPlanUrlForYear(
+        schoolType,
+        "2026/2027"
+    );
 }
 
 function getDistinctSchoolTypes() {

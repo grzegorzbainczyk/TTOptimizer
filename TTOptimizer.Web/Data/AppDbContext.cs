@@ -70,6 +70,11 @@ namespace TTOptimizer.Web.Data
                 .HasMaxLength(200);
 
             modelBuilder.Entity<AppUser>()
+                .Property(x => x.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<AppUser>()
                 .HasIndex(x => x.UserName)
                 .IsUnique();
 

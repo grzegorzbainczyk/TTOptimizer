@@ -8,6 +8,8 @@
 
         public string DisplayName { get; set; } = string.Empty;
 
+        public string PasswordHash { get; set; } = string.Empty;
+
         public List<AppUserOrganization> AppUserOrganizations { get; set; } = new();
 
         public List<Teacher> Teachers { get; set; } = new();

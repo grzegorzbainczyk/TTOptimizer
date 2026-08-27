@@ -241,7 +241,8 @@ public class SchoolUnitsController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(
         int id,
-        [FromQuery] int organizationId)
+        [FromQuery] int organizationId,
+        [FromQuery] bool deleteClasses = false)
     {
         if (organizationId <= 0)
         {
@@ -254,6 +255,7 @@ public class SchoolUnitsController : ControllerBase
 
         var schoolUnit =
             await _dbContext.SchoolUnits
+                .AsNoTracking()
                 .FirstOrDefaultAsync(item =>
                     item.Id == id &&
                     item.OrganizationId == organizationId);
@@ -267,30 +269,94 @@ public class SchoolUnitsController : ControllerBase
             });
         }
 
-        var hasClasses =
+        var classIds =
             await _dbContext.ClassGroups
-                .AnyAsync(item =>
+                .AsNoTracking()
+                .Where(item =>
                     item.OrganizationId == organizationId &&
-                    item.SchoolUnitId == id);
+                    item.SchoolUnitId == id)
+                .Select(item => item.Id)
+                .ToListAsync();
 
-        if (hasClasses)
+        if (classIds.Count > 0 && !deleteClasses)
         {
             return Conflict(new
             {
                 success = false,
+                code = "school_has_classes",
+                classCount = classIds.Count,
                 message =
-                    "The school cannot be deleted because classes are assigned to it."
+                    "Ta szkoła ma przypisane klasy. Jej usunięcie może również usunąć dane powiązane z tymi klasami."
             });
         }
 
-        _dbContext.SchoolUnits.Remove(schoolUnit);
-        await _dbContext.SaveChangesAsync();
+        await using var transaction =
+            await _dbContext.Database.BeginTransactionAsync();
 
-        return Ok(new
+        try
         {
-            success = true,
-            message = "School was deleted."
-        });
+            if (classIds.Count > 0)
+            {
+                var studentGroupIds =
+                    await _dbContext.StudentGroups
+                        .AsNoTracking()
+                        .Where(item =>
+                            item.OrganizationId == organizationId &&
+                            item.ClassGroupId.HasValue &&
+                            classIds.Contains(item.ClassGroupId.Value))
+                        .Select(item => item.Id)
+                        .ToListAsync();
+
+                await _dbContext.LessonRequirements
+                    .Where(item =>
+                        item.OrganizationId == organizationId &&
+                        (
+                            (item.ClassGroupId.HasValue &&
+                             classIds.Contains(item.ClassGroupId.Value)) ||
+                            (item.StudentGroupId.HasValue &&
+                             studentGroupIds.Contains(item.StudentGroupId.Value))
+                        ))
+                    .ExecuteDeleteAsync();
+
+                if (studentGroupIds.Count > 0)
+                {
+                    await _dbContext.StudentGroupMembers
+                        .Where(item =>
+                            studentGroupIds.Contains(item.StudentGroupId) ||
+                            studentGroupIds.Contains(item.MemberGroupId))
+                        .ExecuteDeleteAsync();
+                }
+
+                await _dbContext.ClassGroups
+                    .Where(item =>
+                        item.OrganizationId == organizationId &&
+                        classIds.Contains(item.Id))
+                    .ExecuteDeleteAsync();
+            }
+
+            await _dbContext.SchoolUnits
+                .Where(item =>
+                    item.Id == id &&
+                    item.OrganizationId == organizationId)
+                .ExecuteDeleteAsync();
+
+            await transaction.CommitAsync();
+
+            return Ok(new
+            {
+                success = true,
+                deletedClasses = classIds.Count,
+                message =
+                    classIds.Count > 0
+                        ? $"Szkoła została usunięta razem z {classIds.Count} klasami."
+                        : "Szkoła została usunięta."
+            });
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     private ActionResult? ValidateSchoolUnitRequest(

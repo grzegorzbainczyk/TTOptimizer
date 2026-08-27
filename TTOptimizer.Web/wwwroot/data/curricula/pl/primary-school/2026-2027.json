@@ -1,354 +1,160 @@
 {
   "country": "PL",
-  "schoolType": "PrimarySchool",
+  "schoolType": "primary",
   "schoolYear": "2026/2027",
+  "version": "2026-08-24",
+  "title": "Szkoła podstawowa - lista przedmiotów 2026/2027",
   "source": {
-    "title": "Rozporządzenie Ministra Edukacji z dnia 22 lipca 2026 r. w sprawie ramowych planów nauczania dla publicznych szkół",
-    "journal": "Dz.U. 2026 poz. 1028",
-    "effectiveFrom": "2026-09-01",
-    "eli": "https://eli.gov.pl/eli/DU/2026/1028/ogl",
-    "annexUsage": {
-      "1": "klasy I i IV",
-      "15": "klasy II, III oraz V-VIII"
-    }
+    "legalAct": "Rozporządzenie Ministra Edukacji z dnia 22 lipca 2026 r. w sprawie ramowych planów nauczania dla publicznych szkół (Dz.U. 2026 poz. 1028)",
+    "legalActUrl": "https://eli.gov.pl/eli/DU/2026/1028/ogl",
+    "transitionAct": "Rozporządzenie Ministra Edukacji z dnia 12 marca 2026 r. zmieniające rozporządzenie w sprawie ramowych planów nauczania dla publicznych szkół (Dz.U. 2026 poz. 380)",
+    "transitionActUrl": "https://eli.gov.pl/eli/DU/2026/380/ogl"
   },
-  "notes": [
-    "Godziny do dyspozycji dyrektora nie są automatycznie zamieniane na LessonRequirement.",
-    "Religia/etyka oraz inne zajęcia zależne od odrębnych przepisów nie są automatycznie tworzone.",
-    "W klasach I-III edukacja wczesnoszkolna jest pozostawiona jako jeden przedmiot."
-  ],
-  "grades": [
+  "transitionNote": "W roku szkolnym 2026/2027 nowy ramowy plan stosuje się w klasach I i IV. W klasach II, III oraz V-VIII obowiązuje plan przejściowy. Lista poniżej jest sumą nazw zajęć potrzebnych do obsługi zwykłej szkoły podstawowej w tym roku.",
+  "subjects": [
     {
-      "grade": 1,
-      "sourceAnnex": 1,
-      "lessons": [
-        {
-          "subject": "Edukacja wczesnoszkolna",
-          "hoursPerWeek": 21
-        }
-      ]
+      "name": "Edukacja wczesnoszkolna",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-III"
     },
     {
-      "grade": 2,
-      "sourceAnnex": 15,
-      "lessons": [
-        {
-          "subject": "Edukacja wczesnoszkolna",
-          "hoursPerWeek": 20
-        }
-      ]
+      "name": "Język polski",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VIII"
     },
     {
-      "grade": 3,
-      "sourceAnnex": 15,
-      "lessons": [
-        {
-          "subject": "Edukacja wczesnoszkolna",
-          "hoursPerWeek": 20
-        }
-      ]
+      "name": "Język obcy nowożytny",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-VIII"
     },
     {
-      "grade": 4,
-      "sourceAnnex": 1,
-      "lessons": [
-        {
-          "subject": "Język polski",
-          "hoursPerWeek": 5
-        },
-        {
-          "subject": "Język obcy nowożytny",
-          "hoursPerWeek": 3
-        },
-        {
-          "subject": "Muzyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Plastyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Historia",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Przyroda",
-          "hoursPerWeek": 3
-        },
-        {
-          "subject": "Matematyka",
-          "hoursPerWeek": 4
-        },
-        {
-          "subject": "Informatyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Zajęcia praktyczno-techniczne",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Wychowanie fizyczne",
-          "hoursPerWeek": 4
-        },
-        {
-          "subject": "Edukacja zdrowotna",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Zajęcia z wychowawcą",
-          "hoursPerWeek": 1
-        }
-      ]
+      "name": "Drugi język obcy nowożytny albo język łaciński",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "VII-VIII"
     },
     {
-      "grade": 5,
-      "sourceAnnex": 15,
-      "lessons": [
-        {
-          "subject": "Język polski",
-          "hoursPerWeek": 5
-        },
-        {
-          "subject": "Język obcy nowożytny",
-          "hoursPerWeek": 3
-        },
-        {
-          "subject": "Muzyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Plastyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Historia",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Geografia",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Biologia",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Matematyka",
-          "hoursPerWeek": 4
-        },
-        {
-          "subject": "Informatyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Technika",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Wychowanie fizyczne",
-          "hoursPerWeek": 4
-        },
-        {
-          "subject": "Edukacja zdrowotna",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Zajęcia z wychowawcą",
-          "hoursPerWeek": 1
-        }
-      ]
+      "name": "Muzyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VII"
     },
     {
-      "grade": 6,
-      "sourceAnnex": 15,
-      "lessons": [
-        {
-          "subject": "Język polski",
-          "hoursPerWeek": 5
-        },
-        {
-          "subject": "Język obcy nowożytny",
-          "hoursPerWeek": 3
-        },
-        {
-          "subject": "Muzyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Plastyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Historia",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Geografia",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Biologia",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Matematyka",
-          "hoursPerWeek": 4
-        },
-        {
-          "subject": "Informatyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Technika",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Wychowanie fizyczne",
-          "hoursPerWeek": 4
-        },
-        {
-          "subject": "Edukacja zdrowotna",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Zajęcia z wychowawcą",
-          "hoursPerWeek": 1
-        }
-      ]
+      "name": "Plastyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VII"
     },
     {
-      "grade": 7,
-      "sourceAnnex": 15,
-      "lessons": [
-        {
-          "subject": "Język polski",
-          "hoursPerWeek": 5
-        },
-        {
-          "subject": "Język obcy nowożytny",
-          "hoursPerWeek": 3
-        },
-        {
-          "subject": "Drugi język obcy nowożytny albo język łaciński",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Muzyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Plastyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Historia",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Geografia",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Biologia",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Chemia",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Fizyka",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Matematyka",
-          "hoursPerWeek": 4
-        },
-        {
-          "subject": "Informatyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Wychowanie fizyczne",
-          "hoursPerWeek": 4
-        },
-        {
-          "subject": "Edukacja zdrowotna",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Zajęcia z wychowawcą",
-          "hoursPerWeek": 1
-        }
-      ]
+      "name": "Historia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VIII"
     },
     {
-      "grade": 8,
-      "sourceAnnex": 15,
-      "lessons": [
-        {
-          "subject": "Język polski",
-          "hoursPerWeek": 5
-        },
-        {
-          "subject": "Język obcy nowożytny",
-          "hoursPerWeek": 3
-        },
-        {
-          "subject": "Drugi język obcy nowożytny albo język łaciński",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Historia",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Wiedza o społeczeństwie",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Geografia",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Biologia",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Chemia",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Fizyka",
-          "hoursPerWeek": 2
-        },
-        {
-          "subject": "Matematyka",
-          "hoursPerWeek": 4
-        },
-        {
-          "subject": "Informatyka",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Wychowanie fizyczne",
-          "hoursPerWeek": 4
-        },
-        {
-          "subject": "Edukacja dla bezpieczeństwa",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Edukacja zdrowotna",
-          "hoursPerWeek": 1
-        },
-        {
-          "subject": "Zajęcia z wychowawcą",
-          "hoursPerWeek": 1
-        }
-      ]
+      "name": "Wiedza o społeczeństwie",
+      "selectedByDefault": true,
+      "category": "przejściowe",
+      "appliesTo": "VIII"
+    },
+    {
+      "name": "Edukacja obywatelska",
+      "selectedByDefault": true,
+      "category": "nowe",
+      "appliesTo": "VI-VII docelowo"
+    },
+    {
+      "name": "Przyroda",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VI docelowo"
+    },
+    {
+      "name": "Geografia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "V-VIII / VII-VIII docelowo"
+    },
+    {
+      "name": "Biologia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "V-VIII / VII-VIII docelowo"
+    },
+    {
+      "name": "Chemia",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "VII-VIII"
+    },
+    {
+      "name": "Fizyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "VII-VIII"
+    },
+    {
+      "name": "Matematyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VIII"
+    },
+    {
+      "name": "Informatyka",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VIII"
+    },
+    {
+      "name": "Technika",
+      "selectedByDefault": true,
+      "category": "przejściowe",
+      "appliesTo": "V-VI w planie przejściowym"
+    },
+    {
+      "name": "Zajęcia praktyczno-techniczne",
+      "selectedByDefault": true,
+      "category": "nowe",
+      "appliesTo": "IV-VI docelowo"
+    },
+    {
+      "name": "Wychowanie fizyczne",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "I-VIII"
+    },
+    {
+      "name": "Edukacja dla bezpieczeństwa",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "VIII"
+    },
+    {
+      "name": "Zajęcia z wychowawcą",
+      "selectedByDefault": true,
+      "category": "podstawowe",
+      "appliesTo": "IV-VIII"
+    },
+    {
+      "name": "Edukacja zdrowotna",
+      "selectedByDefault": true,
+      "category": "pozostałe",
+      "appliesTo": "zgodnie z odrębnymi przepisami"
+    },
+    {
+      "name": "Religia",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "I-VIII"
+    },
+    {
+      "name": "Etyka",
+      "selectedByDefault": false,
+      "category": "opcjonalne",
+      "appliesTo": "I-VIII"
     }
   ]
 }

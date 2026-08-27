@@ -7,11 +7,42 @@ import { initializeSchoolSummary } from "./main/school-summary.js";
 import { initializeWelcomeGuide } from "./main/welcome-guide.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await initializeI18n();
-    initializeWelcomeGuide();
+    // Nawigacja jest krytyczna i nie powinna zależeć od i18n ani innych modułów.
     setupDashboardNavigation();
-    initializeTimetable();
-    initializeCsvExport();
-    await initializeSchoolSummary();
-    await initializeOptimization();
+
+    try {
+        await initializeI18n();
+    } catch (error) {
+        console.error("Could not initialize i18n:", error);
+    }
+
+    try {
+        initializeWelcomeGuide();
+    } catch (error) {
+        console.error("Could not initialize welcome guide:", error);
+    }
+
+    try {
+        initializeTimetable();
+    } catch (error) {
+        console.error("Could not initialize timetable:", error);
+    }
+
+    try {
+        initializeCsvExport();
+    } catch (error) {
+        console.error("Could not initialize CSV export:", error);
+    }
+
+    try {
+        await initializeSchoolSummary();
+    } catch (error) {
+        console.error("Could not initialize school summary:", error);
+    }
+
+    try {
+        await initializeOptimization();
+    } catch (error) {
+        console.error("Could not initialize optimization:", error);
+    }
 });

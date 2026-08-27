@@ -10,6 +10,10 @@ public class ClassGroup
 
     public string Name { get; set; } = string.Empty;
 
+    // Nullable only for compatibility with existing/imported legacy rows.
+    // New and edited classes should always have Grade defined.
+    public int? Grade { get; set; }
+
     public string? Info { get; set; }
 
     public int? HomeroomTeacherId { get; set; }

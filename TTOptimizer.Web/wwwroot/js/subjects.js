@@ -1,6 +1,10 @@
 import { initializeI18n, t } from "./i18n.js";
 import { initializeSimpleXlsxImport } from "./simple-xlsx-import.js";
-import { initializeSubjectSetupMode } from "./main/subjects-setup.js";
+import { initializeSubjectSetupMode, prepareOfficialSubjectCandidates } from "./main/subjects-setup.js";
+
+let currentSubjects = [];
+let officialImportSchoolUnits = [];
+let officialImportCandidates = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
     await initializeI18n();
@@ -45,6 +49,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         "click",
         closeSubjectForm
     );
+
+    document.getElementById("importOfficialSubjectsButton")
+        ?.addEventListener("click", openOfficialSubjectImport);
+
+    document.getElementById("closeOfficialSubjectImportButton")
+        ?.addEventListener("click", closeOfficialSubjectImport);
+
+    document.getElementById("officialSubjectImportCloseIcon")
+        ?.addEventListener("click", closeOfficialSubjectImport);
+
+    document.getElementById("prepareOfficialSubjectImportButton")
+        ?.addEventListener("click", prepareOfficialSubjectImport);
+
+    document.getElementById("selectAllOfficialSubjectsButton")
+        ?.addEventListener("click", () => setAllOfficialSubjectSelections(true));
+
+    document.getElementById("clearOfficialSubjectSelectionButton")
+        ?.addEventListener("click", () => setAllOfficialSubjectSelections(false));
+
+    document.getElementById("confirmOfficialSubjectImportButton")
+        ?.addEventListener("click", importSelectedOfficialSubjects);
+
+    document.getElementById("officialSubjectImportModal")
+        ?.addEventListener("click", event => {
+            if (event.target.id === "officialSubjectImportModal") {
+                closeOfficialSubjectImport();
+            }
+        });
 
     initializeSimpleXlsxImport({
         resourceName: "subject",
@@ -110,6 +142,7 @@ async function loadSubjects() {
             ? data
             : data?.subjects ?? [];
 
+        currentSubjects = subjects;
         renderSubjects(subjects);
         updateSubjectsCount(subjects.length);
     } catch (error) {
@@ -257,6 +290,429 @@ function renderSubjects(subjects) {
         row.appendChild(actionsCell);
         tbody.appendChild(row);
     });
+}
+
+
+async function openOfficialSubjectImport() {
+    closeSubjectForm();
+
+    const modal =
+        document.getElementById("officialSubjectImportModal");
+
+    if (!modal) {
+        return;
+    }
+
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+
+    officialImportCandidates = [];
+
+    const preview =
+        document.getElementById("officialSubjectImportPreview");
+
+    if (preview) {
+        preview.hidden = true;
+    }
+
+    toggleOfficialImportPreviewActions(false);
+    showOfficialSubjectImportMessage(
+        "Wczytywanie szkół...",
+        false
+    );
+
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/schoolunits?organizationId=${encodeURIComponent(organizationId)}`
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Nie udało się wczytać szkół. Status: ${response.status}`
+                )
+            );
+        }
+
+        officialImportSchoolUnits =
+            Array.isArray(data)
+                ? data
+                : data?.schoolUnits ?? [];
+
+        populateOfficialSubjectSchoolSelect();
+
+        if (officialImportSchoolUnits.length === 0) {
+            showOfficialSubjectImportMessage(
+                "Najpierw dodaj szkołę na stronie Szkoła.",
+                true
+            );
+            return;
+        }
+
+        showOfficialSubjectImportMessage("", false);
+    } catch (error) {
+        console.error(
+            "Error loading schools for official subject import:",
+            error
+        );
+
+        showOfficialSubjectImportMessage(
+            error instanceof Error
+                ? error.message
+                : "Nie udało się wczytać szkół.",
+            true
+        );
+    }
+}
+
+function closeOfficialSubjectImport() {
+    const modal =
+        document.getElementById("officialSubjectImportModal");
+
+    if (modal) {
+        modal.hidden = true;
+    }
+
+    document.body.classList.remove("modal-open");
+    officialImportCandidates = [];
+    showOfficialSubjectImportMessage("", false);
+}
+
+function populateOfficialSubjectSchoolSelect() {
+    const select =
+        document.getElementById("officialSubjectSchoolUnitId");
+
+    if (!select) {
+        return;
+    }
+
+    select.innerHTML = "";
+
+    for (const school of officialImportSchoolUnits) {
+        const option = document.createElement("option");
+        option.value = String(school.id);
+        option.textContent =
+            `${school.name} · ${formatOfficialSchoolType(school.schoolType)}`;
+        select.appendChild(option);
+    }
+}
+
+async function prepareOfficialSubjectImport() {
+    const schoolSelect =
+        document.getElementById("officialSubjectSchoolUnitId");
+
+    const schoolYear =
+        document.getElementById("officialSubjectSchoolYear")
+            ?.value ?? "2026/2027";
+
+    const schoolUnitId =
+        Number(schoolSelect?.value);
+
+    const schoolUnit =
+        officialImportSchoolUnits.find(
+            item => Number(item.id) === schoolUnitId
+        );
+
+    if (!schoolUnit) {
+        showOfficialSubjectImportMessage(
+            "Wybierz szkołę.",
+            true
+        );
+        return;
+    }
+
+    setOfficialSubjectImportBusy(true);
+    showOfficialSubjectImportMessage(
+        "Przygotowywanie listy przedmiotów...",
+        false
+    );
+
+    try {
+        const result =
+            await prepareOfficialSubjectCandidates({
+                schoolUnits: [schoolUnit],
+                existingSubjects: currentSubjects,
+                schoolYear
+            });
+
+        officialImportCandidates = result.candidates;
+
+        renderOfficialSubjectImportPreview();
+
+        const preview =
+            document.getElementById("officialSubjectImportPreview");
+
+        if (preview) {
+            preview.hidden = false;
+        }
+
+        toggleOfficialImportPreviewActions(true);
+        showOfficialSubjectImportMessage("", false);
+    } catch (error) {
+        console.error(
+            "Error preparing official subject import:",
+            error
+        );
+
+        showOfficialSubjectImportMessage(
+            error instanceof Error
+                ? error.message
+                : "Nie udało się przygotować listy przedmiotów.",
+            true
+        );
+    } finally {
+        setOfficialSubjectImportBusy(false);
+    }
+}
+
+function renderOfficialSubjectImportPreview() {
+    const tbody =
+        document.querySelector("#officialSubjectImportTable tbody");
+
+    if (!tbody) {
+        return;
+    }
+
+    tbody.innerHTML = "";
+
+    for (const item of officialImportCandidates) {
+        const row = document.createElement("tr");
+
+        const selectCell = document.createElement("td");
+        const checkbox = document.createElement("input");
+
+        checkbox.type = "checkbox";
+        checkbox.checked =
+            item.selected && !item.alreadyExists;
+        checkbox.disabled = item.alreadyExists;
+
+        checkbox.addEventListener("change", () => {
+            item.selected = checkbox.checked;
+            updateOfficialSubjectImportSummary();
+        });
+
+        selectCell.appendChild(checkbox);
+        row.appendChild(selectCell);
+        row.appendChild(createTableCell(item.name));
+        row.appendChild(createTableCell(item.appliesTo ?? ""));
+        row.appendChild(
+            createTableCell(
+                item.alreadyExists
+                    ? "Już istnieje"
+                    : "Nowy"
+            )
+        );
+
+        tbody.appendChild(row);
+    }
+
+    updateOfficialSubjectImportSummary();
+}
+
+function updateOfficialSubjectImportSummary() {
+    const selectedCount =
+        officialImportCandidates.filter(
+            item => item.selected && !item.alreadyExists
+        ).length;
+
+    const existingCount =
+        officialImportCandidates.filter(
+            item => item.alreadyExists
+        ).length;
+
+    const summary =
+        document.getElementById("officialSubjectImportSummary");
+
+    if (summary) {
+        summary.textContent =
+            `Do dodania: ${selectedCount}` +
+            (
+                existingCount > 0
+                    ? ` · Już istnieje: ${existingCount}`
+                    : ""
+            );
+    }
+
+    const button =
+        document.getElementById("confirmOfficialSubjectImportButton");
+
+    if (button) {
+        button.disabled = selectedCount === 0;
+        button.textContent =
+            selectedCount === 0
+                ? "Brak nowych przedmiotów"
+                : `Dodaj ${selectedCount} przedmiotów`;
+    }
+}
+
+function toggleOfficialImportPreviewActions(visible) {
+    for (const id of [
+        "selectAllOfficialSubjectsButton",
+        "clearOfficialSubjectSelectionButton",
+        "confirmOfficialSubjectImportButton"
+    ]) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.hidden = !visible;
+        }
+    }
+}
+
+function setAllOfficialSubjectSelections(selected) {
+    for (const item of officialImportCandidates) {
+        if (!item.alreadyExists) {
+            item.selected = selected;
+        }
+    }
+
+    renderOfficialSubjectImportPreview();
+}
+
+async function importSelectedOfficialSubjects() {
+    const names =
+        officialImportCandidates
+            .filter(
+                item =>
+                    item.selected &&
+                    !item.alreadyExists
+            )
+            .map(item => item.name);
+
+    if (names.length === 0) {
+        return;
+    }
+
+    setOfficialSubjectImportBusy(true);
+    showOfficialSubjectImportMessage(
+        "Dodawanie przedmiotów...",
+        false
+    );
+
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/subjects/import?organizationId=${encodeURIComponent(organizationId)}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ names })
+            }
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Nie udało się dodać przedmiotów. Status: ${response.status}`
+                )
+            );
+        }
+
+        await loadSubjects();
+
+        showOfficialSubjectImportMessage(
+            `Dodano ${data?.importedCount ?? names.length} przedmiotów` +
+            (
+                data?.skippedExistingCount > 0
+                    ? `, pominięto ${data.skippedExistingCount} już istniejących.`
+                    : "."
+            ),
+            false
+        );
+
+        officialImportCandidates =
+            officialImportCandidates.map(item => ({
+                ...item,
+                alreadyExists:
+                    item.alreadyExists ||
+                    names.some(
+                        name =>
+                            name.localeCompare(
+                                item.name,
+                                "pl",
+                                { sensitivity: "base" }
+                            ) === 0
+                    ),
+                selected: false
+            }));
+
+        renderOfficialSubjectImportPreview();
+    } catch (error) {
+        console.error(
+            "Error importing official subjects:",
+            error
+        );
+
+        showOfficialSubjectImportMessage(
+            error instanceof Error
+                ? error.message
+                : "Nie udało się dodać przedmiotów.",
+            true
+        );
+    } finally {
+        setOfficialSubjectImportBusy(false);
+    }
+}
+
+function setOfficialSubjectImportBusy(disabled) {
+    document.querySelectorAll(
+        "#officialSubjectImportModal select, " +
+        "#officialSubjectImportModal button, " +
+        "#officialSubjectImportModal input"
+    ).forEach(element => {
+        if (
+            element.id === "closeOfficialSubjectImportButton" ||
+            element.id === "officialSubjectImportCloseIcon"
+        ) {
+            return;
+        }
+
+        element.disabled = disabled;
+    });
+}
+
+function showOfficialSubjectImportMessage(message, isError) {
+    const element =
+        document.getElementById("officialSubjectImportMessage");
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent = message;
+    element.classList.toggle(
+        "error-message",
+        Boolean(isError)
+    );
+}
+
+function formatOfficialSchoolType(value) {
+    switch (Number(value)) {
+        case 1:
+            return "Szkoła podstawowa";
+        case 2:
+            return "Liceum";
+        case 3:
+            return "Technikum";
+        case 4:
+            return "Branżowa I stopnia";
+        case 5:
+            return "Branżowa II stopnia";
+        default:
+            return "Nieznany typ";
+    }
 }
 
 function updateSubjectsCount(count) {

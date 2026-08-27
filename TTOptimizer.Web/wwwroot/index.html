@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,8 @@
 
     <link rel="stylesheet"
           href="css/style.css">
+
+    <link rel="stylesheet" href="css/auth-validation.css">
 </head>
 
 <body class="auth-page">
@@ -22,53 +24,106 @@
                 <h1>ClassFlow</h1>
 
                 <p>
-                    Organize and optimize school timetables
-                    with a C++ engine and ASP.NET.
+                    Organizuj i optymalizuj plany lekcji
+                    z wykorzystaniem C++ i ASP.NET.
                 </p>
             </header>
 
             <div class="auth-form">
 
-                <div class="form-group">
-                    <label for="emailInput">
-                        Email
-                    </label>
+                <div id="loginFields">
+                    <div class="form-group">
+                        <label for="loginEmailInput">E-mail</label>
+                        <input id="loginEmailInput"
+                               name="loginEmail"
+                               type="email"
+                               placeholder="user@example.com"
+                               autocomplete="username">
+                    </div>
 
-                    <input id="emailInput"
-                           name="email"
-                           type="email"
-                           placeholder="user@example.com"
-                           autocomplete="email">
+                    <div class="form-group">
+                        <label for="loginPasswordInput">Hasło</label>
+                        <input id="loginPasswordInput"
+                               name="loginPassword"
+                               type="password"
+                               placeholder="Hasło"
+                               autocomplete="current-password">
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="passwordInput">
-                        Password
-                    </label>
+                <div id="registrationFields" hidden>
+                    <div class="form-group">
+                        <label for="registerEmailInput">E-mail</label>
+                        <input id="registerEmailInput"
+                               name="registerEmail"
+                               type="email"
+                               placeholder="user@example.com"
+                               autocomplete="username">
+                    </div>
 
-                    <input id="passwordInput"
-                           name="password"
-                           type="password"
-                           placeholder="Password"
-                           autocomplete="current-password">
+                    <div class="form-group">
+                        <label for="displayNameInput">Imię i nazwisko / nazwa użytkownika</label>
+                        <input id="displayNameInput"
+                               type="text"
+                               maxlength="200"
+                               autocomplete="name"
+                               placeholder="np. Jan Kowalski">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="organizationNameInput">Nazwa organizacji</label>
+                        <input id="organizationNameInput"
+                               type="text"
+                               maxlength="200"
+                               placeholder="np. Zespół Szkół nr 1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerPasswordInput">Hasło</label>
+                        <input id="registerPasswordInput"
+                               name="registerPassword"
+                               type="password"
+                               placeholder="Hasło"
+                               autocomplete="new-password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPasswordInput">Powtórz hasło</label>
+                        <input id="confirmPasswordInput"
+                               name="confirmPassword"
+                               type="password"
+                               placeholder="Powtórz hasło"
+                               autocomplete="new-password">
+                    </div>
+
+                    <p class="demo-info">
+                        Rejestracja utworzy nowe konto oraz nową organizację.
+                    </p>
                 </div>
 
                 <div class="auth-actions">
                     <button id="loginButton"
                             type="button"
                             class="auth-button auth-button-primary">
-                        Log in
+                        Zaloguj
                     </button>
 
                     <button id="registerButton"
                             type="button"
                             class="auth-button auth-button-secondary">
-                        Register
+                        Zarejestruj
                     </button>
                 </div>
 
+                <button id="cancelRegistrationButton"
+                        type="button"
+                        class="auth-button auth-button-secondary"
+                        hidden>
+                    Anuluj rejestrację
+                </button>
+
                 <div class="auth-separator">
-                    <span>or use demo mode</span>
+                    <span>lub użyj trybu demonstracyjnego</span>
                 </div>
 
                 <div class="demo-buttons">
@@ -76,46 +131,29 @@
                     <button id="demoEasyButton"
                             type="button"
                             class="demo-button">
-
                         <span class="demo-button-title">
-                            Easy demo
+                            Demo łatwe
                         </span>
-
                         <span class="demo-button-description">
-                            Small dataset
-                        </span>
-                    </button>
-
-                    <button id="demoMediumButton"
-                            type="button"
-                            class="demo-button">
-
-                        <span class="demo-button-title">
-                            Medium demo
-                        </span>
-
-                        <span class="demo-button-description">
-                            Typical school
+                            Mały zestaw danych
                         </span>
                     </button>
 
                     <button id="demoHardButton"
                             type="button"
                             class="demo-button">
-
                         <span class="demo-button-title">
-                            Hard demo
+                            Demo trudne
                         </span>
-
                         <span class="demo-button-description">
-                            Large dataset
+                            Duży zestaw danych
                         </span>
                     </button>
 
                 </div>
 
                 <p class="demo-info">
-                    Demo data is available without registration.
+                    Dane demonstracyjne są dostępne bez rejestracji.
                 </p>
 
                 <p id="authMessage"

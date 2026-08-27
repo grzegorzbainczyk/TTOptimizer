@@ -38,15 +38,15 @@
                     </div>
 
                     <div class="header-actions dashboard-header-actions">
-                        <button id="setupButton"
-                                class="dashboard-setup-button"
-                                type="button"
-                                title="Konfigurator szkoły"
-                                data-i18n-title="setup.dashboardTitle">
+                        <a id="setupButton"
+                           class="dashboard-setup-button"
+                           href="setup.html"
+                           title="Konfigurator szkoły"
+                           data-i18n-title="setup.dashboardTitle">
                             <span class="dashboard-setup-button-icon" aria-hidden="true">🛠️</span>
                             <span class="dashboard-setup-button-text"
                                   data-i18n="setup.dashboardButton">Konfigurator szkoły</span>
-                        </button>
+                        </a>
 
                         <div class="dashboard-utility-actions">
                             <label for="languageSelector"
@@ -83,27 +83,11 @@
                         <span data-i18n="resources.description">Manage input data used by the optimizer.</span>
                     </p>
 
-                    <button id="schoolButton" class="resource-button">
-                        <span class="resource-button-icon">🏫</span>
+                    <button id="teachersButton" class="resource-button">
+                        <span class="resource-button-icon">👤</span>
                         <span>
-                            <strong data-i18n="resources.school">School</strong>
-                            <small data-i18n="resources.school.description">School information</small>
-                        </span>
-                    </button>
-
-                    <button id="buildingsButton" class="resource-button">
-                        <span class="resource-button-icon">🏢</span>
-                        <span>
-                            <strong data-i18n="resources.buildings">Buildings</strong>
-                            <small data-i18n="resources.buildings.description">School locations</small>
-                        </span>
-                    </button>
-
-                    <button id="roomsButton" class="resource-button">
-                        <span class="resource-button-icon">🚪</span>
-                        <span>
-                            <strong data-i18n="resources.rooms">Rooms</strong>
-                            <small data-i18n="resources.rooms.description">Classrooms</small>
+                            <strong data-i18n="resources.teachers">Teachers</strong>
+                            <small data-i18n="resources.teachers.description">Manage staff</small>
                         </span>
                     </button>
 
@@ -123,19 +107,27 @@
                         </span>
                     </button>
 
+                    <button id="roomsButton" class="resource-button">
+                        <span class="resource-button-icon">🚪</span>
+                        <span>
+                            <strong data-i18n="resources.rooms">Rooms</strong>
+                            <small data-i18n="resources.rooms.description">Classrooms</small>
+                        </span>
+                    </button>
+
+                    <button id="buildingsButton" class="resource-button">
+                        <span class="resource-button-icon">🏢</span>
+                        <span>
+                            <strong data-i18n="resources.buildings">Buildings</strong>
+                            <small data-i18n="resources.buildings.description">School locations</small>
+                        </span>
+                    </button>
+
                     <button id="subjectsButton" class="resource-button">
                         <span class="resource-button-icon">📚</span>
                         <span>
                             <strong data-i18n="resources.subjects">Subjects</strong>
                             <small data-i18n="resources.subjects.description">Lesson topics</small>
-                        </span>
-                    </button>
-
-                    <button id="teachersButton" class="resource-button">
-                        <span class="resource-button-icon">👤</span>
-                        <span>
-                            <strong data-i18n="resources.teachers">Teachers</strong>
-                            <small data-i18n="resources.teachers.description">Manage staff</small>
                         </span>
                     </button>
 
@@ -147,11 +139,27 @@
                         </span>
                     </button>
 
+                    <button id="schoolButton" class="resource-button">
+                        <span class="resource-button-icon">🏫</span>
+                        <span>
+                            <strong data-i18n="resources.school">School</strong>
+                            <small data-i18n="resources.school.description">School information</small>
+                        </span>
+                    </button>
+
                     <button id="organizationPreferencesButton" class="resource-button">
-                        <span class="resource-button-icon">⚙️</span>
+                        <span class="resource-button-icon">🏫</span>
                         <span>
                             <strong data-i18n="resources.preferences">Scheduling defaults</strong>
                             <small data-i18n="resources.preferences.description">Organization-wide preferences</small>
+                        </span>
+                    </button>
+
+                    <button id="rulesButton" class="resource-button">
+                        <span class="resource-button-icon">⚙️</span>
+                        <span>
+                            <strong data-i18n="resources.rules">Rules</strong>
+                            <small data-i18n="resources.rules.description">Availability and constraints</small>
                         </span>
                     </button>
                 </aside>
