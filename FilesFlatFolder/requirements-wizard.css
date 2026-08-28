@@ -185,3 +185,61 @@ body.modal-open {
         flex-wrap: wrap;
     }
 }
+
+
+/* Czytelniejsza nawigacja kreatora: poprzednia/następna klasa bliżej środka. */
+.lesson-wizard-footer {
+    display: grid;
+    grid-template-columns: 1fr auto auto 1fr;
+    align-items: center;
+    column-gap: 12px;
+}
+
+#lessonWizardCloseButton {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+}
+
+#lessonWizardBackButton {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#lessonWizardNextButton {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+#confirmCurriculumImportButton {
+    grid-column: 4;
+    grid-row: 1;
+    justify-self: end;
+}
+
+.lesson-wizard-footer-spacer {
+    display: none;
+}
+
+.lesson-wizard-summary-warning {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 1px solid #b42318;
+    border-radius: 8px;
+    color: #b42318;
+    font-weight: 700;
+    background: #fff7f6;
+}
+
+@media (max-width: 800px) {
+    .lesson-wizard-footer {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    #lessonWizardCloseButton,
+    #confirmCurriculumImportButton {
+        margin-left: 0;
+    }
+}

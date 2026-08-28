@@ -2220,7 +2220,8 @@ function getApiErrorMessage(
         isSummary: false,
         rowsByClassId: new Map(),
         gradeByClassId: new Map(),
-        curriculumCache: new Map()
+        curriculumCache: new Map(),
+        lastTeacherBySubjectId: new Map()
     };
 
     const byId = id => document.getElementById(id);
@@ -2579,10 +2580,22 @@ function getApiErrorMessage(
                     ? Number(existing.teacherId)
                     : null;
 
+                if (row.subjectId && row.teacherId) {
+                    state.lastTeacherBySubjectId.set(
+                        Number(row.subjectId),
+                        Number(row.teacherId)
+                    );
+                }
+
                 if (!row.hoursPerWeek) {
                     row.hoursPerWeek =
                         Number(existing.hoursPerWeek) || null;
                 }
+            } else if (row.subjectId) {
+                row.teacherId =
+                    state.lastTeacherBySubjectId.get(
+                        Number(row.subjectId)
+                    ) ?? null;
             }
 
             refreshAction(row);
@@ -2723,6 +2736,13 @@ function getApiErrorMessage(
                 row.teacherId =
                     Number(teacherSelect.value) || null;
 
+                if (row.subjectId && row.teacherId) {
+                    state.lastTeacherBySubjectId.set(
+                        Number(row.subjectId),
+                        Number(row.teacherId)
+                    );
+                }
+
                 refreshAction(row);
                 statusCell.textContent = statusText(row);
             };
@@ -2743,10 +2763,10 @@ function getApiErrorMessage(
             ["lessonWizardSchoolLabel", "lessonWizard.school", "Szkoła"],
             ["lessonWizardYearLabel", "lessonWizard.schoolYear", "Rok szkolny"],
             ["lessonWizardGradeLabel", "lessonWizard.grade", "Rocznik"],
-            ["lessonWizardBackButton", "lessonWizard.back", "← Wstecz"],
+            ["lessonWizardBackButton", "lessonWizard.back", "← Poprzednia klasa"],
             ["lessonWizardCloseButton", "common.cancel", "Anuluj"],
-            ["lessonWizardNextButton", "lessonWizard.nextSimple", "Dalej →"],
-            ["confirmCurriculumImportButton", "lessonWizard.apply", "Zastosuj zmiany"],
+            ["lessonWizardNextButton", "lessonWizard.nextSimple", "Następna klasa →"],
+            ["confirmCurriculumImportButton", "lessonWizard.apply", "Zapisz gotowe zmiany"],
             ["lessonWizardSummaryTitle", "lessonWizard.summary", "Podsumowanie"],
             ["lessonWizardSummaryHint", "lessonWizard.summaryHint",
                 "Przed zapisem uzupełnij nauczycieli i liczbę godzin."]
@@ -2877,7 +2897,38 @@ function getApiErrorMessage(
         const classGroup = classes[state.classIndex] ?? null;
 
         byId("lessonWizardSummaryPanel").hidden = !state.isSummary;
-        byId("lessonWizardNextButton").hidden = state.isSummary;
+
+        const nextButton =
+            byId("lessonWizardNextButton");
+
+        if (nextButton) {
+            nextButton.hidden = state.isSummary;
+
+            if (!state.isSummary) {
+                const schools = getAllSchools();
+                const currentSchoolIndex =
+                    schools.findIndex(
+                        item =>
+                            Number(item.id) ===
+                            Number(state.schoolUnitId)
+                    );
+
+                const isLastSchool =
+                    currentSchoolIndex ===
+                    schools.length - 1;
+
+                const isLastClass =
+                    classes.length > 0 &&
+                    state.classIndex ===
+                    classes.length - 1;
+
+                nextButton.textContent =
+                    isLastSchool && isLastClass
+                        ? "Podsumowanie →"
+                        : "Następna klasa →";
+            }
+        }
+
         byId("confirmCurriculumImportButton").hidden = !state.isSummary;
 
         const gradeField =
@@ -3011,11 +3062,30 @@ function getApiErrorMessage(
         }
 
         const apply = byId("confirmCurriculumImportButton");
+        const hint = byId("lessonWizardSummaryHint");
+        const actionableCount =
+            counts.create + counts.update;
+
+        if (hint) {
+            if (counts.attention > 0) {
+                hint.textContent =
+                    `Uwaga: ${counts.attention} lekcji nie ma kompletnych danych. ` +
+                    "Zapisane zostaną tylko gotowe lekcje. " +
+                    "Brakujące dane możesz uzupełnić później.";
+                hint.classList.add(
+                    "lesson-wizard-summary-warning"
+                );
+            } else {
+                hint.textContent =
+                    "Wszystkie lekcje mają kompletne dane.";
+                hint.classList.remove(
+                    "lesson-wizard-summary-warning"
+                );
+            }
+        }
 
         if (apply) {
-            apply.disabled =
-                counts.attention > 0 ||
-                (counts.create + counts.update) === 0;
+            apply.disabled = actionableCount === 0;
         }
     }
 
@@ -3097,27 +3167,23 @@ function getApiErrorMessage(
         const rows = getAllRows();
         rows.forEach(refreshAction);
 
-        if (rows.some(row => row.action === "attention")) {
-            showCurriculumImportMessage(
-                text(
-                    "lessonWizard.summaryHint",
-                    "Przed zapisem uzupełnij nauczycieli i liczbę godzin."
-                ),
-                true
-            );
-            return;
-        }
-
         const actionable = rows.filter(
             row => row.action === "create" || row.action === "update"
         );
 
         if (actionable.length === 0) {
+            const incompleteCount =
+                rows.filter(
+                    row => row.action === "attention"
+                ).length;
+
             showCurriculumImportMessage(
-                text(
-                    "lessonWizard.nothingToSave",
-                    "Nie ma zmian do zapisania."
-                ),
+                incompleteCount > 0
+                    ? "Nie ma jeszcze gotowych lekcji do zapisania. Uzupełnij co najmniej jedną lekcję."
+                    : text(
+                        "lessonWizard.nothingToSave",
+                        "Nie ma zmian do zapisania."
+                    ),
                 true
             );
             return;
@@ -3157,12 +3223,26 @@ function getApiErrorMessage(
             );
         }
 
+        const incompleteCount =
+            rows.filter(
+                row => row.action === "attention"
+            ).length;
+
         await refreshPageData();
+
+        if (incompleteCount > 0) {
+            console.info(
+                `${incompleteCount} incomplete lesson(s) were left for later.`
+            );
+        }
+
         closeWizard();
     }
 
     async function openWizard() {
         closeRequirementForm();
+
+        state.lastTeacherBySubjectId.clear();
 
         // Keep these sequential because the current GET endpoints still
         // contain legacy WholeClass repair/backfill logic.
