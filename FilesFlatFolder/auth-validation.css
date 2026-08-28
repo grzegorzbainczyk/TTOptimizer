@@ -1,0 +1,25 @@
+
+.auth-message {
+    min-height: 1.5rem;
+    margin-top: 14px;
+    text-align: center;
+}
+
+.auth-message-error {
+    color: #b42318;
+    font-weight: 700;
+    font-size: 0.98rem;
+}
+
+.auth-message-info {
+    color: #1f4e79;
+    font-weight: 600;
+}
+
+.auth-message-error::before {
+    content: "⚠ ";
+}
+
+.auth-message-info::before {
+    content: "• ";
+}

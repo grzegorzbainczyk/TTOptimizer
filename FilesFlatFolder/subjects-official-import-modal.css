@@ -1,0 +1,122 @@
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.official-subject-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.58);
+}
+
+.official-subject-modal-backdrop[hidden] {
+    display: none;
+}
+
+.official-subject-modal {
+    width: min(1180px, 96vw);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+    overflow: hidden;
+}
+
+.official-subject-modal-header,
+.official-subject-modal-footer {
+    padding: 20px 24px;
+    background: #fff;
+}
+
+.official-subject-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.official-subject-modal-header h2 {
+    margin: 6px 0 4px;
+}
+
+.official-subject-modal-header p {
+    margin: 0;
+}
+
+.official-subject-modal-close {
+    min-width: 46px;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.official-subject-modal-body {
+    padding: 20px 24px;
+    overflow: auto;
+}
+
+.official-subject-modal-toolbar {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.7fr) auto;
+    gap: 16px;
+    align-items: end;
+    margin-bottom: 12px;
+}
+
+.official-subject-modal-toolbar-action {
+    display: flex;
+    align-items: end;
+}
+
+.official-subject-modal-summary-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: 8px 0 12px;
+    font-weight: 600;
+}
+
+.official-subject-modal-table-wrapper {
+    max-height: 52vh;
+    overflow: auto;
+}
+
+.official-subject-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.official-subject-modal-footer-left,
+.official-subject-modal-footer-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+@media (max-width: 760px) {
+    .official-subject-modal-backdrop {
+        padding: 10px;
+    }
+
+    .official-subject-modal {
+        width: 100%;
+        max-height: 96vh;
+        border-radius: 14px;
+    }
+
+    .official-subject-modal-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .official-subject-modal-footer {
+        flex-direction: column;
+    }
+}

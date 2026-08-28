@@ -1308,7 +1308,11 @@ async function loadCurriculumPreview() {
                     grade: selection.grade,
                     studentGroupId: wholeClassGroup.id,
                     sourceSubjectName: lesson.subject,
-                    hoursPerWeek: Number(lesson.hoursPerWeek),
+                    hoursPerWeek:
+                        Number.isFinite(Number(lesson.hoursPerWeek)) &&
+                        Number(lesson.hoursPerWeek) >= 1
+                            ? Number(lesson.hoursPerWeek)
+                            : 1,
                     subjectId: matchedSubject?.id ?? null,
                     createSubject: !matchedSubject,
                     teacherId: null,
@@ -2216,7 +2220,8 @@ function getApiErrorMessage(
         isSummary: false,
         rowsByClassId: new Map(),
         gradeByClassId: new Map(),
-        curriculumCache: new Map()
+        curriculumCache: new Map(),
+        lastTeacherBySubjectId: new Map()
     };
 
     const byId = id => document.getElementById(id);
@@ -2426,25 +2431,40 @@ function getApiErrorMessage(
                 item => Number(item.grade) === Number(grade)
             );
 
-            return (gradeDefinition?.lessons ?? []).map(item => ({
-                subjectName: item.subject,
-                hoursPerWeek:
-                    Number.isFinite(Number(item.hoursPerWeek))
-                        ? Number(item.hoursPerWeek)
-                        : null,
-                source: "hourly-plan"
-            }));
+            return (gradeDefinition?.lessons ?? []).map(item => {
+                const configuredHours =
+                    Number(item.hoursPerWeek);
+
+                return {
+                    subjectName: item.subject,
+                    hoursPerWeek:
+                        Number.isFinite(configuredHours) &&
+                        configuredHours >= 1
+                            ? configuredHours
+                            : 1,
+                    source: "hourly-plan"
+                };
+            });
         }
 
         if (Array.isArray(definition?.subjects)) {
             return definition.subjects
                 .filter(item => item.selectedByDefault !== false)
                 .filter(item => appliesToGrade(item.appliesTo, grade))
-                .map(item => ({
-                    subjectName: item.name,
-                    hoursPerWeek: null,
-                    source: "subject-list"
-                }));
+                .map(item => {
+                    const configuredHours =
+                        Number(item.hoursPerWeek);
+
+                    return {
+                        subjectName: item.name,
+                        hoursPerWeek:
+                            Number.isFinite(configuredHours) &&
+                            configuredHours >= 1
+                                ? configuredHours
+                                : 1,
+                        source: "subject-list"
+                    };
+                });
         }
 
         return [];
@@ -2560,10 +2580,22 @@ function getApiErrorMessage(
                     ? Number(existing.teacherId)
                     : null;
 
+                if (row.subjectId && row.teacherId) {
+                    state.lastTeacherBySubjectId.set(
+                        Number(row.subjectId),
+                        Number(row.teacherId)
+                    );
+                }
+
                 if (!row.hoursPerWeek) {
                     row.hoursPerWeek =
                         Number(existing.hoursPerWeek) || null;
                 }
+            } else if (row.subjectId) {
+                row.teacherId =
+                    state.lastTeacherBySubjectId.get(
+                        Number(row.subjectId)
+                    ) ?? null;
             }
 
             refreshAction(row);
@@ -2662,7 +2694,7 @@ function getApiErrorMessage(
             hoursInput.min = "1";
             hoursInput.max = "40";
             hoursInput.step = "1";
-            hoursInput.value = row.hoursPerWeek ?? "";
+            hoursInput.value = row.hoursPerWeek ?? 1;
             hoursInput.className = "lesson-wizard-hours-input";
             hoursInput.placeholder = "—";
             hoursCell.appendChild(hoursInput);
@@ -2703,6 +2735,13 @@ function getApiErrorMessage(
                     Number(hoursInput.value) || null;
                 row.teacherId =
                     Number(teacherSelect.value) || null;
+
+                if (row.subjectId && row.teacherId) {
+                    state.lastTeacherBySubjectId.set(
+                        Number(row.subjectId),
+                        Number(row.teacherId)
+                    );
+                }
 
                 refreshAction(row);
                 statusCell.textContent = statusText(row);
@@ -3144,6 +3183,8 @@ function getApiErrorMessage(
 
     async function openWizard() {
         closeRequirementForm();
+
+        state.lastTeacherBySubjectId.clear();
 
         // Keep these sequential because the current GET endpoints still
         // contain legacy WholeClass repair/backfill logic.

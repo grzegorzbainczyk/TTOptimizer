@@ -1,0 +1,187 @@
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.lesson-wizard-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(20, 22, 26, 0.58);
+}
+
+.lesson-wizard-backdrop[hidden] {
+    display: none;
+}
+
+.lesson-wizard-dialog {
+    display: flex;
+    flex-direction: column;
+    width: min(1180px, 96vw);
+    max-height: 92vh;
+    overflow: hidden;
+    background: var(--surface-color, #fff);
+    border: 1px solid var(--border-color, #d7d9dd);
+    border-radius: 16px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.lesson-wizard-header,
+.lesson-wizard-footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+}
+
+.lesson-wizard-header {
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color, #e0e2e5);
+}
+
+.lesson-wizard-header h2 {
+    margin: 2px 0 4px;
+}
+
+.lesson-wizard-header p {
+    margin: 0;
+}
+
+.lesson-wizard-eyebrow,
+.lesson-wizard-school-name {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.72;
+}
+
+.lesson-wizard-close {
+    min-width: 42px;
+    font-size: 1.3rem;
+}
+
+.lesson-wizard-context {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 180px minmax(240px, 1fr);
+    gap: 18px;
+    align-items: end;
+    padding: 16px 22px;
+    background: rgba(0, 0, 0, 0.025);
+    border-bottom: 1px solid var(--border-color, #e0e2e5);
+}
+
+.lesson-wizard-context label,
+.lesson-wizard-grade-field {
+    display: grid;
+    gap: 6px;
+}
+
+.lesson-wizard-progress {
+    display: grid;
+    gap: 7px;
+}
+
+.lesson-wizard-progress-track {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.09);
+}
+
+.lesson-wizard-progress-value {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: currentColor;
+    transition: width 160ms ease;
+}
+
+.lesson-wizard-body {
+    overflow: auto;
+    padding: 22px;
+}
+
+.lesson-wizard-class-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 16px;
+}
+
+.lesson-wizard-class-heading h3 {
+    margin: 3px 0 0;
+    font-size: 1.45rem;
+}
+
+.lesson-wizard-grade-field {
+    min-width: 130px;
+}
+
+.lesson-wizard-table select {
+    min-width: 220px;
+    width: 100%;
+}
+
+.lesson-wizard-empty {
+    padding: 28px;
+    border: 1px dashed var(--border-color, #cfd2d8);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.lesson-wizard-footer {
+    border-top: 1px solid var(--border-color, #e0e2e5);
+}
+
+.lesson-wizard-footer-spacer {
+    flex: 1;
+}
+
+.lesson-wizard-summary {
+    padding: 4px 0 14px;
+}
+
+.lesson-wizard-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.lesson-wizard-summary-grid > div {
+    display: grid;
+    gap: 4px;
+    padding: 16px;
+    border: 1px solid var(--border-color, #dfe1e5);
+    border-radius: 12px;
+}
+
+.lesson-wizard-summary-grid strong {
+    font-size: 1.7rem;
+}
+
+@media (max-width: 800px) {
+    .lesson-wizard-context {
+        grid-template-columns: 1fr;
+    }
+
+    .lesson-wizard-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .lesson-wizard-class-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .lesson-wizard-footer {
+        flex-wrap: wrap;
+    }
+}

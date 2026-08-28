@@ -1,0 +1,139 @@
+
+/* Więcej oddechu dla sekcji informacyjnej "Kompletność roczników". */
+.class-grade-completeness-section {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Modal generatora klas */
+.class-generator-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.38);
+}
+
+.class-generator-overlay[hidden] {
+    display: none;
+}
+
+.class-generator-modal {
+    width: min(720px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    border-radius: 14px;
+    padding: 24px;
+    background: white;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
+}
+
+.class-generator-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.class-generator-header h2 {
+    margin: 2px 0 4px;
+}
+
+.class-generator-eyebrow {
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+}
+
+.class-generator-school-info {
+    margin: 0;
+    font-weight: 700;
+}
+
+.class-generator-close {
+    border: 0;
+    background: transparent;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.class-generator-intro {
+    margin: 18px 0;
+}
+
+.class-generator-rows {
+    display: grid;
+    gap: 10px;
+}
+
+.class-generator-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) 90px minmax(100px, auto);
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 9px;
+}
+
+.class-generator-row input {
+    width: 100%;
+}
+
+.class-generator-row-suffix {
+    font-size: 0.9rem;
+    opacity: 0.72;
+}
+
+.class-generator-preview {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.035);
+}
+
+.class-generator-preview-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.class-generator-preview-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    padding: 6px 9px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 999px;
+    font-weight: 700;
+    background: white;
+}
+
+.class-generator-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+    .class-generator-row {
+        grid-template-columns: 1fr 80px;
+    }
+
+    .class-generator-row-suffix {
+        display: none;
+    }
+
+    .class-generator-modal {
+        padding: 18px;
+    }
+}
