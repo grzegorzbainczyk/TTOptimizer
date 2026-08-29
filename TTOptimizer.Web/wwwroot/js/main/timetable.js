@@ -10,8 +10,20 @@ import {
 const LAST_RESULT_STORAGE_KEY =
     "ttorganizer.lastOptimizationResult";
 
+let currentScheduledLessons = [];
+let currentTimetableView = "list";
+
+const WEEK_DAYS = [
+    ["Poniedziałek", "Monday"],
+    ["Wtorek", "Tuesday"],
+    ["Środa", "Wednesday"],
+    ["Czwartek", "Thursday"],
+    ["Piątek", "Friday"]
+];
+
 export function initializeTimetable() {
     setupClearResultButton();
+    setupTimetableViewControls();
     loadLastOptimizationResultFromStorage();
 
     window.addEventListener(
@@ -48,6 +60,8 @@ export function renderOptimizationResult(data) {
         );
 
     if (optimizationFailed || preprocessingFailed) {
+        currentScheduledLessons = [];
+
         renderPreprocessingFailure(
             result,
             preprocessingIssues
@@ -55,12 +69,16 @@ export function renderOptimizationResult(data) {
 
         populateFilters([]);
         renderScheduledLessonRows([]);
+        renderCurrentTimetableView();
         return;
     }
+
+    currentScheduledLessons = scheduledLessons;
 
     renderOptimizationSuccess(result, scheduledLessons);
     populateFilters(scheduledLessons);
     renderScheduledLessonRows(scheduledLessons);
+    renderCurrentTimetableView();
 }
 
 export function clearOptimizationResultForNewRun() {
@@ -421,6 +439,338 @@ function applyFilters() {
     }
 }
 
+
+function setupTimetableViewControls() {
+    document.querySelectorAll(".timetable-view-button")
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                currentTimetableView =
+                    button.dataset.view ?? "list";
+                renderCurrentTimetableView();
+            });
+        });
+
+    document.getElementById("timetableWeeklySelector")
+        ?.addEventListener("change", renderWeeklySchedule);
+}
+
+function renderCurrentTimetableView() {
+    const listView =
+        document.getElementById("timetableListView");
+    const weeklyView =
+        document.getElementById("timetableWeeklyView");
+    const isList = currentTimetableView === "list";
+
+    if (listView) listView.hidden = !isList;
+    if (weeklyView) weeklyView.hidden = isList;
+
+    document.querySelectorAll(".timetable-view-button")
+        .forEach(button => {
+            button.classList.toggle(
+                "active",
+                button.dataset.view === currentTimetableView
+            );
+        });
+
+    if (!isList) {
+        populateWeeklySelector();
+        renderWeeklySchedule();
+    }
+}
+
+function populateWeeklySelector() {
+    const selector =
+        document.getElementById("timetableWeeklySelector");
+    if (!selector) return;
+
+    const previous = selector.value;
+    const values = [...new Set(
+        currentScheduledLessons
+            .map(item =>
+                String(getPerspectiveValue(
+                    item,
+                    currentTimetableView
+                ) ?? "")
+            )
+            .filter(Boolean)
+    )].sort((a, b) =>
+        a.localeCompare(
+            b,
+            undefined,
+            { numeric: true, sensitivity: "base" }
+        )
+    );
+
+    selector.innerHTML = "";
+
+    values.forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        selector.appendChild(option);
+    });
+
+    if (values.includes(previous)) {
+        selector.value = previous;
+    }
+}
+
+function getPerspectiveValue(lesson, view) {
+    if (view === "class") {
+        return getClassValue(lesson);
+    }
+    if (view === "teacher") {
+        return getTeacherValue(lesson);
+    }
+    if (view === "room") {
+        return getRoomValue(lesson);
+    }
+    return "";
+}
+
+function getClassValue(lesson) {
+    return lesson.classGroup ??
+        lesson.classGroupName ??
+        lesson.classGroupId ??
+        "";
+}
+
+function getSubjectValue(lesson) {
+    return lesson.subject ??
+        lesson.subjectName ??
+        lesson.subjectId ??
+        "";
+}
+
+function getTeacherValue(lesson) {
+    return lesson.teacher ??
+        lesson.teacherName ??
+        lesson.teacherId ??
+        "";
+}
+
+function getRoomValue(lesson) {
+    return lesson.room ??
+        lesson.roomName ??
+        lesson.roomId ??
+        "";
+}
+
+function renderWeeklySchedule() {
+    const tbody =
+        document.getElementById("timetableWeeklyBody");
+    const selector =
+        document.getElementById("timetableWeeklySelector");
+
+    if (!tbody || !selector) return;
+
+    updateWeeklyHeading();
+
+    const selected = selector.value;
+
+    if (!selected) {
+        tbody.innerHTML =
+            `<tr><td colspan="6">${weeklyText(
+                "Brak danych do wyświetlenia.",
+                "No data to display."
+            )}</td></tr>`;
+        return;
+    }
+
+    const lessons = currentScheduledLessons.filter(
+        lesson =>
+            String(getPerspectiveValue(
+                lesson,
+                currentTimetableView
+            )) === selected
+    );
+
+    const maxSlot = Math.max(
+        0,
+        ...lessons.map(getSlotNumber)
+    );
+
+    tbody.innerHTML = "";
+
+    for (let slot = 1; slot <= maxSlot; slot++) {
+        const row = document.createElement("tr");
+
+        const slotCell = document.createElement("th");
+        slotCell.scope = "row";
+        slotCell.className = "timetable-slot-cell";
+        slotCell.textContent = String(slot);
+        row.appendChild(slotCell);
+
+        for (let day = 0; day < 5; day++) {
+            const cell = document.createElement("td");
+            cell.className = "timetable-weekly-cell";
+
+            const matching = lessons.filter(
+                lesson =>
+                    normalizeDay(lesson.day) === day &&
+                    getSlotNumber(lesson) === slot
+            );
+
+            if (matching.length === 0) {
+                cell.classList.add(
+                    "timetable-weekly-cell-empty"
+                );
+                cell.textContent = "·";
+            } else {
+                matching.forEach(lesson =>
+                    cell.appendChild(
+                        createWeeklyLessonCard(lesson)
+                    )
+                );
+            }
+
+            row.appendChild(cell);
+        }
+
+        tbody.appendChild(row);
+    }
+}
+
+function createWeeklyLessonCard(lesson) {
+    const card = document.createElement("div");
+    card.className = "timetable-weekly-lesson";
+
+    const subject = document.createElement("strong");
+    subject.className = "timetable-weekly-subject";
+    subject.textContent = String(
+        getSubjectValue(lesson) || "-"
+    );
+    card.appendChild(subject);
+
+    const details = [];
+
+    if (currentTimetableView !== "class") {
+        details.push([
+            weeklyText("Klasa", "Class"),
+            getClassValue(lesson)
+        ]);
+    }
+
+    if (currentTimetableView !== "teacher") {
+        details.push([
+            weeklyText("Nauczyciel", "Teacher"),
+            getTeacherValue(lesson)
+        ]);
+    }
+
+    if (currentTimetableView !== "room") {
+        details.push([
+            weeklyText("Sala", "Room"),
+            getRoomValue(lesson)
+        ]);
+    }
+
+    details
+        .filter(([, value]) => Boolean(value))
+        .forEach(([label, value]) => {
+            const line = document.createElement("span");
+            line.textContent = `${label}: ${value}`;
+            card.appendChild(line);
+        });
+
+    return card;
+}
+
+function getSlotNumber(lesson) {
+    const lessonNumber = Number(lesson.lessonNumber);
+    if (Number.isFinite(lessonNumber)) {
+        return lessonNumber + 1;
+    }
+
+    const slot = Number(lesson.slot);
+    if (Number.isFinite(slot)) {
+        return slot >= 1 ? slot : slot + 1;
+    }
+
+    return 0;
+}
+
+function normalizeDay(day) {
+    const numeric = Number(day);
+
+    if (Number.isInteger(numeric)) {
+        if (numeric >= 0 && numeric <= 4) {
+            return numeric;
+        }
+        if (numeric >= 1 && numeric <= 5) {
+            return numeric - 1;
+        }
+    }
+
+    const value = String(day ?? "")
+        .trim()
+        .toLocaleLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    const aliases = {
+        monday: 0, mon: 0, poniedzialek: 0, pon: 0,
+        tuesday: 1, tue: 1, wtorek: 1, wt: 1,
+        wednesday: 2, wed: 2, sroda: 2, sr: 2,
+        thursday: 3, thu: 3, czwartek: 3, czw: 3,
+        friday: 4, fri: 4, piatek: 4, pt: 4
+    };
+
+    return aliases[value] ?? -1;
+}
+
+function updateWeeklyHeading() {
+    const config = {
+        class: ["Klasa:", "Class:"],
+        teacher: ["Nauczyciel:", "Teacher:"],
+        room: ["Sala:", "Room:"]
+    }[currentTimetableView] ?? ["Klasa:", "Class:"];
+
+    const eyebrow =
+        document.getElementById("timetableWeeklyEyebrow");
+    const title =
+        document.getElementById("timetableWeeklyTitle");
+    const label =
+        document.getElementById("timetableWeeklySelectorLabel");
+    const selector =
+        document.getElementById("timetableWeeklySelector");
+
+    if (eyebrow) {
+        eyebrow.textContent =
+            weeklyText("Plan tygodniowy", "Weekly timetable");
+    }
+    if (label) {
+        label.textContent = weeklyText(config[0], config[1]);
+    }
+    if (title) {
+        title.textContent =
+            selector?.selectedOptions?.[0]?.textContent ??
+            "";
+    }
+
+    const headers = document.querySelectorAll(
+        "#timetableWeeklyTable thead th"
+    );
+
+    if (headers.length >= 6) {
+        headers[0].textContent =
+            weeklyText("Lekcja", "Lesson");
+
+        WEEK_DAYS.forEach((day, index) => {
+            headers[index + 1].textContent =
+                weeklyText(day[0], day[1]);
+        });
+    }
+}
+
+function weeklyText(pl, en) {
+    return document.documentElement.lang
+        ?.toLowerCase() === "pl"
+        ? pl
+        : en;
+}
+
+
 function clearOptimizationResult() {
     setResultMessage(
         "neutral",
@@ -433,6 +783,9 @@ function clearOptimizationResult() {
     setStatusText(t("optimization.ready"));
     setTimetableMessage(t("table.noTimetable"));
     resetAllFilters();
+    currentScheduledLessons = [];
+    currentTimetableView = "list";
+    renderCurrentTimetableView();
     clearLastOptimizationResultFromStorage();
 }
 

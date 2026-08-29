@@ -591,5 +591,7 @@
   "lessons.subjectsLoadFailed": "Nie udało się wczytać przedmiotów.",
   "lessons.teachersLoadFailed": "Nie udało się wczytać nauczycieli.",
   "lessons.classesLoadFailed": "Nie udało się wczytać klas.",
-  "common.new": "Nowy"
+  "common.new": "Nowy",
+  "optimization.generation": "Generacja",
+  "optimization.feasibleSolutionFound": "Znaleziono poprawne rozwiązanie"
 }

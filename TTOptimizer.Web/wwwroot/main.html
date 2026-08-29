@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/welcome-guide.css" />
     <link rel="stylesheet" href="css/school-readiness.css" />
+    <link rel="stylesheet" href="css/timetable-weekly.css" />
 </head>
 
 <body>
@@ -327,50 +328,86 @@
                         </div>
 
                         <div id="timetableContent">
-                            <div class="filters-row">
-                                <label>
-                                    <span data-i18n="filter.class">Class:</span>
-                                    <select id="classFilter">
-                                        <option value="" data-i18n="filter.allClasses">All classes</option>
-                                    </select>
-                                </label>
-
-                                <label>
-                                    <span data-i18n="filter.teacher">Teacher:</span>
-                                    <select id="teacherFilter">
-                                        <option value="" data-i18n="filter.allTeachers">All teachers</option>
-                                    </select>
-                                </label>
-
-                                <label>
-                                    <span data-i18n="filter.room">Room:</span>
-                                    <select id="roomFilter">
-                                        <option value="" data-i18n="filter.allRooms">All rooms</option>
-                                    </select>
-                                </label>
+                            <div class="timetable-view-toolbar">
+                                <button class="app-button app-button-secondary timetable-view-button active" type="button" data-view="list">Lista</button>
+                                <button class="app-button app-button-secondary timetable-view-button" type="button" data-view="class">Klasa</button>
+                                <button class="app-button app-button-secondary timetable-view-button" type="button" data-view="teacher">Nauczyciel</button>
+                                <button class="app-button app-button-secondary timetable-view-button" type="button" data-view="room">Sala</button>
                             </div>
 
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th data-i18n="table.day">Day</th>
-                                        <th data-i18n="table.slot">Slot</th>
-                                        <th data-i18n="table.lesson">Lesson</th>
-                                        <th data-i18n="table.class">Class</th>
-                                        <th data-i18n="table.subject">Subject</th>
-                                        <th data-i18n="table.teacher">Teacher</th>
-                                        <th data-i18n="table.room">Room</th>
-                                    </tr>
-                                </thead>
+                            <div id="timetableListView">
+                                <div class="filters-row">
+                                    <label>
+                                        <span data-i18n="filter.class">Class:</span>
+                                        <select id="classFilter">
+                                            <option value="" data-i18n="filter.allClasses">All classes</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span data-i18n="filter.teacher">Teacher:</span>
+                                        <select id="teacherFilter">
+                                            <option value="" data-i18n="filter.allTeachers">All teachers</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span data-i18n="filter.room">Room:</span>
+                                        <select id="roomFilter">
+                                            <option value="" data-i18n="filter.allRooms">All rooms</option>
+                                        </select>
+                                    </label>
+                                </div>
 
-                                <tbody id="timetableBody">
-                                    <tr>
-                                        <td colspan="7" data-i18n="table.noTimetable">No timetable generated yet.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        </div>
+                                <div class="timetable-table-scroll">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th data-i18n="table.day">Day</th>
+                                                <th data-i18n="table.slot">Slot</th>
+                                                <th data-i18n="table.lesson">Lesson</th>
+                                                <th data-i18n="table.class">Class</th>
+                                                <th data-i18n="table.subject">Subject</th>
+                                                <th data-i18n="table.teacher">Teacher</th>
+                                                <th data-i18n="table.room">Room</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="timetableBody">
+                                            <tr><td colspan="7" data-i18n="table.noTimetable">No timetable generated yet.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div id="timetableWeeklyView" class="timetable-weekly-view" hidden>
+                                <div class="timetable-weekly-heading">
+                                    <div>
+                                        <span id="timetableWeeklyEyebrow" class="timetable-weekly-eyebrow">Plan tygodniowy</span>
+                                        <h3 id="timetableWeeklyTitle">Wybierz element</h3>
+                                    </div>
+                                    <label class="timetable-weekly-selector">
+                                        <span id="timetableWeeklySelectorLabel">Wybierz:</span>
+                                        <select id="timetableWeeklySelector"></select>
+                                    </label>
+                                </div>
+
+                                <div class="timetable-weekly-table-scroll">
+                                    <table id="timetableWeeklyTable" class="data-table timetable-weekly-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="timetable-slot-column">Lekcja</th>
+                                                <th>Poniedziałek</th>
+                                                <th>Wtorek</th>
+                                                <th>Środa</th>
+                                                <th>Czwartek</th>
+                                                <th>Piątek</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="timetableWeeklyBody">
+                                            <tr><td colspan="6">Brak planu lekcji.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>                        </div>
                     </section>
 
                 </div>

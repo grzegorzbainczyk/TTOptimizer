@@ -591,5 +591,7 @@
   "lessons.subjectsLoadFailed": "Could not load subjects.",
   "lessons.teachersLoadFailed": "Could not load teachers.",
   "lessons.classesLoadFailed": "Could not load classes.",
-  "common.new": "New"
+  "common.new": "New",
+  "optimization.generation": "Generation",
+  "optimization.feasibleSolutionFound": "Feasible solution found"
 }

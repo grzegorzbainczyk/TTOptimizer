@@ -2531,7 +2531,21 @@ function getApiErrorMessage(
         const storedGrade = state.gradeByClassId.get(classId);
 
         if (storedRows && Number(storedGrade) === Number(grade)) {
-            storedRows.forEach(refreshAction);
+            storedRows.forEach(row => {
+                if (
+                    !row.teacherId &&
+                    !row.existingRequirementId &&
+                    row.subjectId
+                ) {
+                    row.teacherId =
+                        state.lastTeacherBySubjectId.get(
+                            Number(row.subjectId)
+                        ) ?? null;
+                }
+
+                refreshAction(row);
+            });
+
             return storedRows;
         }
 
