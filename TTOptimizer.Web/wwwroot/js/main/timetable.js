@@ -517,7 +517,8 @@ function populateWeeklySelector() {
 
 function getPerspectiveValue(lesson, view) {
     if (view === "class") {
-        return getClassValue(lesson);
+        return getStudentGroupValue(lesson) ||
+            getClassValue(lesson);
     }
     if (view === "teacher") {
         return getTeacherValue(lesson);
@@ -532,6 +533,12 @@ function getClassValue(lesson) {
     return lesson.classGroup ??
         lesson.classGroupName ??
         lesson.classGroupId ??
+        "";
+}
+
+function getStudentGroupValue(lesson) {
+    return lesson.studentGroup ??
+        lesson.studentGroupName ??
         "";
 }
 
@@ -643,6 +650,15 @@ function createWeeklyLessonCard(lesson) {
     card.appendChild(subject);
 
     const details = [];
+
+    const studentGroup = getStudentGroupValue(lesson);
+
+    if (studentGroup) {
+        details.push([
+            weeklyText("Grupa", "Group"),
+            studentGroup
+        ]);
+    }
 
     if (currentTimetableView !== "class") {
         details.push([

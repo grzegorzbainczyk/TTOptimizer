@@ -1,14 +1,15 @@
 const NAVIGATION_TARGETS = {
-    schoolButton: "school.html",
-    buildingsButton: "buildings.html",
-    roomsButton: "rooms.html",
-    classesButton: "classes.html",
-    studentGroupsButton: "student-groups.html",
-    subjectsButton: "subjects.html",
+    setupButton: "setup.html",
     teachersButton: "teachers.html",
+    classesButton: "classes.html",
+    roomsButton: "rooms.html",
+    subjectsButton: "subjects.html",
+    studentGroupsButton: "student-groups.html",
+    schoolButton: "school.html",
     requirementsButton: "requirements.html",
     additionalLessonsButton: "requirements.html?mode=additional",
     organizationPreferencesButton: "organization-preferences.html",
+    rulesButton: "rules.html",
     aboutProjectButton: "about.html",
     optimizationSettingsButton: "optimization-settings.html"
 };
@@ -23,6 +24,7 @@ function setupNavigationButton(buttonId, targetUrl) {
     const button = document.getElementById(buttonId);
 
     if (!button) {
+        console.warn(`${buttonId} not found`);
         return;
     }
 

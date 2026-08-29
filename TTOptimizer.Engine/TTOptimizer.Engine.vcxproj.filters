@@ -61,6 +61,9 @@
     <Filter Include="Header Files\Decoding">
       <UniqueIdentifier>{3c9f9604-84b8-4ef3-ae04-257fcbffa465}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\IO">
+      <UniqueIdentifier>{6a26bbdc-af20-4d3d-ad3e-8848cc5e7df6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -72,11 +75,11 @@
     <ClCompile Include="src\Optimization\GeneticOptimizer.cpp">
       <Filter>Source Files\Optimization</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Optimization\ThreadPool.cpp">
       <Filter>Source Files\Optimization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,9 +146,6 @@
     <ClInclude Include="include\Generators\ChromosomeFactory.h">
       <Filter>Header Files\Generators</Filter>
     </ClInclude>
-    <ClInclude Include="include\ChromosomeDecoder.h">
-      <Filter>Header Files\Decoding</Filter>
-    </ClInclude>
     <ClInclude Include="include\Evaluation\Rules\ConstraintRuleContext.h">
       <Filter>Header Files\Evaluation\Rules</Filter>
     </ClInclude>
@@ -163,6 +163,15 @@
     </ClInclude>
     <ClInclude Include="include\Utils\DayOfWeekConverter.h">
       <Filter>Header Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IO\JsonReader.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IO\JsonWriter.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Decoding\ChromosomeDecoder.h">
+      <Filter>Header Files\Decoding</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

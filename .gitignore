@@ -42,3 +42,4 @@ packages/
 appsettings.Development.json
 
 TTOptimizer.Web/App_Data/OptimizationRuns/
+FilesFlatFolder/

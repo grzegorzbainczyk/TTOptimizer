@@ -11,6 +11,12 @@ let curriculumTeacherAssignments = [];
 let teachingPlanRowFilter = "all";
 let teachingPlanClassSelections = [];
 
+const requirementsPageMode =
+    new URLSearchParams(window.location.search).get("mode");
+
+const isAdditionalLessonsMode =
+    requirementsPageMode === "additional";
+
 document.addEventListener("DOMContentLoaded", async () => {
     await initializeI18n();
     configureLessonsPageLanguage();
@@ -198,6 +204,69 @@ function configureLessonsPageLanguage() {
     setText("cancelNewSubjectButton", text.cancel);
     setText("backToMainButton", text.back);
     setText("refreshRequirementsButton", text.refresh);
+
+    configureAdditionalLessonsMode();
+}
+
+function configureAdditionalLessonsMode() {
+    if (!isAdditionalLessonsMode) {
+        return;
+    }
+
+    document.title = "ClassFlow - Zajęcia dodatkowe";
+
+    const setText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    };
+
+    setText("requirementsPageLabel", "Dane planu lekcji");
+    setText("requirementsPageTitle", "Zajęcia dodatkowe");
+    setText(
+        "requirementsPageSubtitle",
+        "Dodawaj zajęcia indywidualne, wyrównawcze, koła zainteresowań i inne zajęcia dodatkowe."
+    );
+    setText("requirementsListTitle", "Lista zajęć dodatkowych");
+    setText(
+        "requirementsListDescription",
+        "Możesz utworzyć ucznia lub małą grupę bezpośrednio podczas dodawania zajęć."
+    );
+    setText("addRequirementButtonLabel", "Dodaj zajęcia dodatkowe");
+    setText("requirementNameLabel", "Nazwa zajęć");
+    setText("requirementStudentGroupLabel", "Uczeń / grupa");
+    setText("requirementsNameHeader", "Zajęcia");
+    setText("requirementsStudentGroupHeader", "Uczeń / grupa");
+
+    const importButton =
+        document.getElementById("importCurriculumButton");
+
+    if (importButton) {
+        importButton.hidden = true;
+    }
+
+    const subjectField =
+        document.getElementById("requirementSubjectField");
+
+    if (subjectField) {
+        subjectField.hidden = true;
+    }
+
+    const subjectHeader =
+        document.getElementById("requirementsSubjectHeader");
+
+    if (subjectHeader) {
+        subjectHeader.hidden = true;
+    }
+
+    const quickCreateGroupButton =
+        document.getElementById("newStudentGroupButton");
+
+    if (quickCreateGroupButton) {
+        quickCreateGroupButton.textContent =
+            "Zarządzaj uczniami / grupami";
+    }
 }
 
 async function refreshPageData() {
@@ -393,8 +462,14 @@ async function loadRequirements() {
             : data?.requirements ?? [];
 
         availableRequirements = requirements;
-        renderRequirements(requirements);
-        updateRequirementsCount(requirements.length);
+
+        const visibleRequirements =
+            isAdditionalLessonsMode
+                ? requirements.filter(item => Boolean(item.isAdditional))
+                : requirements;
+
+        renderRequirements(visibleRequirements);
+        updateRequirementsCount(visibleRequirements.length);
     } catch (error) {
         console.error(
             "Error loading requirements:",
@@ -440,16 +515,22 @@ function renderRequirements(requirements) {
         row.className = "teacher-row";
 
         row.appendChild(
-            createTableCell(requirement.name)
+            createTableCell(
+                isAdditionalLessonsMode
+                    ? (requirement.subjectName ?? requirement.name)
+                    : requirement.name
+            )
         );
 
         row.appendChild(
             createTableCell(requirement.studentGroupName)
         );
 
-        row.appendChild(
-            createTableCell(requirement.subjectName)
-        );
+        if (!isAdditionalLessonsMode) {
+            row.appendChild(
+                createTableCell(requirement.subjectName)
+            );
+        }
 
         row.appendChild(
             createTableCell(requirement.teacherName)
@@ -617,15 +698,64 @@ function populateStudentGroupOptions() {
 
     select.appendChild(emptyOption);
 
-    availableStudentGroups.forEach(studentGroup => {
+    const groupsToShow =
+        isAdditionalLessonsMode
+            ? availableStudentGroups.filter(
+                studentGroup =>
+                    studentGroup.type === 3 ||
+                    studentGroup.type === "Individual" ||
+                    studentGroup.typeName === "Individual"
+            )
+            : availableStudentGroups;
+
+    groupsToShow.forEach(studentGroup => {
         const option =
             document.createElement("option");
 
         option.value = studentGroup.id;
-        option.textContent = studentGroup.name;
+
+        if (isAdditionalLessonsMode) {
+            const classGroup =
+                availableClasses.find(
+                    item =>
+                        Number(item.id) ===
+                        Number(studentGroup.classGroupId)
+                );
+
+            const className =
+                classGroup?.name?.trim() ?? "";
+
+            const storedName =
+                String(studentGroup.name ?? "");
+
+            const prefix =
+                className
+                    ? `${className} - `
+                    : "";
+
+            const displayName =
+                prefix && storedName.startsWith(prefix)
+                    ? storedName.slice(prefix.length)
+                    : storedName;
+
+            option.textContent =
+                className
+                    ? `${displayName} (${className})`
+                    : displayName;
+        } else {
+            option.textContent = studentGroup.name;
+        }
 
         select.appendChild(option);
     });
+
+    if (
+        isAdditionalLessonsMode &&
+        groupsToShow.length === 0
+    ) {
+        emptyOption.textContent =
+            "Najpierw dodaj ucznia / grupę";
+    }
 
     select.value = selectedValue;
 }
@@ -693,6 +823,12 @@ function populateNewStudentGroupClassOptions() {
 }
 
 function openNewStudentGroupPanel() {
+    if (isAdditionalLessonsMode) {
+        window.location.href =
+            "student-groups.html#additionalParticipantsSection";
+        return;
+    }
+
     const panel = document.getElementById("newStudentGroupPanel");
     if (!panel) {
         return;
@@ -1773,26 +1909,48 @@ function openAddRequirementForm() {
 
     document.getElementById(
         "requirementIsAdditional"
-    ).checked = false;
+    ).checked = isAdditionalLessonsMode;
+
+    if (isAdditionalLessonsMode) {
+        document.getElementById(
+            "requirementPriority"
+        ).value = "0";
+
+        const additionalCheckbox =
+            document.getElementById("requirementIsAdditional");
+
+        const additionalField =
+            additionalCheckbox?.closest(".form-field");
+
+        if (additionalField) {
+            additionalField.hidden = true;
+        }
+    }
 
     document.getElementById(
         "requirementName"
     ).placeholder =
-        "Optional for regular lessons";
+        isAdditionalLessonsMode
+            ? "np. Matematyka wyrównawcza, Szachy"
+            : "Optional for regular lessons";
 
     clearRequirementFormMessage();
 
     document.getElementById(
         "requirementFormTitle"
     ).textContent =
-        getLessonsPageText().addLessonForm;
+        isAdditionalLessonsMode
+            ? "Dodaj zajęcia dodatkowe"
+            : getLessonsPageText().addLessonForm;
 
     document.getElementById(
         "requirementFormSection"
     ).hidden = false;
 
     document.getElementById(
-        "requirementStudentGroupId"
+        isAdditionalLessonsMode
+            ? "requirementName"
+            : "requirementStudentGroupId"
     ).focus();
 }
 
@@ -1805,7 +1963,9 @@ function openEditRequirementForm(requirement) {
     document.getElementById(
         "requirementName"
     ).value =
-        requirement.name ?? "";
+        isAdditionalLessonsMode
+            ? (requirement.subjectName ?? requirement.name ?? "")
+            : (requirement.name ?? "");
 
     document.getElementById(
         "requirementStudentGroupId"
@@ -1842,7 +2002,9 @@ function openEditRequirementForm(requirement) {
     document.getElementById(
         "requirementFormTitle"
     ).textContent =
-        getLessonsPageText().editLessonForm;
+        isAdditionalLessonsMode
+            ? "Edytuj zajęcia dodatkowe"
+            : getLessonsPageText().editLessonForm;
 
     document.getElementById(
         "requirementFormSection"
@@ -1866,6 +2028,71 @@ function closeRequirementForm() {
     clearRequirementFormMessage();
 }
 
+function normalizeAdditionalSubjectName(value) {
+    return (value ?? "")
+        .toString()
+        .trim()
+        .toLocaleLowerCase("pl-PL")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, " ");
+}
+
+async function ensureAdditionalSubject(activityName) {
+    const normalized =
+        normalizeAdditionalSubjectName(activityName);
+
+    const existing = availableSubjects.find(
+        subject =>
+            normalizeAdditionalSubjectName(subject.name) === normalized
+    );
+
+    if (existing) {
+        return Number(existing.id);
+    }
+
+    const organizationId =
+        window.appContext.requireOrganizationId();
+
+    const response = await fetch(
+        `/api/subjects?organizationId=${encodeURIComponent(
+            organizationId
+        )}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: activityName,
+                info: "Zajęcia dodatkowe"
+            })
+        }
+    );
+
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+        throw new Error(
+            getApiErrorMessage(
+                data,
+                `Could not create subject. Status: ${response.status}`
+            )
+        );
+    }
+
+    const subjectId = Number(data?.id);
+
+    if (subjectId <= 0) {
+        throw new Error(
+            "Nie udało się odczytać identyfikatora utworzonych zajęć."
+        );
+    }
+
+    await loadSubjects();
+    return subjectId;
+}
+
 async function saveRequirement() {
     const requirementId =
         document.getElementById(
@@ -1884,7 +2111,7 @@ async function saveRequirement() {
             ).value
         );
 
-    const subjectId =
+    let subjectId =
         Number(
             document.getElementById(
                 "requirementSubjectId"
@@ -1917,16 +2144,26 @@ async function saveRequirement() {
             "requirementIsAdditional"
         ).checked;
 
+    if (isAdditionalLessonsMode && !name) {
+        showRequirementFormMessage(
+            "Nazwa zajęć jest wymagana.",
+            true
+        );
+        return;
+    }
+
     if (studentGroupId <= 0) {
         showRequirementFormMessage(
-            "Student group is required.",
+            isAdditionalLessonsMode
+                ? "Wybierz ucznia lub grupę."
+                : "Student group is required.",
             true
         );
 
         return;
     }
 
-    if (subjectId <= 0) {
+    if (!isAdditionalLessonsMode && subjectId <= 0) {
         showRequirementFormMessage(
             "Subject is required.",
             true
@@ -1966,14 +2203,37 @@ async function saveRequirement() {
         return;
     }
 
+    const effectivePriority =
+        isAdditionalLessonsMode ? 0 : priority;
+
+    const effectiveIsAdditional =
+        isAdditionalLessonsMode ? true : isAdditional;
+
+    try {
+        if (isAdditionalLessonsMode) {
+            subjectId =
+                await ensureAdditionalSubject(name);
+        }
+    } catch (error) {
+        showRequirementFormMessage(
+            error instanceof Error
+                ? error.message
+                : "Nie udało się przygotować nazwy zajęć.",
+            true
+        );
+        return;
+    }
+
     const requestBody = {
-        name: name || null,
+        name: isAdditionalLessonsMode
+            ? null
+            : (name || null),
         teacherId,
         studentGroupId,
         subjectId,
         hoursPerWeek,
-        priority,
-        isAdditional
+        priority: effectivePriority,
+        isAdditional: effectiveIsAdditional
     };
 
     const isEditing =

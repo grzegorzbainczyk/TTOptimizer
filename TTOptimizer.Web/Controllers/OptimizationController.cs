@@ -130,17 +130,61 @@ public class OptimizationController : ControllerBase
         var roomsById =
             problem.Rooms.ToDictionary(x => x.Id);
 
+        var studentGroupsById =
+            problem.StudentGroups.ToDictionary(x => x.Id);
+
+        string ResolveClassGroupName(EngineScheduledLessonDto lesson)
+        {
+            if (lesson.ClassGroupId > 0 &&
+                classGroupsById.TryGetValue(
+                    lesson.ClassGroupId,
+                    out var directClassGroup))
+            {
+                return directClassGroup.Name;
+            }
+
+            if (lesson.StudentGroupId > 0 &&
+                studentGroupsById.TryGetValue(
+                    lesson.StudentGroupId,
+                    out var studentGroup))
+            {
+                var classNames = studentGroup.ClassGroupIds
+                    .Where(classGroupsById.ContainsKey)
+                    .Select(classGroupId => classGroupsById[classGroupId].Name)
+                    .Distinct()
+                    .ToList();
+
+                if (classNames.Count > 0)
+                {
+                    return string.Join(" + ", classNames);
+                }
+            }
+
+            return lesson.ClassGroupId > 0
+                ? $"Class #{lesson.ClassGroupId}"
+                : string.Empty;
+        }
+
+        string ResolveStudentGroupName(EngineScheduledLessonDto lesson)
+        {
+            if (lesson.StudentGroupId > 0 &&
+                studentGroupsById.TryGetValue(
+                    lesson.StudentGroupId,
+                    out var studentGroup))
+            {
+                return studentGroup.Name;
+            }
+
+            return string.Empty;
+        }
+
         var scheduledLessonViews = engineResult.ScheduledLessons
             .Select(x => new ScheduledLessonViewDto
             {
                 LessonInstanceId = x.LessonInstanceId,
                 RequirementId = x.RequirementId,
-                ClassGroup =
-                    classGroupsById.TryGetValue(
-                        x.ClassGroupId,
-                        out var classGroup)
-                        ? classGroup.Name
-                        : $"Class #{x.ClassGroupId}",
+                ClassGroup = ResolveClassGroupName(x),
+                StudentGroup = ResolveStudentGroupName(x),
                 Subject =
                     subjectsById.TryGetValue(
                         x.SubjectId,

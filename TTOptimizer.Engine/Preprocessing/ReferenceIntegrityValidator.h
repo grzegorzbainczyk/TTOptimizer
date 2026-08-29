@@ -26,21 +26,6 @@ public:
     }
 
 private:
-    static bool studentGroupExists(
-        const TimetableProblem& problem,
-        StudentGroupId studentGroupId)
-    {
-        return std::any_of(
-            problem.studentGroups.begin(),
-            problem.studentGroups.end(),
-            [studentGroupId](
-                const StudentGroup& studentGroup)
-            {
-                return studentGroup.id ==
-                    studentGroupId;
-            });
-    }
-
     static void validateLessonRequirements(
         const TimetableProblem& problem,
         std::vector<PreprocessingIssue>& issues)
@@ -72,41 +57,12 @@ private:
                 issues.push_back(std::move(issue));
             }
 
-            // New model:
-            // StudentGroupId is the primary scheduling target.
-            if (requirement.studentGroupId != 0)
-            {
-                if (!studentGroupExists(
+            // StudentGroupId is the primary scheduling target in the new model.
+            // ClassGroupId is kept only for legacy / compatibility requirements.
+            if (requirement.studentGroupId == 0 &&
+                !classGroupExists(
                     problem,
-                    requirement.studentGroupId))
-                {
-                    PreprocessingIssue issue;
-
-                    issue.code =
-                        PreprocessingIssueCode::
-                        ClassGroupNotFound;
-
-                    issue.requirementId = requirement.id;
-                    issue.teacherId = requirement.teacherId;
-                    issue.classGroupId = requirement.classGroupId;
-                    issue.subjectId = requirement.subjectId;
-
-                    issue.message =
-                        "Lesson requirement "
-                        + std::to_string(requirement.id)
-                        + " references student group "
-                        + std::to_string(
-                            requirement.studentGroupId)
-                        + ", but this student group does not exist.";
-
-                    issues.push_back(std::move(issue));
-                }
-            }
-            // Legacy model:
-            // validate ClassGroupId only when there is no StudentGroupId.
-            else if (!classGroupExists(
-                problem,
-                requirement.classGroupId))
+                    requirement.classGroupId))
             {
                 PreprocessingIssue issue;
 
@@ -123,9 +79,34 @@ private:
                     "Lesson requirement "
                     + std::to_string(requirement.id)
                     + " references class group "
-                    + std::to_string(
-                        requirement.classGroupId)
+                    + std::to_string(requirement.classGroupId)
                     + ", but this class group does not exist.";
+
+                issues.push_back(std::move(issue));
+            }
+
+            if (requirement.studentGroupId != 0 &&
+                !studentGroupExists(
+                    problem,
+                    requirement.studentGroupId))
+            {
+                PreprocessingIssue issue;
+
+                issue.code =
+                    PreprocessingIssueCode::
+                    ClassGroupNotFound;
+
+                issue.requirementId = requirement.id;
+                issue.teacherId = requirement.teacherId;
+                issue.classGroupId = requirement.classGroupId;
+                issue.subjectId = requirement.subjectId;
+
+                issue.message =
+                    "Lesson requirement "
+                    + std::to_string(requirement.id)
+                    + " references student group "
+                    + std::to_string(requirement.studentGroupId)
+                    + ", but this student group does not exist.";
 
                 issues.push_back(std::move(issue));
             }
@@ -302,6 +283,19 @@ private:
             [classGroupId](const ClassGroup& classGroup)
             {
                 return classGroup.id == classGroupId;
+            });
+    }
+
+    static bool studentGroupExists(
+        const TimetableProblem& problem,
+        StudentGroupId studentGroupId)
+    {
+        return std::any_of(
+            problem.studentGroups.begin(),
+            problem.studentGroups.end(),
+            [studentGroupId](const StudentGroup& studentGroup)
+            {
+                return studentGroup.id == studentGroupId;
             });
     }
 

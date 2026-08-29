@@ -75,6 +75,34 @@ public class TimetableProblemBuilderService
             }
         }
 
+        var studentGroupById =
+            studentGroupEntities.ToDictionary(group => group.Id);
+
+        foreach (var requirement in lessonRequirements)
+        {
+            if (requirement.ClassGroupId.HasValue ||
+                !requirement.StudentGroupId.HasValue)
+            {
+                continue;
+            }
+
+            if (!studentGroupById.TryGetValue(
+                    requirement.StudentGroupId.Value,
+                    out var studentGroup))
+            {
+                continue;
+            }
+
+            // Individual and subgroup requirements target a concrete source class.
+            // Keep ClassGroupId as compatibility data for the optimizer input,
+            // while StudentGroupId remains the real scheduling target.
+            if (studentGroup.ClassGroupId.HasValue)
+            {
+                requirement.ClassGroupId =
+                    studentGroup.ClassGroupId.Value;
+            }
+        }
+
         var studentGroups = BuildStudentGroupInputs(studentGroupEntities);
         var studentGroupConflicts = BuildStudentGroupConflicts(studentGroupEntities);
 

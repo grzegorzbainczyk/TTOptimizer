@@ -127,14 +127,14 @@
                 </h3>
 <input id="requirementId" type="hidden"/>
 <div class="form-grid teachers-form-grid">
-<div class="form-field">
-<label for="requirementName">
+<div class="form-field" id="requirementNameField">
+<label id="requirementNameLabel" for="requirementName">
                             Name
                         </label>
 <input data-i18n-placeholder="lessons.namePlaceholder" id="requirementName" maxlength="200" type="text" placeholder="Optional for regular lessons"/>
 </div>
-<div class="form-field">
-<label for="requirementStudentGroupId">
+<div class="form-field" id="requirementStudentGroupField">
+<label id="requirementStudentGroupLabel" for="requirementStudentGroupId">
                             Student group
                         </label>
 <div class="resource-select-with-action">
@@ -176,7 +176,7 @@
        id="newStudentGroupMessage"></p>
 </div>
 </div>
-<div class="form-field">
+<div class="form-field" id="requirementSubjectField">
 <label for="requirementSubjectId">
                             Subject
                         </label>
@@ -265,9 +265,9 @@
 <table class="data-table teachers-table" id="requirementsTable">
 <thead>
 <tr>
-<th data-i18n="common.name">Name</th>
-<th data-i18n="lessons.studentGroup">Student group</th>
-<th data-i18n="lessons.curriculumSubject">Subject</th>
+<th id="requirementsNameHeader" data-i18n="common.name">Name</th>
+<th id="requirementsStudentGroupHeader" data-i18n="lessons.studentGroup">Student group</th>
+<th id="requirementsSubjectHeader" data-i18n="lessons.curriculumSubject">Subject</th>
 <th data-i18n="lessons.curriculumTeacher">Teacher</th>
 <th data-i18n="lessons.curriculumHours">Hours/week</th>
 <th data-i18n="lessons.priority">Priority</th>

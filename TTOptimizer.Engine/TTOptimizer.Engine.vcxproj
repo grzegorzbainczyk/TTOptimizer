@@ -131,7 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Engine\Engine.cpp" />
+    <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Evaluation\FitnessEvaluator.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Optimization\GeneticOptimizer.cpp" />
@@ -139,7 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\nlohmann\json.hpp" />
-    <ClInclude Include="include\ChromosomeDecoder.h" />
+    <ClInclude Include="include\Decoding\ChromosomeDecoder.h" />
     <ClInclude Include="include\Domain\TimetableModels.h" />
     <ClInclude Include="include\Domain\TimetableProblem.h" />
     <ClInclude Include="include\Evaluation\ConstraintViolation.h" />
@@ -154,6 +154,8 @@
     <ClInclude Include="include\Generators\ChromosomeFactory.h" />
     <ClInclude Include="include\Generators\LessonInstanceGenerator.h" />
     <ClInclude Include="include\Generators\ScheduleSlotGenerator.h" />
+    <ClInclude Include="include\IO\JsonReader.h" />
+    <ClInclude Include="include\IO\JsonWriter.h" />
     <ClInclude Include="include\Optimization\ChromosomeMutator.h" />
     <ClInclude Include="include\Optimization\GeneticOptimizer.h" />
     <ClInclude Include="include\Engine.h" />

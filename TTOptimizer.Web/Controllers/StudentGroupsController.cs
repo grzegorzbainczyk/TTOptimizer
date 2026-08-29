@@ -202,11 +202,25 @@ public class StudentGroupsController : ControllerBase
         if (group == null)
             return NotFound(new { message = "Student group was not found." });
         if (group.Type == StudentGroupType.WholeClass)
-            return BadRequest(new { message = "The whole-class group is managed automatically with its class." });
+            return BadRequest(new
+            {
+                code = "whole_class_managed",
+                message = "The whole-class group is managed automatically with its class."
+            });
+
         if (await _db.LessonRequirements.AnyAsync(x => x.StudentGroupId == id))
-            return Conflict(new { message = "Student group is used by lesson requirements." });
+            return Conflict(new
+            {
+                code = "group_used_by_lessons",
+                message = "Student group is used by lesson requirements."
+            });
+
         if (await _db.StudentGroupMembers.AnyAsync(x => x.MemberGroupId == id))
-            return Conflict(new { message = "Student group is used by a combined group." });
+            return Conflict(new
+            {
+                code = "group_used_by_combined",
+                message = "Student group is used by a combined group."
+            });
 
         _db.StudentGroups.Remove(group);
         await _db.SaveChangesAsync();
@@ -223,9 +237,16 @@ public class StudentGroupsController : ControllerBase
             return NotFound(new { message = "Division was not found." });
 
         var ids = division.StudentGroups.Select(x => x.Id).ToList();
-        if (await _db.LessonRequirements.AnyAsync(x => x.StudentGroupId.HasValue && ids.Contains(x.StudentGroupId.Value)) ||
-            await _db.StudentGroupMembers.AnyAsync(x => ids.Contains(x.MemberGroupId)))
-            return Conflict(new { message = "Division contains groups that are already in use." });
+        if (await _db.LessonRequirements.AnyAsync(
+                x => x.StudentGroupId.HasValue &&
+                     ids.Contains(x.StudentGroupId.Value)) ||
+            await _db.StudentGroupMembers.AnyAsync(
+                x => ids.Contains(x.MemberGroupId)))
+            return Conflict(new
+            {
+                code = "division_in_use",
+                message = "Division contains groups that are already in use."
+            });
 
         _db.StudentGroupDivisions.Remove(division);
         await _db.SaveChangesAsync();

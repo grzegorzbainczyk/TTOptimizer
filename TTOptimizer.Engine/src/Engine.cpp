@@ -17,7 +17,7 @@
 #include "Optimization/OptimizationProgress.h"
 #include "Engine/Engine.h"
 #include "Decoding/ChromosomeDecoder.h"
-#include "Serialization/ResultJsonWriter.h"
+#include "Serialization/JsonWriter.h"
 #include "Preprocessing/TimetablePreprocessor.h"
 
 int Engine::execute(const TimetableProblem& problem, std::string& result)
@@ -25,7 +25,7 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
     try
     {
         TimetablePreprocessor preprocessor;
-        ResultJsonWriter writer;
+        JsonWriter writer;
 
         PreprocessingResult preprocessingResult = preprocessor.process(problem);
 
@@ -50,7 +50,21 @@ int Engine::execute(const TimetableProblem& problem, std::string& result)
                     { "type", "progress" },
                     { "generation", progress.generation },
                     { "totalGenerations", progress.totalGenerations },
-                    { "percentage", progress.percentage }
+                    { "percentage", progress.percentage },
+                    { "bestFoundAtGeneration", progress.bestFoundAtGeneration },
+                    {
+                        "best",
+                        {
+                            {
+                                "hardViolationCount",
+                                progress.best.hardViolationCount
+                            },
+                            {
+                                "softPenalty",
+                                progress.best.softPenalty
+                            }
+                        }
+                    }
                 };
 
                 std::cout << message.dump() << '\n' << std::flush;

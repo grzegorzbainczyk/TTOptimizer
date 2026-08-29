@@ -171,6 +171,12 @@ public class EngineScheduledLessonDto
     public int ClassGroupId { get; set; }
 
     /// <summary>
+    /// Gets or sets the identifier of the student group assigned to the lesson.
+    /// Zero means that the legacy ClassGroupId is used directly.
+    /// </summary>
+    public int StudentGroupId { get; set; }
+
+    /// <summary>
     /// Gets or sets the identifier of the subject assigned to the lesson.
     /// </summary>
     public int SubjectId { get; set; }
@@ -217,6 +223,11 @@ public class ScheduledLessonViewDto
     /// Gets or sets the display name of the class group.
     /// </summary>
     public string ClassGroup { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the display name of the student group, when applicable.
+    /// </summary>
+    public string StudentGroup { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the display name of the subject.

@@ -17,6 +17,11 @@ document.addEventListener(
                 "backToMainButton"
             );
 
+        const manageBuildingsButton =
+            document.getElementById(
+                "manageBuildingsButton"
+            );
+
         const refreshRoomsButton =
             document.getElementById(
                 "refreshRoomsButton"
@@ -42,6 +47,13 @@ document.addEventListener(
             () => {
                 window.location.href =
                     "main.html";
+            }
+        );
+
+        manageBuildingsButton?.addEventListener(
+            "click",
+            () => {
+                window.location.href = "buildings.html";
             }
         );
 

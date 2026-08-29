@@ -61,6 +61,8 @@ public:
 
             scheduledLesson.lessonInstanceId =
                 lessonInstance.id;
+            
+            scheduledLesson.studentGroupId = requirement.studentGroupId;
 
             scheduledLesson.requirementId =
                 requirement.id;

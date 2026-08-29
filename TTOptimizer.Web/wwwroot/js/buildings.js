@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await initializeI18n();
     document.title = t("buildings.pageTitle", "ClassFlow - Buildings");
     document.getElementById("backToMainButton")?.addEventListener("click", () => {
-        window.location.href = "main.html";
+        window.location.href = "rooms.html";
     });
 
     document.getElementById("refreshBuildingsButton")?.addEventListener("click", loadBuildings);
