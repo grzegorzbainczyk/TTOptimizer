@@ -166,15 +166,43 @@
 <button class="secondary-button teachers-header-button" data-i18n="common.back" id="backToMainButton" type="button">
                     Back
                 </button>
-<button class="secondary-button teachers-header-button" id="manageBuildingsButton" type="button">
-                    Budynki
-                </button>
 <button class="secondary-button teachers-header-button" data-i18n="common.refresh" id="refreshRoomsButton" type="button">
                     Refresh
                 </button>
 </nav></div></header>
+
 <main class="content-card teachers-card">
-<div class="section-header teachers-section-header"><div><h2 data-i18n="rooms.listTitle">Rooms list</h2><p class="teachers-section-description"><span data-i18n="rooms.listDescription">Manage rooms, subject restrictions and room availability.</span></p></div>
+
+<section class="rooms-buildings-section">
+    <div class="section-header teachers-section-header">
+        <div>
+            <h2>Budynki i sale</h2>
+            <p class="teachers-section-description">
+                Zdefiniuj budynki szkoły i od razu dodaj znajdujące się w nich sale.
+                W większości szkół wystarczy jeden budynek.
+            </p>
+        </div>
+        <button class="primary-button teachers-add-button"
+                id="addBuildingInlineButton"
+                type="button">
+            <span aria-hidden="true">+</span>
+            Dodaj kolejny budynek
+        </button>
+    </div>
+
+    <div id="inlineBuildingsContainer"
+         class="inline-buildings-container">
+        <p class="teachers-table-state">Ładowanie budynków...</p>
+    </div>
+
+    <p id="inlineBuildingsMessage"
+       class="form-message"
+       aria-live="polite"></p>
+</section>
+
+<div class="rooms-list-divider"></div>
+
+<div class="section-header teachers-section-header"><div><h2>Wszystkie sale</h2><p class="teachers-section-description"><span data-i18n="rooms.listDescription">Manage rooms, subject restrictions and room availability.</span></p></div>
 <div class="teachers-header-actions">
 <button class="secondary-button" data-i18n="common.importXlsx" id="importRoomsButton" type="button">Import XLSX</button>
 <input accept=".xlsx" hidden="" id="roomImportFileInput" type="file"/>

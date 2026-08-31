@@ -580,3 +580,138 @@
         flex: 1 1 180px;
     }
 }
+
+
+/* =========================================================
+   Unified Buildings & Rooms editor on rooms.html
+   ========================================================= */
+
+.rooms-buildings-section {
+    margin-bottom: 1.5rem;
+}
+
+.inline-buildings-container {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1rem;
+}
+
+.inline-building-card {
+    padding: 1.2rem;
+    border: 1px solid #ddd6c8;
+    border-radius: 16px;
+    background: #fffdf8;
+    box-shadow: 0 8px 24px rgba(46, 52, 64, 0.06);
+}
+
+.inline-building-header,
+.inline-room-generator-heading,
+.inline-building-save-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.inline-building-header h3,
+.inline-room-generator-heading h4,
+.inline-room-generator-heading p {
+    margin: 0;
+}
+
+.inline-building-header h3 {
+    margin-top: 0.2rem;
+}
+
+.inline-building-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.inline-building-fields label,
+.inline-room-range label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.inline-building-fields small,
+.inline-room-range small {
+    color: #7a8089;
+    font-weight: 400;
+}
+
+.inline-building-save-row {
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.inline-building-status {
+    font-size: 0.9rem;
+}
+
+.inline-room-generator {
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid #e6dfd4;
+}
+
+.inline-room-generator-heading p {
+    margin-top: 0.25rem;
+    max-width: 720px;
+    color: #707782;
+    line-height: 1.45;
+}
+
+.inline-room-generator-disabled {
+    padding: 0.9rem 1rem;
+    border: 1px dashed #d5cec2;
+    border-radius: 12px;
+    background: #faf8f3;
+    color: #737983;
+}
+
+.inline-room-generator-disabled p {
+    margin: 0;
+}
+
+.inline-room-range {
+    display: grid;
+    grid-template-columns: minmax(85px, 120px) minmax(85px, 120px) minmax(150px, 220px) auto;
+    gap: 0.75rem;
+    align-items: end;
+    margin-top: 1rem;
+}
+
+.inline-building-room-list {
+    margin-top: 1rem;
+}
+
+.rooms-list-divider {
+    height: 1px;
+    margin: 1.5rem 0;
+    background: #e4ddd2;
+}
+
+@media (max-width: 760px) {
+    .inline-building-header,
+    .inline-room-generator-heading,
+    .inline-building-save-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .inline-building-fields,
+    .inline-room-range {
+        grid-template-columns: 1fr;
+    }
+
+    .inline-building-header button,
+    .inline-room-generator-heading button,
+    .inline-room-range button {
+        width: 100%;
+    }
+}

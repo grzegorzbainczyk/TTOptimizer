@@ -24,6 +24,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("cancelSchoolUnitButton")
         ?.addEventListener("click", closeSchoolUnitForm);
 
+    document.getElementById("backToMainAfterAddButton")
+        ?.addEventListener("click", () => {
+            window.location.href = "main.html";
+        });
+
+    document.getElementById("addAnotherSchoolButton")
+        ?.addEventListener("click", () => {
+            hideSchoolUnitNextActions();
+            showSchoolUnitsMessage("", false);
+            openAddSchoolUnitForm();
+        });
+
     await Promise.all([
         loadSchoolInformation(),
         loadSchoolUnits()
@@ -297,6 +309,8 @@ function renderSchoolUnits() {
 }
 
 function openAddSchoolUnitForm() {
+    hideSchoolUnitNextActions();
+
     document.getElementById("schoolUnitFormTitle")
         .textContent = "Dodaj szkołę";
 
@@ -313,6 +327,8 @@ function openAddSchoolUnitForm() {
 }
 
 function openEditSchoolUnitForm(schoolUnit) {
+    hideSchoolUnitNextActions();
+
     document.getElementById("schoolUnitFormTitle")
         .textContent = "Edytuj szkołę";
 
@@ -414,12 +430,19 @@ async function saveSchoolUnit() {
         closeSchoolUnitForm();
         await loadSchoolUnits();
 
-        showSchoolUnitsMessage(
-            id
-                ? "Szkoła została zaktualizowana."
-                : "Szkoła została dodana.",
-            false
-        );
+        if (id) {
+            showSchoolUnitsMessage(
+                "Szkoła została zaktualizowana.",
+                false
+            );
+            hideSchoolUnitNextActions();
+        } else {
+            showSchoolUnitsMessage(
+                "Szkoła została dodana.",
+                false
+            );
+            showSchoolUnitNextActions();
+        }
     } catch (error) {
         console.error("Error saving school unit:", error);
 
@@ -435,6 +458,8 @@ async function saveSchoolUnit() {
 }
 
 async function deleteSchoolUnit(schoolUnit) {
+    hideSchoolUnitNextActions();
+
     const confirmed = window.confirm(
         `Czy na pewno usunąć szkołę „${schoolUnit.name}”?`
     );
@@ -608,6 +633,24 @@ function setOrganizationFormDisabled(disabled) {
         if (element) {
             element.disabled = disabled;
         }
+    }
+}
+
+function showSchoolUnitNextActions() {
+    const element =
+        document.getElementById("schoolUnitNextActions");
+
+    if (element) {
+        element.hidden = false;
+    }
+}
+
+function hideSchoolUnitNextActions() {
+    const element =
+        document.getElementById("schoolUnitNextActions");
+
+    if (element) {
+        element.hidden = true;
     }
 }
 

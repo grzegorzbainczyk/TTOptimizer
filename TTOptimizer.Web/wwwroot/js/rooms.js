@@ -4,6 +4,7 @@ import { initializeRoomSetupMode } from "./main/rooms-setup.js";
 
 let availableBuildings = [];
 let availableSubjects = [];
+let currentRooms = [];
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -15,11 +16,6 @@ document.addEventListener(
         const backToMainButton =
             document.getElementById(
                 "backToMainButton"
-            );
-
-        const manageBuildingsButton =
-            document.getElementById(
-                "manageBuildingsButton"
             );
 
         const refreshRoomsButton =
@@ -50,13 +46,6 @@ document.addEventListener(
             }
         );
 
-        manageBuildingsButton?.addEventListener(
-            "click",
-            () => {
-                window.location.href = "buildings.html";
-            }
-        );
-
         refreshRoomsButton?.addEventListener(
             "click",
             refreshPageData
@@ -76,6 +65,11 @@ document.addEventListener(
             "click",
             closeRoomForm
         );
+
+        document.getElementById("addBuildingInlineButton")
+            ?.addEventListener("click", () => {
+                appendInlineBuildingCard(null);
+            });
 
         initializeSimpleXlsxImport({
             resourceName: "room",
@@ -141,6 +135,7 @@ async function loadBuildings() {
     }
 
     populateBuildingOptions();
+    renderInlineBuildings();
 }
 
 async function loadSubjects() {
@@ -231,8 +226,10 @@ async function loadRooms() {
                 ? data
                 : data?.rooms ?? [];
 
+        currentRooms = rooms;
         renderRooms(rooms);
         updateRoomsCount(rooms.length);
+        renderInlineBuildings();
     } catch (error) {
         console.error(
             "Error loading rooms:",
@@ -522,7 +519,8 @@ function openAddRoomForm() {
 
     document.getElementById(
         "roomBuildingId"
-    ).value = "";
+    ).value =
+        availableBuildings[0]?.id?.toString() ?? "";
 
     document.getElementById(
         "restrictedToSubjectId"
@@ -874,6 +872,481 @@ function clearRoomFormMessage() {
     messageElement.classList.remove(
         "error-message"
     );
+}
+
+
+function renderInlineBuildings() {
+    const container =
+        document.getElementById("inlineBuildingsContainer");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if (availableBuildings.length === 0) {
+        appendInlineBuildingCard(null);
+        return;
+    }
+
+    availableBuildings.forEach(building => {
+        appendInlineBuildingCard(building);
+    });
+}
+
+function appendInlineBuildingCard(building) {
+    const container =
+        document.getElementById("inlineBuildingsContainer");
+
+    if (!container) {
+        return;
+    }
+
+    const isNew = !building?.id;
+    const card = document.createElement("section");
+    card.className = "inline-building-card";
+    card.dataset.buildingId = building?.id ?? "";
+
+    const roomsInBuilding = building?.id
+        ? currentRooms.filter(room =>
+            Number(room.buildingId) === Number(building.id))
+        : [];
+
+    card.innerHTML = `
+        <div class="inline-building-header">
+            <div>
+                <span class="room-generator-label">
+                    ${isNew ? "Nowy budynek" : "Budynek"}
+                </span>
+                <h3>${escapeHtmlText(building?.name ?? "Nowy budynek")}</h3>
+            </div>
+            ${isNew
+                ? `<button class="secondary-button inline-building-cancel"
+                           type="button">Usuń ten formularz</button>`
+                : `<button class="secondary-button inline-building-delete"
+                           type="button">Usuń budynek</button>`}
+        </div>
+
+        <div class="inline-building-fields">
+            <label>
+                <span>Nazwa budynku</span>
+                <input class="inline-building-name"
+                       type="text"
+                       maxlength="150"
+                       value="${escapeHtmlAttribute(building?.name ?? "")}"
+                       placeholder="np. Budynek główny" />
+            </label>
+
+            <label>
+                <span>Adres <small>(opcjonalnie)</small></span>
+                <input class="inline-building-address"
+                       type="text"
+                       maxlength="500"
+                       value="${escapeHtmlAttribute(building?.address ?? "")}"
+                       placeholder="np. ul. Szkolna 1" />
+            </label>
+        </div>
+
+        <div class="inline-building-save-row">
+            <button class="primary-button inline-building-save"
+                    type="button">
+                ${isNew ? "Zapisz budynek" : "Zapisz zmiany"}
+            </button>
+            <span class="inline-building-status"></span>
+        </div>
+
+        ${isNew ? `
+            <div class="inline-room-generator inline-room-generator-disabled">
+                <p>Najpierw zapisz budynek, a potem dodasz do niego sale.</p>
+            </div>
+        ` : `
+            <div class="inline-room-generator">
+                <div class="inline-room-generator-heading">
+                    <div>
+                        <h4>Sale w budynku</h4>
+                        <p>
+                            Szybko utwórz zakres, np. od 1 do 20.
+                            Później każdą salę możesz normalnie edytować lub usunąć.
+                        </p>
+                    </div>
+                    <button class="secondary-button inline-add-single-room"
+                            type="button">
+                        + Dodaj pojedynczą salę
+                    </button>
+                </div>
+
+                <div class="inline-room-range">
+                    <label>
+                        <span>Od</span>
+                        <input class="inline-room-from"
+                               type="number"
+                               min="0"
+                               max="9999"
+                               value="1" />
+                    </label>
+                    <label>
+                        <span>Do</span>
+                        <input class="inline-room-to"
+                               type="number"
+                               min="0"
+                               max="9999"
+                               value="20" />
+                    </label>
+                    <label>
+                        <span>Prefiks <small>(opcjonalnie)</small></span>
+                        <input class="inline-room-prefix"
+                               type="text"
+                               maxlength="20"
+                               placeholder="np. A-" />
+                    </label>
+                    <button class="main-action-button inline-generate-rooms"
+                            type="button">
+                        Generuj sale
+                    </button>
+                </div>
+
+                <div class="inline-building-room-list">
+                    ${renderInlineRoomChips(roomsInBuilding)}
+                </div>
+            </div>
+        `}
+    `;
+
+    card.querySelector(".inline-building-save")
+        ?.addEventListener("click", () =>
+            saveInlineBuilding(card, building));
+
+    card.querySelector(".inline-building-cancel")
+        ?.addEventListener("click", () => card.remove());
+
+    card.querySelector(".inline-building-delete")
+        ?.addEventListener("click", () =>
+            deleteInlineBuilding(building));
+
+    card.querySelector(".inline-generate-rooms")
+        ?.addEventListener("click", () =>
+            generateInlineRooms(card, building));
+
+    card.querySelector(".inline-add-single-room")
+        ?.addEventListener("click", () => {
+            openAddRoomForm();
+            const buildingSelect =
+                document.getElementById("roomBuildingId");
+            if (buildingSelect) {
+                buildingSelect.value =
+                    String(building.id);
+            }
+            document.getElementById("roomFormSection")
+                ?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+        });
+
+    container.appendChild(card);
+}
+
+function renderInlineRoomChips(rooms) {
+    if (!rooms || rooms.length === 0) {
+        return `<p class="room-preview-empty">
+            Nie dodano jeszcze sal w tym budynku.
+        </p>`;
+    }
+
+    return `
+        <div class="room-preview-chips">
+            ${rooms.map(room =>
+                `<span class="room-preview-chip">${escapeHtmlText(room.name)}</span>`
+            ).join("")}
+        </div>
+    `;
+}
+
+async function saveInlineBuilding(card, building) {
+    const name =
+        card.querySelector(".inline-building-name")
+            ?.value.trim() ?? "";
+
+    const address =
+        card.querySelector(".inline-building-address")
+            ?.value.trim() ?? "";
+
+    if (!name) {
+        setInlineBuildingStatus(
+            card,
+            "Podaj nazwę budynku.",
+            true
+        );
+        card.querySelector(".inline-building-name")?.focus();
+        return;
+    }
+
+    const button =
+        card.querySelector(".inline-building-save");
+
+    if (button) {
+        button.disabled = true;
+    }
+
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const isEditing = Boolean(building?.id);
+
+        const response = await fetch(
+            isEditing
+                ? `/api/buildings/${encodeURIComponent(building.id)}?organizationId=${encodeURIComponent(organizationId)}`
+                : `/api/buildings?organizationId=${encodeURIComponent(organizationId)}`,
+            {
+                method: isEditing ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name,
+                    address: address || null,
+                    info: building?.info ?? null
+                })
+            }
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Nie udało się zapisać budynku. Status: ${response.status}`
+                )
+            );
+        }
+
+        showInlineBuildingsMessage(
+            isEditing
+                ? "Dane budynku zostały zapisane."
+                : "Budynek został dodany.",
+            false
+        );
+
+        await loadBuildings();
+        await loadRooms();
+    } catch (error) {
+        console.error("Error saving inline building:", error);
+        setInlineBuildingStatus(
+            card,
+            error instanceof Error
+                ? error.message
+                : "Nie udało się zapisać budynku.",
+            true
+        );
+    } finally {
+        if (button) {
+            button.disabled = false;
+        }
+    }
+}
+
+async function deleteInlineBuilding(building) {
+    if (!building?.id) {
+        return;
+    }
+
+    const roomsInBuilding =
+        currentRooms.filter(room =>
+            Number(room.buildingId) === Number(building.id));
+
+    const warning = roomsInBuilding.length > 0
+        ? `Budynek „${building.name}” ma ${roomsInBuilding.length} sal. ` +
+          "Usunięcie budynku usunie również te sale. Czy kontynuować?"
+        : `Czy usunąć budynek „${building.name}”?`;
+
+    if (!window.confirm(warning)) {
+        return;
+    }
+
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/buildings/${encodeURIComponent(building.id)}?organizationId=${encodeURIComponent(organizationId)}`,
+            { method: "DELETE" }
+        );
+
+        if (!response.ok) {
+            const data = await readJsonResponse(response);
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Nie udało się usunąć budynku. Status: ${response.status}`
+                )
+            );
+        }
+
+        showInlineBuildingsMessage(
+            "Budynek został usunięty.",
+            false
+        );
+
+        await refreshPageData();
+    } catch (error) {
+        console.error("Error deleting inline building:", error);
+        showInlineBuildingsMessage(
+            error instanceof Error
+                ? error.message
+                : "Nie udało się usunąć budynku.",
+            true
+        );
+    }
+}
+
+async function generateInlineRooms(card, building) {
+    const from =
+        Number(card.querySelector(".inline-room-from")?.value);
+
+    const to =
+        Number(card.querySelector(".inline-room-to")?.value);
+
+    const prefix =
+        card.querySelector(".inline-room-prefix")
+            ?.value.trim() ?? "";
+
+    if (
+        !Number.isInteger(from) ||
+        !Number.isInteger(to) ||
+        from < 0 ||
+        to < from ||
+        to - from > 500
+    ) {
+        setInlineBuildingStatus(
+            card,
+            "Podaj poprawny zakres sal. Maksymalnie 501 pozycji naraz.",
+            true
+        );
+        return;
+    }
+
+    const rooms = [];
+
+    for (let number = from; number <= to; number++) {
+        rooms.push({
+            name: `${prefix}${number}`,
+            buildingId: building.id
+        });
+    }
+
+    const button =
+        card.querySelector(".inline-generate-rooms");
+
+    if (button) {
+        button.disabled = true;
+    }
+
+    setInlineBuildingStatus(
+        card,
+        "Dodawanie sal...",
+        false
+    );
+
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/rooms/setup-import?organizationId=${encodeURIComponent(organizationId)}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ rooms })
+            }
+        );
+
+        const data = await readJsonResponse(response);
+
+        if (!response.ok) {
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    `Nie udało się wygenerować sal. Status: ${response.status}`
+                )
+            );
+        }
+
+        const created =
+            Number(data?.createdCount) || 0;
+
+        const skipped =
+            Number(data?.skippedExistingCount) || 0;
+
+        showInlineBuildingsMessage(
+            skipped > 0
+                ? `Dodano ${created} sal. Pominięto ${skipped} już istniejących nazw.`
+                : `Dodano ${created} sal.`,
+            false
+        );
+
+        await loadRooms();
+        await loadBuildings();
+    } catch (error) {
+        console.error("Error generating inline rooms:", error);
+        setInlineBuildingStatus(
+            card,
+            error instanceof Error
+                ? error.message
+                : "Nie udało się wygenerować sal.",
+            true
+        );
+    } finally {
+        if (button) {
+            button.disabled = false;
+        }
+    }
+}
+
+function setInlineBuildingStatus(card, message, isError) {
+    const element =
+        card.querySelector(".inline-building-status");
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent = message;
+    element.classList.toggle(
+        "form-message-error",
+        Boolean(isError)
+    );
+}
+
+function showInlineBuildingsMessage(message, isError) {
+    const element =
+        document.getElementById("inlineBuildingsMessage");
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent = message;
+    element.classList.toggle(
+        "form-message-error",
+        Boolean(isError)
+    );
+}
+
+function escapeHtmlText(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+}
+
+function escapeHtmlAttribute(value) {
+    return escapeHtmlText(value);
 }
 
 async function readJsonResponse(

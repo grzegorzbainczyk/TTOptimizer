@@ -2,8 +2,7 @@ let currentReadiness = null;
 
 const RULES = {
     schoolButton: () => true,
-    buildingsButton: () => true,
-    roomsButton: r => r.foundationReady,
+    roomsButton: () => true,
     subjectsButton: r => r.foundationReady,
     teachersButton: r => r.foundationReady,
     classesButton: r => r.foundationReady,
