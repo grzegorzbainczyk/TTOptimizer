@@ -177,9 +177,7 @@
 </div>
 </div>
 <div class="form-field" id="requirementSubjectField">
-<label for="requirementSubjectId">
-                            Subject
-                        </label>
+<label for="requirementSubjectId" data-i18n="lessons.curriculumSubject">Subject</label>
 <div class="resource-select-with-action">
 <select id="requirementSubjectId" required="">
 <option value="">
@@ -215,9 +213,7 @@
 </div>
 </div>
 <div class="form-field">
-<label for="requirementTeacherId">
-                            Teacher
-                        </label>
+<label for="requirementTeacherId" data-i18n="lessons.curriculumTeacher">Teacher</label>
 <select id="requirementTeacherId" required="">
 <option value="">
                                 Select teacher
@@ -225,9 +221,7 @@
 </select>
 </div>
 <div class="form-field">
-<label for="requirementHoursPerWeek">
-                            Hours per week
-                        </label>
+<label for="requirementHoursPerWeek" data-i18n="lessons.hoursPerWeek">Hours per week</label>
 <input id="requirementHoursPerWeek" max="40" min="1" required="" type="number" value="1"/>
 </div>
 <div class="form-field">
@@ -240,9 +234,7 @@
 </small>
 </div>
 <div class="form-field">
-<label for="requirementPriority">
-                            Priority
-                        </label>
+<label for="requirementPriority" data-i18n="lessons.priority">Priority</label>
 <select id="requirementPriority" required="">
 <option data-i18n="lessons.priorityLow" value="0">Low</option>
 <option data-i18n="lessons.priorityNormal" selected="" value="1">Normal</option>
@@ -251,12 +243,8 @@
 </div>
 </div>
 <div class="form-actions teachers-form-actions">
-<button class="primary-button" id="saveRequirementButton" type="button">
-                        Save
-                    </button>
-<button class="secondary-button" id="cancelRequirementButton" type="button">
-                        Cancel
-                    </button>
+<button class="primary-button" id="saveRequirementButton" type="button" data-i18n="common.save">Save</button>
+<button class="secondary-button" id="cancelRequirementButton" type="button" data-i18n="common.cancel">Cancel</button>
 </div>
 <p aria-live="polite" class="form-message" id="requirementFormMessage">
 </p>
@@ -271,9 +259,7 @@
 <th data-i18n="lessons.curriculumTeacher">Teacher</th>
 <th data-i18n="lessons.curriculumHours">Hours/week</th>
 <th data-i18n="lessons.priority">Priority</th>
-<th class="table-actions-column">
-                                Actions
-                            </th>
+<th class="table-actions-column" data-i18n="common.actions">Actions</th>
 </tr>
 </thead>
 <tbody>

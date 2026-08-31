@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClassFlow - Scheduling defaults</title>
+    <title data-i18n="organizationPreferences.pageTitle">ClassFlow - Scheduling defaults</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -17,19 +17,15 @@
                          class="app-logo" />
 
                     <div class="hero-content">
-                        <div class="hero-badge">Organization scheduling</div>
-                        <h1>Scheduling defaults</h1>
-                        <p class="hero-subtitle">
-                            Configure default scheduling preferences inherited by teachers, classes and subjects.
-                        </p>
-                        <p id="organizationName" class="hero-tech">
-                            Loading organization...
-                        </p>
+                        <div class="hero-badge" data-i18n="organizationPreferences.badge">Organization scheduling</div>
+                        <h1 data-i18n="organizationPreferences.title">Scheduling defaults</h1>
+                        <p class="hero-subtitle" data-i18n="organizationPreferences.subtitle">Configure default scheduling preferences inherited by teachers, classes and subjects.</p>
+                        <p id="organizationName" class="hero-tech" data-i18n="organizationPreferences.loadingOrganization">Loading organization...</p>
                     </div>
 
                     <button id="backToMainButton"
                             class="settings-button"
-                            type="button">
+                            type="button" data-i18n="organizationPreferences.backToDashboard">
                         Back to dashboard
                     </button>
                 </div>
@@ -39,39 +35,36 @@
                 <div class="section-header-row">
                     <div>
                         <h2>Teacher scheduling defaults</h2>
-                        <p>
-                            Individual teacher overrides remain unchanged.
-                            Teachers set to Default inherit the values below.
-                        </p>
+                        <p data-i18n="organizationPreferences.teacher.description">Individual teacher overrides remain unchanged. Teachers set to Default inherit the values below.</p>
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-field">
-                        <label for="teacherMinimizeGaps">Minimize gaps</label>
+                        <label for="teacherMinimizeGaps" data-i18n="organizationPreferences.teacher.minimizeGaps">Minimize gaps</label>
                         <select id="teacherMinimizeGaps"></select>
-                        <small>Prefer fewer empty slots between the first and last lesson of a day.</small>
+                        <small data-i18n="organizationPreferences.teacher.minimizeGapsHelp">Prefer fewer empty slots between the first and last lesson of a day.</small>
                     </div>
 
                     <div class="form-field">
-                        <label for="teacherAvoidSingleLessonDay">Avoid single-lesson day</label>
+                        <label for="teacherAvoidSingleLessonDay" data-i18n="organizationPreferences.teacher.avoidSingleLessonDay">Avoid single-lesson day</label>
                         <select id="teacherAvoidSingleLessonDay"></select>
-                        <small>Discourage days on which a teacher comes to school for only one lesson.</small>
+                        <small data-i18n="organizationPreferences.teacher.avoidSingleLessonDayHelp">Discourage days on which a teacher comes to school for only one lesson.</small>
                     </div>
 
                     <div class="form-field">
-                        <label for="teacherAvoidImmediateBuildingChange">Avoid immediate building change</label>
+                        <label for="teacherAvoidImmediateBuildingChange" data-i18n="organizationPreferences.teacher.avoidBuildingChange">Avoid immediate building change</label>
                         <select id="teacherAvoidImmediateBuildingChange"></select>
-                        <small>Discourage consecutive teacher lessons in rooms assigned to different buildings.</small>
+                        <small data-i18n="organizationPreferences.teacher.avoidBuildingChangeHelp">Discourage consecutive teacher lessons in rooms assigned to different buildings.</small>
                     </div>
 
                     <div class="form-field">
-                        <label for="teacherMaxConsecutiveLessons">Max consecutive lessons - importance</label>
+                        <label for="teacherMaxConsecutiveLessons" data-i18n="organizationPreferences.teacher.maxConsecutiveImportance">Max consecutive lessons - importance</label>
                         <select id="teacherMaxConsecutiveLessons"></select>
                     </div>
 
                     <div class="form-field">
-                        <label for="teacherMaxConsecutiveLessonsLimit">Max consecutive lessons - limit</label>
+                        <label for="teacherMaxConsecutiveLessonsLimit" data-i18n="organizationPreferences.teacher.maxConsecutiveLimit">Max consecutive lessons - limit</label>
                         <input id="teacherMaxConsecutiveLessonsLimit"
                                type="number"
                                min="1"
@@ -80,12 +73,12 @@
                     </div>
 
                     <div class="form-field">
-                        <label for="teacherMaxLessonsPerDay">Max lessons per day - importance</label>
+                        <label for="teacherMaxLessonsPerDay" data-i18n="organizationPreferences.teacher.maxPerDayImportance">Max lessons per day - importance</label>
                         <select id="teacherMaxLessonsPerDay"></select>
                     </div>
 
                     <div class="form-field">
-                        <label for="teacherMaxLessonsPerDayLimit">Max lessons per day - limit</label>
+                        <label for="teacherMaxLessonsPerDayLimit" data-i18n="organizationPreferences.teacher.maxPerDayLimit">Max lessons per day - limit</label>
                         <input id="teacherMaxLessonsPerDayLimit"
                                type="number"
                                min="1"
@@ -98,34 +91,31 @@
             <section class="scheduling-defaults-group">
                 <div class="section-header-row">
                     <div>
-                        <h2>Class scheduling defaults</h2>
-                        <p>
-                            Individual class overrides remain unchanged.
-                            Classes set to Default inherit the values below.
-                        </p>
+                        <h2 data-i18n="organizationPreferences.class.title">Class scheduling defaults</h2>
+                        <p data-i18n="organizationPreferences.class.description">Individual class overrides remain unchanged. Classes set to Default inherit the values below.</p>
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-field">
-                        <label for="classGroupMinimizeGaps">Minimize gaps</label>
+                        <label for="classGroupMinimizeGaps" data-i18n="organizationPreferences.class.minimizeGaps">Minimize gaps</label>
                         <select id="classGroupMinimizeGaps"></select>
-                        <small>Prefer fewer empty slots between the first and last lesson of a class day.</small>
+                        <small data-i18n="organizationPreferences.class.minimizeGapsHelp">Prefer fewer empty slots between the first and last lesson of a class day.</small>
                     </div>
 
                     <div class="form-field">
-                        <label for="classGroupAvoidSingleLessonDay">Avoid single-lesson day</label>
+                        <label for="classGroupAvoidSingleLessonDay" data-i18n="organizationPreferences.class.avoidSingleLessonDay">Avoid single-lesson day</label>
                         <select id="classGroupAvoidSingleLessonDay"></select>
-                        <small>Discourage class days containing exactly one lesson.</small>
+                        <small data-i18n="organizationPreferences.class.avoidSingleLessonDayHelp">Discourage class days containing exactly one lesson.</small>
                     </div>
 
                     <div class="form-field">
-                        <label for="classGroupMaxConsecutiveLessons">Max consecutive lessons - importance</label>
+                        <label for="classGroupMaxConsecutiveLessons" data-i18n="organizationPreferences.class.maxConsecutiveImportance">Max consecutive lessons - importance</label>
                         <select id="classGroupMaxConsecutiveLessons"></select>
                     </div>
 
                     <div class="form-field">
-                        <label for="classGroupMaxConsecutiveLessonsLimit">Max consecutive lessons - limit</label>
+                        <label for="classGroupMaxConsecutiveLessonsLimit" data-i18n="organizationPreferences.class.maxConsecutiveLimit">Max consecutive lessons - limit</label>
                         <input id="classGroupMaxConsecutiveLessonsLimit"
                                type="number"
                                min="1"
@@ -134,12 +124,12 @@
                     </div>
 
                     <div class="form-field">
-                        <label for="classGroupMaxLessonsPerDay">Max lessons per day - importance</label>
+                        <label for="classGroupMaxLessonsPerDay" data-i18n="organizationPreferences.class.maxPerDayImportance">Max lessons per day - importance</label>
                         <select id="classGroupMaxLessonsPerDay"></select>
                     </div>
 
                     <div class="form-field">
-                        <label for="classGroupMaxLessonsPerDayLimit">Max lessons per day - limit</label>
+                        <label for="classGroupMaxLessonsPerDayLimit" data-i18n="organizationPreferences.class.maxPerDayLimit">Max lessons per day - limit</label>
                         <input id="classGroupMaxLessonsPerDayLimit"
                                type="number"
                                min="1"
@@ -154,22 +144,18 @@
             <section class="scheduling-defaults-group">
                 <div class="section-header-row">
                     <div>
-                        <h2>Student group scheduling defaults</h2>
-                        <p>
-                            Applies to whole classes, subgroups, combined groups and individual groups.
-                        </p>
+                        <h2 data-i18n="organizationPreferences.studentGroup.title">Student group scheduling defaults</h2>
+                        <p data-i18n="organizationPreferences.studentGroup.description">Applies to whole classes, subgroups, combined groups and individual groups.</p>
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-field">
-                        <label for="studentGroupAvoidImmediateBuildingChange">
+                        <label for="studentGroupAvoidImmediateBuildingChange" data-i18n="organizationPreferences.studentGroup.avoidBuildingChange">
                             Avoid immediate building change
                         </label>
                         <select id="studentGroupAvoidImmediateBuildingChange"></select>
-                        <small>
-                            Discourage consecutive lessons in different buildings when the student groups overlap.
-                        </small>
+                        <small data-i18n="organizationPreferences.studentGroup.avoidBuildingChangeHelp">Discourage consecutive lessons in different buildings when the student groups overlap.</small>
                     </div>
                 </div>
             </section>
@@ -178,28 +164,25 @@
             <section class="scheduling-defaults-group">
                 <div class="section-header-row">
                     <div>
-                        <h2>Subject scheduling defaults</h2>
-                        <p>
-                            Individual subject overrides remain unchanged.
-                            Subjects set to Default inherit the values below.
-                        </p>
+                        <h2 data-i18n="organizationPreferences.subject.title">Subject scheduling defaults</h2>
+                        <p data-i18n="organizationPreferences.subject.description">Individual subject overrides remain unchanged. Subjects set to Default inherit the values below.</p>
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-field">
-                        <label for="subjectSpreadAcrossDays">Spread across days</label>
+                        <label for="subjectSpreadAcrossDays" data-i18n="organizationPreferences.subject.spreadAcrossDays">Spread across days</label>
                         <select id="subjectSpreadAcrossDays"></select>
-                        <small>Prefer distributing each class-subject combination over as many teaching days as reasonably possible.</small>
+                        <small data-i18n="organizationPreferences.subject.spreadAcrossDaysHelp">Prefer distributing each class-subject combination over as many teaching days as reasonably possible.</small>
                     </div>
 
                     <div class="form-field">
-                        <label for="subjectMaxOccurrencesPerDay">Max occurrences per day - importance</label>
+                        <label for="subjectMaxOccurrencesPerDay" data-i18n="organizationPreferences.subject.maxOccurrencesImportance">Max occurrences per day - importance</label>
                         <select id="subjectMaxOccurrencesPerDay"></select>
                     </div>
 
                     <div class="form-field">
-                        <label for="subjectMaxOccurrencesPerDayLimit">Max occurrences per day - limit</label>
+                        <label for="subjectMaxOccurrencesPerDayLimit" data-i18n="organizationPreferences.subject.maxOccurrencesLimit">Max occurrences per day - limit</label>
                         <input id="subjectMaxOccurrencesPerDayLimit"
                                type="number"
                                min="1"
@@ -208,15 +191,15 @@
                     </div>
 
                     <div class="form-field">
-                        <label for="subjectPreferDoubleLessons">Prefer double lessons</label>
+                        <label for="subjectPreferDoubleLessons" data-i18n="organizationPreferences.subject.preferDouble">Prefer double lessons</label>
                         <select id="subjectPreferDoubleLessons"></select>
-                        <small>Prefer consecutive pairs for subjects that benefit from longer blocks.</small>
+                        <small data-i18n="organizationPreferences.subject.preferDoubleHelp">Prefer consecutive pairs for subjects that benefit from longer blocks.</small>
                     </div>
 
                     <div class="form-field">
-                        <label for="subjectAvoidDoubleLessons">Avoid double lessons</label>
+                        <label for="subjectAvoidDoubleLessons" data-i18n="organizationPreferences.subject.avoidDouble">Avoid double lessons</label>
                         <select id="subjectAvoidDoubleLessons"></select>
-                        <small>Discourage consecutive lessons of the same subject for a class.</small>
+                        <small data-i18n="organizationPreferences.subject.avoidDoubleHelp">Discourage consecutive lessons of the same subject for a class.</small>
                     </div>
                 </div>
             </section>
@@ -224,7 +207,7 @@
                 <div class="form-actions">
                     <button id="saveOrganizationPreferencesButton"
                             class="primary-button"
-                            type="button">
+                            type="button" data-i18n="common.save">
                         Save
                     </button>
                 </div>
@@ -235,13 +218,11 @@
                    aria-live="polite"></p>
             </section>
 
-            <footer class="app-footer">
-                Created by Grzegorz Bainczyk
-            </footer>
+            <footer class="app-footer" data-i18n="app.createdBy">Created by Grzegorz Bainczyk</footer>
         </div>
     </main>
 
     <script src="/js/appContext.js"></script>
-    <script src="/js/organization-preferences.js"></script>
+    <script src="/js/organization-preferences.js" type="module"></script>
 </body>
 </html>

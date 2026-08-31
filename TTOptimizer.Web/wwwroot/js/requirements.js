@@ -94,6 +94,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         ?.addEventListener("change", handleAdditionalLessonChanged);
 
     await refreshPageData();
+
+    window.addEventListener("classflow:language-changed", () => {
+        configureLessonsPageLanguage();
+        populateTeacherOptions();
+        populateStudentGroupOptions();
+        populateSubjectOptions();
+        populateNewStudentGroupClassOptions();
+        if (Array.isArray(availableRequirements)) {
+            const visibleRequirements = isAdditionalLessonsMode
+                ? availableRequirements.filter(item => Boolean(item.isAdditional))
+                : availableRequirements;
+            renderRequirements(visibleRequirements);
+            updateRequirementsCount(visibleRequirements.length);
+        }
+    });
 });
 
 function getLessonsPageText() {
@@ -213,7 +228,7 @@ function configureAdditionalLessonsMode() {
         return;
     }
 
-    document.title = "ClassFlow - Zajęcia dodatkowe";
+    document.title = `ClassFlow - ${t("lessons.additionalPageTitle", "Additional lessons")}`;
 
     const setText = (id, value) => {
         const element = document.getElementById(id);
@@ -222,22 +237,22 @@ function configureAdditionalLessonsMode() {
         }
     };
 
-    setText("requirementsPageLabel", "Dane planu lekcji");
-    setText("requirementsPageTitle", "Zajęcia dodatkowe");
+    setText("requirementsPageLabel", t("common.timetableInput", "Timetable input"));
+    setText("requirementsPageTitle", t("lessons.additionalPageTitle", "Additional lessons"));
     setText(
         "requirementsPageSubtitle",
-        "Dodawaj zajęcia indywidualne, wyrównawcze, koła zainteresowań i inne zajęcia dodatkowe."
+        t("lessons.additionalPageSubtitle", "Add individual lessons, remedial classes, clubs and other additional activities.")
     );
-    setText("requirementsListTitle", "Lista zajęć dodatkowych");
+    setText("requirementsListTitle", t("lessons.additionalListTitle", "Additional lessons list"));
     setText(
         "requirementsListDescription",
-        "Możesz utworzyć ucznia lub małą grupę bezpośrednio podczas dodawania zajęć."
+        t("lessons.additionalListDescription", "You can create a student or a small group directly while adding an activity.")
     );
-    setText("addRequirementButtonLabel", "Dodaj zajęcia dodatkowe");
-    setText("requirementNameLabel", "Nazwa zajęć");
-    setText("requirementStudentGroupLabel", "Uczeń / grupa");
-    setText("requirementsNameHeader", "Zajęcia");
-    setText("requirementsStudentGroupHeader", "Uczeń / grupa");
+    setText("addRequirementButtonLabel", t("lessons.addAdditional", "Add additional lesson"));
+    setText("requirementNameLabel", t("lessons.activityName", "Activity name"));
+    setText("requirementStudentGroupLabel", t("lessons.studentOrGroup", "Student / group"));
+    setText("requirementsNameHeader", t("lessons.activities", "Activities"));
+    setText("requirementsStudentGroupHeader", t("lessons.studentOrGroup", "Student / group"));
 
     const importButton =
         document.getElementById("importCurriculumButton");
@@ -265,7 +280,7 @@ function configureAdditionalLessonsMode() {
 
     if (quickCreateGroupButton) {
         quickCreateGroupButton.textContent =
-            "Zarządzaj uczniami / grupami";
+            t("lessons.manageStudentsGroups", "Manage students / groups");
     }
 }
 
@@ -754,7 +769,7 @@ function populateStudentGroupOptions() {
         groupsToShow.length === 0
     ) {
         emptyOption.textContent =
-            "Najpierw dodaj ucznia / grupę";
+            t("lessons.addStudentGroupFirst", "Add a student / group first");
     }
 
     select.value = selectedValue;

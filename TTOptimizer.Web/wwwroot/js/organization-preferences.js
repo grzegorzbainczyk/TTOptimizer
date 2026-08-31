@@ -1,3 +1,5 @@
+import { initializeI18n, t } from "./i18n.js";
+
 const preferenceLevels = [
     "Disabled",
     "Low",
@@ -7,6 +9,8 @@ const preferenceLevels = [
 ];
 
 document.addEventListener("DOMContentLoaded", async () => {
+    await initializeI18n();
+    document.title = t("organizationPreferences.pageTitle", "ClassFlow - Scheduling defaults");
     initializeLevelSelects();
 
     document.getElementById("backToMainButton")
@@ -45,7 +49,7 @@ function initializeLevelSelects() {
         for (const level of preferenceLevels) {
             const option = document.createElement("option");
             option.value = level;
-            option.textContent = level;
+            option.textContent = t(`organizationPreferences.level.${level}`, level);
             select.appendChild(option);
         }
     }
@@ -56,7 +60,7 @@ async function loadOrganizationPreferences() {
         const organizationId =
             window.appContext.requireOrganizationId();
 
-        showStatus("Loading scheduling defaults...");
+        showStatus(t("organizationPreferences.loading", "Loading scheduling defaults..."));
 
         const response = await fetch(
             `/api/organization-scheduling-preferences?organizationId=${encodeURIComponent(organizationId)}`
@@ -67,7 +71,7 @@ async function loadOrganizationPreferences() {
         if (!response.ok || !data?.success) {
             throw new Error(
                 data?.message ??
-                "Could not load organization scheduling defaults."
+                t("organizationPreferences.loadFailed", "Could not load organization scheduling defaults.")
             );
         }
 
@@ -136,7 +140,7 @@ async function loadOrganizationPreferences() {
         if (organizationName) {
             organizationName.textContent =
                 preferences.organizationName ??
-                `Organization #${organizationId}`;
+                t("organizationPreferences.organizationFallback", "Organization #{id}").replace("{id}", organizationId);
         }
 
         showStatus("");
@@ -149,7 +153,7 @@ async function loadOrganizationPreferences() {
         showStatus(
             error instanceof Error
                 ? error.message
-                : "Could not load scheduling defaults.",
+                : t("organizationPreferences.loadFailed", "Could not load scheduling defaults."),
             true
         );
     }
@@ -236,13 +240,13 @@ async function saveOrganizationPreferences() {
             payload.subjectAvoidDoubleLessons !== "Disabled")
         {
             throw new Error(
-                "Prefer double lessons and avoid double lessons cannot both be enabled."
+                t("organizationPreferences.doubleConflict", "Prefer double lessons and avoid double lessons cannot both be enabled.")
             );
         }
 
         if (saveButton) saveButton.disabled = true;
 
-        showStatus("Saving scheduling defaults...");
+        showStatus(t("organizationPreferences.saving", "Saving scheduling defaults..."));
 
         const response = await fetch(
             `/api/organization-scheduling-preferences?organizationId=${encodeURIComponent(organizationId)}`,
@@ -260,13 +264,12 @@ async function saveOrganizationPreferences() {
         if (!response.ok || !data?.success) {
             throw new Error(
                 data?.message ??
-                "Could not save organization scheduling defaults."
+                t("organizationPreferences.saveFailed", "Could not save organization scheduling defaults.")
             );
         }
 
         showStatus(
-            data.message ??
-            "Organization scheduling defaults were saved."
+            t("organizationPreferences.saved", "Organization scheduling defaults were saved.")
         );
     } catch (error) {
         console.error(
@@ -277,7 +280,7 @@ async function saveOrganizationPreferences() {
         showStatus(
             error instanceof Error
                 ? error.message
-                : "Could not save scheduling defaults.",
+                : t("organizationPreferences.saveFailed", "Could not save scheduling defaults."),
             true
         );
     } finally {
@@ -303,7 +306,7 @@ function getInteger(id) {
 
 function validateLimit(value, label) {
     if (!Number.isInteger(value) || value < 1 || value > 8) {
-        throw new Error(`${label} limit must be between 1 and 8.`);
+        throw new Error(t("organizationPreferences.limitRange", "{label} limit must be between 1 and 8.").replace("{label}", label));
     }
 }
 
@@ -317,7 +320,7 @@ async function readJsonResponse(response) {
     } catch {
         return {
             success: false,
-            message: `Server returned invalid JSON. Status: ${response.status}`
+            message: t("organizationPreferences.invalidJson", "Server returned invalid JSON. Status: {status}").replace("{status}", response.status)
         };
     }
 }

@@ -1,3 +1,5 @@
+import { initializeI18n, t } from "./i18n.js";
+
 const daysCount = 5;
 const slotsPerDay = 8;
 
@@ -16,6 +18,8 @@ const preferenceCycle = [
 ];
 
 document.addEventListener("DOMContentLoaded", async () => {
+    await initializeI18n();
+    document.title = t("availability.pageTitle", "ClassFlow - Time Slot Preferences");
     const backButton =
         document.getElementById("backButton");
 
@@ -93,7 +97,7 @@ function readResourceParameters() {
         resourceId <= 0
     ) {
         showAvailabilityMessage(
-            "Invalid resource type or resource ID.",
+            t("availability.invalidResource", "Invalid resource type or resource ID."),
             true
         );
 
@@ -209,8 +213,7 @@ async function loadTimeSlotPreferences() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not load time slot preferences. ` +
-                    `Status: ${response.status}`
+                    t("availability.loadFailedStatus", "Could not load time slot preferences. Status: {status}").replace("{status}", response.status)
                 )
             );
         }
@@ -256,7 +259,7 @@ async function loadTimeSlotPreferences() {
         showAvailabilityMessage(
             error instanceof Error
                 ? error.message
-                : "Could not load time slot preferences.",
+                : t("availability.loadFailed", "Could not load time slot preferences."),
             true
         );
     }
@@ -325,15 +328,14 @@ async function saveTimeSlotPreferences() {
             throw new Error(
                 getApiErrorMessage(
                     data,
-                    `Could not save time slot preferences. ` +
-                    `Status: ${response.status}`
+                    t("availability.saveFailedStatus", "Could not save time slot preferences. Status: {status}").replace("{status}", response.status)
                 )
             );
         }
 
         showAvailabilityMessage(
             data?.message ??
-            "Time slot preferences were saved.",
+            t("availability.saved", "Time slot preferences were saved."),
             false
         );
     } catch (error) {
@@ -345,7 +347,7 @@ async function saveTimeSlotPreferences() {
         showAvailabilityMessage(
             error instanceof Error
                 ? error.message
-                : "Could not save time slot preferences.",
+                : t("availability.saveFailed", "Could not save time slot preferences."),
             true
         );
     }
@@ -375,7 +377,7 @@ function getTimeSlotPreferencesEndpoint(
 
         default:
             throw new Error(
-                `Unsupported resource type: ${resourceType}`
+                t("availability.unsupportedResource", "Unsupported resource type: {type}").replace("{type}", resourceType)
             );
     }
 
@@ -400,19 +402,19 @@ function updatePageHeader(resourceName) {
         );
 
     const resourceLabels = {
-        teacher: "Teacher",
-        class: "Class",
-        room: "Room",
-        subject: "Subject"
+        teacher: t("availability.resource.teacher", "Teacher"),
+        class: t("availability.resource.class", "Class"),
+        room: t("availability.resource.room", "Room"),
+        subject: t("availability.resource.subject", "Subject")
     };
 
     const resourceLabel =
         resourceLabels[resourceType] ??
-        "Resource";
+        t("availability.resource.generic", "Resource");
 
     if (pageTitle) {
         pageTitle.textContent =
-            `${resourceLabel} time slot preferences`;
+            t("availability.resourceTitle", "{resource} time slot preferences").replace("{resource}", resourceLabel);
     }
 
     if (resourceNameElement) {
@@ -538,22 +540,22 @@ function renderAvailabilityTable() {
         switch (preference) {
             case "Preferred":
                 cell.classList.add("preferred");
-                cell.textContent = "Preferred";
+                cell.textContent = t("availability.preferred", "Preferred");
                 break;
 
             case "NotPreferred":
                 cell.classList.add("not-preferred");
-                cell.textContent = "Not preferred";
+                cell.textContent = t("availability.notPreferred", "Not preferred");
                 break;
 
             case "Unavailable":
                 cell.classList.add("unavailable");
-                cell.textContent = "Unavailable";
+                cell.textContent = t("availability.unavailable", "Unavailable");
                 break;
 
             default:
                 cell.classList.add("available");
-                cell.textContent = "Available";
+                cell.textContent = t("availability.available", "Available");
                 break;
         }
 
