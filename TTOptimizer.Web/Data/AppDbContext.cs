@@ -408,6 +408,11 @@ namespace TTOptimizer.Web.Data
                     .HasForeignKey(item => item.SubjectId)
                     .OnDelete(DeleteBehavior.Cascade);
 
+                entity.HasOne(item => item.PreferredRoom)
+                    .WithMany()
+                    .HasForeignKey(item => item.PreferredRoomId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
                 entity.ToTable(table =>
                 {
                     table.HasCheckConstraint("CK_SubjectSchedulingPreferences_MaxOccurrencesPerDayLimit",

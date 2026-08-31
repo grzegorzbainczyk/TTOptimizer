@@ -137,6 +137,12 @@ struct SubjectSchedulingPreference
     SchedulingPreferenceLevel avoidDoubleLessons{
         SchedulingPreferenceLevel::Disabled
     };
+
+    RoomId preferredRoomId{};
+
+    SchedulingPreferenceLevel preferredRoomImportance{
+        SchedulingPreferenceLevel::Disabled
+    };
 };
 
 struct TimetableProblem

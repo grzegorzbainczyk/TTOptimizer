@@ -603,7 +603,8 @@ public class SubjectsController : ControllerBase
         if (!IsValidOptionalLevel(request.SpreadAcrossDays) ||
             !IsValidOptionalLevel(request.MaxOccurrencesPerDay) ||
             !IsValidOptionalLevel(request.PreferDoubleLessons) ||
-            !IsValidOptionalLevel(request.AvoidDoubleLessons))
+            !IsValidOptionalLevel(request.AvoidDoubleLessons) ||
+            !IsValidOptionalLevel(request.PreferredRoomImportance))
         {
             return BadRequest(new
             {
@@ -639,6 +640,24 @@ public class SubjectsController : ControllerBase
                 success = false,
                 message = "Subject was not found."
             });
+        }
+
+        if (request.PreferredRoomId.HasValue)
+        {
+            var preferredRoomExists = await _db.Rooms
+                .AsNoTracking()
+                .AnyAsync(room =>
+                    room.Id == request.PreferredRoomId.Value &&
+                    room.OrganizationId == organizationId);
+
+            if (!preferredRoomExists)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Preferred room was not found in this organization."
+                });
+            }
         }
 
         var organizationDefaults =
@@ -702,6 +721,15 @@ public class SubjectsController : ControllerBase
 
         preferences.AvoidDoubleLessons =
             request.AvoidDoubleLessons;
+
+        preferences.PreferredRoomId =
+            request.PreferredRoomId;
+
+        preferences.PreferredRoomImportance =
+            request.PreferredRoomId.HasValue
+                ? request.PreferredRoomImportance
+                    ?? SchedulingPreferenceLevel.Hard
+                : null;
 
         await _db.SaveChangesAsync();
 
@@ -787,7 +815,16 @@ public class SubjectsController : ControllerBase
                 defaultAvoidDoubleLessons,
             EffectiveAvoidDoubleLessons =
                 preferences?.AvoidDoubleLessons
-                ?? defaultAvoidDoubleLessons
+                ?? defaultAvoidDoubleLessons,
+
+            PreferredRoomId =
+                preferences?.PreferredRoomId,
+
+            PreferredRoomImportance =
+                preferences?.PreferredRoomId != null
+                    ? preferences.PreferredRoomImportance
+                        ?? SchedulingPreferenceLevel.Hard
+                    : null
         };
     }
 

@@ -18,6 +18,8 @@
 #include "Soft/SubjectSpreadAcrossDaysRule.h"
 #include "Soft/SubjectMaxOccurrencesPerDayRule.h"
 #include "Soft/SubjectPreferDoubleLessonsRule.h"
+#include "Soft/SubjectKeepSameRoomForDoubleLessonsRule.h"
+#include "Soft/SubjectPreferredRoomRule.h"
 #include "Soft/SubjectAvoidDoubleLessonsRule.h"
 
 class ConstraintRuleRegistry
@@ -66,6 +68,12 @@ public:
 
         rules_.push_back(
             std::make_unique<SubjectPreferDoubleLessonsRule>());
+
+        rules_.push_back(
+            std::make_unique<SubjectKeepSameRoomForDoubleLessonsRule>());
+
+        rules_.push_back(
+            std::make_unique<SubjectPreferredRoomRule>());
 
         rules_.push_back(
             std::make_unique<SubjectAvoidDoubleLessonsRule>());

@@ -32,6 +32,8 @@ enum class ConstraintViolationType
     SubjectSpreadAcrossDays,
     SubjectMaxOccurrencesPerDay,
     SubjectPreferDoubleLessons,
+    SubjectKeepSameRoomForDoubleLessons,
+    SubjectPreferredRoom,
     SubjectAvoidDoubleLessons
 };
 

@@ -117,6 +117,10 @@ public class SubjectSchedulingPreferenceInput
     public SchedulingPreferenceLevel PreferDoubleLessons { get; set; }
 
     public SchedulingPreferenceLevel AvoidDoubleLessons { get; set; }
+
+    public int PreferredRoomId { get; set; }
+
+    public SchedulingPreferenceLevel PreferredRoomImportance { get; set; }
 }
 
 

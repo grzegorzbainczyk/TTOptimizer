@@ -392,7 +392,16 @@ public class TimetableProblemBuilderService
 
                         AvoidDoubleLessons =
                             overrideValue?.AvoidDoubleLessons
-                            ?? defaultSubjectAvoidDoubleLessons
+                            ?? defaultSubjectAvoidDoubleLessons,
+
+                        PreferredRoomId =
+                            overrideValue?.PreferredRoomId ?? 0,
+
+                        PreferredRoomImportance =
+                            overrideValue?.PreferredRoomId != null
+                                ? overrideValue.PreferredRoomImportance
+                                    ?? SchedulingPreferenceLevel.Hard
+                                : SchedulingPreferenceLevel.Disabled
                     };
                 })
                 .ToList();

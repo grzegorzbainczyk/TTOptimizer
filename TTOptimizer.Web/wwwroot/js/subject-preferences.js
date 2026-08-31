@@ -1,3 +1,5 @@
+import { initializeI18n, t } from "./i18n.js";
+
 const preferenceLevels = [
     "Disabled",
     "Low",
@@ -30,8 +32,12 @@ const levelFields = [
 ];
 
 let currentPreferences = null;
+let availableRooms = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
+    await initializeI18n();
+    document.title = t("subjectPreferences.pageTitle", "ClassFlow - Subject preferences");
+
     const subjectId = getSubjectId();
 
     document.getElementById("subjectId").value =
@@ -54,7 +60,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("avoidDoubleLessonsImportance")
         ?.addEventListener("change", validateDoubleLessonSelection);
 
+    document.getElementById("preferredRoomId")
+        ?.addEventListener("change", updatePreferredRoomImportanceState);
+
+    await loadRooms();
     await loadPreferences();
+
+    window.addEventListener(
+        "classflow:language-changed",
+        () => {
+            if (currentPreferences) {
+                renderPreferences(currentPreferences);
+            }
+        }
+    );
 });
 
 function getSubjectId() {
@@ -66,7 +85,7 @@ function getSubjectId() {
         Number.parseInt(value ?? "", 10);
 
     if (!Number.isInteger(subjectId) || subjectId <= 0) {
-        throw new Error("Subject ID is missing or invalid.");
+        throw new Error(t("subjectPreferences.invalidSubjectId", "Subject ID is missing or invalid."));
     }
 
     return subjectId;
@@ -80,7 +99,7 @@ async function loadPreferences() {
         const subjectId =
             getSubjectId();
 
-        showMessage("Loading subject scheduling preferences...");
+        showMessage(t("subjectPreferences.loading", "Loading subject scheduling preferences..."));
 
         const response = await fetch(
             `/api/subjects/${encodeURIComponent(subjectId)}/scheduling-preferences?organizationId=${encodeURIComponent(organizationId)}`
@@ -92,7 +111,7 @@ async function loadPreferences() {
         if (!response.ok || !data?.success) {
             throw new Error(
                 data?.message ??
-                "Could not load subject scheduling preferences."
+                t("subjectPreferences.loadFailed", "Could not load subject scheduling preferences.")
             );
         }
 
@@ -113,7 +132,7 @@ async function loadPreferences() {
         showMessage(
             error instanceof Error
                 ? error.message
-                : "Could not load subject scheduling preferences.",
+                : t("subjectPreferences.loadFailed", "Could not load subject scheduling preferences."),
             true
         );
     }
@@ -126,7 +145,7 @@ function renderPreferences(preferences) {
     if (subjectName) {
         subjectName.textContent =
             preferences.subjectName ??
-            "Subject preferences";
+            t("subjectPreferences.subjectFallback", "Subject preferences");
     }
 
     for (const field of levelFields) {
@@ -143,6 +162,12 @@ function renderPreferences(preferences) {
         preferences.maxOccurrencesPerDayLimit,
         preferences.defaultMaxOccurrencesPerDayLimit
     );
+
+    populatePreferredRoomSelect(preferences.preferredRoomId);
+    populatePreferredRoomImportance(
+        preferences.preferredRoomImportance
+    );
+    updatePreferredRoomImportanceState();
 }
 
 function populateLevelSelect(
@@ -164,7 +189,11 @@ function populateLevelSelect(
 
     defaultOption.value = "default";
     defaultOption.textContent =
-        `Default (${defaultValue})`;
+        t("subjectPreferences.defaultValue", "Default ({value})")
+            .replace(
+                "{value}",
+                translatePreferenceLevel(defaultValue)
+            );
 
     select.appendChild(defaultOption);
 
@@ -173,7 +202,7 @@ function populateLevelSelect(
             document.createElement("option");
 
         option.value = level;
-        option.textContent = level;
+        option.textContent = translatePreferenceLevel(level);
 
         select.appendChild(option);
     }
@@ -219,12 +248,18 @@ async function savePreferences() {
             avoidDoubleLessons:
                 getOptionalLevel(
                     "avoidDoubleLessonsImportance"
-                )
+                ),
+
+            preferredRoomId:
+                getOptionalInt("preferredRoomId"),
+
+            preferredRoomImportance:
+                getPreferredRoomImportance()
         };
 
         validateOptionalLimit(
             payload.maxOccurrencesPerDayLimit,
-            "Max occurrences per day"
+            t("subjectPreferences.maxOccurrencesPerDay.title", "Max occurrences per day")
         );
 
         validateDoubleLessonSelection();
@@ -233,7 +268,7 @@ async function savePreferences() {
             saveButton.disabled = true;
         }
 
-        showMessage("Saving subject scheduling preferences...");
+        showMessage(t("subjectPreferences.saving", "Saving subject scheduling preferences..."));
 
         const response = await fetch(
             `/api/subjects/${encodeURIComponent(subjectId)}/scheduling-preferences?organizationId=${encodeURIComponent(organizationId)}`,
@@ -252,7 +287,7 @@ async function savePreferences() {
         if (!response.ok || !data?.success) {
             throw new Error(
                 data?.message ??
-                "Could not save subject scheduling preferences."
+                t("subjectPreferences.saveFailed", "Could not save subject scheduling preferences.")
             );
         }
 
@@ -264,8 +299,10 @@ async function savePreferences() {
         );
 
         showMessage(
-            data.message ??
-            "Subject scheduling preferences were saved."
+            t(
+                "subjectPreferences.saved",
+                "Subject scheduling preferences were saved."
+            )
         );
     } catch (error) {
         console.error(
@@ -276,7 +313,7 @@ async function savePreferences() {
         showMessage(
             error instanceof Error
                 ? error.message
-                : "Could not save subject scheduling preferences.",
+                : t("subjectPreferences.saveFailed", "Could not save subject scheduling preferences."),
             true
         );
     } finally {
@@ -305,6 +342,22 @@ async function useAllDefaults() {
         limit.value = "";
     }
 
+    const preferredRoom =
+        document.getElementById("preferredRoomId");
+
+    if (preferredRoom) {
+        preferredRoom.value = "";
+    }
+
+    const preferredRoomImportance =
+        document.getElementById("preferredRoomImportance");
+
+    if (preferredRoomImportance) {
+        preferredRoomImportance.value = "Hard";
+    }
+
+    updatePreferredRoomImportanceState();
+
     await savePreferences();
 }
 
@@ -328,6 +381,119 @@ function getOptionalLimit(id) {
     return Number.parseInt(raw, 10);
 }
 
+function getOptionalInt(id) {
+    const raw = document.getElementById(id)?.value;
+
+    if (!raw) {
+        return null;
+    }
+
+    const value = Number.parseInt(raw, 10);
+    return Number.isInteger(value) && value > 0
+        ? value
+        : null;
+}
+
+function getPreferredRoomImportance() {
+    const preferredRoomId = getOptionalInt("preferredRoomId");
+
+    if (preferredRoomId == null) {
+        return null;
+    }
+
+    return document.getElementById("preferredRoomImportance")?.value
+        ?? "Hard";
+}
+
+async function loadRooms() {
+    try {
+        const organizationId =
+            window.appContext.requireOrganizationId();
+
+        const response = await fetch(
+            `/api/rooms?organizationId=${encodeURIComponent(organizationId)}`
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                t(
+                    "subjectPreferences.room.loadFailed",
+                    "Could not load rooms."
+                )
+            );
+        }
+
+        const data = await readJsonResponse(response);
+        availableRooms = Array.isArray(data) ? data : [];
+    } catch (error) {
+        console.error("Error loading rooms for subject preferences:", error);
+        availableRooms = [];
+    }
+}
+
+function populatePreferredRoomSelect(selectedRoomId) {
+    const select = document.getElementById("preferredRoomId");
+
+    if (!select) {
+        return;
+    }
+
+    select.innerHTML = "";
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = t(
+        "subjectPreferences.room.noPreferredRoom",
+        "No preferred room"
+    );
+    select.appendChild(emptyOption);
+
+    for (const room of availableRooms) {
+        const option = document.createElement("option");
+        option.value = String(room.id);
+        option.textContent = room.buildingName
+            ? `${room.name} (${room.buildingName})`
+            : room.name;
+        select.appendChild(option);
+    }
+
+    select.value = selectedRoomId == null
+        ? ""
+        : String(selectedRoomId);
+}
+
+function populatePreferredRoomImportance(savedValue) {
+    const select = document.getElementById("preferredRoomImportance");
+
+    if (!select) {
+        return;
+    }
+
+    select.innerHTML = "";
+
+    for (const level of preferenceLevels) {
+        if (level === "Disabled") {
+            continue;
+        }
+
+        const option = document.createElement("option");
+        option.value = level;
+        option.textContent = translatePreferenceLevel(level);
+        select.appendChild(option);
+    }
+
+    select.value = savedValue ?? "Hard";
+}
+
+function updatePreferredRoomImportanceState() {
+    const preferredRoomId = getOptionalInt("preferredRoomId");
+    const importance = document.getElementById("preferredRoomImportance");
+
+    if (importance) {
+        importance.disabled = preferredRoomId == null;
+    }
+}
+
 function validateOptionalLimit(value, label) {
     if (value == null) {
         return;
@@ -338,7 +504,10 @@ function validateOptionalLimit(value, label) {
         value > 8)
     {
         throw new Error(
-            `${label} limit must be between 1 and 8.`
+            t(
+                "subjectPreferences.limitRange",
+                "{label} limit must be between 1 and 8."
+            ).replace("{label}", label)
         );
     }
 }
@@ -372,7 +541,10 @@ function validateDoubleLessonSelection() {
         effectiveAvoid !== "Disabled")
     {
         throw new Error(
-            "Prefer double lessons and avoid double lessons cannot both be enabled."
+            t(
+                "subjectPreferences.doubleConflict",
+                "Prefer double lessons and avoid double lessons cannot both be enabled."
+            )
         );
     }
 }
@@ -394,15 +566,32 @@ function setLimit(
             savedValue ?? "";
 
         input.placeholder =
-            `Default (${defaultValue})`;
+            t(
+                "subjectPreferences.defaultValue",
+                "Default ({value})"
+            ).replace("{value}", defaultValue);
     }
 
     if (hint) {
         hint.textContent =
             savedValue == null
-                ? `Using organization default: ${defaultValue}`
-                : `Organization default: ${defaultValue}`;
+                ? t(
+                    "subjectPreferences.usingOrganizationDefault",
+                    "Using organization default: {value}"
+                ).replace("{value}", defaultValue)
+                : t(
+                    "subjectPreferences.organizationDefault",
+                    "Organization default: {value}"
+                ).replace("{value}", defaultValue);
     }
+}
+
+
+function translatePreferenceLevel(level) {
+    return t(
+        `subjectPreferences.level.${level}`,
+        level
+    );
 }
 
 async function readJsonResponse(response) {
@@ -419,7 +608,10 @@ async function readJsonResponse(response) {
         return {
             success: false,
             message:
-                `Server returned invalid JSON. Status: ${response.status}`
+                t(
+                    "subjectPreferences.invalidJson",
+                    "Server returned invalid JSON. Status: {status}"
+                ).replace("{status}", response.status)
         };
     }
 }

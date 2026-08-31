@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClassFlow - Subject preferences</title>
+    <title data-i18n="subjectPreferences.pageTitle">ClassFlow - Subject preferences</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="teachers-page">
@@ -11,18 +11,15 @@
         <header class="app-header teachers-header">
             <div class="teachers-header-content">
                 <div class="teachers-title-group">
-                    <span class="teachers-page-label">Subject scheduling</span>
+                    <span class="teachers-page-label" data-i18n="subjectPreferences.pageLabel">Subject scheduling</span>
                     <h1 id="subjectName">Subject preferences</h1>
-                    <p class="page-subtitle">
-                        Configure scheduling preferences for this subject.
-                        Default values are inherited from the organization.
-                    </p>
+                    <p class="page-subtitle" data-i18n="subjectPreferences.subtitle">Configure scheduling preferences for this subject. Default values are inherited from the organization.</p>
                 </div>
 
                 <nav class="header-actions">
                     <button id="backToSubjectsButton"
                             class="secondary-button teachers-header-button"
-                            type="button">
+                            type="button" data-i18n="subjectPreferences.backToSubjects">
                         Back to subjects
                     </button>
                 </nav>
@@ -32,10 +29,8 @@
         <main class="content-card teachers-card">
             <div class="section-header teachers-section-header">
                 <div>
-                    <h2>Scheduling preferences</h2>
-                    <p class="teachers-section-description">
-                        These rules are evaluated separately for each class using this subject.
-                    </p>
+                    <h2 data-i18n="subjectPreferences.title">Scheduling preferences</h2>
+                    <p class="teachers-section-description" data-i18n="subjectPreferences.description">These rules are evaluated separately for each class using this subject.</p>
                 </div>
             </div>
 
@@ -44,37 +39,37 @@
 
                 <section class="teacher-preferences-group">
                     <div class="teacher-preferences-group-header">
-                        <h3>Weekly distribution</h3>
-                        <p>Control how often and on how many days a subject appears.</p>
+                        <h3 data-i18n="subjectPreferences.weeklyDistribution.title">Weekly distribution</h3>
+                        <p data-i18n="subjectPreferences.weeklyDistribution.description">Control how often and on how many days a subject appears.</p>
                     </div>
 
                     <div class="teacher-preferences-simple-grid">
                         <article class="teacher-preference-card">
                             <div class="teacher-preference-card-header">
-                                <h4>Spread across days</h4>
-                                <p>Prefer using as many distinct teaching days as the weekly lesson count reasonably allows.</p>
+                                <h4 data-i18n="subjectPreferences.spreadAcrossDays.title">Spread across days</h4>
+                                <p data-i18n="subjectPreferences.spreadAcrossDays.description">Prefer using as many distinct teaching days as the weekly lesson count reasonably allows.</p>
                             </div>
 
                             <div class="form-field">
-                                <label for="spreadAcrossDaysImportance">Importance</label>
+                                <label for="spreadAcrossDaysImportance" data-i18n="subjectPreferences.importance">Importance</label>
                                 <select id="spreadAcrossDaysImportance"></select>
                             </div>
                         </article>
 
                         <article class="teacher-preference-card">
                             <div class="teacher-preference-card-header">
-                                <h4>Max occurrences per day</h4>
-                                <p>Limit how many lessons of this subject a class should have in one day.</p>
+                                <h4 data-i18n="subjectPreferences.maxOccurrencesPerDay.title">Max occurrences per day</h4>
+                                <p data-i18n="subjectPreferences.maxOccurrencesPerDay.description">Limit how many lessons of this subject a class should have in one day.</p>
                             </div>
 
                             <div class="teacher-preference-paired-fields">
                                 <div class="form-field">
-                                    <label for="maxOccurrencesPerDayImportance">Importance</label>
+                                    <label for="maxOccurrencesPerDayImportance" data-i18n="subjectPreferences.importance">Importance</label>
                                     <select id="maxOccurrencesPerDayImportance"></select>
                                 </div>
 
                                 <div class="form-field">
-                                    <label for="maxOccurrencesPerDayLimit">Maximum lessons</label>
+                                    <label for="maxOccurrencesPerDayLimit" data-i18n="subjectPreferences.maximumLessons">Maximum lessons</label>
                                     <input id="maxOccurrencesPerDayLimit"
                                            type="number"
                                            min="1"
@@ -89,52 +84,78 @@
 
                 <section class="teacher-preferences-group">
                     <div class="teacher-preferences-group-header">
-                        <h3>Lesson blocks</h3>
-                        <p>Choose whether consecutive same-subject lessons are desirable.</p>
+                        <h3 data-i18n="subjectPreferences.lessonBlocks.title">Lesson blocks</h3>
+                        <p data-i18n="subjectPreferences.lessonBlocks.description">Choose whether consecutive same-subject lessons are desirable.</p>
                     </div>
 
                     <div class="teacher-preferences-simple-grid">
                         <article class="teacher-preference-card">
                             <div class="teacher-preference-card-header">
-                                <h4>Prefer double lessons</h4>
-                                <p>Prefer pairing lessons into consecutive blocks. An unavoidable single lesson for an odd weekly count is not penalized.</p>
+                                <h4 data-i18n="subjectPreferences.preferDouble.title">Prefer double lessons</h4>
+                                <p data-i18n="subjectPreferences.preferDouble.description">Prefer pairing lessons into consecutive blocks. An unavoidable single lesson for an odd weekly count is not penalized.</p>
                             </div>
 
                             <div class="form-field">
-                                <label for="preferDoubleLessonsImportance">Importance</label>
+                                <label for="preferDoubleLessonsImportance" data-i18n="subjectPreferences.importance">Importance</label>
                                 <select id="preferDoubleLessonsImportance"></select>
                             </div>
                         </article>
 
                         <article class="teacher-preference-card">
                             <div class="teacher-preference-card-header">
-                                <h4>Avoid double lessons</h4>
-                                <p>Discourage adjacent lessons of this subject for the same class.</p>
+                                <h4 data-i18n="subjectPreferences.avoidDouble.title">Avoid double lessons</h4>
+                                <p data-i18n="subjectPreferences.avoidDouble.description">Discourage adjacent lessons of this subject for the same class.</p>
                             </div>
 
                             <div class="form-field">
-                                <label for="avoidDoubleLessonsImportance">Importance</label>
+                                <label for="avoidDoubleLessonsImportance" data-i18n="subjectPreferences.importance">Importance</label>
                                 <select id="avoidDoubleLessonsImportance"></select>
                             </div>
                         </article>
                     </div>
 
-                    <p class="subject-preferences-note">
-                        Prefer double lessons and Avoid double lessons cannot both be enabled.
-                    </p>
+                    <p class="subject-preferences-note" data-i18n="subjectPreferences.doubleConflictNote">Prefer double lessons and Avoid double lessons cannot both be enabled.</p>
+                </section>
+
+                <section class="teacher-preferences-group">
+                    <div class="teacher-preferences-group-header">
+                        <h3 data-i18n="subjectPreferences.room.title">Sala</h3>
+                        <p data-i18n="subjectPreferences.room.description">Wybierz salę, która powinna być używana dla lekcji tego przedmiotu.</p>
+                    </div>
+
+                    <div class="teacher-preferences-simple-grid">
+                        <article class="teacher-preference-card">
+                            <div class="teacher-preference-card-header">
+                                <h4 data-i18n="subjectPreferences.room.preferredRoom">Preferowana sala</h4>
+                                <p data-i18n="subjectPreferences.room.preferredRoomDescription">Na przykład sala gimnastyczna dla WF lub pracownia komputerowa dla informatyki.</p>
+                            </div>
+
+                            <div class="teacher-preference-paired-fields">
+                                <div class="form-field">
+                                    <label for="preferredRoomId" data-i18n="subjectPreferences.room.preferredRoom">Preferowana sala</label>
+                                    <select id="preferredRoomId"></select>
+                                </div>
+
+                                <div class="form-field">
+                                    <label for="preferredRoomImportance" data-i18n="subjectPreferences.importance">Ważność</label>
+                                    <select id="preferredRoomImportance"></select>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
                 </section>
 
                 <div class="teacher-preferences-footer">
                     <div class="teachers-form-actions">
                         <button id="saveSubjectPreferencesButton"
                                 class="main-action-button"
-                                type="button">
+                                type="button" data-i18n="common.save">
                             Save
                         </button>
 
                         <button id="resetSubjectPreferencesButton"
                                 class="secondary-button"
-                                type="button">
+                                type="button" data-i18n="subjectPreferences.useAllDefaults">
                             Use all defaults
                         </button>
                     </div>
@@ -149,6 +170,6 @@
     </div>
 
     <script src="/js/appContext.js"></script>
-    <script src="/js/subject-preferences.js"></script>
+    <script src="/js/subject-preferences.js" type="module"></script>
 </body>
 </html>

@@ -548,6 +548,15 @@ private:
                         "avoidDoubleLessons",
                         "Disabled"));
 
+            preference.preferredRoomId =
+                item.value("preferredRoomId", 0);
+
+            preference.preferredRoomImportance =
+                parseSchedulingPreferenceLevel(
+                    item.value(
+                        "preferredRoomImportance",
+                        "Disabled"));
+
             problem.subjectSchedulingPreferences.push_back(
                 preference);
         }

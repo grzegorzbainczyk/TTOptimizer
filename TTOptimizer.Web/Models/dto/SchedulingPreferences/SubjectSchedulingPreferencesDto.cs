@@ -27,6 +27,10 @@ public class SubjectSchedulingPreferencesDto
     public SchedulingPreferenceLevel? AvoidDoubleLessons { get; set; }
     public SchedulingPreferenceLevel DefaultAvoidDoubleLessons { get; set; }
     public SchedulingPreferenceLevel EffectiveAvoidDoubleLessons { get; set; }
+
+    public int? PreferredRoomId { get; set; }
+
+    public SchedulingPreferenceLevel? PreferredRoomImportance { get; set; }
 }
 
 public class UpdateSubjectSchedulingPreferencesRequest
@@ -40,4 +44,8 @@ public class UpdateSubjectSchedulingPreferencesRequest
     public SchedulingPreferenceLevel? PreferDoubleLessons { get; set; }
 
     public SchedulingPreferenceLevel? AvoidDoubleLessons { get; set; }
+
+    public int? PreferredRoomId { get; set; }
+
+    public SchedulingPreferenceLevel? PreferredRoomImportance { get; set; }
 }

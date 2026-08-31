@@ -18,5 +18,11 @@ public class SubjectSchedulingPreferences
 
     public SchedulingPreferenceLevel? AvoidDoubleLessons { get; set; }
 
+    public int? PreferredRoomId { get; set; }
+
+    public SchedulingPreferenceLevel? PreferredRoomImportance { get; set; }
+
     public Subject Subject { get; set; } = null!;
+
+    public Room? PreferredRoom { get; set; }
 }
