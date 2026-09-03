@@ -45,6 +45,7 @@ public class ClassesController : ControllerBase
                 SchoolUnitName = classGroup.SchoolUnit.Name,
                 Name = classGroup.Name,
                 Grade = classGroup.Grade,
+                IsEarlyEducation = classGroup.IsEarlyEducation,
                 Info = classGroup.Info,
 
                 HomeroomTeacherId =
@@ -119,6 +120,7 @@ public class ClassesController : ControllerBase
             SchoolUnitId = request.SchoolUnitId,
             Name = normalizedName,
             Grade = request.Grade,
+            IsEarlyEducation = request.IsEarlyEducation,
             Info = NormalizeOptionalText(request.Info),
             HomeroomTeacherId = request.HomeroomTeacherId,
             DefaultRoomId = request.DefaultRoomId
@@ -249,6 +251,7 @@ public class ClassesController : ControllerBase
         classGroup.SchoolUnitId = request.SchoolUnitId;
         classGroup.Name = normalizedName;
         classGroup.Grade = request.Grade;
+        classGroup.IsEarlyEducation = request.IsEarlyEducation;
         classGroup.Info =
             NormalizeOptionalText(request.Info);
 
@@ -412,6 +415,9 @@ public class ClassesController : ControllerBase
                     SchoolUnitId = schoolUnit.Id,
                     Name = item.Name,
                     Grade = item.Grade,
+                    IsEarlyEducation =
+                        schoolUnit.SchoolType == SchoolType.PrimarySchool &&
+                        item.Grade is >= 1 and <= 3,
                     Info = null,
                     HomeroomTeacherId = null,
                     DefaultRoomId = null
@@ -601,12 +607,20 @@ public class ClassesController : ControllerBase
         {
             foreach (var name in namesToImport)
             {
+                var inferredGrade =
+                    InferGradeFromClassName(
+                        name,
+                        schoolUnit.SchoolType);
+
                 var classGroup = new ClassGroup
                 {
                     OrganizationId = organizationId,
                     SchoolUnitId = schoolUnitId,
                     Name = name,
-                    Grade = InferGradeFromClassName(name, schoolUnit.SchoolType),
+                    Grade = inferredGrade,
+                    IsEarlyEducation =
+                        schoolUnit.SchoolType == SchoolType.PrimarySchool &&
+                        inferredGrade is >= 1 and <= 3,
                     Info = null,
                     HomeroomTeacherId = null,
                     DefaultRoomId = null
@@ -1206,6 +1220,7 @@ public class ClassesController : ControllerBase
                 SchoolUnitName = classGroup.SchoolUnit.Name,
                 Name = classGroup.Name,
                 Grade = classGroup.Grade,
+                IsEarlyEducation = classGroup.IsEarlyEducation,
                 Info = classGroup.Info,
 
                 HomeroomTeacherId =

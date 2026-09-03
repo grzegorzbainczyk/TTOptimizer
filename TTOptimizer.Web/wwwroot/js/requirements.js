@@ -1046,7 +1046,10 @@ function populateCurriculumClassOptions() {
     teachingPlanClassSelections = availableClasses.map(classGroup => ({
         classGroupId: Number(classGroup.id),
         className: classGroup.name ?? `Class #${classGroup.id}`,
-        grade: inferGradeFromClassName(classGroup.name),
+        grade:
+            Number.isInteger(Number(classGroup.grade))
+                ? Number(classGroup.grade)
+                : inferGradeFromClassName(classGroup.name),
         selected: true
     }));
 
@@ -1321,24 +1324,39 @@ function applyDefaultTeacherToCurriculumRow(row) {
     row.hasMultipleDefaultTeachers = false;
     row.teacherWasAutoAssigned = false;
 
-    if (!row.subjectId) {
-        return;
+    if (row.subjectId) {
+        const assignments =
+            getTeacherAssignmentsForRow(row);
+
+        if (assignments.length === 1) {
+            row.teacherId =
+                Number(assignments[0].teacherId);
+
+            row.teacherWasAutoAssigned = true;
+            return;
+        }
+
+        if (assignments.length > 1) {
+            row.teacherId = null;
+            row.hasMultipleDefaultTeachers = true;
+            return;
+        }
     }
 
-    const assignments =
-        getTeacherAssignmentsForRow(row);
+    const classGroup =
+        availableClasses.find(item =>
+            Number(item.id) === Number(row.classGroupId)
+        );
 
-    if (assignments.length === 1) {
-        row.teacherId =
-            Number(assignments[0].teacherId);
+    const homeroomTeacherId =
+        Number(classGroup?.homeroomTeacherId);
 
+    if (classGroup?.isEarlyEducation &&
+        Number.isInteger(homeroomTeacherId) &&
+        homeroomTeacherId > 0)
+    {
+        row.teacherId = homeroomTeacherId;
         row.teacherWasAutoAssigned = true;
-        return;
-    }
-
-    if (assignments.length > 1) {
-        row.teacherId = null;
-        row.hasMultipleDefaultTeachers = true;
     }
 }
 

@@ -73,6 +73,16 @@ ClassFlow podpowiada, których roczników brakuje. Brak rocznika nie blokuje pra
 <select id="classGrade" required></select>
 <small id="classGradeHelp" data-i18n="classes.gradeHelp">Rocznik zależy od typu wybranej szkoły.</small>
 </div>
+
+<div class="form-field">
+<label class="checkbox-field" for="isEarlyEducation">
+<input id="isEarlyEducation" type="checkbox"/>
+<span>
+    <strong data-i18n="classes.earlyEducation">Edukacja wczesnoszkolna</strong>
+    <small data-i18n="classes.earlyEducationHelp">Dla klas 1–3 wychowawca może być automatycznie używany jako domyślny nauczyciel podczas tworzenia planu nauczania.</small>
+</span>
+</label>
+</div>
 <div class="form-field">
 <label for="homeroomTeacherId">
                             <span data-i18n="classes.homeroomTeacher">Homeroom teacher</span>
@@ -136,6 +146,7 @@ ClassFlow podpowiada, których roczników brakuje. Brak rocznika nie blokuje pra
 <th data-i18n="common.name">Name</th>
 <th id="schoolUnitColumnHeader" data-i18n="classes.school">Szkoła</th>
 <th data-i18n="classes.grade">Rocznik</th>
+<th data-i18n="classes.educationType">Typ nauczania</th>
 <th><span data-i18n="classes.homeroomTeacher">Homeroom teacher</span></th>
 <th><span data-i18n="classes.defaultRoom">Default room</span></th>
 <th data-i18n="common.info">Info</th>
@@ -146,7 +157,7 @@ ClassFlow podpowiada, których roczników brakuje. Brak rocznika nie blokuje pra
 </thead>
 <tbody>
 <tr>
-<td class="teachers-table-state" colspan="7">
+<td class="teachers-table-state" colspan="8">
                                 Loading classes...
                             </td>
 </tr>

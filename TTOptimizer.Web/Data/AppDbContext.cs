@@ -158,6 +158,8 @@ namespace TTOptimizer.Web.Data
             {
                 entity.Property(classGroup => classGroup.Name).IsRequired().HasMaxLength(50);
                 entity.Property(classGroup => classGroup.Info).HasMaxLength(2000);
+                entity.Property(classGroup => classGroup.IsEarlyEducation)
+                    .HasDefaultValue(false);
 
                 entity.HasIndex(classGroup => new { classGroup.OrganizationId, classGroup.Name })
                     .IsUnique();

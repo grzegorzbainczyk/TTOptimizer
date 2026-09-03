@@ -223,8 +223,9 @@ outline: 3px solid var(--color-primary-soft);
 }
 
 .demo-button-title {
-font-size: 14px;
+font-size: 13px;
     font-weight: 600;
+    line-height: 1.25;
 }
 
 .demo-button-description {

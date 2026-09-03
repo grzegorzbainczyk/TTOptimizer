@@ -31,7 +31,7 @@
         }
 
     .demo-buttons {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .demo-button {
@@ -49,6 +49,10 @@
     }
 
     .auth-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .demo-buttons {
         grid-template-columns: 1fr;
     }
 }

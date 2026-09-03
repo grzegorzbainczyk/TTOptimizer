@@ -740,5 +740,10 @@
   "availability.resource.room": "Room",
   "availability.resource.subject": "Subject",
   "availability.resource.generic": "Resource",
-  "availability.resourceTitle": "{resource} time slot preferences"
+  "availability.resourceTitle": "{resource} time slot preferences",
+  "classes.earlyEducation": "Early education",
+  "classes.earlyEducationHelp": "For primary grades 1–3, the homeroom teacher can be used automatically as the default teacher while creating the teaching plan.",
+  "classes.educationType": "Education type",
+  "classes.earlyEducationShort": "Early education",
+  "classes.subjectEducationShort": "Subject-based"
 }

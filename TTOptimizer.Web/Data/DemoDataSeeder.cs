@@ -5,11 +5,14 @@ namespace TTOptimizer.Web.Data;
 
 public class DemoDataSeeder
 {
-    private const string EasyDemoOrganizationName =
-        "Demo School Easy";
+    private const string EmptyDemoOrganizationName =
+        "Pusta szkoła - demo";
 
-    private const string HardDemoOrganizationName =
-        "Demo School Hard";
+    private const string SmallDemoOrganizationName =
+        "Mała szkoła - demo";
+
+    private const string PrimarySchoolDemoOrganizationName =
+        "Szkoła podstawowa - demo";
 
     private readonly AppDbContext _context;
 
@@ -18,58 +21,65 @@ public class DemoDataSeeder
         _context = context;
     }
 
-    public async Task<int> EnsureEasyDemoDataAsync()
+    public Task<int> EnsureEmptyDemoDataAsync()
+    {
+        return GetOrCreateOrganizationAsync(
+            EmptyDemoOrganizationName
+        );
+    }
+
+    public async Task<int> EnsureSmallDemoDataAsync()
     {
         var organizationId =
             await GetOrCreateOrganizationAsync(
-                EasyDemoOrganizationName
+                SmallDemoOrganizationName
             );
 
         if (!await DemoDataExistsAsync(organizationId))
         {
-            await CreateEasyDemoDataAsync(organizationId);
+            await CreateSmallDemoDataAsync(organizationId);
         }
 
         return organizationId;
     }
 
-    public async Task<int> EnsureHardDemoDataAsync()
+    public async Task<int> EnsurePrimarySchoolDemoDataAsync()
     {
         var organizationId =
             await GetOrCreateOrganizationAsync(
-                HardDemoOrganizationName
+                PrimarySchoolDemoOrganizationName
             );
 
         if (!await DemoDataExistsAsync(organizationId))
         {
-            await CreateHardDemoDataAsync(organizationId);
+            await CreatePrimarySchoolDemoDataAsync(organizationId);
         }
 
         return organizationId;
     }
 
-    public async Task<int> ResetEasyDemoDataAsync()
+    public async Task<int> ResetSmallDemoDataAsync()
     {
         var organizationId =
             await GetOrCreateOrganizationAsync(
-                EasyDemoOrganizationName
+                SmallDemoOrganizationName
             );
 
         await ClearDemoDataAsync(organizationId);
-        await CreateEasyDemoDataAsync(organizationId);
+        await CreateSmallDemoDataAsync(organizationId);
 
         return organizationId;
     }
 
-    public async Task<int> ResetHardDemoDataAsync()
+    public async Task<int> ResetPrimarySchoolDemoDataAsync()
     {
         var organizationId =
             await GetOrCreateOrganizationAsync(
-                HardDemoOrganizationName
+                PrimarySchoolDemoOrganizationName
             );
 
         await ClearDemoDataAsync(organizationId);
-        await CreateHardDemoDataAsync(organizationId);
+        await CreatePrimarySchoolDemoDataAsync(organizationId);
 
         return organizationId;
     }
@@ -177,7 +187,7 @@ public class DemoDataSeeder
         await _context.SaveChangesAsync();
     }
 
-    private async Task CreateEasyDemoDataAsync(
+    private async Task CreateSmallDemoDataAsync(
         int organizationId)
     {
         var schoolUnit =
@@ -188,7 +198,7 @@ public class DemoDataSeeder
             TeacherNumber = 1,
             Name = "Anna Kowalska",
             Alias = "AK",
-            Info = "Prefers morning lessons.",
+            Info = "Preferuje lekcje poranne.",
             OrganizationId = organizationId
         };
 
@@ -212,7 +222,7 @@ public class DemoDataSeeder
 
         var mainBuilding = new Building
         {
-            Name = "Main Building",
+            Name = "Budynek główny",
             OrganizationId = organizationId
         };
 
@@ -233,7 +243,7 @@ public class DemoDataSeeder
         var class1A = new ClassGroup
         {
             Name = "1A",
-            Info = "Main classroom for group 1A.",
+            Info = "Sala macierzysta klasy 1A.",
             HomeroomTeacher = anna,
             DefaultRoom = room101,
             OrganizationId = organizationId,
@@ -243,7 +253,7 @@ public class DemoDataSeeder
         var class1B = new ClassGroup
         {
             Name = "1B",
-            Info = "Main classroom for group 1B.",
+            Info = "Sala macierzysta klasy 1B.",
             HomeroomTeacher = jan,
             DefaultRoom = room102,
             OrganizationId = organizationId,
@@ -252,19 +262,19 @@ public class DemoDataSeeder
 
         var mathematics = new Subject
         {
-            Name = "Mathematics",
+            Name = "Matematyka",
             OrganizationId = organizationId
         };
 
         var polish = new Subject
         {
-            Name = "Polish",
+            Name = "Język polski",
             OrganizationId = organizationId
         };
 
         var english = new Subject
         {
-            Name = "English",
+            Name = "Język angielski",
             OrganizationId = organizationId
         };
 
@@ -347,7 +357,7 @@ public class DemoDataSeeder
         await _context.SaveChangesAsync();
     }
 
-    private async Task CreateHardDemoDataAsync(
+    private async Task CreatePrimarySchoolDemoDataAsync(
         int organizationId)
     {
         var schoolUnit =
@@ -357,18 +367,36 @@ public class DemoDataSeeder
             organizationId,
             new[]
             {
-                "Anna Kowalska",
-                "Marek Wiśniewski",
-                "Joanna Nowak",
-                "Tomasz Zieliński",
-                "Katarzyna Wójcik",
-                "Piotr Kamiński",
-                "Magdalena Lewandowska",
-                "Robert Dąbrowski",
-                "Agnieszka Szymańska",
-                "Paweł Woźniak",
-                "Monika Kozłowska",
-                "Krzysztof Jankowski"
+                "Anna Bursztynowicz",
+                "Barbara Chmielowiec",
+                "Celina Dobrowolska",
+                "Dorota Fijałkowska",
+                "Elżbieta Gromnicka",
+                "Grażyna Jaroszewicz",
+                "Joanna Kordylewska",
+                "Katarzyna Leszczyńska",
+                "Marek Mioduszewski",
+                "Piotr Niedzielski",
+                "Agnieszka Orzechowska",
+                "Tomasz Pruszyński",
+                "Monika Radecka",
+                "Paweł Sarnowski",
+                "Aleksandra Trzebińska",
+                "Robert Uściński",
+                "Michał Wierzbicki",
+                "Renata Zawadzka",
+                "Ewa Białostocka",
+                "Krzysztof Czerwiński",
+                "Adam Drzewiecki",
+                "Łukasz Gronostajski",
+                "Andrzej Jastrzębski",
+                "Magdalena Kwiecińska",
+                "Beata Lubowiecka",
+                "Marcin Mroziński",
+                "Sylwia Ostrowska",
+                "Damian Podgórski",
+                "Teresa Różycka",
+                "Jan Żurawiecki"
             });
 
         var classGroups = CreateClassGroups(
@@ -383,34 +411,46 @@ public class DemoDataSeeder
                 "3A",
                 "3B",
                 "4A",
-                "4B"
+                "4B",
+                "5A",
+                "5B",
+                "6A",
+                "6B",
+                "7A",
+                "7B",
+                "8A",
+                "8B"
             });
 
         var subjects = CreateSubjects(
             organizationId,
             new[]
             {
-                "Mathematics",
-                "Polish",
-                "English",
-                "History",
-                "Geography",
-                "Biology",
-                "Physics",
-                "Chemistry",
-                "Computer Science",
-                "Physical Education"
+                "Edukacja wczesnoszkolna",
+                "Język polski",
+                "Matematyka",
+                "Język angielski",
+                "Język niemiecki",
+                "Historia",
+                "Wiedza o społeczeństwie",
+                "Geografia",
+                "Przyroda",
+                "Biologia",
+                "Fizyka",
+                "Chemia",
+                "Informatyka",
+                "Technika",
+                "Plastyka",
+                "Muzyka",
+                "Wychowanie fizyczne",
+                "Edukacja dla bezpieczeństwa",
+                "Religia",
+                "Etyka"
             });
 
         var mainBuilding = new Building
         {
-            Name = "Main Building",
-            OrganizationId = organizationId
-        };
-
-        var sportsBuilding = new Building
-        {
-            Name = "Sports Building",
+            Name = "Budynek główny",
             OrganizationId = organizationId
         };
 
@@ -422,34 +462,38 @@ public class DemoDataSeeder
                 "102",
                 "103",
                 "104",
+                "105",
+                "106",
+                "107",
+                "108",
                 "201",
                 "202",
-                "Computer Lab",
-                "Physics Lab",
-                "Chemistry Lab",
-                "Gym"
+                "203",
+                "204",
+                "205",
+                "206",
+                "207",
+                "208",
+                "Pracownia komputerowa",
+                "Pracownia chemiczna",
+                "Sala gimnastyczna"
             });
 
         foreach (var room in rooms.Values)
         {
-            room.Building = room.Name == "Gym"
-                ? sportsBuilding
-                : mainBuilding;
+            room.Building = mainBuilding;
         }
 
-        ConfigureHardDemoRooms(rooms, subjects);
+        ConfigurePrimarySchoolRooms(rooms, subjects);
 
-        ConfigureHardDemoClassGroups(
+        ConfigurePrimarySchoolClassGroups(
             classGroups,
             teachers,
             rooms
         );
 
         _context.Teachers.AddRange(teachers.Values);
-        _context.Buildings.AddRange(
-            mainBuilding,
-            sportsBuilding
-        );
+        _context.Buildings.Add(mainBuilding);
 
         _context.Rooms.AddRange(rooms.Values);
         _context.ClassGroups.AddRange(classGroups.Values);
@@ -462,7 +506,7 @@ public class DemoDataSeeder
 
         foreach (var classGroup in classGroups.Values)
         {
-            AddHardClassRequirements(
+            AddPrimarySchoolClassRequirements(
                 organizationId,
                 classGroup,
                 teachers,
@@ -478,73 +522,99 @@ public class DemoDataSeeder
         await _context.SaveChangesAsync();
     }
 
-    private static void ConfigureHardDemoRooms(
-    IReadOnlyDictionary<string, Room> rooms,
-    IReadOnlyDictionary<string, Subject> subjects)
+    private static void ConfigurePrimarySchoolRooms(
+        IReadOnlyDictionary<string, Room> rooms,
+        IReadOnlyDictionary<string, Subject> subjects)
     {
-        rooms["Gym"].RestrictedToSubject =
-            subjects["Physical Education"];
+        rooms["Sala gimnastyczna"].RestrictedToSubject =
+            subjects["Wychowanie fizyczne"];
 
-        rooms["Gym"].PreferredSubject =
-            subjects["Physical Education"];
+        rooms["Sala gimnastyczna"].PreferredSubject =
+            subjects["Wychowanie fizyczne"];
 
-        rooms["Chemistry Lab"].RestrictedToSubject =
-            subjects["Chemistry"];
+        rooms["Pracownia chemiczna"].RestrictedToSubject =
+            subjects["Chemia"];
 
-        rooms["Chemistry Lab"].PreferredSubject =
-            subjects["Chemistry"];
+        rooms["Pracownia chemiczna"].PreferredSubject =
+            subjects["Chemia"];
 
-        rooms["Physics Lab"].PreferredSubject =
-            subjects["Physics"];
+        rooms["Pracownia komputerowa"].RestrictedToSubject =
+            subjects["Informatyka"];
 
-        rooms["Computer Lab"].PreferredSubject =
-            subjects["Computer Science"];
+        rooms["Pracownia komputerowa"].PreferredSubject =
+            subjects["Informatyka"];
     }
 
-    private static void ConfigureHardDemoClassGroups(
+    private static void ConfigurePrimarySchoolClassGroups(
         IDictionary<string, ClassGroup> classGroups,
         IReadOnlyDictionary<string, Teacher> teachers,
         IReadOnlyDictionary<string, Room> rooms)
     {
         SetClassGroupDetails(
             classGroups["1A"],
-            teachers["Anna Kowalska"],
+            teachers["Anna Bursztynowicz"],
             rooms["101"]);
 
         SetClassGroupDetails(
             classGroups["1B"],
-            teachers["Joanna Nowak"],
+            teachers["Barbara Chmielowiec"],
             rooms["102"]);
 
         SetClassGroupDetails(
             classGroups["2A"],
-            teachers["Katarzyna Wójcik"],
+            teachers["Celina Dobrowolska"],
             rooms["103"]);
 
         SetClassGroupDetails(
             classGroups["2B"],
-            teachers["Piotr Kamiński"],
+            teachers["Dorota Fijałkowska"],
             rooms["104"]);
 
         SetClassGroupDetails(
             classGroups["3A"],
-            teachers["Magdalena Lewandowska"],
-            rooms["201"]);
+            teachers["Elżbieta Gromnicka"],
+            rooms["105"]);
 
         SetClassGroupDetails(
             classGroups["3B"],
-            teachers["Robert Dąbrowski"],
-            rooms["202"]);
+            teachers["Grażyna Jaroszewicz"],
+            rooms["106"]);
 
         SetClassGroupDetails(
             classGroups["4A"],
-            teachers["Agnieszka Szymańska"],
-            rooms["Physics Lab"]);
+            teachers["Joanna Kordylewska"],
+            rooms["107"]);
 
         SetClassGroupDetails(
             classGroups["4B"],
-            teachers["Monika Kozłowska"],
-            rooms["Chemistry Lab"]);
+            teachers["Katarzyna Leszczyńska"],
+            rooms["108"]);
+
+        var olderClasses = new[]
+        {
+            ("5A", "201", "Marek Mioduszewski"),
+            ("5B", "202", "Piotr Niedzielski"),
+            ("6A", "203", "Agnieszka Orzechowska"),
+            ("6B", "204", "Tomasz Pruszyński"),
+            ("7A", "205", "Monika Radecka"),
+            ("7B", "206", "Paweł Sarnowski"),
+            ("8A", "207", "Aleksandra Trzebińska"),
+            ("8B", "208", "Michał Wierzbicki")
+        };
+
+        foreach (var (className, roomName, teacherName) in olderClasses)
+        {
+            SetClassGroupDetails(
+                classGroups[className],
+                teachers[teacherName],
+                rooms[roomName]);
+        }
+
+        foreach (var classGroup in classGroups.Values)
+        {
+            classGroup.Grade = GetGradeNumber(classGroup.Name);
+            classGroup.IsEarlyEducation = classGroup.Grade <= 3;
+        }
     }
 
     private static void SetClassGroupDetails(
@@ -555,10 +625,10 @@ public class DemoDataSeeder
         classGroup.HomeroomTeacher = homeroomTeacher;
         classGroup.DefaultRoom = defaultRoom;
         classGroup.Info =
-            $"Demo information for class {classGroup.Name}.";
+            $"Dane demonstracyjne klasy {classGroup.Name}.";
     }
 
-    private static void AddHardClassRequirements(
+    private static void AddPrimarySchoolClassRequirements(
         int organizationId,
         ClassGroup classGroup,
         IReadOnlyDictionary<string, Teacher> teachers,
@@ -567,110 +637,95 @@ public class DemoDataSeeder
     {
         var grade = GetGradeNumber(classGroup.Name);
 
-        var mathematicsTeacher =
-            grade <= 2
-                ? teachers["Anna Kowalska"]
-                : teachers["Marek Wiśniewski"];
+        if (grade <= 3)
+        {
+            var earlyEducationTeachers = new[]
+            {
+                "Anna Bursztynowicz",
+                "Barbara Chmielowiec",
+                "Celina Dobrowolska",
+                "Dorota Fijałkowska",
+                "Elżbieta Gromnicka",
+                "Grażyna Jaroszewicz"
+            };
 
-        var polishTeacher =
-            grade <= 2
-                ? teachers["Joanna Nowak"]
-                : teachers["Tomasz Zieliński"];
+            var teacherIndex = (grade - 1) * 2 +
+                (classGroup.Name.EndsWith("B") ? 1 : 0);
 
-        var englishTeacher =
-            grade <= 2
-                ? teachers["Katarzyna Wójcik"]
-                : teachers["Piotr Kamiński"];
+            AddRequirement("Edukacja wczesnoszkolna",
+                earlyEducationTeachers[teacherIndex], 18);
+            AddRequirement("Język angielski",
+                classGroup.Name.EndsWith("A")
+                    ? "Monika Radecka"
+                    : "Paweł Sarnowski", 2);
+            AddRequirement("Wychowanie fizyczne",
+                classGroup.Name.EndsWith("A")
+                    ? "Marcin Mroziński"
+                    : "Sylwia Ostrowska", 3);
+            AddRequirement("Religia", "Teresa Różycka", 1);
+            return;
+        }
 
-        requirements.Add(
-            CreateRequirement(
-                organizationId,
-                classGroup,
-                subjects["Mathematics"],
-                mathematicsTeacher,
-                4)
-        );
+        var classIndex = (grade - 4) * 2 +
+            (classGroup.Name.EndsWith("B") ? 1 : 0);
 
-        requirements.Add(
-            CreateRequirement(
-                organizationId,
-                classGroup,
-                subjects["Polish"],
-                polishTeacher,
-                4)
-        );
+        AddRequirement("Język polski",
+            new[] { "Joanna Kordylewska", "Katarzyna Leszczyńska", "Marek Mioduszewski" }[classIndex % 3], 5);
+        AddRequirement("Matematyka",
+            new[] { "Piotr Niedzielski", "Agnieszka Orzechowska", "Tomasz Pruszyński" }[classIndex % 3], 4);
+        AddRequirement("Język angielski",
+            new[] { "Monika Radecka", "Paweł Sarnowski", "Aleksandra Trzebińska" }[classIndex % 3], 3);
+        AddRequirement("Historia", "Michał Wierzbicki", 2);
+        AddRequirement("Geografia", "Renata Zawadzka", 1);
+        AddRequirement("Biologia", "Ewa Białostocka", 1);
+        AddRequirement("Informatyka", "Łukasz Gronostajski", 1);
+        AddRequirement("Wychowanie fizyczne",
+            new[] { "Marcin Mroziński", "Sylwia Ostrowska", "Damian Podgórski" }[classIndex % 3], 4);
+        AddRequirement("Religia", "Teresa Różycka", 1);
 
-        requirements.Add(
-            CreateRequirement(
-                organizationId,
-                classGroup,
-                subjects["English"],
-                englishTeacher,
-                3)
-        );
+        if (grade == 4)
+        {
+            AddRequirement("Przyroda", "Renata Zawadzka", 2);
+        }
 
-        requirements.Add(
-            CreateRequirement(
-                organizationId,
-                classGroup,
-                subjects["History"],
-                teachers["Magdalena Lewandowska"],
-                2)
-        );
+        if (grade <= 6)
+        {
+            AddRequirement("Technika", "Andrzej Jastrzębski", 1);
+        }
 
-        requirements.Add(
-            CreateRequirement(
-                organizationId,
-                classGroup,
-                subjects["Geography"],
-                teachers["Robert Dąbrowski"],
-                2)
-        );
+        if (grade <= 7)
+        {
+            AddRequirement("Plastyka", "Magdalena Kwiecińska", 1);
+            AddRequirement("Muzyka", "Beata Lubowiecka", 1);
+        }
 
-        requirements.Add(
-            CreateRequirement(
-                organizationId,
-                classGroup,
-                subjects["Biology"],
-                teachers["Agnieszka Szymańska"],
-                2)
-        );
+        if (grade >= 7)
+        {
+            AddRequirement("Język niemiecki", "Robert Uściński", 2);
+            AddRequirement("Fizyka", "Adam Drzewiecki", 2);
+            AddRequirement("Chemia", "Krzysztof Czerwiński", 2);
+        }
 
-        requirements.Add(
-            CreateRequirement(
-                organizationId,
-                classGroup,
-                subjects["Physics"],
-                teachers["Paweł Woźniak"],
-                grade >= 3 ? 2 : 1)
-        );
+        if (grade == 8)
+        {
+            AddRequirement("Wiedza o społeczeństwie", "Michał Wierzbicki", 2);
+            AddRequirement("Edukacja dla bezpieczeństwa", "Damian Podgórski", 1);
+        }
 
-        requirements.Add(
-            CreateRequirement(
-                organizationId,
-                classGroup,
-                subjects["Chemistry"],
-                teachers["Monika Kozłowska"],
-                grade >= 3 ? 2 : 1)
-        );
-
-        requirements.Add(
-            CreateRequirement(
-                organizationId,
-                classGroup,
-                subjects["Computer Science"],
-                teachers["Krzysztof Jankowski"],
-                2)
-        );
-
-        requirements.Add(
-            CreateRequirement(
-                organizationId,
-                classGroup,
-                subjects["Physical Education"],
-                teachers["Robert Dąbrowski"],
-                3)
-        );
+        void AddRequirement(
+            string subjectName,
+            string teacherName,
+            int hoursPerWeek)
+        {
+            requirements.Add(
+                CreateRequirement(
+                    organizationId,
+                    classGroup,
+                    subjects[subjectName],
+                    teachers[teacherName],
+                    hoursPerWeek)
+            );
+        }
     }
 
     private static LessonRequirement CreateRequirement(

@@ -8,6 +8,8 @@ public class CreateClassGroupRequest
 
     public int Grade { get; set; }
 
+    public bool IsEarlyEducation { get; set; }
+
     public string? Info { get; set; }
 
     public int? HomeroomTeacherId { get; set; }

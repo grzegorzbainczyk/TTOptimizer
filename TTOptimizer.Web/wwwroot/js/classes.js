@@ -230,7 +230,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("schoolUnitId")
         ?.addEventListener("change", () => {
             populateGradeOptions();
+            applySuggestedEarlyEducation();
         });
+
+    document.getElementById("classGrade")
+        ?.addEventListener("change", applySuggestedEarlyEducation);
 
     initializeSimpleXlsxImport({
         resourceName: "class",
@@ -433,7 +437,7 @@ async function loadClasses() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="6" class="teachers-table-state">Loading classes...</td>
+            <td colspan="8" class="teachers-table-state">Loading classes...</td>
         </tr>
     `;
 
@@ -494,7 +498,7 @@ function renderClasses(classes) {
     if (!Array.isArray(classes) || classes.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" class="teachers-table-state">No classes found.</td>
+                <td colspan="8" class="teachers-table-state">No classes found.</td>
             </tr>
         `;
 
@@ -517,6 +521,14 @@ function renderClasses(classes) {
 
         row.appendChild(
             createTableCell(classGroup.grade ?? "")
+        );
+
+        row.appendChild(
+            createTableCell(
+                classGroup.isEarlyEducation
+                    ? t("classes.earlyEducationShort", "Wczesnoszkolne")
+                    : t("classes.subjectEducationShort", "Przedmiotowe")
+            )
         );
 
         row.appendChild(
@@ -1112,6 +1124,41 @@ function clearClassGeneratorMessage() {
     );
 }
 
+
+function isPrimarySchoolUnit(schoolUnitId) {
+    const schoolUnit = availableSchoolUnits.find(
+        item => Number(item.id) === Number(schoolUnitId)
+    );
+
+    return normalizeSchoolType(schoolUnit?.schoolType) ===
+        SCHOOL_TYPE_NAME_TO_NUMBER.PrimarySchool;
+}
+
+function shouldSuggestEarlyEducation() {
+    const schoolUnitId =
+        Number(document.getElementById("schoolUnitId")?.value);
+
+    const grade =
+        Number(document.getElementById("classGrade")?.value);
+
+    return isPrimarySchoolUnit(schoolUnitId) &&
+        Number.isInteger(grade) &&
+        grade >= 1 &&
+        grade <= 3;
+}
+
+function applySuggestedEarlyEducation() {
+    const checkbox =
+        document.getElementById("isEarlyEducation");
+
+    if (!checkbox) {
+        return;
+    }
+
+    checkbox.checked =
+        shouldSuggestEarlyEducation();
+}
+
 function openAddClassForm() {
     document.getElementById("classId").value = "";
 
@@ -1123,6 +1170,8 @@ function openAddClassForm() {
             String(availableSchoolUnits[0].id);
         populateGradeOptions();
     }
+
+    applySuggestedEarlyEducation();
 
     document.getElementById(
         "homeroomTeacherId"
@@ -1161,6 +1210,14 @@ function openEditClassForm(classGroup) {
         classGroup.schoolUnitId?.toString() ?? "";
 
     populateGradeOptions(classGroup.grade);
+
+    const earlyEducationCheckbox =
+        document.getElementById("isEarlyEducation");
+
+    if (earlyEducationCheckbox) {
+        earlyEducationCheckbox.checked =
+            Boolean(classGroup.isEarlyEducation);
+    }
 
     document.getElementById(
         "homeroomTeacherId"
@@ -1222,6 +1279,13 @@ async function saveClass() {
     const gradeValue =
         document.getElementById("classGrade").value;
 
+    const isEarlyEducation =
+        Boolean(
+            document.getElementById(
+                "isEarlyEducation"
+            )?.checked
+        );
+
     const homeroomTeacherValue =
         document.getElementById(
             "homeroomTeacherId"
@@ -1265,6 +1329,7 @@ async function saveClass() {
     const requestBody = {
         schoolUnitId: Number(schoolUnitValue),
         grade: Number(gradeValue),
+        isEarlyEducation,
         name,
         info: info || null,
 
@@ -1409,7 +1474,7 @@ function showClassesError(message) {
     const cell =
         document.createElement("td");
 
-    cell.colSpan = 6;
+    cell.colSpan = 8;
     cell.textContent = message;
 
     row.appendChild(cell);

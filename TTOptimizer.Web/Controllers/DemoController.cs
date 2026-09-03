@@ -7,6 +7,8 @@ namespace TTOptimizer.Web.Controllers;
 [Route("api/[controller]")]
 public class DemoController : ControllerBase
 {
+    private const int HardDemoOrganizationId = 11;
+
     private readonly DemoDataSeeder _demoDataSeeder;
 
     public DemoController(DemoDataSeeder demoDataSeeder)
@@ -14,35 +16,50 @@ public class DemoController : ControllerBase
         _demoDataSeeder = demoDataSeeder;
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> LoginEasy()
+    [HttpPost("login/empty")]
+    public async Task<IActionResult> LoginEmpty()
     {
         var organizationId =
-            await _demoDataSeeder.EnsureEasyDemoDataAsync();
+            await _demoDataSeeder.EnsureEmptyDemoDataAsync();
 
         return Ok(new
         {
             success = true,
             userId = 2, // temporary
-            userName = "Demo Easy User",
+            userName = "Demo Empty User",
             organizationId,
-            demoLevel = "easy"
+            demoLevel = "empty"
+        });
+    }
+
+    [HttpPost("login")]
+    [HttpPost("login/small")]
+    public async Task<IActionResult> LoginSmall()
+    {
+        var organizationId =
+            await _demoDataSeeder.EnsureSmallDemoDataAsync();
+
+        return Ok(new
+        {
+            success = true,
+            userId = 2, // temporary
+            userName = "Demo Small School User",
+            organizationId,
+            demoLevel = "small"
         });
     }
 
     [HttpPost("login/hard")]
-    public async Task<IActionResult> LoginHard()
+    [HttpPost("login/primary-school")]
+    public IActionResult LoginPrimarySchool()
     {
-        var organizationId =
-            await _demoDataSeeder.EnsureHardDemoDataAsync();
-
         return Ok(new
         {
             success = true,
             userId = 2, // temporary
-            userName = "Demo Hard User",
-            organizationId,
-            demoLevel = "hard"
+            userName = "Demo Primary School User",
+            organizationId = HardDemoOrganizationId,
+            demoLevel = "primary-school"
         });
     }
 }

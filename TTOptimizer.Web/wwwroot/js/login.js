@@ -10,11 +10,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const registrationFields =
         document.getElementById("registrationFields");
 
-    const demoEasyButton =
-        document.getElementById("demoEasyButton");
+    const demoEmptyButton =
+        document.getElementById("demoEmptyButton");
 
-    const demoHardButton =
-        document.getElementById("demoHardButton");
+    const demoSmallButton =
+        document.getElementById("demoSmallButton");
+
+    const demoPrimarySchoolButton =
+        document.getElementById("demoPrimarySchoolButton");
 
     const authMessage =
         document.getElementById("authMessage");
@@ -29,14 +32,19 @@ document.addEventListener("DOMContentLoaded", () => {
         () => setRegistrationMode(false)
     );
 
-    demoEasyButton?.addEventListener(
+    demoEmptyButton?.addEventListener(
         "click",
-        loginAsEasyDemo
+        loginAsEmptyDemo
     );
 
-    demoHardButton?.addEventListener(
+    demoSmallButton?.addEventListener(
         "click",
-        loginAsHardDemo
+        loginAsSmallDemo
+    );
+
+    demoPrimarySchoolButton?.addEventListener(
+        "click",
+        loginAsPrimarySchoolDemo
     );
 
     document.getElementById("loginPasswordInput")
@@ -317,17 +325,24 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-    async function loginAsHardDemo() {
+    async function loginAsEmptyDemo() {
         await loginDemo(
-            "/api/demo/login/hard",
-            "Demo trudne"
+            "/api/demo/login/empty",
+            "Pusta szkoła"
         );
     }
 
-    async function loginAsEasyDemo() {
+    async function loginAsSmallDemo() {
         await loginDemo(
             "/api/demo/login",
-            "Demo łatwe"
+            "Mała szkoła"
+        );
+    }
+
+    async function loginAsPrimarySchoolDemo() {
+        await loginDemo(
+            "/api/demo/login/hard",
+            "Szkoła podstawowa"
         );
     }
 
@@ -407,8 +422,9 @@ document.addEventListener("DOMContentLoaded", () => {
             loginButton,
             registerButton,
             cancelRegistrationButton,
-            demoEasyButton,
-            demoHardButton
+            demoEmptyButton,
+            demoSmallButton,
+            demoPrimarySchoolButton
         ]) {
             if (button) {
                 button.disabled = disabled;

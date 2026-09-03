@@ -740,5 +740,10 @@
   "availability.resource.room": "Sala",
   "availability.resource.subject": "Przedmiot",
   "availability.resource.generic": "Zasób",
-  "availability.resourceTitle": "{resource} - preferencje godzin"
+  "availability.resourceTitle": "{resource} - preferencje godzin",
+  "classes.earlyEducation": "Edukacja wczesnoszkolna",
+  "classes.earlyEducationHelp": "Dla klas 1–3 szkoły podstawowej wychowawca może być automatycznie używany jako domyślny nauczyciel podczas tworzenia planu nauczania.",
+  "classes.educationType": "Typ nauczania",
+  "classes.earlyEducationShort": "Wczesnoszkolne",
+  "classes.subjectEducationShort": "Przedmiotowe"
 }
