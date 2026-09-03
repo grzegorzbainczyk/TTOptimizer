@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <set>
 #include <string>
 #include <utility>
@@ -167,14 +168,29 @@ private:
         const int totalTimePeriodCount =
             getTotalTimePeriodCount(problem);
 
-        for (const Subject& subject : problem.subjects)
+        // A subject is not an exclusive resource: lessons of the same
+        // subject may run in parallel for different classes and teachers.
+        // Validate each lesson requirement separately instead of summing
+        // the subject workload across the whole school.
+        for (const LessonRequirement& requirement :
+            problem.lessonRequirements)
         {
-            const int requiredLessonCount =
-                getRequiredLessonCountForSubject(
-                    problem,
-                    subject.id);
+            if (requirement.weeklyCount <= 0)
+            {
+                continue;
+            }
 
-            if (requiredLessonCount == 0)
+            const auto subjectIt = std::find_if(
+                problem.subjects.begin(),
+                problem.subjects.end(),
+                [&requirement](const Subject& subject)
+                {
+                    return subject.id == requirement.subjectId;
+                });
+
+            // Missing references are reported by
+            // ReferenceIntegrityValidator.
+            if (subjectIt == problem.subjects.end())
             {
                 continue;
             }
@@ -182,13 +198,13 @@ private:
             const int unavailableTimePeriodCount =
                 getSubjectUnavailableTimePeriodCount(
                     problem,
-                    subject.id);
+                    requirement.subjectId);
 
             const int availableTimePeriodCount =
                 totalTimePeriodCount -
                 unavailableTimePeriodCount;
 
-            if (requiredLessonCount <=
+            if (requirement.weeklyCount <=
                 availableTimePeriodCount)
             {
                 continue;
@@ -200,18 +216,22 @@ private:
             issue.code =
                 PreprocessingIssueCode::
                 SubjectInsufficientAvailability;
-            issue.subjectId = subject.id;
-            issue.requiredCount = requiredLessonCount;
+            issue.subjectId = requirement.subjectId;
+            issue.classGroupId = requirement.classGroupId;
+            issue.requirementId = requirement.id;
+            issue.requiredCount = requirement.weeklyCount;
             issue.availableCount = availableTimePeriodCount;
 
             issue.message =
-                "Subject "
-                + subject.name
+                "Lesson requirement ID "
+                + std::to_string(requirement.id)
+                + " for subject "
+                + subjectIt->name
                 + " (ID "
-                + std::to_string(subject.id)
+                + std::to_string(requirement.subjectId)
                 + ") requires "
-                + std::to_string(requiredLessonCount)
-                + " weekly lessons, but has only "
+                + std::to_string(requirement.weeklyCount)
+                + " weekly lessons, but the subject has only "
                 + std::to_string(availableTimePeriodCount)
                 + " available time periods.";
 
@@ -259,7 +279,7 @@ private:
             PreprocessingIssueSeverity::Error;
         issue.code =
             PreprocessingIssueCode::
-                InsufficientRoomAvailability;
+            InsufficientRoomAvailability;
         issue.requiredCount = requiredLessonCount;
         issue.availableCount = availableRoomSlotCount;
 
@@ -329,26 +349,6 @@ private:
         {
             if (requirement.classGroupId ==
                 classGroupId &&
-                requirement.weeklyCount > 0)
-            {
-                requiredLessonCount +=
-                    requirement.weeklyCount;
-            }
-        }
-
-        return requiredLessonCount;
-    }
-
-    static int getRequiredLessonCountForSubject(
-        const TimetableProblem& problem,
-        SubjectId subjectId)
-    {
-        int requiredLessonCount = 0;
-
-        for (const LessonRequirement& requirement :
-            problem.lessonRequirements)
-        {
-            if (requirement.subjectId == subjectId &&
                 requirement.weeklyCount > 0)
             {
                 requiredLessonCount +=

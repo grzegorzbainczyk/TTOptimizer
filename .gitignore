@@ -43,3 +43,13 @@ appsettings.Development.json
 
 TTOptimizer.Web/App_Data/OptimizationRuns/
 FilesFlatFolder/
+
+.vs/
+**/bin/
+**/obj/
+**/x64/
+**/*.user
+**/*.suo
+
+TTOptimizer.Web/App_Data/OptimizationRuns/*
+!TTOptimizer.Web/App_Data/OptimizationRuns/.gitkeep
