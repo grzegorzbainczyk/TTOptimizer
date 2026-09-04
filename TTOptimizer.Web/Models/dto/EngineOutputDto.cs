@@ -65,6 +65,16 @@ public class EngineOutputDto
     public int HardViolationCount { get; set; }
 
     /// <summary>
+    /// Gets or sets the penalty breakdown calculated for the final timetable.
+    /// </summary>
+    public List<ConstraintRuleResultDto> RuleResults { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets concrete hard constraint violations in the final timetable.
+    /// </summary>
+    public List<ConstraintViolationDto> Violations { get; set; } = new();
+
+    /// <summary>
     /// Gets or sets preprocessing issues detected before optimization.
     /// </summary>
     public List<PreprocessingIssueDto> PreprocessingIssues { get; set; } = new();

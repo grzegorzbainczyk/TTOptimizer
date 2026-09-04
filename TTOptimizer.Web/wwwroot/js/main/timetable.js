@@ -6,6 +6,10 @@ import {
     setStatusText,
     setTimetableContentVisible
 } from "./optimization-ui.js";
+import {
+    clearConstraintReport,
+    renderConstraintReport
+} from "./constraint-report.js";
 
 const LAST_RESULT_STORAGE_KEY =
     "ttorganizer.lastOptimizationResult";
@@ -61,6 +65,7 @@ export function renderOptimizationResult(data) {
 
     if (optimizationFailed || preprocessingFailed) {
         currentScheduledLessons = [];
+        clearConstraintReport();
 
         renderPreprocessingFailure(
             result,
@@ -76,6 +81,7 @@ export function renderOptimizationResult(data) {
     currentScheduledLessons = scheduledLessons;
 
     renderOptimizationSuccess(result, scheduledLessons);
+    renderConstraintReport(result);
     populateFilters(scheduledLessons);
     renderScheduledLessonRows(scheduledLessons);
     renderCurrentTimetableView();
@@ -89,6 +95,7 @@ export function clearOptimizationResultForNewRun() {
     );
 
     hidePreprocessingIssues();
+    clearConstraintReport();
     setTimetableContentVisible(true);
     setTimetableMessage(t("optimization.running"));
     resetAllFilters();
@@ -795,6 +802,7 @@ function clearOptimizationResult() {
     );
 
     hidePreprocessingIssues();
+    clearConstraintReport();
     setTimetableContentVisible(true);
     setStatusText(t("optimization.ready"));
     setTimetableMessage(t("table.noTimetable"));

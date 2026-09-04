@@ -81,30 +81,54 @@ namespace
 
         if (iterator == preferences.end())
         {
-            return TimeSlotPreferenceType::Available;
+            // No explicit setting means that the time slot is fully preferred.
+            // Users only need to store exceptions: Available, NotPreferred
+            // or Unavailable.
+            return TimeSlotPreferenceType::Preferred;
         }
 
         return iterator->preferenceType;
     }
 
     void AddTimeSlotPreferencePenalty(
-        FitnessScore& score,
+        ConstraintRuleResult& ruleResult,
         TimeSlotPreferenceType preferenceType)
     {
         switch (preferenceType)
         {
         case TimeSlotPreferenceType::Preferred: return;
 
-        case TimeSlotPreferenceType::Available: score.addSoftPenalty(1.0);
+        case TimeSlotPreferenceType::Available:
+            ruleResult.violationCount++;
+            ruleResult.penalty += 1.0;
             return;
 
-        case TimeSlotPreferenceType::NotPreferred: score.addSoftPenalty(10.0);
+        case TimeSlotPreferenceType::NotPreferred:
+            ruleResult.violationCount++;
+            ruleResult.penalty += 10.0;
             return;
 
         case TimeSlotPreferenceType::Unavailable:
             // Hard violations are reported separately.
             return;
         }
+    }
+
+    ConstraintRuleResult CreateTimeSlotPreferenceRuleResult(
+        std::string code,
+        std::string name,
+        std::string description,
+        ConstraintRuleCategory category)
+    {
+        ConstraintRuleResult result;
+        result.code = std::move(code);
+        result.name = std::move(name);
+        result.description = std::move(description);
+        result.kind = ConstraintRuleKind::Soft;
+        result.category = category;
+        result.penaltyLevel = ConstraintPenaltyLevel::None;
+
+        return result;
     }
 
     const StudentGroup& FindStudentGroupById(
@@ -157,7 +181,7 @@ namespace
                 classGroupId, dayIndex, slotIndex, &ClassGroupTimeSlotPreference::classGroupId);
             if (PreferenceRank(current) > PreferenceRank(result)) result = current;
         }
-        return group.classGroupIds.empty() ? TimeSlotPreferenceType::Available : result;
+        return group.classGroupIds.empty() ? TimeSlotPreferenceType::Preferred : result;
     }
 
     ConstraintViolation CreateViolation(
@@ -180,6 +204,34 @@ FitnessScore FitnessEvaluator::evaluate(
     const std::vector<ScheduleSlot>& scheduleSlots) const
 {
     FitnessScore score;
+
+    ConstraintRuleResult teacherTimeSlotPreferenceResult =
+        CreateTimeSlotPreferenceRuleResult(
+            "TeacherTimeSlotPreference",
+            "Teacher time preferences",
+            "Lessons placed outside teachers' preferred time slots.",
+            ConstraintRuleCategory::Teacher);
+
+    ConstraintRuleResult classGroupTimeSlotPreferenceResult =
+        CreateTimeSlotPreferenceRuleResult(
+            "ClassGroupTimeSlotPreference",
+            "Class group time preferences",
+            "Lessons placed outside class groups' preferred time slots.",
+            ConstraintRuleCategory::ClassGroup);
+
+    ConstraintRuleResult roomTimeSlotPreferenceResult =
+        CreateTimeSlotPreferenceRuleResult(
+            "RoomTimeSlotPreference",
+            "Room time preferences",
+            "Lessons placed outside rooms' preferred time slots.",
+            ConstraintRuleCategory::Room);
+
+    ConstraintRuleResult subjectTimeSlotPreferenceResult =
+        CreateTimeSlotPreferenceRuleResult(
+            "SubjectTimeSlotPreference",
+            "Subject time preferences",
+            "Lessons placed outside subjects' preferred time slots.",
+            ConstraintRuleCategory::Subject);
 
     /*
      * Chromosome representation:
@@ -277,10 +329,18 @@ FitnessScore FitnessEvaluator::evaluate(
                 problem.subjectTimeSlotPreferences,
                 requirement.subjectId, dayIndex, slotIndex, &SubjectTimeSlotPreference::subjectId);
 
-        AddTimeSlotPreferencePenalty(score, teacherPreference);
-        AddTimeSlotPreferencePenalty(score, classGroupPreference);
-        AddTimeSlotPreferencePenalty(score, roomPreference);
-        AddTimeSlotPreferencePenalty(score, subjectPreference);
+        AddTimeSlotPreferencePenalty(
+            teacherTimeSlotPreferenceResult,
+            teacherPreference);
+        AddTimeSlotPreferencePenalty(
+            classGroupTimeSlotPreferenceResult,
+            classGroupPreference);
+        AddTimeSlotPreferencePenalty(
+            roomTimeSlotPreferenceResult,
+            roomPreference);
+        AddTimeSlotPreferencePenalty(
+            subjectTimeSlotPreferenceResult,
+            subjectPreference);
 
         // Hard constraint: teacher is unavailable.
         if (teacherPreference ==
@@ -372,6 +432,15 @@ FitnessScore FitnessEvaluator::evaluate(
             score.addHardViolation(std::move(violation));
         }
     }
+
+    score.addRuleResult(
+        std::move(teacherTimeSlotPreferenceResult));
+    score.addRuleResult(
+        std::move(classGroupTimeSlotPreferenceResult));
+    score.addRuleResult(
+        std::move(roomTimeSlotPreferenceResult));
+    score.addRuleResult(
+        std::move(subjectTimeSlotPreferenceResult));
 
     /*
      * Hard constraint:

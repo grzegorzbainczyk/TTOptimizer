@@ -180,6 +180,12 @@ public class OptimizerRoomDto
     /// Gets or sets the maximum number of students that can use the room.
     /// </summary>
     public int Capacity { get; set; }
+
+    /// <summary>
+    /// Gets or sets the subjects allowed in this room.
+    /// An empty collection means that the room has no subject restriction.
+    /// </summary>
+    public List<int> AllowedSubjects { get; set; } = new();
 }
 
 /// <summary>

@@ -220,6 +220,8 @@ public class OptimizationController : ControllerBase
                 initialPenalty = engineResult.InitialPenalty,
                 bestPenalty = engineResult.BestPenalty,
                 hardViolationCount = engineResult.HardViolationCount,
+                ruleResults = engineResult.RuleResults,
+                violations = engineResult.Violations,
                 preprocessingIssues = engineResult.PreprocessingIssues,
                 scheduledLessons = scheduledLessonViews,
                 optimizationInfo = engineResult.OptimizationInfo,

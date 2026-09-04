@@ -68,6 +68,11 @@ private:
             return TimeSlotPreferenceType::Preferred;
         }
 
+        if (value == "Available")
+        {
+            return TimeSlotPreferenceType::Available;
+        }
+
         if (value == "NotPreferred")
         {
             return TimeSlotPreferenceType::NotPreferred;
@@ -236,6 +241,15 @@ private:
             }
 
             room.capacity = item.value("capacity", 0);
+
+            if (item.contains("allowedSubjects") &&
+                item.at("allowedSubjects").is_array())
+            {
+                room.allowedSubjects =
+                    item.at("allowedSubjects")
+                    .get<std::vector<SubjectId>>();
+            }
+
             problem.rooms.push_back(room);
         }
     }

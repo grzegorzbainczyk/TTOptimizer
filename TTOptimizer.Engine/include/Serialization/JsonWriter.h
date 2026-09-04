@@ -75,6 +75,16 @@ public:
 		result["ruleResults"] =
 			json::array();
 
+		result["violations"] =
+			json::array();
+
+		for (const ConstraintViolation& violation :
+			score.violations)
+		{
+			result["violations"].push_back(
+				violationToJson(violation));
+		}
+
 		for (const ConstraintRuleResult& ruleResult :
 			score.ruleResults)
 		{
@@ -106,6 +116,16 @@ public:
 
 			ruleJson["penalty"] =
 				ruleResult.penalty;
+
+			ruleJson["violations"] =
+				json::array();
+
+			for (const ConstraintViolation& violation :
+				ruleResult.violations)
+			{
+				ruleJson["violations"].push_back(
+					violationToJson(violation));
+			}
 
 			result["ruleResults"].push_back(
 				std::move(ruleJson));
@@ -143,7 +163,7 @@ public:
 			lessonJson["roomId"] =
 				lesson.roomId;
 
-			lessonJson["day"] = 
+			lessonJson["day"] =
 				DayOfWeekConverter::toString(
 					lesson.timeSlot.day);
 
@@ -194,6 +214,9 @@ public:
 			json::array();
 
 		result["ruleResults"] =
+			json::array();
+
+		result["violations"] =
 			json::array();
 
 		result["preprocessingIssues"] =
@@ -281,10 +304,67 @@ public:
 		result["ruleResults"] =
 			json::array();
 
+		result["violations"] =
+			json::array();
+
 		return result.dump(2);
 	}
 
 private:
+	static json violationToJson(
+		const ConstraintViolation& violation)
+	{
+		return json{
+			{ "type", violationTypeToString(violation.type) },
+			{ "teacherId", violation.teacherId },
+			{ "classGroupId", violation.classGroupId },
+			{ "studentGroupId", violation.studentGroupId },
+			{ "otherStudentGroupId", violation.otherStudentGroupId },
+			{ "roomId", violation.roomId },
+			{ "subjectId", violation.subjectId },
+			{ "dayIndex", violation.dayIndex },
+			{ "slotIndex", violation.slotIndex },
+			{ "occurrenceCount", violation.occurrenceCount },
+			{ "message", violation.message }
+		};
+	}
+
+	static std::string violationTypeToString(
+		ConstraintViolationType type)
+	{
+		switch (type)
+		{
+		case ConstraintViolationType::InvalidChromosome: return "InvalidChromosome";
+		case ConstraintViolationType::InvalidScheduleSlot: return "InvalidScheduleSlot";
+		case ConstraintViolationType::TeacherUnavailable: return "TeacherUnavailable";
+		case ConstraintViolationType::ClassGroupUnavailable: return "ClassGroupUnavailable";
+		case ConstraintViolationType::RoomUnavailable: return "RoomUnavailable";
+		case ConstraintViolationType::SubjectUnavailable: return "SubjectUnavailable";
+		case ConstraintViolationType::TeacherConflict: return "TeacherConflict";
+		case ConstraintViolationType::ClassGroupConflict: return "ClassGroupConflict";
+		case ConstraintViolationType::StudentGroupConflict: return "StudentGroupConflict";
+		case ConstraintViolationType::StudentGroupImmediateBuildingChange: return "StudentGroupImmediateBuildingChange";
+		case ConstraintViolationType::RoomConflict: return "RoomConflict";
+		case ConstraintViolationType::TeacherGap: return "TeacherGap";
+		case ConstraintViolationType::TeacherSingleLessonDay: return "TeacherSingleLessonDay";
+		case ConstraintViolationType::TeacherImmediateBuildingChange: return "TeacherImmediateBuildingChange";
+		case ConstraintViolationType::TeacherMaxConsecutiveLessons: return "TeacherMaxConsecutiveLessons";
+		case ConstraintViolationType::TeacherMaxLessonsPerDay: return "TeacherMaxLessonsPerDay";
+		case ConstraintViolationType::ClassGroupGap: return "ClassGroupGap";
+		case ConstraintViolationType::ClassGroupSingleLessonDay: return "ClassGroupSingleLessonDay";
+		case ConstraintViolationType::ClassGroupMaxConsecutiveLessons: return "ClassGroupMaxConsecutiveLessons";
+		case ConstraintViolationType::ClassGroupMaxLessonsPerDay: return "ClassGroupMaxLessonsPerDay";
+		case ConstraintViolationType::SubjectSpreadAcrossDays: return "SubjectSpreadAcrossDays";
+		case ConstraintViolationType::SubjectMaxOccurrencesPerDay: return "SubjectMaxOccurrencesPerDay";
+		case ConstraintViolationType::SubjectPreferDoubleLessons: return "SubjectPreferDoubleLessons";
+		case ConstraintViolationType::SubjectKeepSameRoomForDoubleLessons: return "SubjectKeepSameRoomForDoubleLessons";
+		case ConstraintViolationType::SubjectPreferredRoom: return "SubjectPreferredRoom";
+		case ConstraintViolationType::SubjectAvoidDoubleLessons: return "SubjectAvoidDoubleLessons";
+		}
+
+		return "Unknown";
+	}
+
 	static std::string ruleKindToString(
 		ConstraintRuleKind kind)
 	{

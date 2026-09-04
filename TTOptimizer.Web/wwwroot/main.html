@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/welcome-guide.css" />
     <link rel="stylesheet" href="css/school-readiness.css" />
     <link rel="stylesheet" href="css/timetable-weekly.css" />
+    <link rel="stylesheet" href="css/constraint-report.css" />
 </head>
 
 <body>
@@ -286,128 +287,176 @@
                         </section>
 
                         <div id="normalResultContent">
-                        <div id="resultMessages" class="result-messages">
-                            <section id="resultMessagePanel"
-                                     class="result-message-panel result-message-neutral">
-<div class="result-message-content">
-                                    <span class="result-message-label">
-                                        <span data-i18n="result.optimizationResult">Optimization result</span>
-                                    </span>
-
-                                    <h3 id="resultMessageTitle">
-                                        <span data-i18n="result.none">No optimization result yet</span>
-                                    </h3>
-
-                                    <p id="resultMessageText">
-                                        <span data-i18n="result.noneDescription">Run the optimizer to generate a timetable.</span>
-                                    </p>
-                                </div>
-                            </section>
-
-                            <section id="preprocessingDetails"
-                                     class="preprocessing-details hidden">
-                                <div class="preprocessing-details-header">
-                                    <div>
+                            <div id="resultMessages" class="result-messages">
+                                <section id="resultMessagePanel"
+                                         class="result-message-panel result-message-neutral">
+                                    <div class="result-message-content">
                                         <span class="result-message-label">
-                                            <span data-i18n="problem.details">Problem details</span>
+                                            <span data-i18n="result.optimizationResult">Optimization result</span>
                                         </span>
 
-                                        <h3 data-i18n="problem.inputRequiresAttention">Input data requires attention</h3>
+                                        <h3 id="resultMessageTitle">
+                                            <span data-i18n="result.none">No optimization result yet</span>
+                                        </h3>
+
+                                        <p id="resultMessageText">
+                                            <span data-i18n="result.noneDescription">Run the optimizer to generate a timetable.</span>
+                                        </p>
+                                    </div>
+                                </section>
+
+                                <section id="preprocessingDetails"
+                                         class="preprocessing-details hidden">
+                                    <div class="preprocessing-details-header">
+                                        <div>
+                                            <span class="result-message-label">
+                                                <span data-i18n="problem.details">Problem details</span>
+                                            </span>
+
+                                            <h3 data-i18n="problem.inputRequiresAttention">Input data requires attention</h3>
+                                        </div>
+
+                                        <span id="preprocessingIssueCount"
+                                              class="issue-count-badge">
+                                            <span data-i18n="problem.zeroProblems">0 problems</span>
+                                        </span>
                                     </div>
 
-                                    <span id="preprocessingIssueCount"
-                                          class="issue-count-badge">
-                                        <span data-i18n="problem.zeroProblems">0 problems</span>
-                                    </span>
+                                    <ul id="preprocessingIssuesList"
+                                        class="preprocessing-issues-list">
+                                    </ul>
+                                </section>
+
+                                <section id="constraintReport"
+                                         class="constraint-report hidden"
+                                         aria-labelledby="constraintReportTitle">
+                                    <div class="constraint-report-header">
+                                        <div>
+                                            <span class="result-message-label"
+                                                  data-i18n="constraintReport.eyebrow">Optimization quality</span>
+                                            <h3 id="constraintReportTitle"
+                                                data-i18n="constraintReport.title">
+                                                Unmet constraints
+                                            </h3>
+                                            <p data-i18n="constraintReport.description">This report explains the remaining penalty in the best timetable.</p>
+                                        </div>
+
+                                        <div class="constraint-report-summary">
+                                            <div class="constraint-report-metric constraint-report-metric-hard">
+                                                <span data-i18n="constraintReport.hardViolations">Hard violations</span>
+                                                <strong id="constraintReportHardValue">0</strong>
+                                            </div>
+                                            <div class="constraint-report-metric">
+                                                <span data-i18n="constraintReport.softPenalty">Soft penalty</span>
+                                                <strong id="constraintReportSoftValue">0</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p id="constraintReportEmpty"
+                                       class="constraint-report-empty"
+                                       data-i18n="constraintReport.perfect"
+                                       hidden>No constraint is violated and the soft penalty is zero.</p>
+
+                                    <div id="constraintReportTableWrapper"
+                                         class="constraint-report-table-wrapper">
+                                        <table class="constraint-report-table">
+                                            <thead>
+                                                <tr>
+                                                    <th data-i18n="constraintReport.constraint">Constraint</th>
+                                                    <th data-i18n="constraintReport.type">Type</th>
+                                                    <th data-i18n="constraintReport.occurrences">Occurrences</th>
+                                                    <th data-i18n="constraintReport.penalty">Penalty</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="constraintReportBody"></tbody>
+                                        </table>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div id="timetableContent">
+                                <div class="timetable-view-toolbar">
+                                    <button class="app-button app-button-secondary timetable-view-button active" type="button" data-view="list">Lista</button>
+                                    <button class="app-button app-button-secondary timetable-view-button" type="button" data-view="class">Klasa</button>
+                                    <button class="app-button app-button-secondary timetable-view-button" type="button" data-view="teacher">Nauczyciel</button>
+                                    <button class="app-button app-button-secondary timetable-view-button" type="button" data-view="room">Sala</button>
                                 </div>
 
-                                <ul id="preprocessingIssuesList"
-                                    class="preprocessing-issues-list">
-                                </ul>
-                            </section>
+                                <div id="timetableListView">
+                                    <div class="filters-row">
+                                        <label>
+                                            <span data-i18n="filter.class">Class:</span>
+                                            <select id="classFilter">
+                                                <option value="" data-i18n="filter.allClasses">All classes</option>
+                                            </select>
+                                        </label>
+                                        <label>
+                                            <span data-i18n="filter.teacher">Teacher:</span>
+                                            <select id="teacherFilter">
+                                                <option value="" data-i18n="filter.allTeachers">All teachers</option>
+                                            </select>
+                                        </label>
+                                        <label>
+                                            <span data-i18n="filter.room">Room:</span>
+                                            <select id="roomFilter">
+                                                <option value="" data-i18n="filter.allRooms">All rooms</option>
+                                            </select>
+                                        </label>
+                                    </div>
+
+                                    <div class="timetable-table-scroll">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th data-i18n="table.day">Day</th>
+                                                    <th data-i18n="table.slot">Slot</th>
+                                                    <th data-i18n="table.lesson">Lesson</th>
+                                                    <th data-i18n="table.class">Class</th>
+                                                    <th data-i18n="table.subject">Subject</th>
+                                                    <th data-i18n="table.teacher">Teacher</th>
+                                                    <th data-i18n="table.room">Room</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="timetableBody">
+                                                <tr><td colspan="7" data-i18n="table.noTimetable">No timetable generated yet.</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div id="timetableWeeklyView" class="timetable-weekly-view" hidden>
+                                    <div class="timetable-weekly-heading">
+                                        <div>
+                                            <span id="timetableWeeklyEyebrow" class="timetable-weekly-eyebrow">Plan tygodniowy</span>
+                                            <h3 id="timetableWeeklyTitle">Wybierz element</h3>
+                                        </div>
+                                        <label class="timetable-weekly-selector">
+                                            <span id="timetableWeeklySelectorLabel">Wybierz:</span>
+                                            <select id="timetableWeeklySelector"></select>
+                                        </label>
+                                    </div>
+
+                                    <div class="timetable-weekly-table-scroll">
+                                        <table id="timetableWeeklyTable" class="data-table timetable-weekly-table">
+                                            <thead>
+                                                <tr>
+                                                    <th class="timetable-slot-column">Lekcja</th>
+                                                    <th>Poniedziałek</th>
+                                                    <th>Wtorek</th>
+                                                    <th>Środa</th>
+                                                    <th>Czwartek</th>
+                                                    <th>Piątek</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="timetableWeeklyBody">
+                                                <tr><td colspan="6">Brak planu lekcji.</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <div id="timetableContent">
-                            <div class="timetable-view-toolbar">
-                                <button class="app-button app-button-secondary timetable-view-button active" type="button" data-view="list">Lista</button>
-                                <button class="app-button app-button-secondary timetable-view-button" type="button" data-view="class">Klasa</button>
-                                <button class="app-button app-button-secondary timetable-view-button" type="button" data-view="teacher">Nauczyciel</button>
-                                <button class="app-button app-button-secondary timetable-view-button" type="button" data-view="room">Sala</button>
-                            </div>
-
-                            <div id="timetableListView">
-                                <div class="filters-row">
-                                    <label>
-                                        <span data-i18n="filter.class">Class:</span>
-                                        <select id="classFilter">
-                                            <option value="" data-i18n="filter.allClasses">All classes</option>
-                                        </select>
-                                    </label>
-                                    <label>
-                                        <span data-i18n="filter.teacher">Teacher:</span>
-                                        <select id="teacherFilter">
-                                            <option value="" data-i18n="filter.allTeachers">All teachers</option>
-                                        </select>
-                                    </label>
-                                    <label>
-                                        <span data-i18n="filter.room">Room:</span>
-                                        <select id="roomFilter">
-                                            <option value="" data-i18n="filter.allRooms">All rooms</option>
-                                        </select>
-                                    </label>
-                                </div>
-
-                                <div class="timetable-table-scroll">
-                                    <table class="data-table">
-                                        <thead>
-                                            <tr>
-                                                <th data-i18n="table.day">Day</th>
-                                                <th data-i18n="table.slot">Slot</th>
-                                                <th data-i18n="table.lesson">Lesson</th>
-                                                <th data-i18n="table.class">Class</th>
-                                                <th data-i18n="table.subject">Subject</th>
-                                                <th data-i18n="table.teacher">Teacher</th>
-                                                <th data-i18n="table.room">Room</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="timetableBody">
-                                            <tr><td colspan="7" data-i18n="table.noTimetable">No timetable generated yet.</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div id="timetableWeeklyView" class="timetable-weekly-view" hidden>
-                                <div class="timetable-weekly-heading">
-                                    <div>
-                                        <span id="timetableWeeklyEyebrow" class="timetable-weekly-eyebrow">Plan tygodniowy</span>
-                                        <h3 id="timetableWeeklyTitle">Wybierz element</h3>
-                                    </div>
-                                    <label class="timetable-weekly-selector">
-                                        <span id="timetableWeeklySelectorLabel">Wybierz:</span>
-                                        <select id="timetableWeeklySelector"></select>
-                                    </label>
-                                </div>
-
-                                <div class="timetable-weekly-table-scroll">
-                                    <table id="timetableWeeklyTable" class="data-table timetable-weekly-table">
-                                        <thead>
-                                            <tr>
-                                                <th class="timetable-slot-column">Lekcja</th>
-                                                <th>Poniedziałek</th>
-                                                <th>Wtorek</th>
-                                                <th>Środa</th>
-                                                <th>Czwartek</th>
-                                                <th>Piątek</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="timetableWeeklyBody">
-                                            <tr><td colspan="6">Brak planu lekcji.</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>                        </div>
                     </section>
 
                 </div>
@@ -420,7 +469,7 @@
         </div>
     </main>
 
-    
+
     <div id="welcomeGuideOverlay"
          class="welcome-guide-overlay hidden"
          role="dialog"

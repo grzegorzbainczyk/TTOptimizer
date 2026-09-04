@@ -57,9 +57,12 @@ public:
 					context.problem,
 					scheduleSlot.roomId);
 
-			if (!ContainsSubject(
-				room.allowedSubjects,
-				requirement.subjectId))
+			// An empty collection means that the room has no subject
+			// restriction. Only explicitly restricted rooms are checked.
+			if (!room.allowedSubjects.empty() &&
+				!ContainsSubject(
+					room.allowedSubjects,
+					requirement.subjectId))
 			{
 				++result.violationCount;
 			}

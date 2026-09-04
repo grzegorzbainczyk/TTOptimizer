@@ -131,9 +131,6 @@
     <ClInclude Include="include\Preprocessing\AvailabilityValidator.h">
       <Filter>Header Files\Preprocessing</Filter>
     </ClInclude>
-    <ClInclude Include="include\ResultJsonWriter.h">
-      <Filter>Header Files\Serialization</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
@@ -158,12 +155,6 @@
     <ClInclude Include="include\Evaluation\Rules\IConstraintRule.h">
       <Filter>Header Files\Evaluation\Rules</Filter>
     </ClInclude>
-    <ClInclude Include="include\JsonReader.h">
-      <Filter>Header Files\Serialization</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Utils\DayOfWeekConverter.h">
-      <Filter>Header Files\Serialization</Filter>
-    </ClInclude>
     <ClInclude Include="include\IO\JsonReader.h">
       <Filter>Header Files\IO</Filter>
     </ClInclude>
@@ -172,6 +163,12 @@
     </ClInclude>
     <ClInclude Include="include\Decoding\ChromosomeDecoder.h">
       <Filter>Header Files\Decoding</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Serialization\JsonWriter.h">
+      <Filter>Header Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Serialization\JsonReader.h">
+      <Filter>Header Files\Serialization</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

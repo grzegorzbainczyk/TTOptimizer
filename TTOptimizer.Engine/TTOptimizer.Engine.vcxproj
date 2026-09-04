@@ -165,9 +165,8 @@
     <ClInclude Include="include\Preprocessing\ReferenceIntegrityValidator.h" />
     <ClInclude Include="include\Preprocessing\StructuralProblemValidator.h" />
     <ClInclude Include="include\Preprocessing\TimetablePreprocessor.h" />
-    <ClInclude Include="include\ResultJsonWriter.h" />
-    <ClInclude Include="include\JsonReader.h" />
-    <ClInclude Include="include\Utils\DayOfWeekConverter.h" />
+    <ClInclude Include="include\Serialization\JsonReader.h" />
+    <ClInclude Include="include\Serialization\JsonWriter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

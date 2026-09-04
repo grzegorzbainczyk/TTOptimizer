@@ -506,7 +506,14 @@ public class CppOptimizerService
                     new OptimizerRoomDto
                     {
                         Id = room.Id,
-                        Name = room.Name
+                        Name = room.Name,
+                        BuildingId = room.BuildingId,
+                        AllowedSubjects = room.RestrictedToSubjectId.HasValue
+                            ? new List<int>
+                            {
+                                room.RestrictedToSubjectId.Value
+                            }
+                            : new List<int>()
                     })
                 .ToList(),
 
