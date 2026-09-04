@@ -32,6 +32,7 @@ const levelFields = [
 let currentPreferences = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
+    await initializeI18n();
     const classGroupId = getClassGroupId();
 
     document.getElementById("classGroupId").value =
@@ -49,6 +50,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         ?.addEventListener("click", useAllDefaults);
 
     await loadPreferences();
+
+    window.addEventListener("classflow:language-changed", () => {
+        if (currentPreferences) renderPreferences(currentPreferences);
+    });
 });
 
 function getClassGroupId() {
@@ -59,7 +64,7 @@ function getClassGroupId() {
     const classGroupId = Number.parseInt(value ?? "", 10);
 
     if (!Number.isInteger(classGroupId) || classGroupId <= 0) {
-        throw new Error("Class ID is missing or invalid.");
+        throw new Error(t("classPreferences.invalidClassId"));
     }
 
     return classGroupId;
@@ -72,7 +77,7 @@ async function loadPreferences() {
 
         const classGroupId = getClassGroupId();
 
-        showMessage("Loading class scheduling preferences...");
+        showMessage(t("classPreferences.loading"));
 
         const response = await fetch(
             `/api/classes/${encodeURIComponent(classGroupId)}/scheduling-preferences?organizationId=${encodeURIComponent(organizationId)}`
@@ -82,8 +87,7 @@ async function loadPreferences() {
 
         if (!response.ok || !data?.success) {
             throw new Error(
-                data?.message ??
-                "Could not load class scheduling preferences."
+                t("classPreferences.loadFailed")
             );
         }
 
@@ -100,7 +104,7 @@ async function loadPreferences() {
         showMessage(
             error instanceof Error
                 ? error.message
-                : "Could not load class scheduling preferences.",
+                : t("classPreferences.loadFailed"),
             true
         );
     }
@@ -113,7 +117,7 @@ function renderPreferences(preferences) {
     if (classGroupName) {
         classGroupName.textContent =
             preferences.classGroupName ??
-            "Class preferences";
+            t("classPreferences.classFallback");
     }
 
     for (const field of levelFields) {
@@ -160,7 +164,9 @@ function populateLevelSelect(
 
     defaultOption.value = "default";
     defaultOption.textContent =
-        `Default (${defaultValue})`;
+        formatText("classPreferences.defaultValue", {
+            value: translateLevel(defaultValue)
+        });
 
     select.appendChild(defaultOption);
 
@@ -169,7 +175,7 @@ function populateLevelSelect(
             document.createElement("option");
 
         option.value = level;
-        option.textContent = level;
+        option.textContent = translateLevel(level);
 
         select.appendChild(option);
     }
@@ -225,19 +231,19 @@ async function savePreferences() {
 
         validateOptionalLimit(
             payload.maxConsecutiveLessonsLimit,
-            "Max consecutive lessons"
+            t("classPreferences.maxConsecutive.label")
         );
 
         validateOptionalLimit(
             payload.maxLessonsPerDayLimit,
-            "Max lessons per day"
+            t("classPreferences.maxPerDay.label")
         );
 
         if (saveButton) {
             saveButton.disabled = true;
         }
 
-        showMessage("Saving class scheduling preferences...");
+        showMessage(t("classPreferences.saving"));
 
         const response = await fetch(
             `/api/classes/${encodeURIComponent(classGroupId)}/scheduling-preferences?organizationId=${encodeURIComponent(organizationId)}`,
@@ -255,8 +261,7 @@ async function savePreferences() {
 
         if (!response.ok || !data?.success) {
             throw new Error(
-                data?.message ??
-                "Could not save class scheduling preferences."
+                t("classPreferences.saveFailed")
             );
         }
 
@@ -268,8 +273,7 @@ async function savePreferences() {
         );
 
         showMessage(
-            data.message ??
-            "Class scheduling preferences were saved."
+            t("classPreferences.saved")
         );
     } catch (error) {
         console.error(
@@ -280,7 +284,7 @@ async function savePreferences() {
         showMessage(
             error instanceof Error
                 ? error.message
-                : "Could not save class scheduling preferences.",
+                : t("classPreferences.saveFailed"),
             true
         );
     } finally {
@@ -351,7 +355,7 @@ function validateOptionalLimit(value, label) {
         value > 8)
     {
         throw new Error(
-            `${label} limit must be between 1 and 8.`
+            formatText("classPreferences.limitRange", { label })
         );
     }
 }
@@ -373,26 +377,27 @@ function setLimit(
             savedValue ?? "";
 
         input.placeholder =
-            `Default (${defaultValue})`;
+            formatText("classPreferences.defaultValue", { value: defaultValue });
     }
 
     if (hint) {
         hint.textContent =
             savedValue == null
-                ? `Using organization default: ${defaultValue}`
-                : `Organization default: ${defaultValue}`;
+                ? formatText("classPreferences.usingOrganizationDefault", { value: defaultValue })
+                : formatText("classPreferences.organizationDefault", { value: defaultValue });
     }
 }
 
 function showEffectiveSummary(preferences) {
     showMessage(
-        "Effective: " +
-        `gaps ${preferences.effectiveMinimizeGaps}, ` +
-        `single-lesson day ${preferences.effectiveAvoidSingleLessonDay}, ` +
-        `consecutive ${preferences.effectiveMaxConsecutiveLessons} ` +
-        `(limit ${preferences.effectiveMaxConsecutiveLessonsLimit}), ` +
-        `daily ${preferences.effectiveMaxLessonsPerDay} ` +
-        `(limit ${preferences.effectiveMaxLessonsPerDayLimit}).`
+        formatText("classPreferences.effectiveSummary", {
+            gaps: translateLevel(preferences.effectiveMinimizeGaps),
+            single: translateLevel(preferences.effectiveAvoidSingleLessonDay),
+            consecutive: translateLevel(preferences.effectiveMaxConsecutiveLessons),
+            consecutiveLimit: preferences.effectiveMaxConsecutiveLessonsLimit,
+            daily: translateLevel(preferences.effectiveMaxLessonsPerDay),
+            dailyLimit: preferences.effectiveMaxLessonsPerDayLimit
+        })
     );
 }
 
@@ -410,9 +415,21 @@ async function readJsonResponse(response) {
         return {
             success: false,
             message:
-                `Server returned invalid JSON. Status: ${response.status}`
+                formatText("classPreferences.invalidJson", { status: response.status })
         };
     }
+}
+
+function translateLevel(level) {
+    return t(`classPreferences.level.${level}`, level);
+}
+
+function formatText(key, values) {
+    let result = t(key);
+    for (const [name, value] of Object.entries(values)) {
+        result = result.replaceAll(`{${name}}`, String(value));
+    }
+    return result;
 }
 
 function showMessage(
@@ -434,3 +451,4 @@ function showMessage(
         isError
     );
 }
+import { initializeI18n, t } from "./i18n.js";

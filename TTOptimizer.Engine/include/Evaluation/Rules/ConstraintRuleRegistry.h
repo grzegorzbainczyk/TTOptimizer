@@ -20,6 +20,7 @@
 #include "Soft/SubjectPreferDoubleLessonsRule.h"
 #include "Soft/SubjectKeepSameRoomForDoubleLessonsRule.h"
 #include "Soft/SubjectPreferredRoomRule.h"
+#include "Soft/LessonRequirementPreferredRoomRule.h"
 #include "Soft/SubjectAvoidDoubleLessonsRule.h"
 
 class ConstraintRuleRegistry
@@ -74,6 +75,9 @@ public:
 
         rules_.push_back(
             std::make_unique<SubjectPreferredRoomRule>());
+
+        rules_.push_back(
+            std::make_unique<LessonRequirementPreferredRoomRule>());
 
         rules_.push_back(
             std::make_unique<SubjectAvoidDoubleLessonsRule>());

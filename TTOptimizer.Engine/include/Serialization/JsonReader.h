@@ -322,6 +322,15 @@ private:
             requirement.studentGroupId = item.value("studentGroupId", 0);
             requirement.subjectId = item.value("subjectId", 0);
             requirement.weeklyCount = item.value("lessonsPerWeek", 0);
+            if (item.contains("preferredRoomId") &&
+                !item.at("preferredRoomId").is_null())
+            {
+                requirement.preferredRoomId =
+                    item.at("preferredRoomId").get<RoomId>();
+            }
+            requirement.preferredRoomImportance =
+                parseSchedulingPreferenceLevel(item.value(
+                    "preferredRoomImportance", "Disabled"));
             problem.lessonRequirements.push_back(requirement);
         }
     }

@@ -42,7 +42,10 @@ public class RequirementsController : ControllerBase
                 SubjectId = x.SubjectId,
                 SubjectName = x.Subject.Name,
                 HoursPerWeek = x.HoursPerWeek,
-                Priority = x.Priority
+                Priority = x.Priority,
+                PreferredRoomId = x.PreferredRoomId,
+                PreferredRoomName = x.PreferredRoom != null ? x.PreferredRoom.Name : null,
+                PreferredRoomImportance = x.PreferredRoomImportance
             })
             .ToListAsync();
         return Ok(requirements);
@@ -345,7 +348,7 @@ public class RequirementsController : ControllerBase
         [FromQuery] int organizationId,
         [FromBody] CreateStudentGroupLessonRequirementRequest request)
     {
-        var validation = await ValidateRequestAsync(organizationId, request.TeacherId, request.StudentGroupId, request.SubjectId, request.HoursPerWeek, request.Priority);
+        var validation = await ValidateRequestAsync(organizationId, request.TeacherId, request.StudentGroupId, request.SubjectId, request.HoursPerWeek, request.Priority, request.PreferredRoomId, request.PreferredRoomImportance);
         if (validation != null) return validation;
 
         var group = await _db.StudentGroups.FirstAsync(x => x.Id == request.StudentGroupId);
@@ -364,7 +367,11 @@ public class RequirementsController : ControllerBase
             ClassGroupId = group.ClassGroupId,
             SubjectId = request.SubjectId,
             HoursPerWeek = request.HoursPerWeek,
-            Priority = request.Priority
+            Priority = request.Priority,
+            PreferredRoomId = request.PreferredRoomId,
+            PreferredRoomImportance = request.PreferredRoomId.HasValue
+                ? request.PreferredRoomImportance
+                : SchedulingPreferenceLevel.Disabled
         };
         _db.LessonRequirements.Add(entity);
         await _db.SaveChangesAsync();
@@ -380,7 +387,7 @@ public class RequirementsController : ControllerBase
         var entity = await _db.LessonRequirements.FirstOrDefaultAsync(x => x.Id == id && x.OrganizationId == organizationId);
         if (entity == null) return NotFound(new { message = "Lesson requirement not found." });
 
-        var validation = await ValidateRequestAsync(organizationId, request.TeacherId, request.StudentGroupId, request.SubjectId, request.HoursPerWeek, request.Priority);
+        var validation = await ValidateRequestAsync(organizationId, request.TeacherId, request.StudentGroupId, request.SubjectId, request.HoursPerWeek, request.Priority, request.PreferredRoomId, request.PreferredRoomImportance);
         if (validation != null) return validation;
 
         var duplicate = await _db.LessonRequirements.AnyAsync(x => x.OrganizationId == organizationId && x.Id != id &&
@@ -396,6 +403,10 @@ public class RequirementsController : ControllerBase
         entity.SubjectId = request.SubjectId;
         entity.HoursPerWeek = request.HoursPerWeek;
         entity.Priority = request.Priority;
+        entity.PreferredRoomId = request.PreferredRoomId;
+        entity.PreferredRoomImportance = request.PreferredRoomId.HasValue
+            ? request.PreferredRoomImportance
+            : SchedulingPreferenceLevel.Disabled;
         await _db.SaveChangesAsync();
         return Ok(await GetRequirementDTOAsync(id, organizationId));
     }
@@ -410,7 +421,7 @@ public class RequirementsController : ControllerBase
         return NoContent();
     }
 
-    private async Task<ActionResult?> ValidateRequestAsync(int organizationId, int teacherId, int studentGroupId, int subjectId, int hoursPerWeek, LessonPriority priority)
+    private async Task<ActionResult?> ValidateRequestAsync(int organizationId, int teacherId, int studentGroupId, int subjectId, int hoursPerWeek, LessonPriority priority, int? preferredRoomId, SchedulingPreferenceLevel preferredRoomImportance)
     {
         if (organizationId <= 0) return BadRequest(new { message = "Organization ID is required." });
         if (teacherId <= 0) return BadRequest(new { message = "Teacher is required." });
@@ -418,12 +429,17 @@ public class RequirementsController : ControllerBase
         if (subjectId <= 0) return BadRequest(new { message = "Subject is required." });
         if (hoursPerWeek is < 1 or > 40) return BadRequest(new { message = "Hours per week must be between 1 and 40." });
         if (!Enum.IsDefined(priority)) return BadRequest(new { message = "Priority is invalid." });
+        if (!Enum.IsDefined(preferredRoomImportance)) return BadRequest(new { message = "Preferred room importance is invalid." });
+        if (preferredRoomId.HasValue && preferredRoomImportance == SchedulingPreferenceLevel.Disabled)
+            return BadRequest(new { message = "Select an importance level for the preferred room." });
         if (!await _db.Teachers.AnyAsync(x => x.Id == teacherId && x.OrganizationId == organizationId))
             return BadRequest(new { message = "Teacher was not found." });
         if (!await _db.StudentGroups.AnyAsync(x => x.Id == studentGroupId && x.OrganizationId == organizationId))
             return BadRequest(new { message = "Student group was not found." });
         if (!await _db.Subjects.AnyAsync(x => x.Id == subjectId && x.OrganizationId == organizationId))
             return BadRequest(new { message = "Subject was not found." });
+        if (preferredRoomId.HasValue && !await _db.Rooms.AnyAsync(x => x.Id == preferredRoomId.Value && x.OrganizationId == organizationId))
+            return BadRequest(new { message = "Preferred room was not found." });
         return null;
     }
 
@@ -436,7 +452,10 @@ public class RequirementsController : ControllerBase
                 StudentGroupId = x.StudentGroupId!.Value, StudentGroupName = x.StudentGroup!.Name,
                 ClassGroupId = x.StudentGroup.ClassGroupId,
                 ClassName = x.StudentGroup.ClassGroup != null ? x.StudentGroup.ClassGroup.Name : null,
-                SubjectId = x.SubjectId, SubjectName = x.Subject.Name, HoursPerWeek = x.HoursPerWeek, Priority = x.Priority
+                SubjectId = x.SubjectId, SubjectName = x.Subject.Name, HoursPerWeek = x.HoursPerWeek, Priority = x.Priority,
+                PreferredRoomId = x.PreferredRoomId,
+                PreferredRoomName = x.PreferredRoom != null ? x.PreferredRoom.Name : null,
+                PreferredRoomImportance = x.PreferredRoomImportance
             }).FirstOrDefaultAsync();
 
     private static string? NormalizeName(string? name)
@@ -489,4 +508,3 @@ public class ImportTeachingPlanItemRequest
 
     public int ResolvedSubjectId { get; set; }
 }
-

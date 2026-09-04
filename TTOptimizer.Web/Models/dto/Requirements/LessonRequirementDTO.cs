@@ -17,4 +17,7 @@ public class LessonRequirementDTO
     public string SubjectName { get; set; } = string.Empty;
     public int HoursPerWeek { get; set; }
     public LessonPriority Priority { get; set; }
+    public int? PreferredRoomId { get; set; }
+    public string? PreferredRoomName { get; set; }
+    public SchedulingPreferenceLevel PreferredRoomImportance { get; set; }
 }

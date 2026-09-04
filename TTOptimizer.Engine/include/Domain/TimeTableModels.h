@@ -18,6 +18,15 @@ using LessonInstanceId = int;
 using LessonInstanceIndex = std::size_t;
 using ScheduleSlotIndex = std::size_t;
 
+enum class SchedulingPreferenceLevel
+{
+    Disabled,
+    Low,
+    Medium,
+    High,
+    Hard
+};
+
 enum class DayOfWeek
 {
     Monday = 0,
@@ -183,6 +192,10 @@ struct LessonRequirement
     SubjectId subjectId{};
     TeacherId teacherId{};
     int weeklyCount{};
+    RoomId preferredRoomId{};
+    SchedulingPreferenceLevel preferredRoomImportance{
+        SchedulingPreferenceLevel::Disabled
+    };
 };
 
 struct LessonInstance

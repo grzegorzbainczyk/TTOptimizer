@@ -107,6 +107,12 @@ namespace TTOptimizer.Web.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("PreferredRoomId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PreferredRoomImportance")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("StudentGroupId")
                         .HasColumnType("integer");
 
@@ -123,6 +129,8 @@ namespace TTOptimizer.Web.Migrations
                     b.HasIndex("ClassGroupId");
 
                     b.HasIndex("OrganizationId");
+
+                    b.HasIndex("PreferredRoomId");
 
                     b.HasIndex("StudentGroupId");
 
@@ -1110,6 +1118,11 @@ namespace TTOptimizer.Web.Migrations
                         .HasForeignKey("StudentGroupId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Room", "PreferredRoom")
+                        .WithMany()
+                        .HasForeignKey("PreferredRoomId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
@@ -1125,6 +1138,8 @@ namespace TTOptimizer.Web.Migrations
                     b.Navigation("ClassGroup");
 
                     b.Navigation("Organization");
+
+                    b.Navigation("PreferredRoom");
 
                     b.Navigation("StudentGroup");
 

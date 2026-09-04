@@ -107,6 +107,9 @@
     <ClInclude Include="include\Evaluation\Rules\Soft\RoomSubjectCompatibilityRule.h">
       <Filter>Header Files\Evaluation\Rules\Soft</Filter>
     </ClInclude>
+    <ClInclude Include="include\Evaluation\Rules\Soft\LessonRequirementPreferredRoomRule.h">
+      <Filter>Header Files\Evaluation\Rules\Soft</Filter>
+    </ClInclude>
     <ClInclude Include="include\Optimization\GeneticOptimizer.h">
       <Filter>Header Files\Optimization</Filter>
     </ClInclude>

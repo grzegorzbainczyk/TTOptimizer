@@ -241,6 +241,23 @@
 <option data-i18n="lessons.priorityHigh" value="2">High</option>
 </select>
 </div>
+<div class="form-field">
+<label for="requirementPreferredRoomId">Preferowana sala</label>
+<select id="requirementPreferredRoomId">
+<option value="">Brak — użyj ustawienia przedmiotu</option>
+</select>
+</div>
+<div class="form-field">
+<label for="requirementPreferredRoomImportance">Ważność preferowanej sali</label>
+<select id="requirementPreferredRoomImportance" disabled>
+<option value="Disabled">Wyłączona</option>
+<option value="Low">Niska</option>
+<option value="Medium">Średnia</option>
+<option value="High">Wysoka</option>
+<option value="Hard">Twarda (wymagana)</option>
+</select>
+<small>Ustawienie zajęć zastępuje preferowaną salę przedmiotu.</small>
+</div>
 </div>
 <div class="form-actions teachers-form-actions">
 <button class="primary-button" id="saveRequirementButton" type="button" data-i18n="common.save">Save</button>
@@ -259,12 +276,13 @@
 <th data-i18n="lessons.curriculumTeacher">Teacher</th>
 <th data-i18n="lessons.curriculumHours">Hours/week</th>
 <th data-i18n="lessons.priority">Priority</th>
+<th>Preferowana sala</th>
 <th class="table-actions-column" data-i18n="common.actions">Actions</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="teachers-table-state" colspan="7">
+<td class="teachers-table-state" colspan="8">
                                 Loading requirements...
                             </td>
 </tr>

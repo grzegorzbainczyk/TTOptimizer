@@ -4,6 +4,7 @@ let availableTeachers = [];
 let availableStudentGroups = [];
 let availableSubjects = [];
 let availableClasses = [];
+let availableRooms = [];
 let availableRequirements = [];
 let curriculumDefinition = null;
 let curriculumPreviewRows = [];
@@ -93,6 +94,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("requirementIsAdditional")
         ?.addEventListener("change", handleAdditionalLessonChanged);
 
+    document.getElementById("requirementPreferredRoomId")
+        ?.addEventListener("change", handlePreferredRoomChanged);
+
     await refreshPageData();
 
     window.addEventListener("classflow:language-changed", () => {
@@ -101,6 +105,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         populateStudentGroupOptions();
         populateSubjectOptions();
         populateNewStudentGroupClassOptions();
+        populatePreferredRoomOptions();
         if (Array.isArray(availableRequirements)) {
             const visibleRequirements = isAdditionalLessonsMode
                 ? availableRequirements.filter(item => Boolean(item.isAdditional))
@@ -289,10 +294,25 @@ async function refreshPageData() {
         loadTeachers(),
         loadStudentGroups(),
         loadSubjects(),
-        loadClasses()
+        loadClasses(),
+        loadRooms()
     ]);
 
     await loadRequirements();
+}
+
+async function loadRooms() {
+    try {
+        const organizationId = window.appContext.requireOrganizationId();
+        const response = await fetch(`/api/rooms?organizationId=${encodeURIComponent(organizationId)}`);
+        const data = await readJsonResponse(response);
+        if (!response.ok) throw new Error(getApiErrorMessage(data, `Could not load rooms. Status: ${response.status}`));
+        availableRooms = Array.isArray(data) ? data : data?.rooms ?? [];
+    } catch (error) {
+        console.error("Error loading rooms:", error);
+        availableRooms = [];
+    }
+    populatePreferredRoomOptions();
 }
 
 async function loadTeachers() {
@@ -517,7 +537,7 @@ function renderRequirements(requirements) {
     ) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="teachers-table-state">${t("lessons.noneFound")}</td>
+                <td colspan="8" class="teachers-table-state">${t("lessons.noneFound")}</td>
             </tr>
         `;
 
@@ -558,6 +578,12 @@ function renderRequirements(requirements) {
         row.appendChild(
             createTableCell(formatPriority(requirement.priority))
         );
+
+        row.appendChild(createTableCell(
+            requirement.preferredRoomName
+                ? `${requirement.preferredRoomName} (${formatPreferenceLevel(requirement.preferredRoomImportance)})`
+                : "—"
+        ));
 
         const actionsCell =
             document.createElement("td");
@@ -808,6 +834,38 @@ function populateSubjectOptions() {
     });
 
     select.value = selectedValue;
+}
+
+function populatePreferredRoomOptions() {
+    const select = document.getElementById("requirementPreferredRoomId");
+    if (!select) return;
+    const selectedValue = select.value;
+    select.innerHTML = "";
+    const empty = document.createElement("option");
+    empty.value = "";
+    empty.textContent = "Brak — użyj ustawienia przedmiotu";
+    select.appendChild(empty);
+    availableRooms.forEach(room => {
+        const option = document.createElement("option");
+        option.value = room.id;
+        option.textContent = room.name;
+        select.appendChild(option);
+    });
+    select.value = selectedValue;
+    handlePreferredRoomChanged();
+}
+
+function handlePreferredRoomChanged() {
+    const room = document.getElementById("requirementPreferredRoomId");
+    const importance = document.getElementById("requirementPreferredRoomImportance");
+    if (!room || !importance) return;
+    importance.disabled = !room.value;
+    if (!room.value) importance.value = "Disabled";
+    else if (importance.value === "Disabled") importance.value = "High";
+}
+
+function formatPreferenceLevel(level) {
+    return ({ Low: "niska", Medium: "średnia", High: "wysoka", Hard: "twarda" })[level] ?? level ?? "—";
 }
 
 
@@ -1940,6 +1998,10 @@ function openAddRequirementForm() {
         "requirementPriority"
     ).value = "1";
 
+    document.getElementById("requirementPreferredRoomId").value = "";
+    document.getElementById("requirementPreferredRoomImportance").value = "Disabled";
+    handlePreferredRoomChanged();
+
     document.getElementById(
         "requirementIsAdditional"
     ).checked = isAdditionalLessonsMode;
@@ -2024,6 +2086,12 @@ function openEditRequirementForm(requirement) {
         "requirementPriority"
     ).value =
         requirement.priority?.toString() ?? "1";
+
+    document.getElementById("requirementPreferredRoomId").value =
+        requirement.preferredRoomId?.toString() ?? "";
+    document.getElementById("requirementPreferredRoomImportance").value =
+        requirement.preferredRoomImportance ?? "Disabled";
+    handlePreferredRoomChanged();
 
     document.getElementById(
         "requirementIsAdditional"
@@ -2172,6 +2240,12 @@ async function saveRequirement() {
             ).value
         );
 
+    const preferredRoomValue = document.getElementById("requirementPreferredRoomId").value;
+    const preferredRoomId = preferredRoomValue ? Number(preferredRoomValue) : null;
+    const preferredRoomImportance = preferredRoomId
+        ? document.getElementById("requirementPreferredRoomImportance").value
+        : "Disabled";
+
     const isAdditional =
         document.getElementById(
             "requirementIsAdditional"
@@ -2266,7 +2340,9 @@ async function saveRequirement() {
         subjectId,
         hoursPerWeek,
         priority: effectivePriority,
-        isAdditional: effectiveIsAdditional
+        isAdditional: effectiveIsAdditional,
+        preferredRoomId,
+        preferredRoomImportance
     };
 
     const isEditing =
@@ -3666,4 +3742,3 @@ function getApiErrorMessage(
             });
     });
 })();
-

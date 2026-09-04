@@ -547,7 +547,9 @@ public class CppOptimizerService
                             SubjectId = requirement.SubjectId,
                             LessonsPerWeek = requirement.HoursPerWeek,
                             IsAdditional = requirement.IsAdditional,
-                            Priority = requirement.Priority
+                            Priority = requirement.Priority,
+                            PreferredRoomId = requirement.PreferredRoomId,
+                            PreferredRoomImportance = requirement.PreferredRoomImportance
                         })
                     .ToList(),
 

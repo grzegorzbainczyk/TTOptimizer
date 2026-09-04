@@ -231,6 +231,10 @@ public class OptimizerLessonRequirementDto
     /// Gets or sets the scheduling priority of the lesson requirement.
     /// </summary>
     public LessonPriority Priority { get; set; } = LessonPriority.Normal;
+
+    public int? PreferredRoomId { get; set; }
+    public SchedulingPreferenceLevel PreferredRoomImportance { get; set; }
+        = SchedulingPreferenceLevel.Disabled;
 }
 
 public class OptimizerStudentGroupDto

@@ -359,6 +359,7 @@ private:
 		case ConstraintViolationType::SubjectPreferDoubleLessons: return "SubjectPreferDoubleLessons";
 		case ConstraintViolationType::SubjectKeepSameRoomForDoubleLessons: return "SubjectKeepSameRoomForDoubleLessons";
 		case ConstraintViolationType::SubjectPreferredRoom: return "SubjectPreferredRoom";
+		case ConstraintViolationType::LessonRequirementPreferredRoom: return "LessonRequirementPreferredRoom";
 		case ConstraintViolationType::SubjectAvoidDoubleLessons: return "SubjectAvoidDoubleLessons";
 		}
 

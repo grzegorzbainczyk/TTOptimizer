@@ -104,6 +104,15 @@ public:
             const LessonRequirement& requirement =
                 *requirementIterator->second;
 
+            // A room configured directly on the lesson requirement is more
+            // specific and therefore replaces the subject-level preference.
+            if (requirement.preferredRoomId != 0 &&
+                requirement.preferredRoomImportance !=
+                    SchedulingPreferenceLevel::Disabled)
+            {
+                continue;
+            }
+
             const auto preferenceIterator =
                 preferenceBySubjectId.find(requirement.subjectId);
 

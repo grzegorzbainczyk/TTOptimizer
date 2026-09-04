@@ -11,6 +11,8 @@ public class CreateStudentGroupLessonRequirementRequest
     public int SubjectId { get; set; }
     public int HoursPerWeek { get; set; }
     public LessonPriority Priority { get; set; } = LessonPriority.Normal;
+    public int? PreferredRoomId { get; set; }
+    public SchedulingPreferenceLevel PreferredRoomImportance { get; set; } = SchedulingPreferenceLevel.Disabled;
 }
 
 public class UpdateStudentGroupLessonRequirementRequest
@@ -22,4 +24,6 @@ public class UpdateStudentGroupLessonRequirementRequest
     public int SubjectId { get; set; }
     public int HoursPerWeek { get; set; }
     public LessonPriority Priority { get; set; } = LessonPriority.Normal;
+    public int? PreferredRoomId { get; set; }
+    public SchedulingPreferenceLevel PreferredRoomImportance { get; set; } = SchedulingPreferenceLevel.Disabled;
 }

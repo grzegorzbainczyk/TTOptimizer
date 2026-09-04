@@ -21,9 +21,14 @@ public class LessonRequirement
 
     public LessonPriority Priority { get; set; } = LessonPriority.Normal;
 
+    public int? PreferredRoomId { get; set; }
+    public SchedulingPreferenceLevel PreferredRoomImportance { get; set; }
+        = SchedulingPreferenceLevel.Disabled;
+
     public Organization Organization { get; set; } = null!;
     public ClassGroup? ClassGroup { get; set; }
     public StudentGroup? StudentGroup { get; set; }
     public Subject Subject { get; set; } = null!;
     public Teacher Teacher { get; set; } = null!;
+    public Room? PreferredRoom { get; set; }
 }

@@ -11,15 +11,6 @@ enum class TimeSlotPreferenceType
     Unavailable
 };
 
-enum class SchedulingPreferenceLevel
-{
-    Disabled,
-    Low,
-    Medium,
-    High,
-    Hard
-};
-
 struct TeacherTimeSlotPreference
 {
     TeacherId teacherId{};

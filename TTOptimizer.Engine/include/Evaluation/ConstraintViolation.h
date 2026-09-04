@@ -34,6 +34,7 @@ enum class ConstraintViolationType
     SubjectPreferDoubleLessons,
     SubjectKeepSameRoomForDoubleLessons,
     SubjectPreferredRoom,
+    LessonRequirementPreferredRoom,
     SubjectAvoidDoubleLessons
 };
 

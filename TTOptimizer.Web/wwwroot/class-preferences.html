@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClassFlow - Class preferences</title>
+    <title data-i18n="classPreferences.pageTitle">ClassFlow - Preferencje klasy</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="teachers-page">
@@ -11,19 +11,16 @@
         <header class="app-header teachers-header">
             <div class="teachers-header-content">
                 <div class="teachers-title-group">
-                    <span class="teachers-page-label">Class scheduling</span>
-                    <h1 id="classGroupName">Class preferences</h1>
-                    <p class="page-subtitle">
-                        Configure scheduling preferences for this class.
-                        Default values are inherited from the organization.
-                    </p>
+                    <span class="teachers-page-label" data-i18n="classPreferences.badge">Planowanie klasy</span>
+                    <h1 id="classGroupName" data-i18n="classPreferences.classFallback">Preferencje klasy</h1>
+                    <p class="page-subtitle" data-i18n="classPreferences.subtitle">Skonfiguruj preferencje planowania tej klasy. Wartości domyślne są dziedziczone z organizacji.</p>
                 </div>
 
                 <nav class="header-actions">
                     <button id="backToClassesButton"
                             class="secondary-button teachers-header-button"
                             type="button">
-                        Back to classes
+                        <span data-i18n="classPreferences.backToClasses">Powrót do klas</span>
                     </button>
                 </nav>
             </div>
@@ -32,10 +29,8 @@
         <main class="content-card teachers-card">
             <div class="section-header teachers-section-header">
                 <div>
-                    <h2>Scheduling preferences</h2>
-                    <p class="teachers-section-description">
-                        Override only the rules that should differ from organization defaults.
-                    </p>
+                    <h2 data-i18n="classPreferences.title">Preferencje planowania</h2>
+                    <p class="teachers-section-description" data-i18n="classPreferences.description">Zmień tylko te reguły, które mają się różnić od wartości domyślnych organizacji.</p>
                 </div>
             </div>
 
@@ -44,31 +39,31 @@
 
                 <section class="teacher-preferences-group">
                     <div class="teacher-preferences-group-header">
-                        <h3>Schedule quality</h3>
-                        <p>Preferences affecting the shape of a class timetable.</p>
+                        <h3 data-i18n="classPreferences.quality.title">Jakość planu</h3>
+                        <p data-i18n="classPreferences.quality.description">Preferencje wpływające na układ planu lekcji klasy.</p>
                     </div>
 
                     <div class="teacher-preferences-simple-grid">
                         <article class="teacher-preference-card">
                             <div class="teacher-preference-card-header">
-                                <h4>Minimize gaps</h4>
-                                <p>Reduce empty slots between the first and last lesson of the day.</p>
+                                <h4 data-i18n="classPreferences.minimizeGaps.title">Minimalizuj okienka</h4>
+                                <p data-i18n="classPreferences.minimizeGaps.description">Ograniczaj wolne godziny pomiędzy pierwszą a ostatnią lekcją dnia.</p>
                             </div>
 
                             <div class="form-field">
-                                <label for="minimizeGapsImportance">Importance</label>
+                                <label for="minimizeGapsImportance" data-i18n="classPreferences.importance">Ważność</label>
                                 <select id="minimizeGapsImportance"></select>
                             </div>
                         </article>
 
                         <article class="teacher-preference-card">
                             <div class="teacher-preference-card-header">
-                                <h4>Avoid single-lesson day</h4>
-                                <p>Discourage class days containing exactly one lesson.</p>
+                                <h4 data-i18n="classPreferences.avoidSingleLessonDay.title">Unikaj dnia z jedną lekcją</h4>
+                                <p data-i18n="classPreferences.avoidSingleLessonDay.description">Zniechęcaj do dni, w których klasa ma dokładnie jedną lekcję.</p>
                             </div>
 
                             <div class="form-field">
-                                <label for="avoidSingleLessonDayImportance">Importance</label>
+                                <label for="avoidSingleLessonDayImportance" data-i18n="classPreferences.importance">Ważność</label>
                                 <select id="avoidSingleLessonDayImportance"></select>
                             </div>
                         </article>
@@ -77,25 +72,25 @@
 
                 <section class="teacher-preferences-group">
                     <div class="teacher-preferences-group-header">
-                        <h3>Daily workload</h3>
-                        <p>Control consecutive lessons and total lessons per day.</p>
+                        <h3 data-i18n="classPreferences.workload.title">Dzienne obciążenie</h3>
+                        <p data-i18n="classPreferences.workload.description">Kontroluj liczbę kolejnych lekcji oraz łączną liczbę lekcji dziennie.</p>
                     </div>
 
                     <div class="teacher-preferences-limit-grid">
                         <article class="teacher-preference-card">
                             <div class="teacher-preference-card-header">
-                                <h4>Max consecutive lessons</h4>
-                                <p>Penalize lesson runs longer than the configured limit.</p>
+                                <h4 data-i18n="classPreferences.maxConsecutive.title">Maksymalna liczba kolejnych lekcji</h4>
+                                <p data-i18n="classPreferences.maxConsecutive.description">Naliczaj karę za ciągi lekcji dłuższe niż ustawiony limit.</p>
                             </div>
 
                             <div class="teacher-preference-paired-fields">
                                 <div class="form-field">
-                                    <label for="maxConsecutiveLessonsImportance">Importance</label>
+                                    <label for="maxConsecutiveLessonsImportance" data-i18n="classPreferences.importance">Ważność</label>
                                     <select id="maxConsecutiveLessonsImportance"></select>
                                 </div>
 
                                 <div class="form-field">
-                                    <label for="maxConsecutiveLessonsLimit">Maximum lessons</label>
+                                    <label for="maxConsecutiveLessonsLimit" data-i18n="classPreferences.maximumLessons">Maksymalna liczba lekcji</label>
                                     <input id="maxConsecutiveLessonsLimit"
                                            type="number"
                                            min="1"
@@ -108,18 +103,18 @@
 
                         <article class="teacher-preference-card">
                             <div class="teacher-preference-card-header">
-                                <h4>Max lessons per day</h4>
-                                <p>Penalize days that exceed the configured daily lesson limit.</p>
+                                <h4 data-i18n="classPreferences.maxPerDay.title">Maksymalna liczba lekcji dziennie</h4>
+                                <p data-i18n="classPreferences.maxPerDay.description">Naliczaj karę za dni przekraczające ustawiony dzienny limit lekcji.</p>
                             </div>
 
                             <div class="teacher-preference-paired-fields">
                                 <div class="form-field">
-                                    <label for="maxLessonsPerDayImportance">Importance</label>
+                                    <label for="maxLessonsPerDayImportance" data-i18n="classPreferences.importance">Ważność</label>
                                     <select id="maxLessonsPerDayImportance"></select>
                                 </div>
 
                                 <div class="form-field">
-                                    <label for="maxLessonsPerDayLimit">Maximum lessons</label>
+                                    <label for="maxLessonsPerDayLimit" data-i18n="classPreferences.maximumLessons">Maksymalna liczba lekcji</label>
                                     <input id="maxLessonsPerDayLimit"
                                            type="number"
                                            min="1"
@@ -137,13 +132,13 @@
                         <button id="saveClassGroupPreferencesButton"
                                 class="main-action-button"
                                 type="button">
-                            Save
+                            <span data-i18n="common.save">Zapisz</span>
                         </button>
 
                         <button id="resetClassGroupPreferencesButton"
                                 class="secondary-button"
                                 type="button">
-                            Use all defaults
+                            <span data-i18n="classPreferences.useAllDefaults">Użyj wszystkich wartości domyślnych</span>
                         </button>
                     </div>
 
@@ -157,6 +152,6 @@
     </div>
 
     <script src="/js/appContext.js"></script>
-    <script src="/js/class-preferences.js"></script>
+    <script src="/js/class-preferences.js" type="module"></script>
 </body>
 </html>

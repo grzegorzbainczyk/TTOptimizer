@@ -282,6 +282,7 @@ namespace TTOptimizer.Web.Data
                     .WithMany(item => item.MemberOf)
                     .HasForeignKey(item => item.MemberGroupId)
                     .OnDelete(DeleteBehavior.Restrict);
+
             });
 
             modelBuilder.Entity<LessonRequirement>(entity =>
@@ -297,6 +298,11 @@ namespace TTOptimizer.Web.Data
                     .WithMany()
                     .HasForeignKey(item => item.ClassGroupId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(item => item.PreferredRoom)
+                    .WithMany()
+                    .HasForeignKey(item => item.PreferredRoomId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<OptimizationRun>()

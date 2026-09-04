@@ -150,6 +150,7 @@
     <ClInclude Include="include\Evaluation\Rules\ConstraintRuleResult.h" />
     <ClInclude Include="include\Evaluation\Rules\IConstraintRule.h" />
     <ClInclude Include="include\Evaluation\Rules\Soft\RoomSubjectCompatibilityRule.h" />
+    <ClInclude Include="include\Evaluation\Rules\Soft\LessonRequirementPreferredRoomRule.h" />
     <ClInclude Include="include\Evaluation\Validation\ChromosomeValidator.h" />
     <ClInclude Include="include\Generators\ChromosomeFactory.h" />
     <ClInclude Include="include\Generators\LessonInstanceGenerator.h" />
